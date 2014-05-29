@@ -22,8 +22,8 @@
     {:color (color-name (get piece "color"))
      :role (role-name (get piece "type"))}))
 
-(defn move-piece [chess from to]
+(defn move-piece [chess from to validate]
   "Tries to move a piece; returns a new chess on success, or nil on failure"
   (let [new-chess (create (.fen chess))
-        msg (clj->js (pp {:from from :to to}))]
+        msg (clj->js {:from from :to to})]
     (when-let [_ (.move new-chess msg)] new-chess)))

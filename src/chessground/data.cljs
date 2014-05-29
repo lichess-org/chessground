@@ -6,24 +6,13 @@
             [chessground.chess :as chess])
   (:require-macros [cljs.core.async.macros :as am]))
 
-(defn select-square
-  "User has clicked on a square"
-  [state key]
-  (assoc
-    (or
-      (when-let [selected-key (:selected state)]
-        (when-let [new-chess (chess/move-piece (:chess state) selected-key key)]
-          (assoc state :chess new-chess)))
-      state)
-    :selected key))
-
 (def defaults
   "Default state, overridable by user configuration"
   {:fen nil
    :orientation :white
-   :movable
-   {:enabled :both ; :white | :black | :both | nil
-    }
+   :movable {:enabled :both ; :white | :black | :both | nil
+             }
+   :validate-moves true ; only accepts legal moves
    :selected nil ; last clicked square. :a2 | nil
    })
 
@@ -32,6 +21,17 @@
         with-chess (assoc merged :chess (chess/create (:fen config)))
         without-fen (dissoc with-chess :fen)]
     without-fen))
+
+(defn user-move [state from to]
+  "Attempts to play a move. Returns the new chess, or nil"
+  (chess/move-piece (:chess state) from to (:validate-moves state)))
+
+(defn select-square [state key]
+  (assoc (or (when-let [selected-key (:selected state)]
+               (when-let [new-chess (user-move state selected-key key)]
+                 (assoc state :chess new-chess)))
+             state)
+         :selected key))
 
 (defn set-fen [state fen]
   (assoc state :chess (chess/create fen)))
