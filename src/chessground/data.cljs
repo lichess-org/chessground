@@ -7,5 +7,8 @@
 (defn fresh
   "Returns a new, empty application state."
   []
-  {:filter :all
-   :items []})
+  {:orientation :black
+   :movable {:enabled :both ; :white | :black | :both | nil
+             }
+   :clicked nil ; last clicked square. :a2 | nil
+   })
