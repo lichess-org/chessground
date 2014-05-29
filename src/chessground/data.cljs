@@ -24,6 +24,11 @@
         without-fen (dissoc with-chess :fen)]
     without-fen))
 
+(defn set-fen [state fen]
+  (assoc state :chess (chess/create fen)))
+
+(defn clear [state] (set-fen state nil))
+
 (defn set-orientation [state orientation-str]
   (let [orientation (keyword orientation-str)]
     (if (common/set-contains? chess/colors orientation)

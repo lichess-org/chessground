@@ -4,7 +4,7 @@
 
 (defn create [fen]
   (let [chess (new js/Chess)]
-    (if fen (.load chess fen) (.reset chess))
+    (if fen (pp (.load chess fen)) (.reset chess))
     chess))
 
 (def colors '(:white :black))

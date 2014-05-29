@@ -10,4 +10,6 @@
   (clj->js
     (letfn [(push [ch val] (am/go (a/>! (get channels ch) val)))]
       {"toggleOrientation" (fn [] (push :toggle-orientation true))
-       "setOrientation" (fn [o] (push :set-orientation o))})))
+       "setOrientation" (fn [o] (push :set-orientation o))
+       "setFen" (fn [f] (push :set-fen f))
+       "clear" (fn [] (push :clear true))})))

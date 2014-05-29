@@ -14,10 +14,14 @@
    :render-pending? (atom false)
    :channels {:toggle-orientation (a/chan)
               :set-orientation (a/chan)
+              :set-fen (a/chan)
+              :clear (a/chan)
               }
    :consumers {
                :toggle-orientation data/toggle-orientation
-               :set-orientation data/set-orientation}
+               :set-orientation data/set-orientation
+               :set-fen data/set-fen
+               :clear data/clear}
    })
 
 (defn init-updates
@@ -29,7 +33,7 @@
   (doseq [[ch update-fn] (:consumers app)]
     (am/go (while true
              (let [val (a/<! (get (:channels app) ch))
-                   _ (.log js/console (str "on channel [" ch "], received value [" val "]"))
+                   _ (pp (str "on channel [" ch "], received value [" val "]"))
                    new-state (swap! (:state app) update-fn val)]
                (render/request-render app))))))
 
