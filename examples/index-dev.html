@@ -21,10 +21,14 @@
       var ground2 = chessground.main(document.getElementById('ground2', {
         orientation: "black"
       }));
-      var ground3 = chessground.main(document.getElementById('ground3'));
-      setInterval(function() {
-        ground3.toggleOrientation();
+      console.log(ground2);
+      setTimeout(function() {
+        ground2.setOrientation('black');
       }, 1000);
+      var ground3 = chessground.main(document.getElementById('ground3'));
+      // setInterval(function() {
+      //   ground3.toggleOrientation();
+      // }, 1000);
     </script>
   </body>
 </html>

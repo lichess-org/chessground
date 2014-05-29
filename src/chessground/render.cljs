@@ -1,4 +1,5 @@
 (ns chessground.render
+  "React components declarations, i.e. HTML templating + behavior"
   (:require [chessground.common :refer [pp]]
             [chessground.chess :as chess]
             [cljs.core.async :as a]

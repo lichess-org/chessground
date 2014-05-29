@@ -27,7 +27,7 @@
 (defn set-orientation [state orientation-str]
   (let [orientation (keyword orientation-str)]
     (if (common/set-contains? chess/colors orientation)
-      (assoc state :orientation (pp orientation))
+      (assoc state :orientation orientation)
       state)))
 
 (defn toggle-orientation [state]

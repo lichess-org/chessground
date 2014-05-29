@@ -1,6 +1,7 @@
 (ns chessground
   (:require [cljs.core.async :as a]
             [chessground.common :refer [pp]]
+            [chessground.api :as api]
             [chessground.render :as render]
             [chessground.data :as data])
   (:require-macros [cljs.core.async.macros :as am]))
@@ -12,9 +13,12 @@
    :state (atom (data/fresh config))
    :render-pending? (atom false)
    :channels {:toggle-orientation (a/chan)
+              :set-orientation (a/chan)
               }
    :consumers {
-               :toggle-orientation data/toggle-orientation}})
+               :toggle-orientation data/toggle-orientation
+               :set-orientation data/set-orientation}
+   })
 
 (defn init-updates
   "For every entry in a map of channel identifiers to consumers,
@@ -29,13 +33,10 @@
                    new-state (swap! (:state app) update-fn val)]
                (render/request-render app))))))
 
-(defn make-api [{channels :channels}]
-  {"toggleOrientation" (fn [] (am/go (a/>! (:toggle-orientation channels) true)))})
-
 (defn ^:export main
-  "Application entry point"
+  "Application entry point; returns the public JavaScript API"
   [dom-element config]
   (let [app (load-app dom-element (or config {}))]
     (init-updates app)
     (render/request-render app)
-    (clj->js (make-api app))))
+    (api/build (:channels app))))
