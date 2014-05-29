@@ -8,8 +8,6 @@ and relies on [react.js](http://facebook.github.io/react/) for manipulating the 
 The codebase applies the [flux](http://facebook.github.io/react/docs/flux-overview.html) architecture,
 using the [quiescent](https://github.com/levand/quiescent) abstraction and clojure [async queues](https://github.com/clojure/core.async).
 
-ChessGround also provides an immutable abstraction over [chess.js](https://github.com/jhlywa/chess.js).
-
 This library is meant to replace all [lichess.org](http://lichess.org) chessboards,
 and can be used as a drop-in replacement for chessboardjs and pgn4web.
 

@@ -15,8 +15,9 @@
 
 (q/defcomponent Piece
   "A piece in a square"
-  [{color :color role :role :as p}]
-  (d/div {:className (class-name #{"piece" color role})}))
+  [{color :color role :role}]
+  (pp [color role])
+  (d/div {:className (class-name #{"piece" (name color) (name role)})}))
 
 (q/defcomponent Square
   "One of the 64 board squares"
