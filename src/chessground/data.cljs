@@ -1,7 +1,8 @@
 (ns chessground.data
   "Contains functions for manipulating and persisting the application data"
   (:refer-clojure :exclude [filter])
-  (:require [cljs.core.async :as a])
+  (:require [cljs.core.async :as a]
+            [chessground.chess :as chess])
   (:require-macros [cljs.core.async.macros :as am]))
 
 (def defaults
@@ -18,6 +19,6 @@
   "Returns a new, empty application state."
   [config]
   (let [merged (merge defaults config)
-        with-chess (assoc merged :chess nil)
+        with-chess (assoc merged :chess (chess/create (:fen config)))
         without-fen (dissoc with-chess :fen)]
     without-fen))

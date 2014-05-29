@@ -1,14 +1,27 @@
 (ns chessground.render
   (:require [chessground.common :refer [pp]]
+            [chessground.chess :as chess]
             [cljs.core.async :as a]
             [quiescent :as q :include-macros true]
             [quiescent.dom :as d])
   (:require-macros [cljs.core.async.macros :as am]))
 
+(defn class-name
+  "Convenience function for creating class names from sets.
+   Nils will not be included."
+  [classes]
+  (apply str (interpose " " (map identity classes))))
+
+(q/defcomponent Piece
+  "A piece in a square"
+  [{color :color role :role :as p}]
+  (d/div {:className (class-name #{"piece" color role})}))
+
 (q/defcomponent Square
   "One of the 64 board squares"
-  [app file rank]
-  (d/div {:className "square" :data-key (str file rank)}))
+  [app key]
+  (d/div {:className "square" :data-key key}
+         (when-let [piece (chess/get-piece (:chess app) key)] (Piece piece))))
 
 (q/defcomponent Board
   "The whole board"
@@ -16,7 +29,7 @@
   (let [white (= (:orientation app) :white)
         squares (for [rank (if white (range 8 0 -1) (range 1 9))
                       file (seq (if white "abcdefgh" "hgfedcba"))]
-                  (Square app file rank))]
+                  (Square app (str file rank)))]
     (apply d/div {:className "board"} squares)))
 
 (q/defcomponent App
