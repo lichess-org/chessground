@@ -1,0 +1,6 @@
+.lein-repl-history
+target/
+checkouts/
+.nrepl-port
+generated
+debug
