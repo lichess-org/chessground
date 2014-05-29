@@ -1,21 +1,24 @@
 (ns chessground
   (:require [cljs.core.async :as a]
+            [chessground.common :refer [pp]]
             [chessground.render :as render]
             [chessground.data :as data])
   (:require-macros [cljs.core.async.macros :as am]))
 
 (defn load-app
   "Return a map containing the initial application"
-  []
-  {:state (atom (data/fresh))
+  [dom-element config]
+  {:dom-element dom-element
+   :state (atom (data/fresh config))
+   :render-pending? (atom false)
    :channels {}
    :consumers {}})
 
 (defn init-updates
   "For every entry in a map of channel identifiers to consumers,
-  initiate a channel listener which will update the application state
-  using the appropriate function whenever a value is recieved, as
-  well as triggering a render."
+   initiate a channel listener which will update the application state
+   using the appropriate function whenever a value is recieved, as
+   well as triggering a render."
   [app]
   (doseq [[ch update-fn] (:consumers app)]
     (am/go (while true
@@ -26,7 +29,7 @@
 
 (defn ^:export main
   "Application entry point"
-  []
-  (let [app (load-app)]
+  [dom-element config]
+  (let [app (load-app dom-element (or config {}))]
     (init-updates app)
     (render/request-render app)))

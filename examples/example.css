@@ -1,8 +1,16 @@
+body {
+  background: #202020;
+  text-align: center;
+}
+.chessground {
+  display: inline-block;
+  vertical-align: top;
+  margin-right: 5px;
+}
 .chessground .board {
   line-height: 0;
   background-size: cover;
-  display: inline-block;
-  border: 5px solid #ccc;
+  border: 5px solid #606060;
   border-radius: 2px;
 }
 .chessground.tiny .board {

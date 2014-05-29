@@ -1,5 +1,7 @@
 (ns chessground.common)
 
+(enable-console-print!)
+
 (defn pp [expr]
-  (.log js/console expr)
+  (println expr)
   expr)
