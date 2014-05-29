@@ -2,6 +2,7 @@
   "Contains functions for manipulating and persisting the application data"
   (:refer-clojure :exclude [filter])
   (:require [cljs.core.async :as a]
+            [chessground.common :as common :refer [pp]]
             [chessground.chess :as chess])
   (:require-macros [cljs.core.async.macros :as am]))
 
@@ -22,3 +23,12 @@
         with-chess (assoc merged :chess (chess/create (:fen config)))
         without-fen (dissoc with-chess :fen)]
     without-fen))
+
+(defn set-orientation [state orientation-str]
+  (let [orientation (keyword orientation-str)]
+    (if (common/set-contains? chess/colors orientation)
+      (assoc state :orientation (pp orientation))
+      state)))
+
+(defn toggle-orientation [state]
+  (set-orientation state (if (= (:orientation state) :white) :black :white)))

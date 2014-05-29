@@ -7,6 +7,8 @@
     (if fen (.load chess fen) (.reset chess))
     chess))
 
+(def colors '(:white :black))
+
 (def color-names {"w" "white" "b" "black"})
 (defn color-name [color-key] (get color-names color-key))
 (def role-names {"p" "pawn" "n" "knight" "b" "bishop" "r" "rook" "q" "queen" "k" "king"})

@@ -11,8 +11,10 @@
   {:dom-element dom-element
    :state (atom (data/fresh config))
    :render-pending? (atom false)
-   :channels {}
-   :consumers {}})
+   :channels {:toggle-orientation (a/chan)
+              }
+   :consumers {
+               :toggle-orientation data/toggle-orientation}})
 
 (defn init-updates
   "For every entry in a map of channel identifiers to consumers,
@@ -23,13 +25,17 @@
   (doseq [[ch update-fn] (:consumers app)]
     (am/go (while true
              (let [val (a/<! (get (:channels app) ch))
-                   _ (.log js/console (str "on channel [" ch "], recieved value [" val "]"))
+                   _ (.log js/console (str "on channel [" ch "], received value [" val "]"))
                    new-state (swap! (:state app) update-fn val)]
                (render/request-render app))))))
+
+(defn make-api [{channels :channels}]
+  {"toggleOrientation" (fn [] (am/go (a/>! (:toggle-orientation channels) true)))})
 
 (defn ^:export main
   "Application entry point"
   [dom-element config]
   (let [app (load-app dom-element (or config {}))]
     (init-updates app)
-    (render/request-render app)))
+    (render/request-render app)
+    (clj->js (make-api app))))

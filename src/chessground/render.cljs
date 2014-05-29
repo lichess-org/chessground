@@ -19,23 +19,23 @@
 
 (q/defcomponent Square
   "One of the 64 board squares"
-  [app key]
+  [state key]
   (d/div {:className "square" :data-key key}
-         (when-let [piece (chess/get-piece (:chess app) key)] (Piece piece))))
+         (when-let [piece (chess/get-piece (:chess state) key)] (Piece piece))))
 
 (q/defcomponent Board
   "The whole board"
-  [app]
-  (let [white (= (:orientation app) :white)
+  [state]
+  (let [white (= (:orientation state) :white)
         squares (for [rank (if white (range 8 0 -1) (range 1 9))
                       file (seq (if white "abcdefgh" "hgfedcba"))]
-                  (Square app (str file rank)))]
+                  (Square state (str file rank)))]
     (apply d/div {:className "board"} squares)))
 
 (q/defcomponent App
   "The root of the application"
-  [app channels]
-  (Board app))
+  [state channels]
+  (Board state))
 
 ;; Here we use an atom to tell us if we already have a render queued
 ;; up; if so, requesting another render is a no-op

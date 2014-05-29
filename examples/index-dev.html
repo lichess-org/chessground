@@ -17,11 +17,14 @@
     <script type="text/javascript">goog.require("chessground");</script>
 
     <script>
-      chessground.main(document.getElementById('ground1'));
-      chessground.main(document.getElementById('ground2', {
+      var ground1 = chessground.main(document.getElementById('ground1'));
+      var ground2 = chessground.main(document.getElementById('ground2', {
         orientation: "black"
       }));
-      chessground.main(document.getElementById('ground3'));
+      var ground3 = chessground.main(document.getElementById('ground3'));
+      setInterval(function() {
+        ground3.toggleOrientation();
+      }, 1000);
     </script>
   </body>
 </html>
