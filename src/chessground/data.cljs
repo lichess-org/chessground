@@ -6,6 +6,17 @@
             [chessground.chess :as chess])
   (:require-macros [cljs.core.async.macros :as am]))
 
+(defn select-square
+  "User has clicked on a square"
+  [state key]
+  (assoc
+    (or
+      (when-let [selected-key (:selected state)]
+        (when-let [new-chess (chess/move-piece (:chess state) selected-key key)]
+          (assoc state :chess new-chess)))
+      state)
+    :selected key))
+
 (def defaults
   "Default state, overridable by user configuration"
   {:fen nil
@@ -13,12 +24,10 @@
    :movable
    {:enabled :both ; :white | :black | :both | nil
     }
-   :clicked nil ; last clicked square. :a2 | nil
+   :selected nil ; last clicked square. :a2 | nil
    })
 
-(defn fresh
-  "Returns a new, empty application state."
-  [config]
+(defn make [config]
   (let [merged (merge defaults config)
         with-chess (assoc merged :chess (chess/create (:fen config)))
         without-fen (dissoc with-chess :fen)]

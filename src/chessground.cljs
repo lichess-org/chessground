@@ -10,18 +10,20 @@
   "Return a map containing the initial application"
   [dom-element config]
   {:dom-element dom-element
-   :state (atom (data/fresh config))
+   :state (atom (data/make config))
    :render-pending? (atom false)
    :channels {:toggle-orientation (a/chan)
               :set-orientation (a/chan)
               :set-fen (a/chan)
               :clear (a/chan)
+              :select-square (a/chan)
               }
    :consumers {
                :toggle-orientation data/toggle-orientation
                :set-orientation data/set-orientation
                :set-fen data/set-fen
-               :clear data/clear}
+               :clear data/clear
+               :select-square data/select-square}
    })
 
 (defn init-updates

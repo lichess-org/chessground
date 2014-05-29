@@ -34,16 +34,20 @@ body {
 .chessground.marble .board {
   background-image: url('http://lichess1.org/assets/images/board/marble.jpg');
 }
-.chessground .board > div {
+.chessground .square {
   position: relative;
   display: inline-block;
   width: 12.5%;
   height: 12.5%;
+  cursor: pointer;
 }
-.chessground .board > div.last {
+.chessground .square.last {
   background: radial-gradient(ellipse at center, rgba(155, 199, 00, 0.81) 0%, rgba(155, 199, 00, 0) 100%);
 }
-.chessground.coordinates .board > div::before {
+.chessground .square.selected {
+  box-shadow: inset 0 0 10px 2px rgba(216, 85, 0, 0.9);
+}
+.chessground.coordinates .square::before {
   position: absolute;
   left: 2px;
   bottom: 2px;
@@ -53,7 +57,7 @@ body {
   color: #fff;
   opacity: 0.5;
 }
-.chessground .board .piece {
+.chessground .piece {
   position: absolute;
   bottom: 0;
   left: 0;
@@ -61,7 +65,7 @@ body {
   height: 100%;
   background-size: cover;
 }
-.chessground .board .piece[draggable] {
+.chessground .piece[draggable] {
   cursor: move;
 }
 .chessground.pirouetti .piece {
