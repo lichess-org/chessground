@@ -4,15 +4,21 @@
             [chessground.fen :as forsyth]
             [clojure.string :refer [lower-case]]))
 
-(defn create [fen]
+(def colors [:white :black])
+
+(defn make [fen]
   {:pieces (forsyth/parse fen)})
 
-(def colors '(:white :black))
+(defn get-piece [chess key] (get-in chess [:pieces key]))
 
-(defn get-piece [chess key] (get-in chess [:pieces (keyword key)]))
+(defn remove-piece [chess key] (update-in chess [:pieces] dissoc key))
 
-(defn move-piece [chess from to validate] chess)
-; "Tries to move a piece; returns a new chess on success, or nil on failure"
-; (let [new-chess (create (.fen chess))
-;       msg (clj->js {:from from :to to})]
-;   (when-let [_ (.move new-chess msg)] new-chess)))
+(defn put-piece [chess key piece] (assoc-in chess [:pieces key] piece))
+
+(defn- count-pieces [chess] (count (:pieces chess)))
+
+(defn move-piece [chess from to]
+  (when-let [piece (get-piece chess from)]
+    (-> chess
+        (remove-piece from)
+        (put-piece to piece))))

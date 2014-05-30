@@ -1,8 +1,6 @@
 (ns chessground.api
   "External JavaScript API exposed to the end user"
-  (:require [chessground.common :refer [pp push!]]
-            [cljs.core.async :as a])
-  (:require-macros [cljs.core.async.macros :as am]))
+  (:require [chessground.common :refer [pp push!]]))
 
 (defn build
   "Creates JavaScript functions that push to the channels"
