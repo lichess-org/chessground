@@ -1,8 +1,12 @@
 (ns chessground.chess
   "Immutable board data. Does not implement chess rules"
   (:require [chessground.common :refer [pp]]
-            [chessground.fen :as forsyth]
-            [clojure.string :refer [lower-case]]))
+            [chessground.fen :as forsyth]))
+
+; Representation of a chess game:
+; {:pieces {:a1 {:color :white :role :rook}
+;           :b1 {:color :white :role :knight}
+;          }}
 
 (def colors [:white :black])
 
