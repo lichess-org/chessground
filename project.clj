@@ -19,7 +19,7 @@
                       }}
                :prod {:source-paths ["src"]
                       :compiler
-                      {:output-to "chessground.min.js"
+                      {:output-to "generated/chessground.min.js"
                        :optimizations :advanced
                        :preamble ["react/react.min.js"]
                        :externs ["react/externs/react.js"]
