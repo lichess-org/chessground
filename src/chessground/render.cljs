@@ -12,8 +12,10 @@
 
 (q/defcomponent Piece
   "A piece in a square"
-  [{color :color role :role}]
-  (d/div {:className (class-name #{"piece" (name color) (name role)})}))
+  [{color :color role :role} channels]
+  (d/div {:className (class-name #{"piece" (name color) (name role)})
+          :draggable true
+          :onDragStart #(push! (:drag-start channels) %)}))
 
 (q/defcomponent Square
   "One of the 64 board squares"
@@ -22,7 +24,7 @@
                                    (when (= (:selected state) key) "selected")})
           :data-key (name key)
           :onClick #(push! (:select-square channels) key)}
-         (when-let [piece (chess/get-piece (:chess state) key)] (Piece piece))))
+         (when-let [piece (chess/get-piece (:chess state) key)] (Piece piece channels))))
 
 (q/defcomponent Board
   "The whole board"

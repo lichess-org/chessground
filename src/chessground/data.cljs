@@ -12,6 +12,7 @@
    :movable {:enabled :both ; :white | :black | :both | nil
              }
    :selected nil ; last clicked square. :a2 | nil
+   :dragged nil ; dom element | nil
    })
 
 (defn set-fen [state fen] (assoc state :chess (chess/make fen)))
@@ -19,6 +20,14 @@
 (defn make [config] (-> (merge defaults config)
                         (set-fen (:fen config))
                         (dissoc :fen)))
+
+(defn drag-start [state event]
+  (.log js/console event)
+  (let [data (.stringify js/JSON (clj->js {:test "foo"}))]
+    (pp data)
+    (pp event)
+    (.setData (get (js->clj event) "dataTransfer") data))
+  state)
 
 (defn select-square [state key]
   (or (when-let [from (:selected state)]
