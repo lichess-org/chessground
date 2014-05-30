@@ -4,9 +4,10 @@
   :dependencies [[org.clojure/clojure "1.6.0"]
                  [org.clojure/clojurescript "0.0-2227"]
                  [org.clojure/core.async "0.1.303.0-886421-alpha"]
-                 [quiescent/quiescent "0.1.2"]
+                 [quiescent/quiescent "0.1.3-THIB"]
                  [com.facebook/react "0.9.0.2"]
                  [ring "1.2.1"]]
+  :repositories [["local" "file:///home/thib/clojars"]]
   :ring {:handler chessground.serve/handler}
   :cljsbuild {:builds
               {:dev {:source-paths ["src"]

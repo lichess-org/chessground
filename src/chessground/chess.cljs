@@ -15,6 +15,8 @@
 
 (defn get-piece [chess key] (get-in chess [:pieces key]))
 
+(defn get-pieces [chess] (:pieces chess))
+
 (defn remove-piece [chess key] (update-in chess [:pieces] dissoc key))
 
 (defn put-piece [chess key piece] (assoc-in chess [:pieces key] piece))

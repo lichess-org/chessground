@@ -20,6 +20,14 @@
                         (set-fen (:fen config))
                         (dissoc :fen)))
 
+(defn drag-start [state node]
+  state)
+
+(defn drag-end [state node]
+  (let [from (.getAttribute (.-parentNode node) "data-key")]
+    (pp from)
+    state))
+
 (defn select-square [state key]
   (or (when-let [from (:selected state)]
         (when-let [new-chess (chess/move-piece (:chess state) from key)]

@@ -17,13 +17,17 @@
               :set-fen (a/chan)
               :clear (a/chan)
               :select-square (a/chan)
+              :drag-start (a/chan)
+              :drag-end (a/chan)
               }
    :consumers {
                :toggle-orientation data/toggle-orientation
                :set-orientation data/set-orientation
                :set-fen data/set-fen
                :clear data/clear
-               :select-square data/select-square}
+               :select-square data/select-square
+               :drag-start data/drag-start
+               :drag-end data/drag-end}
    })
 
 (defn init-updates

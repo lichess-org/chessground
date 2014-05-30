@@ -6,23 +6,41 @@
             [quiescent :as q :include-macros true]
             [quiescent.dom :as d]))
 
-(defn class-name
+(defn- class-name
   "Convenience function for creating class names from sets. Nils will not be included."
   [classes] (apply str (interpose " " (map identity classes))))
 
+(defn- draggable [channels component]
+  (q/wrapper component
+             :onMount (fn [node]
+                        (let [draggie (new js/Draggabilly node)]
+                          (.on draggie "dragStart" #(push! (:drag-start channels) node))
+                          (.on draggie "dragEnd" #(push! (:drag-end channels) node))))))
+
+(defn- droppable [channels component]
+  (let [config {"dragsters" ".piece"
+                "over" (fn [drop drag] (pp [drop drag]))}]
+    (q/wrapper component
+               :onMount (fn [node]
+                          (.droppabilly (js/jQuery node) (clj->js config))))))
+
 (q/defcomponent Piece
   "A piece in a square"
-  [{color :color role :role}]
-  (d/div {:className (class-name #{"piece" (name color) (name role)})}))
+  [{color :color role :role} channels]
+  (draggable channels
+             (d/div {:className (class-name #{"piece" (name color) (name role)})})))
 
 (q/defcomponent Square
   "One of the 64 board squares"
-  [state channels key]
-  (d/div {:className (class-name #{"square"
-                                   (when (= (:selected state) key) "selected")})
-          :data-key (name key)
-          :onClick #(push! (:select-square channels) key)}
-         (when-let [piece (chess/get-piece (:chess state) key)] (Piece piece))))
+  [state key channels]
+  (droppable channels
+             (d/div {:className (class-name #{"square"
+                                              (when (= (:selected state) key) "selected")})
+                     :key (name key) ; react.js key just in case it helps performance
+                     :data-key (name key)
+                     :onClick #(push! (:select-square channels) key)}
+                    (when-let [piece (chess/get-piece (:chess state) key)]
+                      (Piece piece channels)))))
 
 (q/defcomponent Board
   "The whole board"
@@ -30,7 +48,7 @@
   (let [white (= (:orientation state) :white)
         squares (for [rank (if white (range 8 0 -1) (range 1 9))
                       file (seq (if white "abcdefgh" "hgfedcba"))]
-                  (Square state channels (keyword (str file rank))))]
+                  (Square state (keyword (str file rank)) channels))]
     (apply d/div {:className "board"} squares)))
 
 (q/defcomponent App
