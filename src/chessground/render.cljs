@@ -14,8 +14,8 @@
 (q/defcomponent Piece
   "A piece in a square"
   [{color :color role :role} channels]
-  (drag/make (d/div {:className (class-name #{"piece" (name color) (name role)})})
-             (push-args! (:drag-end channels))))
+  (drag/make channels
+             (d/div {:className (class-name #{"piece" (name color) (name role)})})))
 
 (q/defcomponent Square
   "One of the 64 board squares"

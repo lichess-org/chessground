@@ -21,6 +21,9 @@
                         (set-fen (:fen config))
                         (dissoc :fen)))
 
+(defn drag-start [state _]
+  (dissoc state :selected))
+
 (defn drag-end [state args]
   (or (when-let [[orig dest] (drag/end args)]
         (when-let [new-chess (chess/move-piece (:chess state) orig dest)]

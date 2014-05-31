@@ -12,15 +12,18 @@
       (jq/remove-class (jq/siblings $el) over-class)
       (jq/add-class $el over-class))))
 
-(defn make [component on-end]
+(defn make [channels component]
   "Make a react component draggable"
   (q/wrapper component :onMount (fn [node] (-> (new js/Draggabilly node)
+                                               (.on "dragStart" (push-args! (:drag-start channels)))
                                                (.on "dragMove" drag-move)
-                                               (.on "dragEnd" on-end)))))
+                                               (.on "dragEnd" (push-args! (:drag-end channels)))))))
 
 (defn end [[draggie event pointer]]
-  "Restore element position and return origin and destination square keys"
+  "Undo damages done by dragging and return origin and destination square keys"
   (jq/css ($ (.-element draggie)) {:top 0 :left 0})
   (when-let [orig (square-key (.-element draggie))]
-    (when-let [dest (square-key (.-target event))]
-      [orig dest])))
+    (when-let [dest-element (common/square-element (.-target event))]
+      (jq/remove-class ($ dest-element) over-class)
+      (when-let [dest (square-key dest-element)]
+        [orig dest]))))
