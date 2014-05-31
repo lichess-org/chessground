@@ -24,7 +24,8 @@
                                    (when (= (:selected state) key) "selected")})
           :key (name key) ; react.js key just in case it helps performance
           :data-key (name key)
-          :onClick #(push! (:select-square channels) key)}
+          :onClick #(push! (:select-square channels) key)
+          :onTouchStart #(push! (:select-square channels) key)}
          (when-let [piece (chess/get-piece (:chess state) key)]
            (Piece piece channels))))
 
@@ -40,7 +41,10 @@
 (q/defcomponent App
   "The root of the application"
   [state channels]
-  (Board state channels))
+  (if (true? (:touch-device state))
+    (do (.initializeTouchEvents js/React true)
+        (Board state channels))
+    (Board state channels)))
 
 ;; Here we use an atom to tell us if we already have a render queued
 ;; up; if so, requesting another render is a no-op
