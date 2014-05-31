@@ -2,8 +2,8 @@
   "Contains functions for manipulating and persisting the application data"
   (:refer-clojure :exclude [filter])
   (:require [cljs.core.async :as a]
-            [jayq.core :as jq :refer [$]]
-            [chessground.common :as common :refer [pp]]
+            [chessground.drag :as drag]
+            [chessground.common :as common :refer [pp square-key]]
             [chessground.chess :as chess]))
 
 (def defaults
@@ -13,8 +13,6 @@
    :movable {:enabled :both ; :white | :black | :both | nil
              }
    :selected nil ; last clicked square. :a2 | nil
-   :drag-from nil ; square we drag the piece from :a2 | nil
-   :drag-over nil ; square being hovered during a drag. :a2 | nil
    })
 
 (defn set-fen [state fen] (assoc state :chess (chess/make fen)))
@@ -23,29 +21,11 @@
                         (set-fen (:fen config))
                         (dissoc :fen)))
 
-(defn square-key [dom-element]
-  (keyword (or
-             (.getAttribute dom-element "data-key")
-             (.getAttribute (.-parentNode dom-element) "data-key"))))
-
-(defn element-from-point [pointer]
-  (.elementFromPoint js/document (.-pageX pointer) (.-pageY pointer)))
-
-(defn drag-start [state [draggie event pointer]]
-  (assoc state :drag-from (square-key (.-target event))))
-
-(defn drag-move [state [draggie event pointer]]
-  (assoc state :drag-over (square-key (element-from-point pointer))))
-
-(defn drag-end [state [draggie event pointer]]
-  (jq/css ($ (.-element draggie)) {:top 0 :left 0})
-  (-> (or (when-let [to (square-key (.-target event))]
-            (when-let [from (:drag-from state)]
-              (when-let [new-chess (chess/move-piece (:chess state) from to)]
-                (assoc state :chess new-chess))))
-          state)
-      (dissoc :drag-from)
-      (dissoc :drag-over)))
+(defn drag-end [state args]
+  (or (when-let [[orig dest] (drag/end args)]
+        (when-let [new-chess (chess/move-piece (:chess state) orig dest)]
+          (assoc state :chess new-chess)))
+      state))
 
 (defn select-square [state key]
   (or (when-let [from (:selected state)]

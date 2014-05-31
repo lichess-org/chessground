@@ -2,6 +2,7 @@
   "React components declarations, i.e. HTML templating + behavior"
   (:require [chessground.common :refer [pp push! push-args!]]
             [chessground.chess :as chess]
+            [chessground.drag :as drag]
             [cljs.core.async :as a]
             [quiescent :as q :include-macros true]
             [quiescent.dom :as d]))
@@ -10,26 +11,17 @@
   "Convenience function for creating class names from sets. Nils will not be included."
   [classes] (apply str (interpose " " (map identity classes))))
 
-(defn- draggable [channels component]
-  (q/wrapper component
-             :onMount (fn [node]
-                        (let [draggie (new js/Draggabilly node)]
-                          (.on draggie "dragStart" (push-args! (:drag-start channels)))
-                          ; (.on draggie "dragMove" (push-args! (:drag-move channels)))
-                          (.on draggie "dragEnd" (push-args! (:drag-end channels)))))))
-
 (q/defcomponent Piece
   "A piece in a square"
   [{color :color role :role} channels]
-  (draggable channels
-             (d/div {:className (class-name #{"piece" (name color) (name role)})})))
+  (drag/make (d/div {:className (class-name #{"piece" (name color) (name role)})})
+             (push-args! (:drag-end channels))))
 
 (q/defcomponent Square
   "One of the 64 board squares"
   [state key channels]
   (d/div {:className (class-name #{"square"
-                                   (when (= (:selected state) key) "selected")
-                                   (when (= (:drag-over state) key) "drag-over")})
+                                   (when (= (:selected state) key) "selected")})
           :key (name key) ; react.js key just in case it helps performance
           :data-key (name key)
           :onClick #(push! (:select-square channels) key)}

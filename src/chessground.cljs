@@ -17,8 +17,6 @@
               :set-fen (a/chan)
               :clear (a/chan)
               :select-square (a/chan)
-              :drag-start (a/chan)
-              :drag-move (a/chan)
               :drag-end (a/chan)
               }
    :consumers {
@@ -27,8 +25,6 @@
                :set-fen data/set-fen
                :clear data/clear
                :select-square data/select-square
-               :drag-start data/drag-start
-               :drag-move data/drag-move
                :drag-end data/drag-end}
    })
 

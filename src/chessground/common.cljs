@@ -12,3 +12,9 @@
 (defn push! [chan msg] (am/go (a/>! chan msg)))
 
 (defn push-args! [chan] (fn [& args] (push! chan args)))
+
+(defn square-key [dom-element]
+  "Gets the square key from the element, or its parent"
+  (keyword (or
+             (.getAttribute dom-element "data-key")
+             (.getAttribute (.-parentNode dom-element) "data-key"))))
