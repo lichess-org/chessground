@@ -41,10 +41,13 @@ body {
   height: 12.5%;
   cursor: pointer;
 }
+.chessground .square:hover {
+  box-shadow: inset 0 0 20px 10px rgba(255, 255, 255, 0.1);
+}
 .chessground .square.last {
   background: radial-gradient(ellipse at center, rgba(155, 199, 00, 0.81) 0%, rgba(155, 199, 00, 0) 100%);
 }
-.chessground .square.selected {
+.chessground .square.selected, .chessground .square.drag-over {
   box-shadow: inset 0 0 10px 2px rgba(216, 85, 0, 0.9);
 }
 .chessground.coordinates .square::before {
@@ -65,8 +68,10 @@ body {
   height: 100%;
   background-size: cover;
 }
-.chessground .piece[draggable] {
+.chessground .piece.is-dragging {
   cursor: move;
+  z-index: 9;
+  pointer-events: none;
 }
 .chessground.pirouetti .piece {
   bottom: 0;

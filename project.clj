@@ -6,6 +6,7 @@
                  [org.clojure/core.async "0.1.303.0-886421-alpha"]
                  [quiescent-thib/quiescent-thib "0.1.2-THIB"]
                  [com.facebook/react "0.9.0.2"]
+                 [jayq "2.5.1"]
                  [ring "1.2.1"]]
   :ring {:handler chessground.serve/handler}
   :cljsbuild {:builds
@@ -21,8 +22,8 @@
                       {:output-to "generated/chessground.min.js"
                        :optimizations :advanced
                        :preamble ["react/react.min.js"]
-                       :externs ["react/externs/react.js"]
-                       :pretty-print false
+                       :externs ["react/externs/react.js" "externs/misc.js" "externs/jquery.js"]
+                       :pretty-print true
                        :closure-warnings {:non-standard-jsdoc :off}}}}})
 
 

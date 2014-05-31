@@ -18,6 +18,7 @@
               :clear (a/chan)
               :select-square (a/chan)
               :drag-start (a/chan)
+              :drag-move (a/chan)
               :drag-end (a/chan)
               }
    :consumers {
@@ -27,6 +28,7 @@
                :clear data/clear
                :select-square data/select-square
                :drag-start data/drag-start
+               :drag-move data/drag-move
                :drag-end data/drag-end}
    })
 
@@ -39,7 +41,7 @@
   (doseq [[ch update-fn] (:consumers app)]
     (am/go (while true
              (let [val (a/<! (get (:channels app) ch))
-                   _ (pp (str "on channel [" ch "], received value [" val "]"))
+                   ; _ (pp (str "on channel [" ch "], received value [" val "]"))
                    new-state (swap! (:state app) update-fn val)]
                (render/request-render app))))))
 

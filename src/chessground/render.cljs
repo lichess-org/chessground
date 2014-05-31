@@ -1,6 +1,6 @@
 (ns chessground.render
   "React components declarations, i.e. HTML templating + behavior"
-  (:require [chessground.common :refer [pp push!]]
+  (:require [chessground.common :refer [pp push! push-args!]]
             [chessground.chess :as chess]
             [cljs.core.async :as a]
             [quiescent :as q :include-macros true]
@@ -14,15 +14,9 @@
   (q/wrapper component
              :onMount (fn [node]
                         (let [draggie (new js/Draggabilly node)]
-                          (.on draggie "dragStart" #(push! (:drag-start channels) node))
-                          (.on draggie "dragEnd" #(push! (:drag-end channels) node))))))
-
-(defn- droppable [channels component]
-  (let [config {"dragsters" ".piece"
-                "over" (fn [drop drag] (pp [drop drag]))}]
-    (q/wrapper component
-               :onMount (fn [node]
-                          (.droppabilly (js/jQuery node) (clj->js config))))))
+                          (.on draggie "dragStart" (push-args! (:drag-start channels)))
+                          ; (.on draggie "dragMove" (push-args! (:drag-move channels)))
+                          (.on draggie "dragEnd" (push-args! (:drag-end channels)))))))
 
 (q/defcomponent Piece
   "A piece in a square"
@@ -33,14 +27,14 @@
 (q/defcomponent Square
   "One of the 64 board squares"
   [state key channels]
-  (droppable channels
-             (d/div {:className (class-name #{"square"
-                                              (when (= (:selected state) key) "selected")})
-                     :key (name key) ; react.js key just in case it helps performance
-                     :data-key (name key)
-                     :onClick #(push! (:select-square channels) key)}
-                    (when-let [piece (chess/get-piece (:chess state) key)]
-                      (Piece piece channels)))))
+  (d/div {:className (class-name #{"square"
+                                   (when (= (:selected state) key) "selected")
+                                   (when (= (:drag-over state) key) "drag-over")})
+          :key (name key) ; react.js key just in case it helps performance
+          :data-key (name key)
+          :onClick #(push! (:select-square channels) key)}
+         (when-let [piece (chess/get-piece (:chess state) key)]
+           (Piece piece channels))))
 
 (q/defcomponent Board
   "The whole board"
