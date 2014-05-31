@@ -1,0 +1,47 @@
+<!doctype html>
+<html data-framework="quiescent">
+  <head>
+    <meta charset="utf-8">
+    <meta name="format-detection" content="telephone=no" />
+    <!-- WARNING: for iOS 7, remove the width=device-width and height=device-height attributes. See https://issues.apache.org/jira/browse/CB-4323 -->
+    <meta name="viewport" content="user-scalable=no, initial-scale=1, maximum-scale=1, minimum-scale=1, width=device-width, height=device-height" />
+    <title>ChessGround mobile (dev mode)</title>
+    <link rel="stylesheet" href="example.css">
+  </head>
+  <body>
+    <div class="chessground wood large merida coordinates" id="ground1"></div>
+    <div class="chessground blue small pirouetti" id="ground2"></div>
+    <div class="chessground marble tiny cburnett" id="ground3"></div>
+
+    <script src="../libs/jquery.min.js"></script>
+    <script src="../libs/react-0.9.0.js"></script>
+    <script src="../libs/draggabilly.pkgd.js"></script>
+    <script src="../generated/goog/base.js" type="text/javascript"></script>
+    <script src="../generated/chessground.dev.js" type="text/javascript"></script>
+    <script type="text/javascript">goog.require("chessground");</script>
+
+    <script>
+      var size = $('body').width() - 5;
+      var ground1 = chessground.main(document.getElementById('ground1'));
+      setTimeout(function() {
+        $('#ground1 .board').width(size).height(size);
+      }, 100);
+
+      // var ground2 = chessground.main(document.getElementById('ground2', {
+        // orientation: "black",
+      // }));
+      // setTimeout(function() {
+        // ground2.setOrientation('black');
+        // ground2.setFen('rnbqkb1r/ppp1np2/3p1N1p/6p1/2PPPp2/3B1N2/PP4PP/R1BQK2R b KQkq - 2 9');
+        // setTimeout(function() {
+        //   ground2.clear();
+        // }, 1000);
+      // }, 1000);
+      // var ground3 = chessground.main(document.getElementById('ground3'));
+      // setInterval(function() {
+      //   ground3.toggleOrientation();
+      // }, 3000);
+    </script>
+  </body>
+</html>
+
