@@ -7,7 +7,7 @@
 (def over-class "drag-over")
 
 (defn get-target [pointer]
-  (if (common/is-touch-device)
+  (if common/is-touch-device
     (.elementFromPoint js/document (.-pageX pointer) (.-pageY pointer))
     (.-target pointer)))
 
@@ -18,7 +18,7 @@
 
 (defn- on-start [_ _ pointer]
   "Shift piece right under the cursor"
-  (when (false? (common/is-touch-device))
+  (when (false? common/is-touch-device)
     (let [$el ($ (get-target pointer))
           pos (.offset $el)
           center-x (+ (.-left pos) (/ (.width $el) 2))
