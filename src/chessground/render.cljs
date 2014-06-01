@@ -47,7 +47,7 @@
 (q/defcomponent App
   "The root of the application"
   [state channels]
-  (if (common/is-touch-device)
+  (if common/is-touch-device
     (do (.initializeTouchEvents js/React true)
         (Board state channels))
     (Board state channels)))
