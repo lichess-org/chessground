@@ -21,6 +21,12 @@ Even thought all code is written in clojurescript, it exposes a JavaScript publi
 lein cljsbuild auto dev
 ```
 
+To make a production build:
+
+```sh
+lein cljsbuild once prod
+```
+
 To serve the examples from a webserver (avoid cross domain requests):
 
 ```
