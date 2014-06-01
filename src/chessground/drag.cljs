@@ -18,14 +18,15 @@
 
 (defn- on-start [_ _ pointer]
   "Shift piece right under the cursor"
-  (let [$el ($ (get-target pointer))
-        pos (.offset $el)
-        center-x (+ (.-left pos) (/ (.width $el) 2))
-        center-y (+ (.-top pos) (/ (.height $el) 2))
-        decay-x (- (.-pageX pointer) center-x)
-        decay-y (- (.-pageY pointer) center-y)]
-    (jq/css $el {:left (str decay-x "px") :top (str decay-y "px")})
-    (highlight-square (jq/parent $el))))
+  (when (false? (common/is-touch-device))
+    (let [$el ($ (get-target pointer))
+          pos (.offset $el)
+          center-x (+ (.-left pos) (/ (.width $el) 2))
+          center-y (+ (.-top pos) (/ (.height $el) 2))
+          decay-x (- (.-pageX pointer) center-x)
+          decay-y (- (.-pageY pointer) center-y)]
+      (jq/css $el {:left (str decay-x "px") :top (str decay-y "px")})
+      (highlight-square (jq/parent $el)))))
 
 (defn- on-move [_ _ pointer]
   "Highlight the square under the dragged piece"
@@ -37,7 +38,7 @@
   (q/wrapper component
              :onMount (fn [node]
                         (-> (new js/Draggabilly node)
-                            ; (.on "dragStart" on-start)
+                            (.on "dragStart" on-start)
                             (.on "dragStart" (push-args! (:drag-start channels)))
                             (.on "dragMove" on-move)
                             (.on "dragEnd" (push-args! (:drag-end channels)))))))
