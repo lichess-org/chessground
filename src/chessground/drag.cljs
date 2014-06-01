@@ -6,6 +6,11 @@
 
 (def over-class "drag-over")
 
+(defn get-target [pointer]
+  (if (common/is-touch-device)
+    (.elementFromPoint js/document (.-pageX pointer) (.-pageY pointer))
+    (.-target pointer)))
+
 (defn- on-start [_ _ pointer]
   "Shift piece right under the cursor"
   (let [$el ($ (get-target pointer))
@@ -22,11 +27,6 @@
     (when (not (jq/has-class $el over-class))
       (jq/remove-class (jq/siblings $el) over-class)
       (jq/add-class $el over-class))))
-
-(defn get-target [pointer]
-  (if (common/is-touch-device)
-    (.elementFromPoint js/document (.-pageX pointer) (.-pageY pointer))
-    (.-target pointer)))
 
 (defn make [channels component]
   "Make a react component draggable"
