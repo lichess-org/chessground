@@ -13,11 +13,7 @@
       (jq/remove-class (jq/siblings $el) over-class)
       (jq/add-class $el over-class))))
 
-(defn get-target [pointer]
-  (if (common/is-touch-device)
-    (.elementFromPoint js/document (.-pageX pointer) (.-pageY pointer))
-    (-.target pointer)))
-
+(defn get-target [pointer] (.elementFromPoint js/document (.-pageX pointer) (.-pageY pointer)))
 
 (defn make [channels component]
   "Make a react component draggable"
