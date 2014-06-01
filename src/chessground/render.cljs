@@ -1,6 +1,6 @@
 (ns chessground.render
   "React components declarations, i.e. HTML templating + behavior"
-  (:require [chessground.common :refer [pp push! push-args!]]
+  (:require [chessground.common :as common :refer [pp push! push-args!]]
             [chessground.chess :as chess]
             [chessground.drag :as drag]
             [cljs.core.async :as a]
@@ -41,7 +41,7 @@
 (q/defcomponent App
   "The root of the application"
   [state channels]
-  (if (true? (:touch-device state))
+  (if (common/is-touch-device)
     (do (.initializeTouchEvents js/React true)
         (Board state channels))
     (Board state channels)))

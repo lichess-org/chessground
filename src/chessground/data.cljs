@@ -13,7 +13,6 @@
    :movable {:enabled :both ; :white | :black | :both | nil
              }
    :selected nil ; last clicked square. :a2 | nil
-   :touch-device false
    })
 
 (defn set-fen [state fen] (assoc state :chess (chess/make fen)))
