@@ -30,7 +30,8 @@ lein cljsbuild once prod
 To serve the examples from a webserver (avoid cross domain requests):
 
 ```
-lein ring server
+sudo npm install -g http-server
+http-server
 ```
 
-Then open [http://localhost:3000/examples/index.html](http://localhost:3000/examples/index.html).
+Then open [http://localhost:8080/examples/index.html](http://localhost:8080/examples/index.html).
