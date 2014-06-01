@@ -25,7 +25,10 @@
           :key (name key) ; react.js key just in case it helps performance
           :data-key (name key)
           :onClick #(push! (:select-square channels) key)
-          :onTouchStart #(push! (:select-square channels) key)}
+          :onTouchStart (fn [event]
+                          (.preventDefault event)
+                          (push! (:select-square channels) key))
+          }
          (when-let [piece (chess/get-piece (:chess state) key)]
            (Piece piece channels))))
 

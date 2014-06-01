@@ -28,7 +28,8 @@
                :clear data/clear
                :select-square data/select-square
                :drag-start data/drag-start
-               :drag-end data/drag-end}
+               :drag-end data/drag-end
+               }
    })
 
 (defn init-updates
