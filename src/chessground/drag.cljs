@@ -18,7 +18,7 @@
 
 (defn- on-start [_ _ pointer]
   "Shift piece right under the cursor"
-  (when (false? common/is-touch-device)
+  (when (not common/is-touch-device)
     (let [$el ($ (get-target pointer))
           pos (.offset $el)
           center-x (+ (.-left pos) (/ (.width $el) 2))

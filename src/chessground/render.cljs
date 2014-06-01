@@ -25,12 +25,10 @@
                     :key (name key) ; react.js key just in case it helps performance
                     :data-key (name key)}
         movable (-> state :movable :enabled)
-        behaviors (when movable {
-                                 :onClick #(push! (:select-square channels) key)
+        behaviors (when movable {:onClick #(push! (:select-square channels) key)
                                  :onTouchStart (fn [event]
                                                  (.preventDefault event)
-                                                 (push! (:select-square channels) key))
-                                 })]
+                                                 (push! (:select-square channels) key))})]
     (d/div (merge attributes behaviors)
            (when-let [piece (chess/get-piece (:chess state) key)]
              (Piece [piece movable] channels)))))
