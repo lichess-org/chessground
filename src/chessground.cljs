@@ -3,7 +3,8 @@
             [chessground.common :refer [pp]]
             [chessground.api :as api]
             [chessground.render :as render]
-            [chessground.data :as data])
+            [chessground.data :as data]
+            [clojure.walk :refer [keywordize-keys]])
   (:require-macros [cljs.core.async.macros :as am]))
 
 (defn load-app
@@ -46,7 +47,7 @@
 (defn ^:export main
   "Application entry point; returns the public JavaScript API"
   [dom-element config]
-  (let [app (load-app dom-element (or config {}))]
+  (let [app (load-app dom-element (or (keywordize-keys (js->clj config)) {}))]
     (init-updates app)
     (render/request-render app)
     (api/build (:channels app))))
