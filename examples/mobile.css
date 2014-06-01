@@ -1,0 +1,5 @@
+
+.mobile .chessground .square.selected, .chessground .square.drag-over {
+  box-shadow: none;
+  background: rgba(216, 85, 0, 0.3);
+}
