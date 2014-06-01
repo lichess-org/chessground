@@ -13,24 +13,27 @@
 
 (q/defcomponent Piece
   "A piece in a square"
-  [{color :color role :role} channels]
-  (drag/make channels
-             (d/div {:className (class-name #{"piece" (name color) (name role)})})))
+  [[{color :color role :role} movable] channels]
+  (let [piece (d/div {:className (class-name #{"piece" (name color) (name role)})})]
+    (if movable (drag/make channels piece) piece)))
 
 (q/defcomponent Square
   "One of the 64 board squares"
   [state key channels]
-  (d/div {:className (class-name #{"square"
-                                   (when (= (:selected state) key) "selected")})
-          :key (name key) ; react.js key just in case it helps performance
-          :data-key (name key)
-          :onClick #(push! (:select-square channels) key)
-          :onTouchStart (fn [event]
-                          (.preventDefault event)
-                          (push! (:select-square channels) key))
-          }
-         (when-let [piece (chess/get-piece (:chess state) key)]
-           (Piece piece channels))))
+  (let [attributes {:className (class-name #{"square"
+                                             (when (= (:selected state) key) "selected")})
+                    :key (name key) ; react.js key just in case it helps performance
+                    :data-key (name key)}
+        movable (-> state :movable :enabled)
+        behaviors (when movable {
+                                 :onClick #(push! (:select-square channels) key)
+                                 :onTouchStart (fn [event]
+                                                 (.preventDefault event)
+                                                 (push! (:select-square channels) key))
+                                 })]
+    (d/div (merge attributes behaviors)
+           (when-let [piece (chess/get-piece (:chess state) key)]
+             (Piece [piece movable] channels)))))
 
 (q/defcomponent Board
   "The whole board"

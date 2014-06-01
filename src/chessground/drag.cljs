@@ -11,6 +11,11 @@
     (.elementFromPoint js/document (.-pageX pointer) (.-pageY pointer))
     (.-target pointer)))
 
+(defn- highlight-square [$el]
+  (when (not (jq/has-class $el over-class))
+    (jq/remove-class (jq/siblings $el) over-class)
+    (jq/add-class $el over-class)))
+
 (defn- on-start [_ _ pointer]
   "Shift piece right under the cursor"
   (let [$el ($ (get-target pointer))
@@ -19,14 +24,13 @@
         center-y (+ (.-top pos) (/ (.height $el) 2))
         decay-x (- (.-pageX pointer) center-x)
         decay-y (- (.-pageY pointer) center-y)]
-    (jq/css $el {:left (str decay-x "px") :top (str decay-y "px")})))
+    (jq/css $el {:left (str decay-x "px") :top (str decay-y "px")})
+    (highlight-square (jq/parent $el))))
 
 (defn- on-move [_ _ pointer]
   "Highlight the square under the dragged piece"
   (let [$el ($ (common/square-element (get-target pointer)))]
-    (when (not (jq/has-class $el over-class))
-      (jq/remove-class (jq/siblings $el) over-class)
-      (jq/add-class $el over-class))))
+    (highlight-square $el)))
 
 (defn make [channels component]
   "Make a react component draggable"
