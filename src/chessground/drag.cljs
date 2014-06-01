@@ -33,7 +33,7 @@
   (q/wrapper component
              :onMount (fn [node]
                         (-> (new js/Draggabilly node)
-                            (.on "dragStart" on-start)
+                            ; (.on "dragStart" on-start)
                             (.on "dragStart" (push-args! (:drag-start channels)))
                             (.on "dragMove" on-move)
                             (.on "dragEnd" (push-args! (:drag-end channels)))))))
