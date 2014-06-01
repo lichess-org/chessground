@@ -21,12 +21,6 @@ Even thought all code is written in clojurescript, it exposes a JavaScript publi
 lein cljsbuild auto dev
 ```
 
-To make a production build:
-
-```sh
-lein cljsbuild once prod
-```
-
 To serve the examples from a webserver (avoid cross domain requests):
 
 ```
@@ -35,3 +29,13 @@ http-server
 ```
 
 Then open [http://localhost:8080/examples/index.html](http://localhost:8080/examples/index.html).
+
+## Production
+
+To make a production build:
+
+```sh
+lein cljsbuild once prod
+```
+
+Then try it on [http://localhost:8080/examples/index.html?prod](http://localhost:8080/examples/index.html?prod).
