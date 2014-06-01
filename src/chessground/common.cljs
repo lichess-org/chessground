@@ -15,6 +15,8 @@
 
 (defn has-class [dom-element class] (.contains (.-classList dom-element) class))
 
+(defn is-touch-device [] true) ; TODO: make a real test (using modernizr?)
+
 (defn square-element [dom-element]
   "If element is a square, return it. If it's a piece, return its parent"
   (if (has-class dom-element "square")
