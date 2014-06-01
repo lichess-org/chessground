@@ -6,6 +6,11 @@
 
 (def over-class "drag-over")
 
+(defn- highlight-square [$el]
+  (when (not (jq/has-class $el over-class))
+    (jq/remove-class (jq/siblings $el) over-class)
+    (jq/add-class $el over-class)))
+
 (defn- on-start [_ event _]
   "Shift piece right under the cursor"
   (let [$el ($ (.-target event))
@@ -14,14 +19,13 @@
         center-y (+ (.-top pos) (/ (.height $el) 2))
         decay-x (- (.-pageX event) center-x)
         decay-y (- (.-pageY event) center-y)]
-    (jq/css $el {:left (str decay-x "px") :top (str decay-y "px")})))
+    (jq/css $el {:left (str decay-x "px") :top (str decay-y "px")})
+    (highlight-square (jq/parent $el))))
 
 (defn- on-move [_ event _]
   "Highlight the square under the dragged piece"
   (let [$el ($ (common/square-element (.-target event)))]
-    (when (not (jq/has-class $el over-class))
-      (jq/remove-class (jq/siblings $el) over-class)
-      (jq/add-class $el over-class))))
+    (highlight-square $el)))
 
 (defn make [channels component]
   "Make a react component draggable"
