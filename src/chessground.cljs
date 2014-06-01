@@ -1,6 +1,6 @@
 (ns chessground
   (:require [cljs.core.async :as a]
-            [chessground.common :refer [pp]]
+            [chessground.common :as common :refer [pp]]
             [chessground.api :as api]
             [chessground.render :as render]
             [chessground.data :as data]
@@ -49,6 +49,7 @@
   "Application entry point; returns the public JavaScript API"
   [dom-element config]
   (let [app (load-app dom-element (or (keywordize-keys (js->clj config)) {}))]
+    (when common/is-touch-device (.initializeTouchEvents js/React true))
     (init-updates app)
     (render/request-render app)
     (api/build (:channels app))))

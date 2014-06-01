@@ -47,10 +47,7 @@
 (q/defcomponent App
   "The root of the application"
   [state channels]
-  (if common/is-touch-device
-    (do (.initializeTouchEvents js/React true)
-        (Board state channels))
-    (Board state channels)))
+  (Board state channels))
 
 ;; Here we use an atom to tell us if we already have a render queued
 ;; up; if so, requesting another render is a no-op
