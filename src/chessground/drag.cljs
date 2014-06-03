@@ -2,7 +2,7 @@
   "Contains functions for drag and drop of pieces"
   (:require [quiescent :as q :include-macros true]
             [jayq.core :as jq :refer [$]]
-            [chessground.common :as common :refer [pp square-key push-args!]]))
+            [chessground.common :as common :refer [pp square-key push!]]))
 
 (def over-class "drag-over")
 
@@ -28,10 +28,13 @@
       (jq/css $el {:left (str decay-x "px") :top (str decay-y "px")})
       (highlight-square (jq/parent $el)))))
 
-(defn- on-move [_ _ pointer]
+(defn- on-move [targets [_ _ pointer]]
   "Highlight the square under the dragged piece"
   (let [$el ($ (common/square-element (get-target pointer)))]
     (highlight-square $el)))
+
+(defn- on-end [draggie _ _]
+  (jq/remove-class (jq/siblings (jq/parent ($ (.-element draggie)))) over-class))
 
 (defn make [channels piece targets]
   "Make a react piece draggable
@@ -40,15 +43,15 @@
              :onMount (fn [node]
                         (-> (new js/Draggabilly node)
                             (.on "dragStart" on-start)
-                            (.on "dragStart" (push-args! (:drag-start channels)))
-                            (.on "dragMove" on-move)
-                            (.on "dragEnd" (push-args! (:drag-end channels)))))))
+                            (.on "dragStart" (fn [& args] (push! (:drag-start channels) args)))
+                            (.on "dragMove" (fn [& args] (on-move targets args)))
+                            (.on "dragEnd" on-end)
+                            (.on "dragEnd" (fn [& args] (push! (:drag-end channels) args)))))))
 
 (defn end [[draggie _ pointer]]
   "Undo damages done by dragging and return origin and destination square keys"
   (jq/css ($ (.-element draggie)) {:top 0 :left 0})
   (when-let [orig (square-key (.-element draggie))]
     (when-let [dest-element (common/square-element (get-target pointer))]
-      (jq/remove-class ($ dest-element) over-class)
       (when-let [dest (square-key dest-element)]
         [orig dest]))))

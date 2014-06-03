@@ -11,8 +11,6 @@
 
 (defn push! [chan msg] (am/go (a/>! chan msg)))
 
-(defn push-args! [chan] (fn [& args] (push! chan args)))
-
 (defn has-class [dom-element class] (.contains (.-classList dom-element) class))
 
 ; is there a better way to do that?

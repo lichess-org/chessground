@@ -1,6 +1,6 @@
 (ns chessground.render
   "React components declarations, i.e. HTML templating + behavior"
-  (:require [chessground.common :as common :refer [pp push! push-args!]]
+  (:require [chessground.common :as common :refer [pp push!]]
             [chessground.chess :as chess]
             [chessground.drag :as drag]
             [cljs.core.async :as a]
