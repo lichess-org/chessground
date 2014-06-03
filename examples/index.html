@@ -51,11 +51,23 @@
       </script>
     </section>
     <section>
-      <div class="chessground marble small cburnett" id="ground4"></div>
+      <div class="chessground wood small cburnett" id="ground4"></div>
       <p>Disable moving pieces</p>
       <script>
         chessground.main(document.getElementById('ground4'), {
-          movable: {enabled: false}
+          movable: {free: false}
+        });
+      </script>
+    </section>
+    <section>
+      <div class="chessground blue small cburnett" id="ground5"></div>
+      <p>Validate moves: only d3, d4, e3 and e4 are allowed</p>
+      <script>
+        chessground.main(document.getElementById('ground5'), {
+          movable: {
+            free: false,
+            valid: {d2: ['d3', 'd4'], e2: ['e3', 'e4']}
+          }
         });
       </script>
     </section>

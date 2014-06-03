@@ -13,9 +13,9 @@
 
 (q/defcomponent Piece
   "A piece in a square"
-  [[{color :color role :role} movable] channels]
+  [[{color :color role :role} targets] channels]
   (let [piece (d/div {:className (class-name #{"piece" (name color) (name role)})})]
-    (if movable (drag/make channels piece) piece)))
+    (if targets (drag/make channels piece targets) piece)))
 
 (q/defcomponent Square
   "One of the 64 board squares"
@@ -24,14 +24,14 @@
                                              (when (= (:selected state) key) "selected")})
                     :key (name key) ; react.js key just in case it helps performance
                     :data-key (name key)}
-        movable (-> state :movable :enabled)
-        behaviors (when movable {:onClick #(push! (:select-square channels) key)
+        targets (if (-> state :movable :free) :all (-> state :movable :valid key))
+        behaviors (when targets {:onClick #(push! (:select-square channels) key)
                                  :onTouchStart (fn [event]
                                                  (.preventDefault event)
                                                  (push! (:select-square channels) key))})]
     (d/div (merge attributes behaviors)
            (when-let [piece (chess/get-piece (:chess state) key)]
-             (Piece [piece movable] channels)))))
+             (Piece [piece targets] channels)))))
 
 (q/defcomponent Board
   "The whole board"

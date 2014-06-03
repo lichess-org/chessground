@@ -10,8 +10,7 @@
   "Default state, overridable by user configuration"
   {:fen nil
    :orientation :white
-   :movable {:enabled :both ; :white | :black | :both | nil
-             :validate true ; whether to validate moves using "valid" or not
+   :movable {:free true ; all moves are valid - board editor
              :valid nil ; valid moves. {:a2 [:a3 :a4] :b1 [:a3 c3]} | nil
              }
    :selected nil ; last clicked square. :a2 | nil

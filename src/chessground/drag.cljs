@@ -33,9 +33,10 @@
   (let [$el ($ (common/square-element (get-target pointer)))]
     (highlight-square $el)))
 
-(defn make [channels component]
-  "Make a react component draggable"
-  (q/wrapper component
+(defn make [channels piece targets]
+  "Make a react piece draggable
+   targets is a list of keys OR the keyword :all"
+  (q/wrapper piece
              :onMount (fn [node]
                         (-> (new js/Draggabilly node)
                             (.on "dragStart" on-start)
