@@ -8,7 +8,7 @@
 
 (def defaults
   "Default state, overridable by user configuration"
-  {:fen nil
+  {:fen nil ; replaced by :chess by data/make
    :orientation :white
    :movable {:free true ; all moves are valid - board editor
              :valid nil ; valid moves. {:a2 [:a3 :a4] :b1 [:a3 c3]} | nil
@@ -18,28 +18,25 @@
 
 (defn set-fen [state fen] (assoc state :chess (chess/make fen)))
 
+(defn clear [state] (set-fen state nil))
+
 (defn make [config] (-> (merge defaults config)
                         (set-fen (:fen config))
                         (dissoc :fen)))
 
-(defn drag-start [state _]
-  (dissoc state :selected))
-
-(defn drag-end [state args]
-  (or (when-let [[orig dest] (drag/end args)]
-        (when-let [new-chess (chess/move-piece (:chess state) orig dest)]
-          (assoc state :chess new-chess)))
+(defn move-piece [state [orig dest]]
+  (or (when-let [new-chess (chess/move-piece (:chess state) orig dest)]
+        (assoc state :chess new-chess))
       state))
+
+(defn unselect-square [state _] (dissoc state :selected))
 
 (defn select-square [state key]
   (or (when-let [from (:selected state)]
-        (when-let [new-chess (chess/move-piece (:chess state) from key)]
-          (-> state
-              (assoc :chess new-chess)
-              (assoc :selected nil))))
-      (assoc state :selected key)))
-
-(defn clear [state] (set-fen state nil))
+        (dissoc (move-piece state [from key]) :selected))
+      (if (chess/get-piece (:chess state) key)
+        (assoc state :selected key)
+        state)))
 
 (defn set-orientation [state orientation-str]
   (let [orientation (keyword orientation-str)]

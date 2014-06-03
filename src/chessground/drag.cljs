@@ -6,17 +6,18 @@
 
 (def over-class "drag-over")
 
-(defn get-target [pointer]
+(defn- get-target [pointer]
   (if common/is-touch-device
     (.elementFromPoint js/document (.-pageX pointer) (.-pageY pointer))
     (.-target pointer)))
 
 (defn- highlight-square [$el]
+  "Add the over-class to the $el square, and remove it on others"
   (when (not (jq/has-class $el over-class))
     (jq/remove-class (jq/siblings $el) over-class)
     (jq/add-class $el over-class)))
 
-(defn- on-start [_ _ pointer]
+(defn- center-piece [pointer]
   "Shift piece right under the cursor"
   (when (not common/is-touch-device)
     (let [$el ($ (get-target pointer))
@@ -33,25 +34,27 @@
   (let [$el ($ (common/square-element (get-target pointer)))]
     (highlight-square $el)))
 
-(defn- on-end [draggie _ _]
-  (jq/remove-class (jq/siblings (jq/parent ($ (.-element draggie)))) over-class))
+(defn- undo-damages [draggie _ _]
+  "Revert DOM and style modifications done by the drag"
+  (let [$draggie ($ (.-element draggie))]
+    (jq/css $draggie {:top 0 :left 0})
+    (jq/remove-class (jq/siblings (jq/parent $draggie)) over-class)))
 
-(defn make [channels piece targets]
-  "Make a react piece draggable
-   targets is a list of keys OR the keyword :all"
-  (q/wrapper piece
-             :onMount (fn [node]
-                        (-> (new js/Draggabilly node)
-                            (.on "dragStart" on-start)
-                            (.on "dragStart" (fn [& args] (push! (:drag-start channels) args)))
-                            (.on "dragMove" (fn [& args] (on-move targets args)))
-                            (.on "dragEnd" on-end)
-                            (.on "dragEnd" (fn [& args] (push! (:drag-end channels) args)))))))
-
-(defn end [[draggie _ pointer]]
-  "Undo damages done by dragging and return origin and destination square keys"
-  (jq/css ($ (.-element draggie)) {:top 0 :left 0})
+(defn- orig-dest [[draggie _ pointer]]
+  "Return the origin and destination of the drag"
   (when-let [orig (square-key (.-element draggie))]
     (when-let [dest-element (common/square-element (get-target pointer))]
       (when-let [dest (square-key dest-element)]
         [orig dest]))))
+
+(defn make [channels piece targets]
+  "Make a react piece draggable. 'targets' is a list of keys OR the keyword :all"
+  (q/wrapper
+    piece
+    :onMount (fn [node]
+               (-> (new js/Draggabilly node)
+                   (.on "dragStart" (fn [_ _ pointer] (center-piece pointer)))
+                   (.on "dragStart" (fn [& args] (push! (:unselect-square channels) true)))
+                   (.on "dragMove" (fn [& args] (on-move targets args)))
+                   (.on "dragEnd" undo-damages)
+                   (.on "dragEnd" (fn [& args] (push! (:move-piece channels) (orig-dest args))))))))

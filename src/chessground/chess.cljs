@@ -23,8 +23,10 @@
 
 (defn- count-pieces [chess] (count (:pieces chess)))
 
-(defn move-piece [chess from to]
-  (when-let [piece (get-piece chess from)]
-    (-> chess
-        (remove-piece from)
-        (put-piece to piece))))
+(defn move-piece [chess orig dest]
+  "Return nil if orig and dest make no sense"
+  (when (not= orig dest)
+    (when-let [piece (get-piece chess orig)]
+      (-> chess
+          (remove-piece orig)
+          (put-piece dest piece)))))
