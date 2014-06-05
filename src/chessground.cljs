@@ -41,9 +41,8 @@
   (doseq [[ch update-fn] (:consumers app)]
     (am/go (while true
              (let [val (a/<! (get (:channels app) ch))
-                   _ (pp (str "on channel [" ch "], received value [" val "]"))
-                   new-state (swap! (:state app) update-fn val)
-                   _ (pp new-state)]
+                   ; _ (pp (str "on channel [" ch "], received value [" val "]"))
+                   new-state (swap! (:state app) update-fn val)]
                (render/request-render app))))))
 
 (defn ^:export main

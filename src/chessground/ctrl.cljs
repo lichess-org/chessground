@@ -17,8 +17,9 @@
 
 (defn move-piece [state [orig dest]]
   (dissoc
-    (or (when-let [new-chess (chess/move-piece (:chess state) orig dest)]
-          (assoc state :chess new-chess))
+    (or (when (data/can-move state orig dest)
+          (when-let [new-chess (chess/move-piece (:chess state) orig dest)]
+            (assoc state :chess new-chess)))
         state)
     :selected))
 

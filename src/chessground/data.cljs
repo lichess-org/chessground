@@ -24,3 +24,7 @@
                         (with-fen (:fen config))
                         (dissoc :fen)
                         (assoc-in [:movable :dests] (fix-dests (-> config :movable :dests)))))
+
+(defn can-move [state orig dest]
+  (let [movable (:movable state)]
+    (or (:free movable) (contains? (-> movable :dests orig) dest))))

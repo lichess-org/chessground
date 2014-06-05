@@ -14,32 +14,29 @@
 
 (q/defcomponent Piece
   "A piece in a square"
-  [[{color :color role :role} key dests] channels]
-  ; (pp (str "render " color " " role))
+  [[{color :color role :role} key has-dests] channels]
   (let [piece (d/div {:className (class-name #{"piece" (name color) (name role)})})]
-    (if dests (drag/make channels key piece) piece)))
+    (if has-dests (drag/make channels key piece) piece)))
 
 (q/defcomponent Square
   "One of the 64 board squares"
-  [{is-selected :is-selected dests :dests is-dest :is-dest piece :piece} key channels]
-  ; (pp (str "render square " key))
+  [{is-selected :is-selected has-dests :has-dests is-dest :is-dest piece :piece} key channels]
   (let [classes #{"square"
                   (when is-selected "selected")
                   (when is-dest "dest")}
         attributes {:className (class-name classes)
                     :key (name key) ; react.js key just in case it helps performance
                     :data-key (name key)}
-        behaviors (when dests {:onClick #(push! (:select-square channels) key)
-                               :onTouchStart (fn [event]
-                                               (.preventDefault event)
-                                               (push! (:select-square channels) key))})]
+        behaviors {:onClick #(push! (:select-square channels) key)
+                   :onTouchStart (fn [event]
+                                   (.preventDefault event)
+                                   (push! (:select-square channels) key))}]
     (d/div (merge attributes behaviors)
-           (when piece (Piece [piece key dests] channels)))))
+           (when piece (Piece [piece key has-dests] channels)))))
 
 (q/defcomponent Board
   "The whole board"
   [state channels]
-  ; (pp "render board")
   (let [white (= (:orientation state) :white)
         movable (:movable state)
         c (:chess state)
@@ -50,7 +47,7 @@
                       :let [key (keyword (str file rank))]]
                   (Square {:is-selected (= selected key)
                            :piece (chess/get-piece c key)
-                           :dests (if (:free movable) :all (key dests))
+                           :has-dests (or (:free movable) (not (empty? (key dests))))
                            :is-dest (when selected
                                       (or (:free movable)
                                           (contains? (-> movable :dests selected) key)))}
