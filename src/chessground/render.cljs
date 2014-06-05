@@ -28,7 +28,7 @@
                     :key (name key) ; react.js key just in case it helps performance
                     :data-key (name key)
                     :style pos}
-        behaviors {:onClick #(push! (:select-square channels) key)
+        behaviors {:onMouseDown #(push! (:select-square channels) key)
                    :onTouchStart (fn [event]
                                    (.preventDefault event)
                                    (push! (:select-square channels) key))}]

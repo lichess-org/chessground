@@ -21,15 +21,13 @@
   (assoc state :selected key))
 
 (defn move-piece [state [orig dest]]
-  (dissoc
-    (or (when (data/can-move? state orig dest)
-          (when-let [new-chess (chess/move-piece (:chess state) orig dest)]
-            (let [new-state (assoc state :chess new-chess)]
-              (when-let [callback (-> state :movable :events :after)]
-                (callback (clj->js orig) (clj->js dest)))
-              new-state)))
-        state)
-    :selected))
+  (or (when (data/can-move? state orig dest)
+        (when-let [new-chess (chess/move-piece (:chess state) orig dest)]
+          (let [new-state (assoc state :chess new-chess)]
+            (when-let [callback (-> state :movable :events :after)]
+              (callback (clj->js orig) (clj->js dest)))
+            (dissoc new-state :selected))))
+      (assoc state :selected dest)))
 
 (defn move-end [state key]
   "A move has been completed or canceled"
