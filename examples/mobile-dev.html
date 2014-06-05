@@ -37,22 +37,20 @@
     </script>
 
     <section>
-      <div class="chessground blue small merida" id="ground5"></div>
-      <p>Valid moves: white plays</p>
+      <div class="chessground wood small merida coordinates" id="ground1"></div>
+      <p>Default options, with CSS coordinates</p>
       <script>
-        var chess = new Chess();
-        chessground.main(document.getElementById('ground5'), {
-          movable: {
-            free: false,
-            dests: chessToDests(chess)
-          }
-        });
-        var size = $('body').width() - 5;
-        setTimeout(function() {
-          $('#ground1 .board').width(size).height(size);
-        }, 100);
+        chessground.main(document.getElementById('ground1'));
       </script>
     </section>
+    <script>
+      $(function() {
+        var size = $('body').width() - 5;
+        setTimeout(function() {
+          $('.board').width(size).height(size);
+        }, 100);
+      });
+    </script>
   </body>
 </html>
 
