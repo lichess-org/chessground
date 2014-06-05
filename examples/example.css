@@ -23,6 +23,7 @@ section p {
 .chessground .board {
   line-height: 0;
   background-size: cover;
+  position: relative;
 }
 .chessground.tiny .board {
   width: 225px;
@@ -46,8 +47,7 @@ section p {
   background-image: url('http://lichess1.org/assets/images/board/marble.jpg');
 }
 .chessground .square {
-  position: relative;
-  display: inline-block;
+  position: absolute;
   width: 12.5%;
   height: 12.5%;
   cursor: pointer;
