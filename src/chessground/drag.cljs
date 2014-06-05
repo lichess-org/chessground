@@ -53,7 +53,7 @@
     piece
     :onMount (fn [node]
                (-> (new js/Draggabilly node (clj->js {:distance 10}))
-                   (.on "dragStart" (fn [_ _ pointer] (center-piece pointer)))
+                   ; (.on "dragStart" (fn [_ _ pointer] (center-piece pointer)))
                    (.on "dragStart" #(push! (:move-start channels) key))
                    (.on "dragStart" (fn [_ _ pointer] (highlight-square (jq/parent ($ (get-target pointer))))))
                    (.on "dragMove" on-move)
