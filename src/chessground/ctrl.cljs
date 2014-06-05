@@ -9,6 +9,11 @@
 
 (def set-fen data/with-fen)
 
+(defn set-dests [state dests]
+  (-> state
+      (data/with-dests dests)
+      (assoc-in [:movable :free] false)))
+
 (defn clear [state] (set-fen state nil))
 
 (defn move-start [state key]
@@ -19,7 +24,10 @@
   (dissoc
     (or (when (data/can-move state orig dest)
           (when-let [new-chess (chess/move-piece (:chess state) orig dest)]
-            (assoc state :chess new-chess)))
+            (let [new-state (assoc state :chess new-chess)
+                  callback (-> state :movable :events :after)]
+              (callback (clj->js orig) (clj->js dest))
+              new-state)))
         state)
     :selected))
 
