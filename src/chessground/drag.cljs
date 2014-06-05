@@ -27,7 +27,7 @@
           decay-x (- (.-pageX pointer) center-x)
           decay-y (- (.-pageY pointer) center-y)]
       (jq/css $el {:left (str decay-x "px") :top (str decay-y "px")})
-      (highlight-square (jq/parent $el)))))
+      )))
 
 (defn- on-move [_ _ pointer]
   "Highlight the square under the dragged piece"
@@ -55,6 +55,10 @@
                (-> (new js/Draggabilly node)
                    (.on "dragStart" (fn [_ _ pointer] (center-piece pointer)))
                    (.on "dragStart" #(push! (:move-start channels) key))
+                   (.on "dragStart" (highlight-square (jq/parent ($ (get-target pointer)))))
                    (.on "dragMove" on-move)
                    (.on "dragEnd" undo-damages)
-                   (.on "dragEnd" (fn [& args] (push! (:move-piece channels) (orig-dest args))))))))
+                   (.on "dragEnd" (fn [& args] 
+                                    (let [traj (orig-dest args)]
+                                      (when (not= (first traj) (second traj))
+                                        (push! (:move-piece channels) (orig-dest args))))))))))
