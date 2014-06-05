@@ -29,7 +29,7 @@
       (jq/css $el {:left (str decay-x "px") :top (str decay-y "px")})
       (highlight-square (jq/parent $el)))))
 
-(defn- on-move [targets [_ _ pointer]]
+(defn- on-move [_ _ pointer]
   "Highlight the square under the dragged piece"
   (let [$el ($ (common/square-element (get-target pointer)))]
     (highlight-square $el)))
@@ -47,14 +47,14 @@
       (when-let [dest (square-key dest-element)]
         [orig dest]))))
 
-(defn make [channels piece targets]
+(defn make [channels key piece]
   "Make a react piece draggable. 'targets' is a list of keys OR the keyword :all"
   (q/wrapper
     piece
     :onMount (fn [node]
                (-> (new js/Draggabilly node)
                    (.on "dragStart" (fn [_ _ pointer] (center-piece pointer)))
-                   (.on "dragStart" (fn [& args] (push! (:unselect-square channels) true)))
-                   (.on "dragMove" (fn [& args] (on-move targets args)))
+                   (.on "dragStart" #(push! (:move-start channels) key))
+                   (.on "dragMove" on-move)
                    (.on "dragEnd" undo-damages)
                    (.on "dragEnd" (fn [& args] (push! (:move-piece channels) (orig-dest args))))))))

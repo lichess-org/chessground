@@ -15,6 +15,10 @@ section p {
   margin: 5px 0 0 0;
 }
 .chessground {
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
 }
 .chessground .board {
   line-height: 0;
@@ -54,7 +58,13 @@ section p {
 .chessground .square.last {
   background: radial-gradient(ellipse at center, rgba(155, 199, 00, 0.81) 0%, rgba(155, 199, 00, 0) 100%);
 }
-.chessground .square.selected, .chessground .square.drag-over {
+.chessground .square.dest {
+  background: radial-gradient(rgba(20, 85, 30, 0.5) 22%, #208030 0, rgba(0, 0, 0, 0.3) 0, rgba(0, 0, 0, 0) 0);
+}
+.chessground .square.selected {
+  background: rgba(20, 85, 30, 0.5);
+}
+.chessground .square.drag-over {
   box-shadow: inset 0 0 10px 2px rgba(216, 85, 0, 0.9);
 }
 .chessground.coordinates .square::before {

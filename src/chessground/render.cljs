@@ -2,6 +2,7 @@
   "React components declarations, i.e. HTML templating + behavior"
   (:require [chessground.common :as common :refer [pp push!]]
             [chessground.chess :as chess]
+            [chessground.data :as data]
             [chessground.drag :as drag]
             [cljs.core.async :as a]
             [quiescent :as q :include-macros true]
@@ -13,25 +14,27 @@
 
 (q/defcomponent Piece
   "A piece in a square"
-  [[{color :color role :role} targets] channels]
+  [[{color :color role :role} key dests] channels]
   ; (pp (str "render " color " " role))
   (let [piece (d/div {:className (class-name #{"piece" (name color) (name role)})})]
-    (if targets (drag/make channels piece targets) piece)))
+    (if dests (drag/make channels key piece) piece)))
 
 (q/defcomponent Square
   "One of the 64 board squares"
-  [{selected :selected targets :targets piece :piece} key channels]
+  [{is-selected :is-selected dests :dests is-dest :is-dest piece :piece} key channels]
   ; (pp (str "render square " key))
-  (let [attributes {:className (class-name #{"square"
-                                             (when selected "selected")})
+  (let [classes #{"square"
+                  (when is-selected "selected")
+                  (when is-dest "dest")}
+        attributes {:className (class-name classes)
                     :key (name key) ; react.js key just in case it helps performance
                     :data-key (name key)}
-        behaviors (when targets {:onClick #(push! (:select-square channels) key)
-                                 :onTouchStart (fn [event]
-                                                 (.preventDefault event)
-                                                 (push! (:select-square channels) key))})]
+        behaviors (when dests {:onClick #(push! (:select-square channels) key)
+                               :onTouchStart (fn [event]
+                                               (.preventDefault event)
+                                               (push! (:select-square channels) key))})]
     (d/div (merge attributes behaviors)
-           (when piece (Piece [piece targets] channels)))))
+           (when piece (Piece [piece key dests] channels)))))
 
 (q/defcomponent Board
   "The whole board"
@@ -41,12 +44,16 @@
         movable (:movable state)
         c (:chess state)
         selected (:selected state)
+        dests (-> state :movable :dests)
         squares (for [rank (if white (range 8 0 -1) (range 1 9))
                       file (seq (if white "abcdefgh" "hgfedcba"))
                       :let [key (keyword (str file rank))]]
-                  (Square {:selected (= selected key)
+                  (Square {:is-selected (= selected key)
                            :piece (chess/get-piece c key)
-                           :targets (if (:free movable) :all (-> movable :valid key))}
+                           :dests (if (:free movable) :all (key dests))
+                           :is-dest (when selected
+                                      (or (:free movable)
+                                          (contains? (-> movable :dests selected) key)))}
                           key channels))]
     (apply d/div {:className "board"} squares)))
 

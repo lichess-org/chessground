@@ -4,6 +4,7 @@
             [chessground.api :as api]
             [chessground.render :as render]
             [chessground.data :as data]
+            [chessground.ctrl :as ctrl]
             [clojure.walk :refer [keywordize-keys]])
   (:require-macros [cljs.core.async.macros :as am]))
 
@@ -18,16 +19,16 @@
               :set-fen (a/chan)
               :clear (a/chan)
               :select-square (a/chan)
-              :unselect-square (a/chan)
+              :move-start (a/chan)
               :move-piece (a/chan)
               }
-   :consumers {:toggle-orientation data/toggle-orientation
-               :set-orientation data/set-orientation
-               :set-fen data/set-fen
-               :clear data/clear
-               :select-square data/select-square
-               :unselect-square data/unselect-square
-               :move-piece data/move-piece
+   :consumers {:toggle-orientation ctrl/toggle-orientation
+               :set-orientation ctrl/set-orientation
+               :set-fen ctrl/set-fen
+               :clear ctrl/clear
+               :select-square ctrl/select-square
+               :move-start ctrl/move-start
+               :move-piece ctrl/move-piece
                }
    })
 
@@ -40,8 +41,9 @@
   (doseq [[ch update-fn] (:consumers app)]
     (am/go (while true
              (let [val (a/<! (get (:channels app) ch))
-                   ; _ (pp (str "on channel [" ch "], received value [" val "]"))
-                   new-state (swap! (:state app) update-fn val)]
+                   _ (pp (str "on channel [" ch "], received value [" val "]"))
+                   new-state (swap! (:state app) update-fn val)
+                   _ (pp new-state)]
                (render/request-render app))))))
 
 (defn ^:export main
