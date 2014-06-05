@@ -52,13 +52,13 @@
   (q/wrapper
     piece
     :onMount (fn [node]
-               (-> (new js/Draggabilly node)
+               (-> (new js/Draggabilly node (clj->js {:distance 10}))
                    (.on "dragStart" (fn [_ _ pointer] (center-piece pointer)))
                    (.on "dragStart" #(push! (:move-start channels) key))
                    (.on "dragStart" (fn [_ _ pointer] (highlight-square (jq/parent ($ (get-target pointer))))))
                    (.on "dragMove" on-move)
                    (.on "dragEnd" undo-damages)
-                   (.on "dragEnd" (fn [& args] 
+                   (.on "dragEnd" (fn [& args]
                                     (let [traj (orig-dest args)]
                                       (when (not= (first traj) (second traj))
                                         (push! (:move-piece channels) (orig-dest args))))))))))
