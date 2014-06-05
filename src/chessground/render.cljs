@@ -20,13 +20,14 @@
 
 (q/defcomponent Square
   "One of the 64 board squares"
-  [{is-selected :is-selected is-movable :is-movable is-dest :is-dest piece :piece} key channels]
+  [{is-selected :is-selected is-movable :is-movable is-dest :is-dest piece :piece} pos key channels]
   (let [classes #{"square"
                   (when is-selected "selected")
                   (when is-dest "dest")}
         attributes {:className (class-name classes)
                     :key (name key) ; react.js key just in case it helps performance
-                    :data-key (name key)}
+                    :data-key (name key)
+                    :style pos}
         behaviors {:onClick #(push! (:select-square channels) key)
                    :onTouchStart (fn [event]
                                    (.preventDefault event)
@@ -42,16 +43,19 @@
         c (:chess state)
         selected (:selected state)
         dests (-> state :movable :dests)
-        squares (for [rank (if white (range 8 0 -1) (range 1 9))
-                      file (seq (if white "abcdefgh" "hgfedcba"))
-                      :let [key (keyword (str file rank))]]
+        squares (for [rank (range 1 9)
+                      file-n (range 1 9)
+                      file (get "abcdefgh" (- file-n 1))
+                      :let [key (keyword (str file rank))
+                            pos {(if white :left :right) (str (* (- file-n 1) 12.5) "%")
+                                 (if white :bottom :top) (str (* (- rank 1) 12.5) "%")}]]
                   (Square {:is-selected (= selected key)
                            :piece (chess/get-piece c key)
                            :is-movable (data/is-movable? state key)
                            :is-dest (when selected
                                       (or (:free movable)
                                           (contains? (-> movable :dests selected) key)))}
-                          key channels))]
+                          pos key channels))]
     (apply d/div {:className "board"} squares)))
 
 (q/defcomponent App
