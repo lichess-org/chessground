@@ -30,3 +30,7 @@
       (-> chess
           (remove-piece orig)
           (put-piece dest piece)))))
+
+(defn owner-color [chess key]
+  "Returns the color of the piece on this square key, or nil"
+  (:color (get-piece chess key)))

@@ -14,13 +14,13 @@
 
 (q/defcomponent Piece
   "A piece in a square"
-  [[{color :color role :role} key has-dests] channels]
+  [[{color :color role :role} key is-movable] channels]
   (let [piece (d/div {:className (class-name #{"piece" (name color) (name role)})})]
-    (if has-dests (drag/make channels key piece) piece)))
+    (if is-movable (drag/make channels key piece) piece)))
 
 (q/defcomponent Square
   "One of the 64 board squares"
-  [{is-selected :is-selected has-dests :has-dests is-dest :is-dest piece :piece} key channels]
+  [{is-selected :is-selected is-movable :is-movable is-dest :is-dest piece :piece} key channels]
   (let [classes #{"square"
                   (when is-selected "selected")
                   (when is-dest "dest")}
@@ -32,7 +32,7 @@
                                    (.preventDefault event)
                                    (push! (:select-square channels) key))}]
     (d/div (merge attributes behaviors)
-           (when piece (Piece [piece key has-dests] channels)))))
+           (when piece (Piece [piece key is-movable] channels)))))
 
 (q/defcomponent Board
   "The whole board"
@@ -47,7 +47,7 @@
                       :let [key (keyword (str file rank))]]
                   (Square {:is-selected (= selected key)
                            :piece (chess/get-piece c key)
-                           :has-dests (or (:free movable) (not (empty? (key dests))))
+                           :is-movable (data/is-movable? state key)
                            :is-dest (when selected
                                       (or (:free movable)
                                           (contains? (-> movable :dests selected) key)))}
