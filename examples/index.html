@@ -31,6 +31,9 @@
         });
         return dests;
       }
+      function chessToColor(chess) {
+        return (chess.turn() == "w") ? "white" : "black";
+      }
     </script>
   </head>
   <body>
@@ -76,6 +79,7 @@
         chessground.main(document.getElementById('ground5'), {
           movable: {
             free: false,
+            color: "white",
             dests: chessToDests(chess)
           }
         });
@@ -91,6 +95,7 @@
           fen: fen,
           movable: {
             free: false,
+            color: chessToColor(chess),
             dests: chessToDests(chess)
           }
         });
