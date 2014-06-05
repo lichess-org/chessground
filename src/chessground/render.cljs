@@ -14,37 +14,40 @@
 (q/defcomponent Piece
   "A piece in a square"
   [[{color :color role :role} targets] channels]
-  ; (pp "render piece")
+  ; (pp (str "render " color " " role))
   (let [piece (d/div {:className (class-name #{"piece" (name color) (name role)})})]
     (if targets (drag/make channels piece targets) piece)))
 
 (q/defcomponent Square
   "One of the 64 board squares"
-  [{selected :selected movable :movable chess :chess} key channels]
+  [{selected :selected targets :targets piece :piece} key channels]
   ; (pp (str "render square " key))
   (let [attributes {:className (class-name #{"square"
                                              (when selected "selected")})
                     :key (name key) ; react.js key just in case it helps performance
                     :data-key (name key)}
-        targets (if (:free movable) :all (-> movable :valid key))
         behaviors (when targets {:onClick #(push! (:select-square channels) key)
                                  :onTouchStart (fn [event]
                                                  (.preventDefault event)
                                                  (push! (:select-square channels) key))})]
     (d/div (merge attributes behaviors)
-           (when-let [piece (chess/get-piece chess key)]
-             (Piece [piece targets] channels)))))
+           (when piece (Piece [piece targets] channels)))))
 
 (q/defcomponent Board
   "The whole board"
   [state channels]
   ; (pp "render board")
   (let [white (= (:orientation state) :white)
+        movable (:movable state)
+        c (:chess state)
+        selected (:selected state)
         squares (for [rank (if white (range 8 0 -1) (range 1 9))
-                      file (seq (if white "abcdefgh" "hgfedcba"))]
-                  (Square {:selected (= (:selected state) key)
-                           :movable (:movable state)
-                           :chess (:chess state)} (keyword (str file rank)) channels))]
+                      file (seq (if white "abcdefgh" "hgfedcba"))
+                      :let [key (keyword (str file rank))]]
+                  (Square {:selected (= selected key)
+                           :piece (chess/get-piece c key)
+                           :targets (if (:free movable) :all (-> movable :valid key))}
+                          key channels))]
     (apply d/div {:className "board"} squares)))
 
 (q/defcomponent App
