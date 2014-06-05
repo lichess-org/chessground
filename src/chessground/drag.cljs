@@ -55,7 +55,7 @@
                (-> (new js/Draggabilly node)
                    (.on "dragStart" (fn [_ _ pointer] (center-piece pointer)))
                    (.on "dragStart" #(push! (:move-start channels) key))
-                   (.on "dragStart" (highlight-square (jq/parent ($ (get-target pointer)))))
+                   (.on "dragStart" (fn [_ _ pointer] (highlight-square (jq/parent ($ (get-target pointer))))))
                    (.on "dragMove" on-move)
                    (.on "dragEnd" undo-damages)
                    (.on "dragEnd" (fn [& args] 
