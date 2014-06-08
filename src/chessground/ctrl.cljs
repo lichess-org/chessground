@@ -26,7 +26,9 @@
           (let [new-state (assoc state :chess new-chess)]
             (when-let [callback (-> state :movable :events :after)]
               (callback (clj->js orig) (clj->js dest)))
-            (dissoc new-state :selected))))
+            (-> new-state
+                (dissoc :selected)
+                (assoc-in [:movable :dests] nil)))))
       (assoc state :selected dest)))
 
 (defn move-end [state key]
