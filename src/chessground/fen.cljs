@@ -7,8 +7,7 @@
 
 (def role-names {:p :pawn :r :rook :n :knight :b :bishop :q :queen :k :king})
 
-(defn- pos-to-key [pos]
-  (keyword (str (get "abcdefgh" (mod pos 8)) (- 8 (int (/ pos 8))))))
+(defn- pos-to-key [pos] (str (get "abcdefgh" (mod pos 8)) (- 8 (int (/ pos 8)))))
 
 (defn- parse-squares [fen-chars]
   (loop [pieces {} pos 0 [current & next] fen-chars]
@@ -24,8 +23,6 @@
                     piece {:role role :color color}]
                 (recur (assoc pieces key piece) (inc pos) next))))))
 
-(defn parse [fen]
-  (parse-squares (->>
-                   (or fen default)
-                   (remove #(= "/" %))
-                   (take-while #(not= \space %)))))
+(defn parse [fen] (parse-squares (->> (or fen default)
+                                      (remove #(= "/" %))
+                                      (take-while #(not= \space %)))))

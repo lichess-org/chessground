@@ -11,4 +11,5 @@
        "setOrientation" (fn [orientation] (push-in :set-orientation orientation))
        "setFen" (fn [fen] (push-in :set-fen fen))
        "setDests" (fn [dests] (push-in :set-dests (js->clj dests)))
+       "setColor" (fn [color] (push-in :set-color (js->clj color)))
        "clear" (fn [] (push-in :clear true))})))

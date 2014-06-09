@@ -7,12 +7,18 @@
             [chessground.common :as common :refer [pp square-key]]
             [chessground.chess :as chess]))
 
+(defn- callback [function & args]
+  "Call a user supplied callback function, if any"
+  (when function (apply function (map clj->js args))))
+
 (def set-fen data/with-fen)
 
 (defn set-dests [state dests]
   (-> state
       (data/with-dests dests)
       (assoc-in [:movable :free] false)))
+
+(defn set-color [state color] (assoc-in state [:movable :color] (keyword color)))
 
 (defn clear [state] (set-fen state nil))
 
@@ -23,12 +29,12 @@
 (defn move-piece [state [orig dest]]
   (or (when (data/can-move? state orig dest)
         (when-let [new-chess (chess/move-piece (:chess state) orig dest)]
-          (let [new-state (assoc state :chess new-chess)]
-            (when-let [callback (-> state :movable :events :after)]
-              (callback (clj->js orig) (clj->js dest)))
-            (-> new-state
-                (dissoc :selected)
-                (assoc-in [:movable :dests] nil)))))
+          (let [new-state (-> state
+                              (assoc :chess new-chess)
+                              (dissoc :selected)
+                              (assoc-in [:movable :dests] nil))]
+            (callback (-> state :movable :events :after) orig dest new-chess)
+            new-state)))
       (assoc state :selected dest)))
 
 (defn move-end [state key]
@@ -36,8 +42,8 @@
   (dissoc state :selected))
 
 (defn select-square [state key]
-  (if-let [from (:selected state)]
-    (move-piece state [from key])
+  (if-let [orig (:selected state)]
+    (move-piece state [orig key])
     (if (chess/get-piece (:chess state) key)
       (assoc state :selected key)
       state)))

@@ -18,6 +18,7 @@
               :set-orientation (a/chan)
               :set-fen (a/chan)
               :set-dests (a/chan)
+              :set-color (a/chan)
               :clear (a/chan)
               :select-square (a/chan)
               :move-start (a/chan)
@@ -27,6 +28,7 @@
                :set-orientation ctrl/set-orientation
                :set-fen ctrl/set-fen
                :set-dests ctrl/set-dests
+               :set-color ctrl/set-color
                :clear ctrl/clear
                :select-square ctrl/select-square
                :move-start ctrl/move-start

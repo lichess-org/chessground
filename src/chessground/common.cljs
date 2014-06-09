@@ -5,7 +5,9 @@
 
 (enable-console-print!)
 
-(defn pp [expr] (.log js/console (if (map? expr) (clj->js expr) expr)) expr)
+(defn pp [& exprs]
+  (doseq [expr exprs] (.log js/console expr))
+  (first exprs))
 
 (defn set-contains? [set val] (some #{val} set))
 
@@ -26,4 +28,4 @@
 
 (defn square-key [dom-element]
   "Gets the square key from the element, or its parent"
-  (keyword (.getAttribute (square-element dom-element) "data-key")))
+  (.getAttribute (square-element dom-element) "data-key"))

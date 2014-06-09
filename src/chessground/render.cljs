@@ -25,8 +25,8 @@
                   (when is-selected "selected")
                   (when is-dest "dest")}
         attributes {:className (class-name classes)
-                    :key (name key) ; react.js key just in case it helps performance
-                    :data-key (name key)
+                    :key key ; react.js key just in case it helps performance
+                    :data-key key
                     :style pos}
         behaviors {:onMouseDown #(push! (:select-square channels) key)
                    :onTouchStart (fn [event]
@@ -46,7 +46,7 @@
         squares (for [rank (range 1 9)
                       file-n (range 1 9)
                       file (get "abcdefgh" (- file-n 1))
-                      :let [key (keyword (str file rank))
+                      :let [key (str file rank)
                             pos {(if white :left :right) (str (* (- file-n 1) 12.5) "%")
                                  (if white :bottom :top) (str (* (- rank 1) 12.5) "%")}]]
                   (Square {:is-selected (= selected key)
@@ -54,7 +54,7 @@
                            :is-movable (data/is-movable? state key)
                            :is-dest (when selected
                                       (or (:free movable)
-                                          (contains? (-> movable :dests selected) key)))}
+                                          (contains? (get dests selected) key)))}
                           pos key channels))]
     (apply d/div {:className "board"} squares)))
 

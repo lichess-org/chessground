@@ -48,7 +48,7 @@
         [orig dest]))))
 
 (defn make [channels key piece]
-  "Make a react piece draggable. 'targets' is a list of keys OR the keyword :all"
+  "Make a react piece draggable."
   (q/wrapper
     piece
     :onMount (fn [node]
@@ -61,4 +61,4 @@
                    (.on "dragEnd" (fn [& args]
                                     (let [traj (orig-dest args)]
                                       (when (not= (first traj) (second traj))
-                                        (push! (:move-piece channels) (orig-dest args))))))))))
+                                        (push! (:move-piece channels) traj)))))))))
