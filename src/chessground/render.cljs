@@ -45,8 +45,8 @@
         dests (-> state :movable :dests)
         squares (for [rank (range 1 9)
                       file-n (range 1 9)
-                      file (get "abcdefgh" (- file-n 1))
-                      :let [key (str file rank)
+                      :let [file (get "abcdefgh" (- file-n 1))
+                            key (str file rank)
                             pos {(if white :left :right) (str (* (- file-n 1) 12.5) "%")
                                  (if white :bottom :top) (str (* (- rank 1) 12.5) "%")}]]
                   (Square {:is-selected (= selected key)
