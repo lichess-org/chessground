@@ -55,5 +55,5 @@
   (let [app (load-app dom-element (or (keywordize-keys (js->clj config)) {}))]
     (when common/is-touch-device (.initializeTouchEvents js/React true))
     (init-updates app)
-    (render/request-render-simple app)
+    (render/request-render app)
     (api/build (:channels app))))

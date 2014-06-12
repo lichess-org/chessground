@@ -63,9 +63,6 @@
   [state channels]
   (Board state channels))
 
-(defn request-render-simple [app]
-  (q/render (App @(:state app) (:channels app)) (:dom-element app)))
-
 ;; Here we use an atom to tell us if we already have a render queued
 ;; up; if so, requesting another render is a no-op
 (defn request-render
