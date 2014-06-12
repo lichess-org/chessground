@@ -67,9 +67,9 @@
 ;; up; if so, requesting another render is a no-op
 (defn request-render
   "Render the given application state tree."
-  [app]
+  [app state]
   (when (compare-and-set! (:render-pending? app) false true)
     (.requestAnimationFrame
       js/window
-      #(q/render (App @(:state app) (:channels app)) (:dom-element app))
+      #(q/render (App @state (:channels app)) (:dom-element app))
       (reset! (:render-pending? app) false))))
