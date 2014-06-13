@@ -4,8 +4,8 @@
             [chessground.fen :as forsyth]))
 
 ; Representation of a chess game:
-; {:pieces {"a1" {:color :white :role :rook}
-;           "b1" {:color :white :role :knight}
+; {:pieces {"a1" {:color "white" :role "rook"}
+;           "b1" {:color "white" :role "knight"}
 ;          }}
 
 (def colors [:white :black])

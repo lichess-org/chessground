@@ -9,7 +9,7 @@
 
 (defn pp [& exprs]
   (when debug
-    (doseq [expr exprs] (.log js/console expr)))
+    (doseq [expr exprs] (.log js/console (clj->js expr))))
     (first exprs))
 
 (defn set-contains? [set val] (some #{val} set))

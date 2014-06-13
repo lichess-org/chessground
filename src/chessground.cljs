@@ -1,6 +1,8 @@
 (ns chessground
   (:require [cljs.core.async :as a]
             [chessground.common :as common :refer [pp]]
+            [chessground.data :as data]
+            [chessground.render :refer [render-app]]
             [clojure.walk :refer [keywordize-keys]])
   (:require-macros [cljs.core.async.macros :as am]))
 
@@ -8,8 +10,7 @@
   "Return a map containing the initial application"
   [dom-element config]
   {:dom-element dom-element
-   :state (atom {})
-   :render-pending? (atom false)
+   :state (atom (data/make config))
    :channels {:toggle-orientation (a/chan)
               :set-orientation (a/chan)
               :set-fen (a/chan)
@@ -25,4 +26,5 @@
 (defn ^:export main
   "Application entry point; returns the public JavaScript API"
   [dom-element config]
-  (pp config))
+  (let [app (load-app dom-element (or (keywordize-keys (js->clj config)) {}))]
+    (render-app dom-element @(:state app))))
