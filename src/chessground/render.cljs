@@ -13,7 +13,7 @@
     (str "<div class='square' data-key='" key "' style=' " style "'>" piece-html "</div>")))
 
 (defn render-board [state]
-  (let [white (= (pp (:orientation state)) :white)
+  (let [white (= (:orientation state) :white)
         c (:chess state)
         squares (for [rank (range 1 9)
                       file-n (range 1 9)
@@ -25,5 +25,5 @@
                   (render-square key pos piece))]
     (str "<div class='board'>" (apply str squares) "</div>")))
 
-(defn render-app [dom-element state]
-  (jq/html ($ dom-element) (render-board state)))
+(defn render-app [state]
+  (render-board state))

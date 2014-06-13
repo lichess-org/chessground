@@ -1,9 +1,11 @@
 (ns chessground
   (:require [cljs.core.async :as a]
+            [clojure.walk :refer [keywordize-keys]]
+            [jayq.core :as jq :refer [$]]
             [chessground.common :as common :refer [pp]]
             [chessground.data :as data]
             [chessground.render :refer [render-app]]
-            [clojure.walk :refer [keywordize-keys]])
+            [chessground.drag :as drag])
   (:require-macros [cljs.core.async.macros :as am]))
 
 (defn load-app
@@ -26,5 +28,7 @@
 (defn ^:export main
   "Application entry point; returns the public JavaScript API"
   [dom-element config]
-  (let [app (load-app dom-element (or (keywordize-keys (js->clj config)) {}))]
-    (render-app dom-element @(:state app))))
+  (let [app (load-app dom-element (or (keywordize-keys (js->clj config)) {}))
+        $app ($ dom-element)]
+    (jq/html $app (render-app @(:state app)))
+    (doseq [$piece ($ :.piece $app)] (drag/piece $piece))))
