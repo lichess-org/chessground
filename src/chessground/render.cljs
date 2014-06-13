@@ -6,7 +6,8 @@
             [chessground.drag :as drag]
             [cljs.core.async :as a]
             [quiescent :as q :include-macros true]
-            [quiescent.dom :as d]))
+            [quiescent.dom :as d])
+  (:require-macros [chessground.macros :as macros]))
 
 (defn- class-name
   "Convenience function for creating class names from sets. Nils will not be included."
@@ -15,12 +16,14 @@
 (q/defcomponent Piece
   "A piece in a square"
   [[{color :color role :role} key is-movable] channels]
+  ; (pp (str "Piece " color " " role))
   (let [piece (d/div {:className (class-name #{"piece" (name color) (name role)})})]
     (if is-movable (drag/make channels key piece) piece)))
 
 (q/defcomponent Square
   "One of the 64 board squares"
   [{is-selected :is-selected is-movable :is-movable is-dest :is-dest piece :piece} pos key channels]
+  ; (pp (str "Square " key))
   (let [classes #{"square"
                   (when is-selected "selected")
                   (when is-dest "dest")}
@@ -35,9 +38,9 @@
     (d/div (merge attributes behaviors)
            (when piece (Piece [piece key is-movable] channels)))))
 
-(q/defcomponent Board
-  "The whole board"
+(defn do-board
   [state channels]
+  (pp "Board")
   (let [white (= (:orientation state) :white)
         movable (:movable state)
         c (:chess state)
@@ -58,9 +61,16 @@
                           pos key channels))]
     (apply d/div {:className "board"} squares)))
 
+(q/defcomponent Board
+  "The whole board"
+  [state channels]
+  (do-board state channels))
+
 (q/defcomponent App
   "The root of the application"
   [state channels]
+  (pp "App")
+  (pp (macros/bench (do-board state channels)))
   (Board state channels))
 
 ;; Here we use an atom to tell us if we already have a render queued
@@ -68,8 +78,9 @@
 (defn request-render
   "Render the given application state tree."
   [app]
-  (when (compare-and-set! (:render-pending? app) false true)
-    (.requestAnimationFrame
-      js/window
-      #(q/render (App @(:state app) (:channels app)) (:dom-element app))
-      (reset! (:render-pending? app) false))))
+  (q/render (App @(:state app) (:channels app)) (:dom-element app)))
+; (when (compare-and-set! (:render-pending? app) false true)
+;   (.requestAnimationFrame
+;     js/window
+;     #(q/render (App @(:state app) (:channels app)) (:dom-element app))
+;     (reset! (:render-pending? app) false))))

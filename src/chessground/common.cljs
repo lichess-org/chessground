@@ -5,9 +5,12 @@
 
 (enable-console-print!)
 
+(def debug true)
+
 (defn pp [& exprs]
-  (doseq [expr exprs] (.log js/console expr))
-  (first exprs))
+  (when debug
+    (doseq [expr exprs] (.log js/console expr)))
+    (first exprs))
 
 (defn set-contains? [set val] (some #{val} set))
 
