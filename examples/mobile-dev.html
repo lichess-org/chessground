@@ -17,28 +17,25 @@
     <script src="../generated/chessground.dev.js" type="text/javascript"></script>
     <script type="text/javascript">goog.require("chessground");</script>
 
-    <script>
-      function include(script) {
-        document.write('\x3Cscript type="text/javascript" src="'+script+'">\x3C/script>');
-      }
-      include("../libs/chess.min.js")
-      function chessToDests(chess) {
-        var dests = {};
-        chess.SQUARES.forEach(function(s) {
-          var ms = chess.moves({square: s});
-          if (ms.length) dests[s] = ms.map(function(m) { return m.substr(-2); });
-        });
-        return dests;
-      }
-    </script>
+    <!-- <script> -->
+    <!--   function include(script) { -->
+    <!--     document.write('\x3Cscript type="text/javascript" src="'+script+'">\x3C/script>'); -->
+    <!--   } -->
+    <!--   include("../libs/chess.min.js") -->
+    <!--   function chessToDests(chess) { -->
+    <!--     var dests = {}; -->
+    <!--     chess.SQUARES.forEach(function(s) { -->
+    <!--       var ms = chess.moves({square: s}); -->
+    <!--       if (ms.length) dests[s] = ms.map(function(m) { return m.substr(-2); }); -->
+    <!--     }); -->
+    <!--     return dests; -->
+    <!--   } -->
+    <!-- </script> -->
 
-    <section>
-      <div class="chessground wood small merida" id="ground1"></div>
-      <p>Default options</p>
-      <script>
-        chessground.main(document.getElementById('ground1'));
-      </script>
-    </section>
+    <div class="chessground wood small merida" id="ground1"></div>
+    <script>
+      chessground.main(document.getElementById('ground1'));
+    </script>
     <script>
       $(function() {
         var size = $('body').width() - 5;
