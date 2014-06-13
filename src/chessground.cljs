@@ -5,7 +5,8 @@
             [chessground.common :as common :refer [pp]]
             [chessground.data :as data]
             [chessground.render :refer [render-app]]
-            [chessground.drag :as drag])
+            [chessground.drag :as drag]
+            [chessground.select :as select])
   (:require-macros [cljs.core.async.macros :as am]))
 
 (defn load-app
@@ -32,4 +33,6 @@
         $app ($ dom-element)]
     (jq/html $app (render-app @(:state app)))
     (doseq [$piece ($ :.piece $app)] (drag/piece $piece))
-    (doseq [$square ($ :.square $app)] (drag/square $square))))
+    (doseq [$square ($ :.square $app)]
+      (drag/square $square)
+      (select/square $square))))
