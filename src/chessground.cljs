@@ -31,4 +31,5 @@
   (let [app (load-app dom-element (or (keywordize-keys (js->clj config)) {}))
         $app ($ dom-element)]
     (jq/html $app (render-app @(:state app)))
-    (doseq [$piece ($ :.piece $app)] (drag/piece $piece))))
+    (doseq [$piece ($ :.piece $app)] (drag/piece $piece))
+    (doseq [$square ($ :.square $app)] (drag/square $square))))

@@ -21,6 +21,14 @@
 ; is there a better way to do that?
 (def is-touch-device (js* "'ontouchstart' in document"))
 
+(def transform-prop "webkitTransform")
+; (let [style (.-style (.querySelector js/document "body"))]
+; (if (js* "'transform' in style") "transform"
+;   (if (js* "'webkitTransform' in style") "webkitTransform"
+;     (if (js* "'mozTransform' in style") "mozTransform"
+;       (if (js* "'oTransform' in style") "oTransform"
+;         "transform"))))))
+
 (defn square-element [dom-element]
   "If element is a square, return it. If it's a piece, return its parent"
   (if (has-class dom-element "square")

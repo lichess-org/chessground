@@ -10,7 +10,7 @@
 (defn render-square [key pos piece]
   (let [style (apply str (map (fn [[k v]] (str (name k) ":" v ";")) pos))
         piece-html (when piece (render-piece piece))]
-    (str "<div class='square' data-key='" key "' style=' " style "'>" piece-html "</div>")))
+    (str "<div class='square' data-key='" key "' style='" style "'>" piece-html "</div>")))
 
 (defn render-board [state]
   (let [white (= (:orientation state) :white)

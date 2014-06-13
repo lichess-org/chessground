@@ -88,7 +88,6 @@ section p {
 .chessground .piece.is-dragging {
   cursor: move;
   z-index: 9;
-  pointer-events: none;
 }
 .chessground.pirouetti .piece {
   bottom: 0;
