@@ -1,7 +1,7 @@
 (ns chessground.drag
   "Make pieces draggable, and squares droppable"
   (:require [jayq.core :as jq :refer [$]]
-            [chessground.common :as common :refer [pp]]
+            [chessground.common :as common :refer [pp push!]]
             [chessground.ctrl :as ctrl]
             [chessground.chess :as chess]))
 
@@ -16,12 +16,12 @@
     (set! (.-transform (.-style target)) transform)
     (aset (.-style target) common/transform-prop transform)))
 
-(defn piece [el]
+(defn piece [el chans]
   (let [obj (js/interact el)]
     (jq/data ($ el) :interact obj)
     (.draggable obj (clj->js {:onmove on-move}))))
 
-(defn square [el]
+(defn square [el chans]
   (let [obj (js/interact el)]
     (jq/data ($ el) :interact obj)
     (.dropzone obj true)
@@ -42,4 +42,4 @@
                       (set! (.-x piece) 0)
                       (set! (.-y piece) 0)
                       (set! (.-transform (.-style piece)) "")
-                      (ctrl/move-piece orig dest)))))))
+                      (push! (:move-piece chans) (map common/square-key [orig dest]))))))))
