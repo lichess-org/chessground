@@ -21,6 +21,20 @@
   (jq/remove-class ($ :.square.selected $app) :selected)
   (when selected (jq/add-class ($square $app selected) :selected)))
 
+(defn- show-dests [$app dests]
+  (doseq [square ($ :.square $app)]
+    (if (common/set-contains? dests (.getAttribute square "data-key"))
+      (-> square .-classList (.add "dest"))
+      (-> square .-classList (.remove "dest")))))
+
+(defn move-start [state orig]
+  "A move has been started, either by clicking on a piece, or dragging it"
+  (let [new-state (assoc state :selected orig)]
+    [new-state
+     (fn [$app chans]
+       (show-selected $app orig)
+       (show-dests $app (data/dests-of state orig)))]))
+
 (defn move-piece [state [orig dest]]
   (or (when (data/can-move? state orig dest)
         (when-let [new-chess (chess/move-piece (:chess state) orig dest)]
@@ -35,6 +49,7 @@
                      $dest ($square $app dest)
                      $piece ($ :.piece $orig)]
                  (show-selected $app nil)
+                 (show-dests $app nil)
                  (.remove ($ :.piece $dest))
                  (.appendTo $piece $dest)))])))
       (if (= orig dest)
@@ -51,8 +66,5 @@
   (if-let [orig (:selected state)]
     (move-piece state [orig key])
     (if (chess/get-piece (:chess state) key)
-      [(assoc state :selected key)
-       (fn [$app chans]
-         (show-selected $app key)
-         (.addClass ($ :.square $app) :dest))]
+      (move-start state key)
       [state noop])))

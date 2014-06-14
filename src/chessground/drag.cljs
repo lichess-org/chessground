@@ -5,12 +5,18 @@
             [chessground.ctrl :as ctrl]
             [chessground.chess :as chess]))
 
+(def dragging-class "dragging")
+(def drag-over-class "drag-over")
+
+(defn on-start [event chans]
+  (clj->js (fn [event] (-> event .-target .-classList (.add dragging-class))))
+  (push! (:move-start chans) (-> event .-target .-parentNode (.getAttribute "data-key"))))
+
 (defn on-move [event]
   (let [target (.-target event)
         x (+ (or (.-x target) 0) (.-dx event))
         y (+ (or (.-y target) 0) (.-dy event))
         transform (str "translate(" x "px, " y "px)")]
-    (.add (.-classList target) "dragging")
     (set! (.-x target) x)
     (set! (.-y target) y)
     (set! (.-transform (.-style target)) transform)
@@ -19,25 +25,24 @@
 (defn piece [el chans]
   (let [obj (js/interact el)]
     (jq/data ($ el) :interact obj)
-    (.draggable obj (clj->js {:onmove on-move}))))
+    (.draggable obj (clj->js {:onstart #(on-start % chans)
+                              :onmove on-move}))))
 
 (defn square [el chans]
   (let [obj (js/interact el)]
     (jq/data ($ el) :interact obj)
     (.dropzone obj true)
     (.on obj "dragenter"
-         (clj->js (fn[event] (.add (.-classList (.-target event)) "drag-over"))))
+         (clj->js (fn[event] (-> event .-target .-classList (.add drag-over-class)))))
     (.on obj "dragleave"
-         (clj->js (fn[event]
-                    (doseq [klass ["selected" "drag-over"]]
-                      (.remove (.-classList (.-target event)) klass)))))
+         (clj->js (fn[event] (-> event .-target .-classList (.remove drag-over-class)))))
     (.on obj "drop"
          (clj->js (fn[event]
                     (let [piece (.-relatedTarget event)
                           orig (.-parentNode piece)
                           dest (.-target event)]
-                      (.remove (.-classList piece) "dragging")
-                      (.remove (.-classList dest) "drag-over")
+                      (.remove (.-classList piece) dragging-class)
+                      (.remove (.-classList dest) drag-over-class)
                       (aset (.-style piece) common/transform-prop "")
                       (set! (.-x piece) 0)
                       (set! (.-y piece) 0)

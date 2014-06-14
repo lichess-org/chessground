@@ -57,8 +57,8 @@
   (let [app (load-app element (or (keywordize-keys (js->clj config)) {}))
         $app ($ element)]
     (jq/html $app (render-app @(:state app)))
-    (doseq [$piece ($ :.piece $app)] (drag/piece $piece (:channels app)))
     (doseq [$square ($ :.square $app)]
       (drag/square $square (:channels app))
       (select/square $square (:channels app)))
+    (doseq [$piece ($ :.piece $app)] (drag/piece $piece (:channels app)))
     (init-updates app)))

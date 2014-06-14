@@ -40,3 +40,12 @@
        (let [movable (:movable state)
              dests (:dests movable)]
          (or (:free movable) (common/set-contains? (get dests orig) dest)))))
+
+(defn dests-of [state orig]
+  "List of destinations square keys for this origin"
+  (if (-> state :movable :free)
+    (for [rank (range 1 9)
+          file (vec "abcdefgh")
+          :let [key (str file rank)]
+          :when (not= orig key)] key)
+    (-> state :movable :dests orig)))
