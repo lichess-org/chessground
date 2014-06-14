@@ -40,11 +40,9 @@
         (let [new-state (dissoc state :selected)]
           [new-state
            (fn [$app chans]
-             (show/selected $app nil))])
-        (let [new-state (assoc state :selected dest)]
-          [new-state
-           (fn [$app chans]
-             (show/selected $app dest))]))))
+             (show/selected $app nil)
+             (show/dests $app nil))])
+        (move-start state dest))))
 
 (defn select-square [state key]
   (if-let [orig (:selected state)]

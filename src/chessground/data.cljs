@@ -9,8 +9,8 @@
   {:fen nil ; replaced by :chess by data/make
    :orientation :white
    :movable {:free true ; all moves are valid - board editor
-             :color :all ; color that can move. :white or :black or :all
-             :dests nil ; valid moves. {"a2" #{"a3" "a4"} "b1" #{"a3" "3"}} | nil
+             :color :all ; color that can move. white or black or all
+             :dests nil ; valid moves. {"a2" ["a3" "a4"] "b1" ["a3" "c3"]} | nil
              :events {:after (fn [orig dest chess] nil) ; called after the moves has been played
                       }
              }
@@ -24,8 +24,7 @@
 
 (defn make [config] (-> (merge defaults config)
                         (with-fen (:fen config))
-                        (dissoc :fen)
-                        (update-in [:movable :color] keyword)))
+                        (dissoc :fen)))
 
 (defn is-movable? [state key]
   "Piece on this square may be moved somewhere, if the validation allows it"
@@ -43,9 +42,11 @@
 
 (defn dests-of [state orig]
   "List of destinations square keys for this origin"
-  (if (-> state :movable :free)
-    (for [rank (range 1 9)
-          file (vec "abcdefgh")
-          :let [key (str file rank)]
-          :when (not= orig key)] key)
-    (-> state :movable :dests orig)))
+  (when (is-movable? state orig)
+    (if (-> state :movable :free)
+      (for [rank (range 1 9)
+            file (vec "abcdefgh")
+            :let [key (str file rank)]
+            :when (not= orig key)] key)
+      (pp (get-in state [:movable :dests]))
+      (get-in state [:movable :dests orig]))))

@@ -11,6 +11,7 @@
   (when selected (jq/add-class ($square $app selected) :selected)))
 
 (defn dests [$app dests]
+  ; this is probably not the best approach, performance-wise.
   (doseq [square ($ :.square $app)]
     (if (common/set-contains? dests (.getAttribute square "data-key"))
       (-> square .-classList (.add "dest"))

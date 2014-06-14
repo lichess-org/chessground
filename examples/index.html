@@ -84,22 +84,22 @@
     <!--     }); -->
     <!--   </script> -->
     <!-- </section> -->
-    <!-- <section> -->
-    <!--   <div class="chessground marble small merida" id="ground6"></div> -->
-    <!--   <p>Valid moves: custom FEN, black plays</p> -->
-    <!--   <script> -->
-    <!--     var fen = '1r2r1k1/p4pbp/2pn2p1/q1N1pb2/3Pp3/1P3PP1/PB4BP/2RQR1K1 b - - 0 20' ; -->
-    <!--     var chess = new Chess(fen); -->
-    <!--     chessground.main(document.getElementById('ground6'), { -->
-    <!--       fen: fen, -->
-    <!--       movable: { -->
-    <!--         free: false, -->
-    <!--         color: chessToColor(chess), -->
-    <!--         dests: chessToDests(chess) -->
-    <!--       } -->
-    <!--     }); -->
-    <!--   </script> -->
-    <!-- </section> -->
+    <section>
+      <div class="chessground marble small merida" id="ground6"></div>
+      <p>Valid moves: custom FEN, black plays</p>
+      <script>
+        var fen = '1r2r1k1/p4pbp/2pn2p1/q1N1pb2/3Pp3/1P3PP1/PB4BP/2RQR1K1 b - - 0 20' ;
+        var chess = new Chess(fen);
+        chessground.main(document.getElementById('ground6'), {
+          fen: fen,
+          movable: {
+            free: false,
+            color: chessToColor(chess),
+            dests: chessToDests(chess)
+          }
+        });
+      </script>
+    </section>
     <!-- <section> -->
     <!--   <div class="chessground wood small merida" id="ground7"></div> -->
     <!--   <p>Actually play a game</p> -->
