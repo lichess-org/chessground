@@ -5,6 +5,7 @@
    and mutating the dom"
   (:require [jayq.core :as jq :refer [$]]
             [chessground.common :as common :refer [pp]]
+            [chessground.show :as show]
             [chessground.data :as data]
             [chessground.chess :as chess]))
 
@@ -14,26 +15,13 @@
 
 (defn- noop [] nil)
 
-(defn- $square [$app key]
-  ($ (str ".square[data-key=" key "]") $app))
-
-(defn- show-selected [$app selected]
-  (jq/remove-class ($ :.square.selected $app) :selected)
-  (when selected (jq/add-class ($square $app selected) :selected)))
-
-(defn- show-dests [$app dests]
-  (doseq [square ($ :.square $app)]
-    (if (common/set-contains? dests (.getAttribute square "data-key"))
-      (-> square .-classList (.add "dest"))
-      (-> square .-classList (.remove "dest")))))
-
 (defn move-start [state orig]
   "A move has been started, either by clicking on a piece, or dragging it"
   (let [new-state (assoc state :selected orig)]
     [new-state
      (fn [$app chans]
-       (show-selected $app orig)
-       (show-dests $app (data/dests-of state orig)))]))
+       (show/selected $app orig)
+       (show/dests $app (data/dests-of state orig)))]))
 
 (defn move-piece [state [orig dest]]
   (or (when (data/can-move? state orig dest)
@@ -45,22 +33,18 @@
             (callback (-> state :movable :events :after) orig dest new-chess)
             [new-state
              (fn [$app chans]
-               (let [$orig ($square $app orig)
-                     $dest ($square $app dest)
-                     $piece ($ :.piece $orig)]
-                 (show-selected $app nil)
-                 (show-dests $app nil)
-                 (.remove ($ :.piece $dest))
-                 (.appendTo $piece $dest)))])))
+               (show/move $app orig dest)
+               (show/selected $app nil)
+               (show/dests $app nil))])))
       (if (= orig dest)
         (let [new-state (dissoc state :selected)]
           [new-state
            (fn [$app chans]
-             (show-selected $app nil))])
+             (show/selected $app nil))])
         (let [new-state (assoc state :selected dest)]
           [new-state
            (fn [$app chans]
-             (show-selected $app dest))]))))
+             (show/selected $app dest))]))))
 
 (defn select-square [state key]
   (if-let [orig (:selected state)]
