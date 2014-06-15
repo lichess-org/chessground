@@ -2,7 +2,6 @@
   "Make squares selectable"
   (:require [jayq.core :as jq :refer [$]]
             [chessground.common :as common :refer [pp push!]]
-            [chessground.ctrl :as ctrl]
             [chessground.chess :as chess]))
 
 (defn handler [event chans]
