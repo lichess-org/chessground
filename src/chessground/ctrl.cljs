@@ -40,6 +40,7 @@
         (let [new-state (dissoc state :selected)]
           [new-state
            (fn [$app chans]
+             (show/un-move $app orig)
              (show/selected $app nil)
              (show/dests $app nil))])
         (move-start state dest))))

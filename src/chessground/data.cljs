@@ -51,5 +51,6 @@
       (for [rank (range 1 9)
             file (vec "abcdefgh")
             :let [key (str file rank)]
-            :when (not= orig key)] key)
+            :when (not= orig key)]
+        key)
       (get-in state [:movable :dests orig]))))
