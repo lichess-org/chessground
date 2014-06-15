@@ -10,7 +10,7 @@
 (defn pp [& exprs]
   (when debug
     (doseq [expr exprs] (.log js/console expr (clj->js expr))))
-    (first exprs))
+  (first exprs))
 
 (defn set-contains? [set val] (some #{val} set))
 
@@ -40,3 +40,6 @@
 (defn square-key [dom-element]
   "Gets the square key from the element, or its parent"
   (.getAttribute (square-element dom-element) "data-key"))
+
+(defn keywordize-keys [hashmap]
+  (into {} (for [[k v] hashmap] [(keyword k) v])))

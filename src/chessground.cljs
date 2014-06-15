@@ -1,6 +1,5 @@
 (ns chessground
   (:require [cljs.core.async :as a]
-            [clojure.walk :refer [keywordize-keys]]
             [jayq.core :as jq :refer [$]]
             [chessground.common :as common :refer [pp]]
             [chessground.data :as data]
@@ -53,7 +52,7 @@
 (defn ^:export main
   "Application entry point; returns the public JavaScript API"
   [element config]
-  (let [app (load-app element (or (keywordize-keys (js->clj config)) {}))]
+  (let [app (load-app element (or (js->clj config) {}))]
     (show/app (:$element app) @(:state app) (:channels app))
     (init-updates app)
     (api/build (:channels app))))

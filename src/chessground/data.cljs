@@ -1,7 +1,7 @@
 (ns chessground.data
   "Representation and manipulation of the application data"
   (:refer-clojure :exclude [filter])
-  (:require [chessground.common :as common :refer [pp]]
+  (:require [chessground.common :as common :refer [pp keywordize-keys]]
             [chessground.chess :as chess]))
 
 (def defaults
@@ -22,9 +22,14 @@
 (defn with-dests [state dests]
   (assoc-in state [:movable :dests] dests))
 
-(defn make [config] (-> (merge defaults config)
-                        (with-fen (:fen config))
-                        (dissoc :fen)))
+(defn make [js-config]
+  (let [config (-> js-config
+                   keywordize-keys
+                   (update-in [:movable] keywordize-keys)
+                   (update-in [:movable :events] keywordize-keys))]
+    (-> (merge defaults config)
+        (with-fen (:fen config))
+        (dissoc :fen))))
 
 (defn is-movable? [state key]
   "Piece on this square may be moved somewhere, if the validation allows it"
@@ -36,9 +41,8 @@
 (defn can-move? [state orig dest]
   "The piece on orig can definitely be moved to dest"
   (and (is-movable? state orig)
-       (let [movable (:movable state)
-             dests (:dests movable)]
-         (or (:free movable) (common/set-contains? (get dests orig) dest)))))
+       (or (-> state :movable :free)
+           (common/set-contains? (get-in state [:movable :dests orig]) dest))))
 
 (defn dests-of [state orig]
   "List of destinations square keys for this origin"
