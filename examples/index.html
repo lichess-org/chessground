@@ -71,20 +71,20 @@
         })();
       </script>
     </section>
+    <section>
+      <div class="chessground wood small cburnett" id="ground4"></div>
+      <p>Disable moving pieces</p>
+      <script>
+        chessground.main(document.getElementById('ground4'), {
+          movable: {free: false}
+        });
+      </script>
+    </section>
     <!-- <section> -->
-      <!--   <div class="chessground wood small cburnett" id="ground4"></div> -->
-      <!--   <p>Disable moving pieces</p> -->
+      <!--   <div class="chessground blue small cburnett" id="ground5"></div> -->
+      <!--   <p>Valid moves: white plays</p> -->
       <!--   <script> -->
-        <!--     chessground.main(document.getElementById('ground4'), { -->
-    <!--       movable: {free: false} -->
-    <!--     }); -->
-      <!--   </script> -->
-    <!-- </section> -->
-  <!-- <section> -->
-    <!--   <div class="chessground blue small cburnett" id="ground5"></div> -->
-    <!--   <p>Valid moves: white plays</p> -->
-    <!--   <script> -->
-      <!--     var chess = new Chess(); -->
+        <!--     var chess = new Chess(); -->
     <!--     chessground.main(document.getElementById('ground5'), { -->
     <!--       movable: { -->
     <!--         free: false, -->
@@ -92,13 +92,13 @@
     <!--         dests: chessToDests(chess) -->
     <!--       } -->
     <!--     }); -->
-    <!--   </script> -->
-  <!-- </section> -->
-<section>
-  <div class="chessground marble small merida" id="ground6"></div>
-  <p>Valid moves: custom FEN, black plays</p>
-  <script>
-    var fen = '1r2r1k1/p4pbp/2pn2p1/q1N1pb2/3Pp3/1P3PP1/PB4BP/2RQR1K1 b - - 0 20' ;
+      <!--   </script> -->
+    <!-- </section> -->
+  <section>
+    <div class="chessground marble small merida" id="ground6"></div>
+    <p>Valid moves: custom FEN, black plays</p>
+    <script>
+      var fen = '1r2r1k1/p4pbp/2pn2p1/q1N1pb2/3Pp3/1P3PP1/PB4BP/2RQR1K1 b - - 0 20' ;
         var chess = new Chess(fen);
         chessground.main(document.getElementById('ground6'), {
           fen: fen,
@@ -108,13 +108,13 @@
             dests: chessToDests(chess)
           }
         });
-  </script>
-</section>
-<!-- <section> -->
-  <!--   <div class="chessground wood small merida" id="ground7"></div> -->
-  <!--   <p>Actually play a game</p> -->
-  <!--   <script> -->
-    <!--     var ground; -->
+    </script>
+  </section>
+  <!-- <section> -->
+    <!--   <div class="chessground wood small merida" id="ground7"></div> -->
+    <!--   <p>Actually play a game</p> -->
+    <!--   <script> -->
+      <!--     var ground; -->
     <!--     var chess = new Chess(); -->
     <!--     function onMove(orig, dest) { -->
     <!--       chess.move({from: orig, to: dest}); -->
@@ -131,8 +131,8 @@
     <!--         } -->
     <!--       } -->
     <!--     }); -->
-  <!--   </script> -->
-<!-- </section> -->
+    <!--   </script> -->
+  <!-- </section> -->
   </body>
 </html>
 

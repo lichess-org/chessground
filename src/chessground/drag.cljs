@@ -22,15 +22,19 @@
     ; (set! (.-transform (.-style target)) transform)
     (aset (.-style target) common/transform-prop transform)))
 
-(defn piece [el chans]
+(defn piece-on [el chans]
   (let [obj (js/interact el)]
     (jq/data ($ el) :interact obj)
     (.draggable obj (clj->js {:onstart #(on-start % chans)
                               :onmove on-move}))))
 
+(defn piece-off [el]
+  (let [$el ($ el)]
+    (.unset (jq/data $el :interact))
+    (jq/remove-data $el :interact)))
+
 (defn square [el chans]
   (let [obj (js/interact el)]
-    (jq/data ($ el) :interact obj)
     (.dropzone obj true)
     (.on obj "dragenter"
          (clj->js (fn[event] (-> event .-target .-classList (.add drag-over-class)))))

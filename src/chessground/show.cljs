@@ -28,16 +28,24 @@
     (.remove ($ :.piece $dest))
     (.appendTo $piece $dest)))
 
-(defn- interactions [$app chans]
-  (doseq [$square ($ :.square $app)]
-    (drag/square $square chans)
-    (select/square $square chans))
-  (doseq [$piece ($ :.piece $app)] (drag/piece $piece chans)))
+(defn- interactions [$app state chans]
+  (doseq [sq ($ :.square $app)]
+    (drag/square sq chans)
+    (select/square sq chans))
+  (let [movable-color (-> state :movable :color)]
+    (doseq [p ($ :.piece $app)
+            :let [$p ($ p)
+                  instance (jq/data $p :interact)
+                  owner (if (jq/has-class $p :white) "white" "black")
+                  draggable (or (= movable-color "both") (= movable-color owner))]]
+      (if instance
+        (when (not draggable) (drag/piece-off p))
+        (when draggable (drag/piece-on p chans))))))
 
 (defn board [$app state chans]
   (jq/replace-with ($ :.board $app) (render/board state))
-  (interactions $app chans))
+  (interactions $app state chans))
 
 (defn app [$app state chans]
   (jq/html $app (render/app state))
-  (interactions $app chans))
+  (interactions $app state chans))

@@ -48,5 +48,4 @@
             file (vec "abcdefgh")
             :let [key (str file rank)]
             :when (not= orig key)] key)
-      (pp (get-in state [:movable :dests]))
       (get-in state [:movable :dests orig]))))
