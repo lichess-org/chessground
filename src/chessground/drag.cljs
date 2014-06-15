@@ -19,7 +19,7 @@
         transform (str "translate(" x "px, " y "px)")]
     (set! (.-x target) x)
     (set! (.-y target) y)
-    (set! (.-transform (.-style target)) transform)
+    ; (set! (.-transform (.-style target)) transform)
     (aset (.-style target) common/transform-prop transform)))
 
 (defn piece [el chans]
@@ -41,12 +41,12 @@
                     (let [piece (.-relatedTarget event)
                           orig (.-parentNode piece)
                           dest (.-target event)]
+                      (push! (:move-piece chans) (map common/square-key [orig dest]))
                       (.remove (.-classList piece) dragging-class)
-                      (.remove (.-classList dest) drag-over-class)
-                      (push! (:move-piece chans) (map common/square-key [orig dest]))))))))
+                      (.remove (.-classList dest) drag-over-class)))))))
 
 (defn unfuck [piece-el]
   (set! (.-x piece-el) 0)
   (set! (.-y piece-el) 0)
-  (set! (.-transform (.-style piece-el)) "")
+  ; (set! (.-transform (.-style piece-el)) "")
   (aset (.-style piece-el) common/transform-prop ""))
