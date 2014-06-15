@@ -24,9 +24,9 @@
 
 (defn make [js-config]
   (let [config (-> js-config
-                   keywordize-keys
-                   (update-in [:movable] keywordize-keys)
-                   (update-in [:movable :events] keywordize-keys))]
+                   keywordize-keys)]
+                   ; (update-in [:movable] keywordize-keys)
+                   ; (update-in [:movable :events] keywordize-keys))]
     (-> (merge defaults config)
         (with-fen (:fen config))
         (dissoc :fen))))
