@@ -43,7 +43,11 @@
              (show/un-move $app orig)
              (show/selected $app nil)
              (show/dests $app nil))])
-        (move-start state dest))))
+        (let [[new-state mutator] (move-start state dest)]
+          [new-state
+           (fn [$app chans]
+             (show/un-move $app orig)
+             (mutator $app chans))]))))
 
 (defn select-square [state key]
   (if-let [orig (:selected state)]
