@@ -7,9 +7,9 @@
 (def defaults
   "Default state, overridable by user configuration"
   {:fen nil ; replaced by :chess by data/make
-   :orientation :white
+   :orientation "white"
    :movable {:free true ; all moves are valid - board editor
-             :color :all ; color that can move. white or black or all
+             :color "all" ; color that can move. white or black or all
              :dests nil ; valid moves. {"a2" ["a3" "a4"] "b1" ["a3" "c3"]} | nil
              :events {:after (fn [orig dest chess] nil) ; called after the moves has been played
                       }

@@ -1,6 +1,7 @@
 (ns chessground.show
   "Mutates the DOM to show state changes"
   (:require [jayq.core :as jq :refer [$]]
+            [chessground.render :as render]
             [chessground.drag :as drag]
             [chessground.common :as common :refer [pp]]))
 
@@ -25,3 +26,6 @@
     (drag/unfuck (first $piece))
     (.remove ($ :.piece $dest))
     (.appendTo $piece $dest)))
+
+(defn board [$app state]
+  (jq/replace-with ($ :.board $app) (render/board state)))

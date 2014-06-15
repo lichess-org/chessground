@@ -50,3 +50,12 @@
     (if (chess/get-piece (:chess state) key)
       (move-start state key)
       [state noop])))
+
+(defn set-orientation [state orientation]
+  (if (common/set-contains? chess/colors orientation)
+    (let [new-state (assoc state :orientation orientation)]
+      [new-state
+       (fn [$app chans] (show/board $app new-state))])))
+
+(defn toggle-orientation [state]
+  (set-orientation state (if (= (:orientation state) "white") "black" "white")))

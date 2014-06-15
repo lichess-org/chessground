@@ -8,7 +8,7 @@
 ;           "b1" {:color "white" :role "knight"}
 ;          }}
 
-(def colors [:white :black])
+(def colors ["white" "black"])
 
 (defn make [fen]
   {:pieces (forsyth/parse fen)})
