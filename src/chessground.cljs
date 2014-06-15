@@ -4,7 +4,8 @@
             [jayq.core :as jq :refer [$]]
             [chessground.common :as common :refer [pp]]
             [chessground.data :as data]
-            [chessground.render :refer [render-app]]
+            [chessground.api :as api]
+            [chessground.render :as render]
             [chessground.ctrl :as ctrl]
             [chessground.drag :as drag]
             [chessground.select :as select])
@@ -56,9 +57,10 @@
   [element config]
   (let [app (load-app element (or (keywordize-keys (js->clj config)) {}))
         $app ($ element)]
-    (jq/html $app (render-app @(:state app)))
+    (jq/html $app (render/app @(:state app)))
     (doseq [$square ($ :.square $app)]
       (drag/square $square (:channels app))
       (select/square $square (:channels app)))
     (doseq [$piece ($ :.piece $app)] (drag/piece $piece (:channels app)))
-    (init-updates app)))
+    (init-updates app)
+    (api/build (:channels app))))
