@@ -9,7 +9,7 @@
   {:fen nil ; replaced by :chess by data/make
    :orientation "white"
    :movable {:free true ; all moves are valid - board editor
-             :color "all" ; color that can move. white or black or all
+             :color "both" ; color that can move. white or black or both
              :dests nil ; valid moves. {"a2" ["a3" "a4"] "b1" ["a3" "c3"]} | nil
              :events {:after (fn [orig dest chess] nil) ; called after the moves has been played
                       }
@@ -31,7 +31,7 @@
   (let [owner (chess/owner-color (:chess state) key)
         movable (:movable state)
         color (:color movable)]
-    (and owner (or (= color :all) (= color owner)))))
+    (and owner (or (= color "both") (= color owner)))))
 
 (defn can-move? [state orig dest]
   "The piece on orig can definitely be moved to dest"

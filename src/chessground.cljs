@@ -5,10 +5,8 @@
             [chessground.common :as common :refer [pp]]
             [chessground.data :as data]
             [chessground.api :as api]
-            [chessground.render :as render]
-            [chessground.ctrl :as ctrl]
-            [chessground.drag :as drag]
-            [chessground.select :as select])
+            [chessground.show :as show]
+            [chessground.ctrl :as ctrl])
   (:require-macros [cljs.core.async.macros :as am]))
 
 (defn load-app
@@ -55,12 +53,7 @@
 (defn ^:export main
   "Application entry point; returns the public JavaScript API"
   [element config]
-  (let [app (load-app element (or (keywordize-keys (js->clj config)) {}))
-        $app ($ element)]
-    (jq/html $app (render/app @(:state app)))
-    (doseq [$square ($ :.square $app)]
-      (drag/square $square (:channels app))
-      (select/square $square (:channels app)))
-    (doseq [$piece ($ :.piece $app)] (drag/piece $piece (:channels app)))
+  (let [app (load-app element (or (keywordize-keys (js->clj config)) {}))]
+    (show/app (:$element app) @(:state app) (:channels app))
     (init-updates app)
     (api/build (:channels app))))

@@ -55,7 +55,7 @@
   (if (common/set-contains? chess/colors orientation)
     (let [new-state (assoc state :orientation orientation)]
       [new-state
-       (fn [$app chans] (show/board $app new-state))])))
+       (fn [$app chans] (show/board $app new-state chans))])))
 
 (defn toggle-orientation [state]
   (set-orientation state (if (= (:orientation state) "white") "black" "white")))
@@ -63,4 +63,4 @@
 (defn set-fen [state fen]
   (let [new-state (data/with-fen state fen)]
     [new-state
-     (fn [$app chans] (show/board $app new-state))]))
+     (fn [$app chans] (show/board $app new-state chans))]))

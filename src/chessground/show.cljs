@@ -3,6 +3,7 @@
   (:require [jayq.core :as jq :refer [$]]
             [chessground.render :as render]
             [chessground.drag :as drag]
+            [chessground.select :as select]
             [chessground.common :as common :refer [pp]]))
 
 (defn- $square [$app key]
@@ -27,5 +28,16 @@
     (.remove ($ :.piece $dest))
     (.appendTo $piece $dest)))
 
-(defn board [$app state]
-  (jq/replace-with ($ :.board $app) (render/board state)))
+(defn- interactions [$app chans]
+  (doseq [$square ($ :.square $app)]
+    (drag/square $square chans)
+    (select/square $square chans))
+  (doseq [$piece ($ :.piece $app)] (drag/piece $piece chans)))
+
+(defn board [$app state chans]
+  (jq/replace-with ($ :.board $app) (render/board state))
+  (interactions $app chans))
+
+(defn app [$app state chans]
+  (jq/html $app (render/app state))
+  (interactions $app chans))
