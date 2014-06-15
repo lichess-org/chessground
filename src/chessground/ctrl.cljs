@@ -30,12 +30,12 @@
                               (assoc :chess new-chess)
                               (dissoc :selected)
                               (assoc-in [:movable :dests] nil))]
-            (callback (-> state :movable :events :after) orig dest new-chess)
             [new-state
              (fn [$app chans]
                (show/move $app orig dest)
                (show/selected $app nil)
-               (show/dests $app nil))])))
+               (show/dests $app nil)
+               (callback (-> new-state :movable :events :after) orig dest new-chess))])))
       (if (= orig dest)
         (let [new-state (dissoc state :selected)]
           [new-state

@@ -43,8 +43,10 @@
                           dest (.-target event)]
                       (.remove (.-classList piece) dragging-class)
                       (.remove (.-classList dest) drag-over-class)
-                      (aset (.-style piece) common/transform-prop "")
-                      (set! (.-x piece) 0)
-                      (set! (.-y piece) 0)
-                      (set! (.-transform (.-style piece)) "")
                       (push! (:move-piece chans) (map common/square-key [orig dest]))))))))
+
+(defn unfuck [piece-el]
+  (set! (.-x piece-el) 0)
+  (set! (.-y piece-el) 0)
+  (set! (.-transform (.-style piece-el)) "")
+  (aset (.-style piece-el) common/transform-prop ""))
