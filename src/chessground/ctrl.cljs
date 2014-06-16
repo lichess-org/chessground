@@ -36,18 +36,12 @@
                (show/selected $app nil)
                (show/dests $app nil)
                (callback (-> new-state :movable :events :after) orig dest new-chess))])))
-      (if (= orig dest)
-        (let [new-state (dissoc state :selected)]
-          [new-state
-           (fn [$app chans]
-             (show/un-move $app orig)
-             (show/selected $app nil)
-             (show/dests $app nil))])
-        (let [[new-state mutator] (move-start state dest)]
-          [new-state
-           (fn [$app chans]
-             (show/un-move $app orig)
-             (mutator $app chans))]))))
+      (let [new-state (dissoc state :selected)]
+        [new-state
+         (fn [$app chans]
+           (show/un-move $app orig)
+           (show/selected $app nil)
+           (show/dests $app nil))])))
 
 (defn select-square [state key]
   (if-let [orig (:selected state)]

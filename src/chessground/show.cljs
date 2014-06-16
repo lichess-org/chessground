@@ -30,8 +30,8 @@
 
 (defn un-move [$app orig]
   (let [$orig ($square $app orig)
-        $piece ($ :.piece $orig)]
-    (drag/unfuck (first $piece))))
+        piece (first ($ :.piece $orig))]
+    (when piece (drag/unfuck piece))))
 
 (defn- interactions [$app state chans]
   (doseq [sq ($ :.square $app)]
