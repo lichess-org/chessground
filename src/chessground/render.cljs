@@ -25,5 +25,13 @@
                   (square key pos p))]
     (str "<div class='board'>" (apply str squares) "</div>")))
 
+(defn spare-pieces [state color klass]
+  (when (:spare-pieces state)
+    (str "<div class='spare-pieces " klass " " color "'>"
+         (apply str (map #(str "<div class='piece " % " " color "'></div>") chess/roles))
+         "</div>")))
+
 (defn app [state]
-  (board state))
+  (str (spare-pieces state (if (= (:orientation state) "white") "black" "white") "top")
+       (board state)
+       (spare-pieces state (if (= (:orientation state) "white") "white" "black") "bottom")))

@@ -9,6 +9,7 @@
 ;          }}
 
 (def colors ["white" "black"])
+(def roles ["pawn" "rook" "knight" "bishop" "queen" "king"])
 
 (def clear {:pieces {}})
 
