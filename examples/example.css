@@ -38,13 +38,13 @@ section p {
   height: 400px;
 }
 .chessground.blue .board {
-  background-image: url('http://localhost:8080/lila/public/images/board/blue2.jpg');
+  background-image: url('http://lichess.org/assets/images/board/blue2.jpg');
 }
 .chessground.wood .board {
-  background-image: url('http://localhost:8080/lila/public/images/board/wood2.jpg');
+  background-image: url('http://lichess.org/assets/images/board/wood2.jpg');
 }
 .chessground.marble .board {
-  background-image: url('http://localhost:8080/lila/public/images/board/marble.jpg');
+  background-image: url('http://lichess.org/assets/images/board/marble.jpg');
 }
 .chessground .square {
   position: absolute;
@@ -96,110 +96,110 @@ section p {
   height: 130%;
 }
 .chessground.pirouetti .piece.pawn.white {
-  background-image: url('http://localhost:8080/lila/public/piece/pirouetti/wP.svg');
+  background-image: url('http://lichess.org/assets/piece/pirouetti/wP.svg');
 }
 .chessground.pirouetti .piece.bishop.white {
-  background-image: url('http://localhost:8080/lila/public/piece/pirouetti/wB.svg');
+  background-image: url('http://lichess.org/assets/piece/pirouetti/wB.svg');
 }
 .chessground.pirouetti .piece.knight.white {
-  background-image: url('http://localhost:8080/lila/public/piece/pirouetti/wN.svg');
+  background-image: url('http://lichess.org/assets/piece/pirouetti/wN.svg');
 }
 .chessground.pirouetti .piece.rook.white {
-  background-image: url('http://localhost:8080/lila/public/piece/pirouetti/wR.svg');
+  background-image: url('http://lichess.org/assets/piece/pirouetti/wR.svg');
 }
 .chessground.pirouetti .piece.queen.white {
-  background-image: url('http://localhost:8080/lila/public/piece/pirouetti/wQ.svg');
+  background-image: url('http://lichess.org/assets/piece/pirouetti/wQ.svg');
 }
 .chessground.pirouetti .piece.king.white {
-  background-image: url('http://localhost:8080/lila/public/piece/pirouetti/wK.svg');
+  background-image: url('http://lichess.org/assets/piece/pirouetti/wK.svg');
 }
 .chessground.pirouetti .piece.pawn.black {
-  background-image: url('http://localhost:8080/lila/public/piece/pirouetti/bP.svg');
+  background-image: url('http://lichess.org/assets/piece/pirouetti/bP.svg');
 }
 .chessground.pirouetti .piece.bishop.black {
-  background-image: url('http://localhost:8080/lila/public/piece/pirouetti/bB.svg');
+  background-image: url('http://lichess.org/assets/piece/pirouetti/bB.svg');
 }
 .chessground.pirouetti .piece.knight.black {
-  background-image: url('http://localhost:8080/lila/public/piece/pirouetti/bN.svg');
+  background-image: url('http://lichess.org/assets/piece/pirouetti/bN.svg');
 }
 .chessground.pirouetti .piece.rook.black {
-  background-image: url('http://localhost:8080/lila/public/piece/pirouetti/bR.svg');
+  background-image: url('http://lichess.org/assets/piece/pirouetti/bR.svg');
 }
 .chessground.pirouetti .piece.queen.black {
-  background-image: url('http://localhost:8080/lila/public/piece/pirouetti/bQ.svg');
+  background-image: url('http://lichess.org/assets/piece/pirouetti/bQ.svg');
 }
 .chessground.pirouetti .piece.king.black {
-  background-image: url('http://localhost:8080/lila/public/piece/pirouetti/bK.svg');
+  background-image: url('http://lichess.org/assets/piece/pirouetti/bK.svg');
 }
 .chessground.cburnett .piece.pawn.white {
-  background-image: url('http://localhost:8080/lila/public/piece/cburnett/wP.svg');
+  background-image: url('http://lichess.org/assets/piece/cburnett/wP.svg');
 }
 .chessground.cburnett .piece.bishop.white {
-  background-image: url('http://localhost:8080/lila/public/piece/cburnett/wB.svg');
+  background-image: url('http://lichess.org/assets/piece/cburnett/wB.svg');
 }
 .chessground.cburnett .piece.knight.white {
-  background-image: url('http://localhost:8080/lila/public/piece/cburnett/wN.svg');
+  background-image: url('http://lichess.org/assets/piece/cburnett/wN.svg');
 }
 .chessground.cburnett .piece.rook.white {
-  background-image: url('http://localhost:8080/lila/public/piece/cburnett/wR.svg');
+  background-image: url('http://lichess.org/assets/piece/cburnett/wR.svg');
 }
 .chessground.cburnett .piece.queen.white {
-  background-image: url('http://localhost:8080/lila/public/piece/cburnett/wQ.svg');
+  background-image: url('http://lichess.org/assets/piece/cburnett/wQ.svg');
 }
 .chessground.cburnett .piece.king.white {
-  background-image: url('http://localhost:8080/lila/public/piece/cburnett/wK.svg');
+  background-image: url('http://lichess.org/assets/piece/cburnett/wK.svg');
 }
 .chessground.cburnett .piece.pawn.black {
-  background-image: url('http://localhost:8080/lila/public/piece/cburnett/bP.svg');
+  background-image: url('http://lichess.org/assets/piece/cburnett/bP.svg');
 }
 .chessground.cburnett .piece.bishop.black {
-  background-image: url('http://localhost:8080/lila/public/piece/cburnett/bB.svg');
+  background-image: url('http://lichess.org/assets/piece/cburnett/bB.svg');
 }
 .chessground.cburnett .piece.knight.black {
-  background-image: url('http://localhost:8080/lila/public/piece/cburnett/bN.svg');
+  background-image: url('http://lichess.org/assets/piece/cburnett/bN.svg');
 }
 .chessground.cburnett .piece.rook.black {
-  background-image: url('http://localhost:8080/lila/public/piece/cburnett/bR.svg');
+  background-image: url('http://lichess.org/assets/piece/cburnett/bR.svg');
 }
 .chessground.cburnett .piece.queen.black {
-  background-image: url('http://localhost:8080/lila/public/piece/cburnett/bQ.svg');
+  background-image: url('http://lichess.org/assets/piece/cburnett/bQ.svg');
 }
 .chessground.cburnett .piece.king.black {
-  background-image: url('http://localhost:8080/lila/public/piece/cburnett/bK.svg');
+  background-image: url('http://lichess.org/assets/piece/cburnett/bK.svg');
 }
 .chessground.merida .piece.pawn.white {
-  background-image: url('http://localhost:8080/lila/public/piece/merida/wP.svg');
+  background-image: url('http://lichess.org/assets/piece/merida/wP.svg');
 }
 .chessground.merida .piece.bishop.white {
-  background-image: url('http://localhost:8080/lila/public/piece/merida/wB.svg');
+  background-image: url('http://lichess.org/assets/piece/merida/wB.svg');
 }
 .chessground.merida .piece.knight.white {
-  background-image: url('http://localhost:8080/lila/public/piece/merida/wN.svg');
+  background-image: url('http://lichess.org/assets/piece/merida/wN.svg');
 }
 .chessground.merida .piece.rook.white {
-  background-image: url('http://localhost:8080/lila/public/piece/merida/wR.svg');
+  background-image: url('http://lichess.org/assets/piece/merida/wR.svg');
 }
 .chessground.merida .piece.queen.white {
-  background-image: url('http://localhost:8080/lila/public/piece/merida/wQ.svg');
+  background-image: url('http://lichess.org/assets/piece/merida/wQ.svg');
 }
 .chessground.merida .piece.king.white {
-  background-image: url('http://localhost:8080/lila/public/piece/merida/wK.svg');
+  background-image: url('http://lichess.org/assets/piece/merida/wK.svg');
 }
 .chessground.merida .piece.pawn.black {
-  background-image: url('http://localhost:8080/lila/public/piece/merida/bP.svg');
+  background-image: url('http://lichess.org/assets/piece/merida/bP.svg');
 }
 .chessground.merida .piece.bishop.black {
-  background-image: url('http://localhost:8080/lila/public/piece/merida/bB.svg');
+  background-image: url('http://lichess.org/assets/piece/merida/bB.svg');
 }
 .chessground.merida .piece.knight.black {
-  background-image: url('http://localhost:8080/lila/public/piece/merida/bN.svg');
+  background-image: url('http://lichess.org/assets/piece/merida/bN.svg');
 }
 .chessground.merida .piece.rook.black {
-  background-image: url('http://localhost:8080/lila/public/piece/merida/bR.svg');
+  background-image: url('http://lichess.org/assets/piece/merida/bR.svg');
 }
 .chessground.merida .piece.queen.black {
-  background-image: url('http://localhost:8080/lila/public/piece/merida/bQ.svg');
+  background-image: url('http://lichess.org/assets/piece/merida/bQ.svg');
 }
 .chessground.merida .piece.king.black {
-  background-image: url('http://localhost:8080/lila/public/piece/merida/bK.svg');
+  background-image: url('http://lichess.org/assets/piece/merida/bK.svg');
 }
