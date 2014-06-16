@@ -47,7 +47,7 @@
 (defn select-square [state key]
   (if-let [orig (:selected state)]
     (move-piece state [orig key])
-    (if (chess/get-piece (:chess state) key)
+    (if (and (chess/get-piece (:chess state) key) (data/is-movable? state key))
       (move-start state key)
       [state noop])))
 
