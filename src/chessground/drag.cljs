@@ -8,7 +8,7 @@
 (def drag-over-class "drag-over")
 
 (defn on-start [event chans]
-  (clj->js (fn [event] (-> event .-target .-classList (.add dragging-class))))
+  (-> event .-target .-classList (.add dragging-class))
   (push! (:move-start chans) (-> event .-target .-parentNode (.getAttribute "data-key"))))
 
 (defn on-move [event]
