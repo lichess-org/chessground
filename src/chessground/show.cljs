@@ -46,8 +46,10 @@
                   owner (if (jq/has-class $p :white) "white" "black")
                   draggable (or (= movable-color "both") (= movable-color owner))]]
       (if instance
-        (when (not draggable) (drag/piece-off p))
-        (when draggable (drag/piece-on p chans))))))
+        (if draggable
+          (drag/piece-on p)
+          (drag/piece-off p))
+        (when draggable (drag/make-draggable p chans))))))
 
 (defn board [$app state chans]
   (jq/replace-with ($ :.board $app) (render/board state))
