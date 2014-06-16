@@ -16,31 +16,57 @@
     <script src="../generated/chessground.dev.js" type="text/javascript"></script>
     <script type="text/javascript">goog.require("chessground");</script>
 
-    <!-- <script> -->
-    <!--   function include(script) { -->
-    <!--     document.write('\x3Cscript type="text/javascript" src="'+script+'">\x3C/script>'); -->
-    <!--   } -->
-    <!--   include("../libs/chess.min.js") -->
-    <!--   function chessToDests(chess) { -->
-    <!--     var dests = {}; -->
-    <!--     chess.SQUARES.forEach(function(s) { -->
-    <!--       var ms = chess.moves({square: s}); -->
-    <!--       if (ms.length) dests[s] = ms.map(function(m) { return m.substr(-2); }); -->
-    <!--     }); -->
-    <!--     return dests; -->
-    <!--   } -->
-    <!-- </script> -->
-
-    <div class="chessground wood small merida" id="ground1"></div>
     <script>
-      chessground.main(document.getElementById('ground1'));
+      function include(script) {
+        document.write('\x3Cscript type="text/javascript" src="'+script+'">\x3C/script>');
+      }
+      include("../libs/chess.min.js")
+      function chessToDests(chess) {
+        var dests = {};
+        chess.SQUARES.forEach(function(s) {
+        var ms = chess.moves({square: s});
+          if (ms.length) dests[s] = ms.map(function(m) { return m.substr(-2); });
+        });
+        return dests;
+      }
+      function chessToColor(chess) {
+        return (chess.turn() == "w") ? "white" : "black";
+      }
     </script>
+
+
+    <!-- <div class="chessground wood small merida" id="ground1"></div> -->
+    <section>
+      <div class="chessground wood small merida" id="ground7"></div>
+      <p>Actually play a game</p>
+      <script>
+        var ground;
+        var chess = new Chess();
+        function onMove(orig, dest) {
+          chess.move({from: orig, to: dest});
+          ground.setDests(chessToDests(chess));
+          ground.setColor(chessToColor(chess));
+        };
+        ground = chessground.main(document.getElementById('ground7'), {
+          movable: {
+            free: false,
+            color: chessToColor(chess),
+            dests: chessToDests(chess),
+          events: {
+            after: onMove
+            }
+        }
+        });
+      </script>
+    </section>
+
+
     <script>
       $(function() {
-        var size = $('body').width() - 5;
-        setTimeout(function() {
-          $('.board').width(size).height(size);
-        }, 100);
+      var size = $('body').width() - 5;
+      setTimeout(function() {
+      $('.board').width(size).height(size);
+      }, 100);
       });
     </script>
   </body>
