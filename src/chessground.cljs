@@ -24,6 +24,7 @@
               :move-start (a/chan)
               :move-piece (a/chan)
               :set-pieces (a/chan)
+              :drop-off (a/chan)
               }
    :consumers {:toggle-orientation ctrl/toggle-orientation
                :set-orientation ctrl/set-orientation
@@ -35,6 +36,7 @@
                :move-start ctrl/move-start
                :move-piece ctrl/move-piece
                :set-pieces ctrl/set-pieces
+               :drop-off ctrl/drop-off
                }
    })
 

@@ -36,7 +36,7 @@
     </script>
   </head>
   <body>
-    <section>
+   <section>
       <div class="chessground wood small merida coordinates" id="ground1"></div>
       <p>Default options, with CSS coordinates</p>
       <script>
@@ -44,10 +44,10 @@
       </script>
     </section>
     <section>
-      <div class="chessground blue small pirouetti" id="ground2"></div>
-      <p>From black point of view, with zoomed in pieces</p>
-      <script>
-        (function() {
+        <div class="chessground blue small pirouetti" id="ground2"></div>
+        <p>From black point of view, with zoomed in pieces</p>
+        <script>
+            (function() {
           var ground = chessground.main(document.getElementById('ground2'), {
             orientation: 'black'
           });
@@ -66,13 +66,13 @@
             }, 1000);
           }, 1000);
         })();
-      </script>
+        </script>
     </section>
-    <section>
+  <section>
       <div class="chessground marble small cburnett" id="ground3"></div>
       <p>Custom FEN positions</p>
       <script>
-        (function() {
+          (function() {
           var ground = chessground.main(document.getElementById('ground3'), {
             fen: 'rnbqkb1r/ppp1np2/3p1N1p/6p1/2PPPp2/3B1N2/PP4PP/R1BQK2R b KQkq - 2 9'
           });
@@ -81,21 +81,21 @@
           }, 3000);
         })();
       </script>
-    </section>
-    <section>
-      <div class="chessground wood small cburnett" id="ground4"></div>
-      <p>Disable moving pieces</p>
-      <script>
+  </section>
+<section>
+    <div class="chessground wood small cburnett" id="ground4"></div>
+    <p>Disable moving pieces</p>
+    <script>
         chessground.main(document.getElementById('ground4'), {
           movable: {free: false}
         });
-      </script>
-    </section>
+    </script>
+</section>
     <section>
-      <div class="chessground blue small cburnett" id="ground5"></div>
-      <p>Valid moves: white plays</p>
-      <script>
-        var chess = new Chess();
+        <div class="chessground blue small cburnett" id="ground5"></div>
+        <p>Valid moves: white plays</p>
+        <script>
+            var chess = new Chess();
         chessground.main(document.getElementById('ground5'), {
           movable: {
             free: false,
@@ -103,13 +103,13 @@
             dests: chessToDests(chess)
           }
         });
-      </script>
+        </script>
     </section>
-    <section>
+  <section>
       <div class="chessground marble small merida" id="ground6"></div>
       <p>Valid moves: custom FEN, black plays</p>
       <script>
-        var fen = '1r2r1k1/p4pbp/2pn2p1/q1N1pb2/3Pp3/1P3PP1/PB4BP/2RQR1K1 b - - 0 20' ;
+          var fen = '1r2r1k1/p4pbp/2pn2p1/q1N1pb2/3Pp3/1P3PP1/PB4BP/2RQR1K1 b - - 0 20' ;
         var chess = new Chess(fen);
         chessground.main(document.getElementById('ground6'), {
           fen: fen,
@@ -120,11 +120,11 @@
           }
         });
       </script>
-    </section>
-    <section>
-      <div class="chessground wood small merida" id="ground7"></div>
-      <p>Actually play a game</p>
-      <script>
+  </section>
+<section>
+    <div class="chessground wood small merida" id="ground7"></div>
+    <p>Actually play a game</p>
+    <script>
         var ground;
         var chess = new Chess();
         function onMove(orig, dest) {
@@ -140,6 +140,19 @@
             events: {
               after: onMove
             }
+          }
+        });
+    </script>
+</section>
+    <section>
+      <div class="chessground wood small merida coordinates" id="ground8"></div>
+      <p>Drop off to trash pieces</p>
+      <script>
+        chessground.main(document.getElementById('ground8'), {
+          movable: {
+            free: true,
+            color: 'both',
+            'drop-off': 'trash'
           }
         });
       </script>

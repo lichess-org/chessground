@@ -87,6 +87,16 @@
     [new-state
      (fn [$app chans] (show/board $app new-state chans))]))
 
+(defn drop-off [state key]
+  (if (= "trash" (-> state :movable :drop-off))
+    (let [[new-state shower] (set-pieces state {key nil})]
+      [(dissoc new-state :selected) shower])
+    (let [new-state (dissoc state :selected)]
+      [new-state
+       (fn [$app chans]
+         (show/selected $app nil)
+         (show/un-move $app key))])))
+
 (defn clear [state]
   (let [new-state (data/clear state)]
     [new-state

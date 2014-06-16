@@ -11,6 +11,7 @@
    :movable {:free true ; all moves are valid - board editor
              :color "both" ; color that can move. white or black or both
              :dests nil ; valid moves. {"a2" ["a3" "a4"] "b1" ["a3" "c3"]} | nil
+             :drop-off "revert" ; when a piece is dropped outside the board. "revert" | "trash"
              :events {:after (fn [orig dest chess] nil) ; called after the moves has been played
                       }
              }

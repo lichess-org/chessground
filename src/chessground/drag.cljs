@@ -21,29 +21,35 @@
     ; (set! (.-transform (.-style target)) transform)
     (aset (.-style target) common/transform-prop transform)))
 
+(defn on-end [event chans]
+  (-> event .-target .-classList (.remove dragging-class))
+  (when (not (.-dropzone event))
+    (push! (:drop-off chans) (-> event .-target .-parentNode (.getAttribute "data-key")))))
+
 (defn piece-on [el chans]
   (jq/data ($ el) :interact (-> (js/interact el)
                                 (.draggable true)
                                 (.on "dragstart" #(on-start % chans))
-                                (.on "dragmove" on-move))))
+                                (.on "dragmove" on-move)
+                                (.on "dragend" #(on-end % chans)))))
 
 (defn piece-off [el]
   (let [$el ($ el)]
     (.unset (jq/data $el :interact))
     (jq/remove-attr $el :data-interact)))
 
+(defn on-drop [event chans]
+  (let [orig (-> event .-relatedTarget .-parentNode)
+        dest (.-target event)]
+    (push! (:move-piece chans) (map common/square-key [orig dest]))
+    (.remove (.-classList dest) drag-over-class)))
+
 (defn square [el chans]
   (-> (js/interact el)
       (.dropzone true)
       (.on "dragenter" #(-> % .-target .-classList (.add drag-over-class)))
       (.on "dragleave" #(-> % .-target .-classList (.remove drag-over-class)))
-      (.on "drop" (fn[event]
-                    (let [piece (.-relatedTarget event)
-                          orig (.-parentNode piece)
-                          dest (.-target event)]
-                      (push! (:move-piece chans) (map common/square-key [orig dest]))
-                      (.remove (.-classList piece) dragging-class)
-                      (.remove (.-classList dest) drag-over-class))))))
+      (.on "drop" #(on-drop % chans))))
 
 (defn unfuck [piece-el]
   (set! (.-x piece-el) 0)
