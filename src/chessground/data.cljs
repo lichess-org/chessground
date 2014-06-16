@@ -19,9 +19,6 @@
 
 (defn with-fen [state fen] (assoc state :chess (chess/make fen)))
 
-(defn with-dests [state dests]
-  (assoc-in state [:movable :dests] dests))
-
 (defn make [js-config]
   (let [config (-> js-config
                    common/keywordize-keys

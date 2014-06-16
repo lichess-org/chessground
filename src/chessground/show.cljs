@@ -33,10 +33,12 @@
         piece (first ($ :.piece $orig))]
     (when piece (drag/unfuck piece))))
 
-(defn- interactions [$app state chans]
+(defn square-interactions [$app state chans]
   (doseq [sq ($ :.square $app)]
     (drag/square sq chans)
-    (select/square sq chans))
+    (select/square sq chans)))
+
+(defn piece-interactions [$app state chans]
   (let [movable-color (-> state :movable :color)]
     (doseq [p ($ :.piece $app)
             :let [$p ($ p)
@@ -49,8 +51,10 @@
 
 (defn board [$app state chans]
   (jq/replace-with ($ :.board $app) (render/board state))
-  (interactions $app state chans))
+  (square-interactions $app state chans)
+  (piece-interactions $app state chans))
 
 (defn app [$app state chans]
   (jq/html $app (render/app state))
-  (interactions $app state chans))
+  (square-interactions $app state chans)
+  (piece-interactions $app state chans))

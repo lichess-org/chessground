@@ -30,7 +30,7 @@
 (defn piece-off [el]
   (let [$el ($ el)]
     (.unset (jq/data $el :interact))
-    (jq/remove-data $el :interact)))
+    (jq/remove-attr $el :data-interact)))
 
 (defn square [el chans]
   (let [obj (js/interact el)]

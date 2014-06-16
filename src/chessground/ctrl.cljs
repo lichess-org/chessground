@@ -54,10 +54,27 @@
   (if (common/set-contains? chess/colors orientation)
     (let [new-state (assoc state :orientation orientation)]
       [new-state
-       (fn [$app chans] (show/board $app new-state chans))])))
+       (fn [$app chans] (show/board $app new-state chans))])
+    [state noop]))
 
 (defn toggle-orientation [state]
   (set-orientation state (if (= (:orientation state) "white") "black" "white")))
+
+(defn set-dests [state dests]
+  (let [new-state (-> state
+                      (assoc-in [:movable :dests] dests)
+                      (assoc-in [:movable :free] false))]
+    [new-state
+     (fn [$app chans]
+       (show/piece-interactions $app new-state chans))]))
+
+(defn set-color [state color]
+  (if (common/set-contains? (conj chess/colors "both") color)
+    (let [new-state (assoc-in state [:movable :color] color)]
+      [new-state
+       (fn [$app chans]
+         (show/piece-interactions $app new-state chans))])
+    [state noop]))
 
 (defn set-fen [state fen]
   (let [new-state (data/with-fen state fen)]
