@@ -9,9 +9,9 @@
         document.write('\x3Cscript type="text/javascript" src="'+script+'">\x3C/script>');
       }
       include("../libs/jquery.min.js");
-      include("../libs/interact.js");
       if (window.location.search.indexOf('prod') === -1) {
         // development
+        include("../libs/interact.js");
         include("../generated/goog/base.js");
         include("../generated/chessground.dev.js");
         document.write('\x3Cscript type="text/javascript">goog.require("chessground");\x3C/script>');

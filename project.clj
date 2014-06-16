@@ -16,8 +16,11 @@
                       :compiler
                       {:output-to "generated/chessground.min.js"
                        :optimizations :advanced
+                       :foreign-libs [{:file "libs/interact.js"
+                                       :provides ["window.interact"]}]
                        :externs ["externs/misc.js" "externs/jquery.js"]
                        :pretty-print true
+                       :language-in :ecmascript5
                        :closure-warnings {:non-standard-jsdoc :off}}}}})
 
 

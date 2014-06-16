@@ -22,10 +22,10 @@
     (aset (.-style target) common/transform-prop transform)))
 
 (defn piece-on [el chans]
-  (let [obj (js/interact el)]
-    (jq/data ($ el) :interact obj)
-    (.draggable obj (clj->js {:onstart #(on-start % chans)
-                              :onmove on-move}))))
+  (jq/data ($ el) :interact (-> (js/interact el)
+                                (.draggable true)
+                                (.on "dragstart" #(on-start % chans))
+                                (.on "dragmove" on-move))))
 
 (defn piece-off [el]
   (let [$el ($ el)]
@@ -33,20 +33,17 @@
     (jq/remove-attr $el :data-interact)))
 
 (defn square [el chans]
-  (let [obj (js/interact el)]
-    (.dropzone obj true)
-    (.on obj "dragenter"
-         (clj->js (fn[event] (-> event .-target .-classList (.add drag-over-class)))))
-    (.on obj "dragleave"
-         (clj->js (fn[event] (-> event .-target .-classList (.remove drag-over-class)))))
-    (.on obj "drop"
-         (clj->js (fn[event]
+  (-> (js/interact el)
+      (.dropzone true)
+      (.on "dragenter" #(-> % .-target .-classList (.add drag-over-class)))
+      (.on "dragleave" #(-> % .-target .-classList (.remove drag-over-class)))
+      (.on "drop" (fn[event]
                     (let [piece (.-relatedTarget event)
                           orig (.-parentNode piece)
                           dest (.-target event)]
                       (push! (:move-piece chans) (map common/square-key [orig dest]))
                       (.remove (.-classList piece) dragging-class)
-                      (.remove (.-classList dest) drag-over-class)))))))
+                      (.remove (.-classList dest) drag-over-class))))))
 
 (defn unfuck [piece-el]
   (set! (.-x piece-el) 0)

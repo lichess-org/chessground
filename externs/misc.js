@@ -1,1 +1,3 @@
-jQuery.prototype.droppabilly = function(options) {};
+// jQuery.prototype.interact = {
+//   unset: function() {}
+// };
