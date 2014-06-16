@@ -1,7 +1,7 @@
 (ns chessground.data
   "Representation and manipulation of the application data"
   (:refer-clojure :exclude [filter])
-  (:require [chessground.common :as common :refer [pp keywordize-keys]]
+  (:require [chessground.common :as common :refer [pp]]
             [chessground.chess :as chess]))
 
 (def defaults
@@ -24,9 +24,9 @@
 
 (defn make [js-config]
   (let [config (-> js-config
-                   keywordize-keys)]
-                   ; (update-in [:movable] keywordize-keys)
-                   ; (update-in [:movable :events] keywordize-keys))]
+                   common/keywordize-keys
+                   (common/keywordize-keys-in [:movable])
+                   (common/keywordize-keys-in [:movable :events]))]
     (-> (merge defaults config)
         (with-fen (:fen config))
         (dissoc :fen))))

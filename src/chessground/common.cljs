@@ -43,3 +43,8 @@
 
 (defn keywordize-keys [hashmap]
   (into {} (for [[k v] hashmap] [(keyword k) v])))
+
+(defn keywordize-keys-in [hashmap path]
+  (if (map? (get-in hashmap path))
+    (update-in hashmap path keywordize-keys)
+    hashmap))
