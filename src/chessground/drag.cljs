@@ -18,7 +18,6 @@
         transform (str "translate(" x "px, " y "px)")]
     (set! (.-x target) x)
     (set! (.-y target) y)
-    ; (set! (.-transform (.-style target)) transform)
     (aset (.-style target) common/transform-prop transform)))
 
 (defn on-end [event chans]
@@ -26,17 +25,18 @@
   (when (not (.-dropzone event))
     (push! (:drop-off chans) (-> event .-target .-parentNode (.getAttribute "data-key")))))
 
-(defn piece-on [el chans]
+(defn make-draggable [el chans]
   (jq/data ($ el) :interact (-> (js/interact el)
                                 (.draggable true)
                                 (.on "dragstart" #(on-start % chans))
                                 (.on "dragmove" on-move)
                                 (.on "dragend" #(on-end % chans)))))
 
+(defn piece-on [el]
+  (.set (jq/data ($ el) :interact) (js-obj "draggable" true)))
+
 (defn piece-off [el]
-  (let [$el ($ el)]
-    (.unset (jq/data $el :interact))
-    (jq/remove-attr $el :data-interact)))
+  (.set (jq/data ($ el) :interact) (js-obj "draggable" false)))
 
 (defn on-drop [event chans]
   (let [orig (-> event .-relatedTarget .-parentNode)
@@ -54,5 +54,4 @@
 (defn unfuck [piece-el]
   (set! (.-x piece-el) 0)
   (set! (.-y piece-el) 0)
-  ; (set! (.-transform (.-style piece-el)) "")
   (aset (.-style piece-el) common/transform-prop ""))
