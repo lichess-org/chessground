@@ -86,3 +86,8 @@
   (let [new-state (update-in state [:chess] #(chess/set-pieces % pieces))]
     [new-state
      (fn [$app chans] (show/board $app new-state chans))]))
+
+(defn clear [state]
+  (let [new-state (data/clear state)]
+    [new-state
+     (fn [$app chans] (show/app $app new-state chans))]))

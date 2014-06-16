@@ -10,6 +10,8 @@
 
 (def colors ["white" "black"])
 
+(def clear {:pieces {}})
+
 (defn make [fen]
   {:pieces (forsyth/parse fen)})
 

@@ -28,6 +28,11 @@
         (with-fen (:fen config))
         (dissoc :fen))))
 
+(defn clear [state]
+  (-> state
+      (assoc :chess chess/clear)
+      (assoc-in [:movable :dests] nil)))
+
 (defn is-movable? [state key]
   "Piece on this square may be moved somewhere, if the validation allows it"
   (let [owner (chess/owner-color (:chess state) key)
