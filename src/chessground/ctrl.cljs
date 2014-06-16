@@ -21,7 +21,8 @@
     [new-state
      (fn [$app chans]
        (show/selected $app orig)
-       (show/dests $app (data/dests-of state orig)))]))
+       (when (not (:free (:movable state)))
+         (show/dests $app (data/dests-of state orig))))]))
 
 (defn move-piece [state [orig dest]]
   (or (when (data/can-move? state orig dest)
