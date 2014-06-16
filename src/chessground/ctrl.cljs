@@ -15,6 +15,18 @@
 
 (defn- noop [] nil)
 
+(defn select-square [state key]
+  (if-let [orig (:selected state)]
+    (if (not (= orig key))
+      (move-piece state [orig key])
+      [state noop])
+    (if (and (chess/get-piece (:chess state) key) (data/is-movable? state key))
+      (move-start state key)
+      [state 
+       (fn [$app chans]
+         (show/selected $app nil)
+         (show/dests $app nil))])))
+
 (defn move-start [state orig]
   "A move has been started, either by clicking on a piece, or dragging it"
   (let [new-state (assoc state :selected orig)]
@@ -37,19 +49,10 @@
                (show/selected $app nil)
                (show/dests $app nil)
                (callback (-> new-state :movable :events :after) orig dest new-chess))])))
-      (let [new-state (dissoc state :selected)]
-        [new-state
-         (fn [$app chans]
-           (show/un-move $app orig)
-           (show/selected $app nil)
-           (show/dests $app nil))])))
-
-(defn select-square [state key]
-  (if-let [orig (:selected state)]
-    (move-piece state [orig key])
-    (if (and (chess/get-piece (:chess state) key) (data/is-movable? state key))
-      (move-start state key)
-      [state noop])))
+      (if (= orig dest)
+        [state (fn [$app chans] (show/move $app orig dest))]
+        (let [new-state (dissoc state :selected)]
+          (select-square new-state dest)))))
 
 (defn set-orientation [state orientation]
   (if (common/set-contains? chess/colors orientation)
