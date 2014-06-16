@@ -81,3 +81,8 @@
   (let [new-state (data/with-fen state fen)]
     [new-state
      (fn [$app chans] (show/board $app new-state chans))]))
+
+(defn set-pieces [state pieces]
+  (let [new-state (update-in state [:chess] #(chess/set-pieces % pieces))]
+    [new-state
+     (fn [$app chans] (show/board $app new-state chans))]))

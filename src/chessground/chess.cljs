@@ -21,6 +21,12 @@
 
 (defn put-piece [chess key piece] (assoc-in chess [:pieces key] piece))
 
+(defn set-pieces [chess changes]
+  (pp (update-in chess [:pieces]
+             (fn [pieces] (reduce (fn [ps [key p]]
+                                    (if p (assoc ps key p) (dissoc ps key)))
+                                  pieces changes)))))
+
 (defn- count-pieces [chess] (count (:pieces chess)))
 
 (defn move-piece [chess orig dest]
