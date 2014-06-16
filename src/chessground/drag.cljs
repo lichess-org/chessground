@@ -18,19 +18,19 @@
         transform (str "translate(" x "px, " y "px)")]
     (set! (.-x target) x)
     (set! (.-y target) y)
-    ; (set! (.-transform (.-style target)) transform)
     (aset (.-style target) common/transform-prop transform)))
 
-(defn piece-on [el chans]
+(defn make-draggable [el chans]
   (let [obj (js/interact el)]
     (jq/data ($ el) :interact obj)
     (.draggable obj (clj->js {:onstart #(on-start % chans)
                               :onmove on-move}))))
 
+(defn piece-on [el]
+  (.set (jq/data ($ el) :interact) (js-obj "draggable" true)))
+
 (defn piece-off [el]
-  (let [$el ($ el)]
-    (.unset (jq/data $el :interact))
-    (jq/remove-attr $el :data-interact)))
+  (.set (jq/data ($ el) :interact) (js-obj "draggable" false)))
 
 (defn square [el chans]
   (let [obj (js/interact el)]
@@ -51,5 +51,4 @@
 (defn unfuck [piece-el]
   (set! (.-x piece-el) 0)
   (set! (.-y piece-el) 0)
-  ; (set! (.-transform (.-style piece-el)) "")
   (aset (.-style piece-el) common/transform-prop ""))
