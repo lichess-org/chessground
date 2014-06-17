@@ -40,6 +40,10 @@
 
 (defn piece-interactions [$app state chans]
   (let [movable-color (-> state :movable :color)]
+    ; set the interact value
+    (reset! (:interact state) {:white "foo" :black "bar"})
+    ; read the interact value
+    (pp @(:interact state))
     (doseq [p ($ :.piece $app)
             :let [$p ($ p)
                   instance (jq/data $p :interact)
