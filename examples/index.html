@@ -8,7 +8,6 @@
       function include(script) {
         document.write('\x3Cscript type="text/javascript" src="'+script+'">\x3C/script>');
       }
-      include("../libs/jquery.min.js");
       if (window.location.search.indexOf('prod') === -1) {
         // development
         include("../libs/interact.js");
