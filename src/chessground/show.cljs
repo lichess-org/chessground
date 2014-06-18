@@ -1,49 +1,48 @@
 (ns chessground.show
   "Mutates the DOM to show state changes"
-  (:require [jayq.core :as jq :refer [$]]
-            [chessground.render :as render]
+  (:require [chessground.render :as render]
             [chessground.drag :as drag]
             [chessground.select :as select]
             [chessground.common :as common :refer [pp]]))
 
-(defn- $square [$app key]
-  ($ (str ".square[data-key=" key "]") $app))
+(defn- square [rootEl key]
+  (common/$ (str ".square[data-key=" key "]") rootEl))
 
-(defn selected [$app selected]
-  (jq/remove-class ($ :.square.selected $app) :selected)
-  (when selected (jq/add-class ($square $app selected) :selected)))
+(defn selected [rootEl selected]
+  (doseq [anySelected (common/$$ ".square.selected" rootEl)]
+    (-> anySelected .-classList (.remove "selected")))
+  (when selected (-> (square rootEl selected) .-classList (.add "selected"))))
 
-(defn dests [$app dests]
+(defn dests [rootEl dests]
   ; this is probably not the best approach, performance-wise.
-  (doseq [square ($ :.square $app)]
+  (doseq [square (common/$$ ".square" rootEl)]
     (if (common/set-contains? dests (.getAttribute square "data-key"))
       (-> square .-classList (.add "dest"))
       (-> square .-classList (.remove "dest")))))
 
-(defn move [$app orig dest]
-  (let [$orig ($square $app orig)
-        $dest ($square $app dest)
-        $piece ($ :.piece $orig)]
-    (drag/unfuck (first $piece))
-    (.remove ($ :.piece $dest))
-    (.appendTo $piece $dest)))
+(defn move [rootEl orig dest]
+  (let [origSquare (square rootEl orig)
+        destSquare (square rootEl dest)
+        piece (common/$ ".piece" origSquare)]
+    (drag/unfuck piece)
+    (when-let [destPiece (common/$ ".piece" rootEl)] (.remove-child destSquare destPiece))
+    (.append-child destSquare piece)))
 
-(defn un-move [$app orig]
-  (let [$orig ($square $app orig)
-        piece (first ($ :.piece $orig))]
+(defn un-move [rootEl orig]
+  (let [origSquare (square rootEl orig)
+        piece (common/$ ".piece" origSquare)]
     (when piece (drag/unfuck piece))))
 
-(defn square-interactions [$app state chans]
-  (doseq [sq ($ :.square $app)]
+(defn square-interactions [rootEl state chans]
+  (doseq [sq (common/$$ ".square" rootEl)]
     (drag/square sq chans)
     (select/square sq chans)))
 
-(defn piece-interactions [$app state chans]
+(defn piece-interactions [rootEl state chans]
   (let [movable-color (-> state :movable :color)]
-    (doseq [p ($ :.piece $app)
-            :let [$p ($ p)
-                  instance (common/get-dom-data p :interact (:interact state))
-                  owner (if (jq/has-class $p :white) "white" "black")
+    (doseq [p (common/$$ ".piece" rootEl)
+            :let [instance (common/get-dom-data p :interact)
+                  owner (if (common/has-class p :white) "white" "black")
                   draggable (or (= movable-color "both") (= movable-color owner))]]
       (if instance
         (if draggable
@@ -51,12 +50,12 @@
           (drag/piece-off p state))
         (when draggable (drag/make-draggable p chans state))))))
 
-(defn board [$app state chans]
-  (jq/replace-with ($ :.board $app) (render/board state))
-  (square-interactions $app state chans)
-  (piece-interactions $app state chans))
+(defn board [rootEl state chans]
+  (set! (.-innerHTML (common/$ ".board" rootEl)) (render/board state))
+  (square-interactions rootEl state chans)
+  (piece-interactions rootEl state chans))
 
-(defn app [$app state chans]
-  (jq/html $app (render/app state))
-  (square-interactions $app state chans)
-  (piece-interactions $app state chans))
+(defn app [rootEl state chans]
+  (set! (.-innerHTML rootEl) (render/app state))
+  (square-interactions rootEl state chans)
+  (piece-interactions rootEl state chans))

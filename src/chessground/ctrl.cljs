@@ -1,10 +1,9 @@
 (ns chessground.ctrl
   "Changes to state.
    Each function returns a new state
-   and a function taking an $app and channels,
+   and a function taking a rootEl and channels,
    and mutating the dom"
-  (:require [jayq.core :as jq :refer [$]]
-            [chessground.common :as common :refer [pp]]
+  (:require [chessground.common :as common :refer [pp]]
             [chessground.show :as show]
             [chessground.data :as data]
             [chessground.chess :as chess]))
@@ -19,10 +18,10 @@
   "A move has been started, either by clicking on a piece, or dragging it"
   (let [new-state (assoc state :selected orig)]
     [new-state
-     (fn [$app chans]
-       (show/selected $app orig)
+     (fn [rootEl chans]
+       (show/selected rootEl orig)
        (when (not (:free (:movable state)))
-         (show/dests $app (data/dests-of state orig))))]))
+         (show/dests rootEl (data/dests-of state orig))))]))
 
 (defn move-piece [state [orig dest]]
   (or (when (data/can-move? state orig dest)
@@ -32,21 +31,21 @@
                               (dissoc :selected)
                               (assoc-in [:movable :dests] nil))]
             [new-state
-             (fn [$app chans]
-               (show/move $app orig dest)
-               (show/selected $app nil)
-               (show/dests $app nil)
+             (fn [rootEl chans]
+               (show/move rootEl orig dest)
+               (show/selected rootEl nil)
+               (show/dests rootEl nil)
                (callback (-> new-state :movable :events :after) orig dest new-chess))])))
       (if (= orig dest)
-        [state (fn [$app chans] (show/move $app orig dest))]
+        [state (fn [rootEl chans] (show/move rootEl orig dest))]
         (let [new-state (dissoc state :selected)]
           (if (and (chess/get-piece (:chess new-state) dest) (data/is-movable? new-state dest))
             (move-start state dest)
               [new-state
-              (fn [$app chans]
-                (show/un-move $app orig)
-                (show/selected $app nil)
-                (show/dests $app nil))])))))
+              (fn [rootEl chans]
+                (show/un-move rootEl orig)
+                (show/selected rootEl nil)
+                (show/dests rootEl nil))])))))
 
 (defn select-square [state key]
   (if-let [orig (:selected state)]
@@ -56,15 +55,15 @@
     (if (and (chess/get-piece (:chess state) key) (data/is-movable? state key))
       (move-start state key)
       [state 
-       (fn [$app chans]
-         (show/selected $app nil)
-         (show/dests $app nil))])))
+       (fn [rootEl chans]
+         (show/selected rootEl nil)
+         (show/dests rootEl nil))])))
 
 (defn set-orientation [state orientation]
   (if (common/set-contains? chess/colors orientation)
     (let [new-state (assoc state :orientation orientation)]
       [new-state
-       (fn [$app chans] (show/board $app new-state chans))])
+       (fn [rootEl chans] (show/board rootEl new-state chans))])
     [state noop]))
 
 (defn toggle-orientation [state]
@@ -75,26 +74,26 @@
                       (assoc-in [:movable :dests] dests)
                       (assoc-in [:movable :free] false))]
     [new-state
-     (fn [$app chans]
-       (show/piece-interactions $app new-state chans))]))
+     (fn [rootEl chans]
+       (show/piece-interactions rootEl new-state chans))]))
 
 (defn set-color [state color]
   (if (common/set-contains? (conj chess/colors "both") color)
     (let [new-state (assoc-in state [:movable :color] color)]
       [new-state
-       (fn [$app chans]
-         (show/piece-interactions $app new-state chans))])
+       (fn [rootEl chans]
+         (show/piece-interactions rootEl new-state chans))])
     [state noop]))
 
 (defn set-fen [state fen]
   (let [new-state (data/with-fen state fen)]
     [new-state
-     (fn [$app chans] (show/board $app new-state chans))]))
+     (fn [rootEl chans] (show/board rootEl new-state chans))]))
 
 (defn set-pieces [state pieces]
   (let [new-state (update-in state [:chess] #(chess/set-pieces % pieces))]
     [new-state
-     (fn [$app chans] (show/board $app new-state chans))]))
+     (fn [rootEl chans] (show/board rootEl new-state chans))]))
 
 (defn drop-off [state key]
   (if (= "trash" (-> state :movable :drop-off))
@@ -102,11 +101,11 @@
       [(dissoc new-state :selected) shower])
     (let [new-state (dissoc state :selected)]
       [new-state
-       (fn [$app chans]
-         (show/selected $app nil)
-         (show/un-move $app key))])))
+       (fn [rootEl chans]
+         (show/selected rootEl nil)
+         (show/un-move rootEl key))])))
 
 (defn clear [state]
   (let [new-state (data/clear state)]
     [new-state
-     (fn [$app chans] (show/app $app new-state chans))]))
+     (fn [rootEl chans] (show/app rootEl new-state chans))]))

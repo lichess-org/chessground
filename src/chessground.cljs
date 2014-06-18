@@ -1,6 +1,5 @@
 (ns chessground
   (:require [cljs.core.async :as a]
-            [jayq.core :as jq :refer [$]]
             [chessground.common :as common :refer [pp]]
             [chessground.data :as data]
             [chessground.api :as api]
@@ -8,11 +7,14 @@
             [chessground.ctrl :as ctrl])
   (:require-macros [cljs.core.async.macros :as am]))
 
+(extend-type js/NodeList
+  ISeqable
+  (-seq [array] (array-seq array 0)))
+
 (defn load-app
   "Return a map containing the initial application"
   [element config]
   {:element element
-   :$element ($ element)
    :state (atom (data/make config))
    :channels {:toggle-orientation (a/chan)
               :set-orientation (a/chan)
@@ -51,12 +53,12 @@
                    _ (pp (str "on channel [" ch "], received value [" val "]"))
                    [new-state mutate-dom] (update-fn @(:state app) val)]
                (reset! (:state app) new-state)
-               (mutate-dom (:$element app) (:channels app)))))))
+               (mutate-dom (:element app) (:channels app)))))))
 
 (defn ^:export main
   "Application entry point; returns the public JavaScript API"
   [element config]
   (let [app (load-app element (or (js->clj config) {}))]
-    (show/app (:$element app) @(:state app) (:channels app))
+    (show/app (:element app) @(:state app) (:channels app))
     (init-updates app)
     (api/build (:channels app))))

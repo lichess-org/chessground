@@ -1,7 +1,6 @@
 (ns chessground.render
   "HTML templates"
-  (:require [jayq.core :as jq :refer [$]]
-            [chessground.common :as common :refer [pp]]
+  (:require [chessground.common :as common :refer [pp]]
             [chessground.chess :as chess]))
 
 (defn piece [{color :color role :role}]

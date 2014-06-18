@@ -1,7 +1,6 @@
 (ns chessground.drag
   "Make pieces draggable, and squares droppable"
-  (:require [jayq.core :as jq :refer [$]]
-            [chessground.common :as common :refer [pp push!]]
+  (:require [chessground.common :as common :refer [pp push!]]
             [chessground.chess :as chess]))
 
 (def dragging-class "dragging")

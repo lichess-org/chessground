@@ -37,6 +37,16 @@
 
 (defn has-class [dom-element class] (.contains (.-classList dom-element) class))
 
+(defn $ [selector & [context]]
+  (if context
+    (.querySelector context selector)
+    (.querySelector js/document selector)))
+
+(defn $$ [selector & [context]]
+  (if context
+    (.querySelectorAll context selector)
+    (.querySelectorAll js/document selector)))
+
 ; is there a better way to do that?
 (def is-touch-device (js* "'ontouchstart' in document"))
 
@@ -67,3 +77,9 @@
   (if (map? (get-in hashmap path))
     (update-in hashmap path keywordize-keys)
     hashmap))
+
+(defn nodelist-to-seq
+  "Converts nodelist to (not lazy) seq."
+  [nl]
+  (let [result-seq (map #(.item nl %) (range (.length nl)))]
+    (doall result-seq)))
