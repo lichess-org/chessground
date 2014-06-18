@@ -22,10 +22,9 @@
   "Alternative to of jquery .data(key, value): set an object associated to a dom element"
   (if-let [id (aget el exp)]
     (swap! store assoc-in [id key] value)
-    (do
-      (let [setid (swap! uid inc)]
-        (aset el exp setid)
-        (swap! store assoc-in [setid key] value)))))
+    (let [setid (swap! uid inc)]
+      (aset el exp setid)
+      (swap! store assoc-in [setid key] value))))
 
 (defn pp [& exprs]
   (when debug
