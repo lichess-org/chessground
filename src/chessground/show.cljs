@@ -40,20 +40,16 @@
 
 (defn piece-interactions [$app state chans]
   (let [movable-color (-> state :movable :color)]
-    ; set the interact value
-    (reset! (:interact state) {:white "foo" :black "bar"})
-    ; read the interact value
-    (pp @(:interact state))
     (doseq [p ($ :.piece $app)
             :let [$p ($ p)
-                  instance (jq/data $p :interact)
+                  instance (common/get-dom-data p :interact (:interact state))
                   owner (if (jq/has-class $p :white) "white" "black")
                   draggable (or (= movable-color "both") (= movable-color owner))]]
       (if instance
         (if draggable
-          (drag/piece-on p)
-          (drag/piece-off p))
-        (when draggable (drag/make-draggable p chans))))))
+          (drag/piece-on p state)
+          (drag/piece-off p state))
+        (when draggable (drag/make-draggable p chans state))))))
 
 (defn board [$app state chans]
   (jq/replace-with ($ :.board $app) (render/board state))

@@ -7,6 +7,24 @@
 
 (def debug true)
 
+(def exp (str "Chessground" (js/Date.)))
+
+(def uid (atom 0))
+
+(defn get-dom-data [el, key, dataStore]
+  "Alternative to jquery .data(key): retrieve an object associated to a dom element"
+  (when-let [id (aget el exp)]
+    (get-in @dataStore [id key])))
+
+(defn set-dom-data [el, key, value, dataStore]
+  "Alternative to of jquery .data(key, value): set an object associated to a dom element"
+  (if-let [id (aget el exp)]
+    (swap! dataStore assoc-in [id key] value)
+    (do
+      (let [setid (swap! uid inc)]
+        (aset el exp setid)
+        (swap! dataStore assoc-in [setid key] value)))))
+
 (defn pp [& exprs]
   (when debug
     (doseq [expr exprs] (.log js/console (clj->js expr))))

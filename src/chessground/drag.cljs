@@ -25,18 +25,18 @@
   (when (not (.-dropzone event))
     (push! (:drop-off chans) (-> event .-target .-parentNode (.getAttribute "data-key")))))
 
-(defn make-draggable [el chans]
-  (jq/data ($ el) :interact (-> (js/interact el)
+(defn make-draggable [el chans state]
+  (common/set-dom-data el :interact (-> (js/interact el)
                                 (.draggable true)
                                 (.on "dragstart" #(on-start % chans))
                                 (.on "dragmove" on-move)
-                                (.on "dragend" #(on-end % chans)))))
+                                (.on "dragend" #(on-end % chans))) (:interact state)))
 
-(defn piece-on [el]
-  (.set (jq/data ($ el) :interact) (js-obj "draggable" true)))
+(defn piece-on [el state]
+  (.set (common/get-dom-data el :interact (:interact state)) (js-obj "draggable" true)))
 
-(defn piece-off [el]
-  (.set (jq/data ($ el) :interact) (js-obj "draggable" false)))
+(defn piece-off [el state]
+  (.set (common/get-dom-data el :interact (:interact state)) (js-obj "draggable" false)))
 
 (defn on-drop [event chans]
   (let [orig (-> event .-relatedTarget .-parentNode)
