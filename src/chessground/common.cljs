@@ -11,19 +11,21 @@
 
 (def uid (atom 0))
 
-(defn get-dom-data [el, key, dataStore]
+(def store (atom {}))
+
+(defn get-dom-data [el key]
   "Alternative to jquery .data(key): retrieve an object associated to a dom element"
   (when-let [id (aget el exp)]
-    (get-in @dataStore [id key])))
+    (get-in @store [id key])))
 
-(defn set-dom-data [el, key, value, dataStore]
+(defn set-dom-data [el key value]
   "Alternative to of jquery .data(key, value): set an object associated to a dom element"
   (if-let [id (aget el exp)]
-    (swap! dataStore assoc-in [id key] value)
+    (swap! store assoc-in [id key] value)
     (do
       (let [setid (swap! uid inc)]
         (aset el exp setid)
-        (swap! dataStore assoc-in [setid key] value)))))
+        (swap! store assoc-in [setid key] value)))))
 
 (defn pp [& exprs]
   (when debug

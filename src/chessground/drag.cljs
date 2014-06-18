@@ -30,13 +30,13 @@
                                 (.draggable true)
                                 (.on "dragstart" #(on-start % chans))
                                 (.on "dragmove" on-move)
-                                (.on "dragend" #(on-end % chans))) (:interact state)))
+                                (.on "dragend" #(on-end % chans)))))
 
 (defn piece-on [el state]
-  (.set (common/get-dom-data el :interact (:interact state)) (js-obj "draggable" true)))
+  (.set (common/get-dom-data el :interact) (js-obj "draggable" true)))
 
 (defn piece-off [el state]
-  (.set (common/get-dom-data el :interact (:interact state)) (js-obj "draggable" false)))
+  (.set (common/get-dom-data el :interact) (js-obj "draggable" false)))
 
 (defn on-drop [event chans]
   (let [orig (-> event .-relatedTarget .-parentNode)

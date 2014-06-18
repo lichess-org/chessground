@@ -16,8 +16,7 @@
                       }
              }
    :selected nil ; square key of the currently moving piece. "a2" | nil
-   :spare-pieces false ; provide extra pieces to put on the board
-   :interact (atom {})
+   :spare-pieces false ; provide extra pieces to put on the board)
    })
 
 (defn with-fen [state fen] (assoc state :chess (chess/make fen)))
