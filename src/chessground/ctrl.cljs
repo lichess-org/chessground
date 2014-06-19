@@ -24,35 +24,47 @@
          (show/dests root (data/dests-of state orig))))]))
 
 (defn move-piece [state [orig dest]]
-  (or (when (data/can-move? state orig dest)
-        (when-let [new-chess (chess/move-piece (:chess state) orig dest)]
-          (let [new-state (-> state
-                              (assoc :chess new-chess)
-                              (dissoc :selected)
-                              (assoc-in [:movable :dests] nil))]
-            [new-state
-             (fn [root chans]
-               (show/move root orig dest)
-               (show/selected root nil)
-               (show/dests root nil)
-               (callback (-> new-state :movable :events :after) orig dest new-chess))])))
-      (if (= orig dest)
-        [state (fn [root chans] (show/move root orig dest))]
-        (let [new-state (dissoc state :selected)]
-          (if (and (chess/get-piece (:chess new-state) dest) (data/is-movable? new-state dest))
-            (move-start state dest)
-              [new-state
-              (fn [root chans]
-                (show/un-move root orig)
-                (show/selected root nil)
-                (show/dests root nil))])))))
+  (or 
+    ; destination is available: return new state, move the piece
+    (when (data/can-move? state orig dest)
+      (when-let [new-chess (chess/move-piece (:chess state) orig dest)]
+        (let [new-state (-> state
+                            (assoc :chess new-chess)
+                            (dissoc :selected)
+                            (assoc-in [:movable :dests] nil))]
+          [new-state
+           (fn [root chans]
+             (show/move root orig dest)
+             (show/selected root nil)
+             (show/dests root nil)
+             (callback (-> new-state :movable :events :after) orig dest new-chess))])))
+    ; destination not available
+    (if (= orig dest)
+      ; dragging to same square: don't change state, replace piece to origin
+      [state (fn [root chans] (show/move root orig dest))]
+      ; moving to a non allowed square: cancel move means unselect orig square and replace
+      ; piece to origin
+      (let [new-state (dissoc state :selected)
+            ; TODO: try to save dragging piece in state to avoid to check in DOM directly
+            ; FIXME: dest square don't have class drag-over at the moment of the test (it should)
+            ; instead dest square have class "selected" (it should not)
+            dest-square (common/$ (str ".square[data-key=" dest "]") (:element state))]
+        (if (and (not (common/has-class dest-square "drag-over")) (data/is-movable? new-state dest))
+          ; when not dragging, allow to reselect movable pieces on single click/touch
+          (move-start state dest)
+          ; otherwise cancel move 
+          [new-state
+           (fn [root chans]
+             (show/un-move root orig)
+             (show/selected root nil)
+             (show/dests root nil))])))))
 
 (defn select-square [state key]
   (if-let [orig (:selected state)]
     (if (not (= orig key))
       (move-piece state [orig key])
       [state noop])
-    (if (and (chess/get-piece (:chess state) key) (data/is-movable? state key))
+    (if (data/is-movable? state key)
       (move-start state key)
       [state 
        (fn [root chans]
