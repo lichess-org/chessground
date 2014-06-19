@@ -8,7 +8,7 @@
 
 (defn on-start [event chans]
   (-> event .-target .-classList (.add dragging-class))
-  (push! (:move-start chans) (-> event .-target .-parentNode (.getAttribute "data-key"))))
+  (push! (:drag-start chans) (-> event .-target .-parentNode (.getAttribute "data-key"))))
 
 (defn on-move [event]
   (let [target (.-target event)

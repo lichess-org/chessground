@@ -16,6 +16,7 @@
                       }
              }
    :selected nil ; square key of the currently moving piece. "a2" | nil
+   :dragging false ; currently dragging?
    :spare-pieces false ; provide extra pieces to put on the board)
    })
 

@@ -15,8 +15,17 @@
 (defn- noop [] nil)
 
 (defn move-start [state orig]
-  "A move has been started, either by clicking on a piece, or dragging it"
+  "A move has been started, by clicking on a piece"
   (let [new-state (assoc state :selected orig)]
+    [new-state
+     (fn [root chans]
+       (show/selected root orig)
+       (when (not (:free (:movable state)))
+         (show/dests root (data/dests-of state orig))))]))
+
+(defn drag-start [state orig]
+  "A move has been started, by dragging a piece"
+  (let [new-state (assoc state :selected orig :dragging true)]
     [new-state
      (fn [root chans]
        (show/selected root orig)
@@ -29,7 +38,7 @@
     (when (data/can-move? state orig dest)
       (when-let [new-chess (chess/move-piece (:chess state) orig dest)]
         (let [new-state (-> state
-                            (assoc :chess new-chess)
+                            (assoc :chess new-chess :dragging false)
                             (dissoc :selected)
                             (assoc-in [:movable :dests] nil))]
           [new-state
@@ -38,21 +47,17 @@
              (show/selected root nil)
              (show/dests root nil)
              (callback (-> new-state :movable :events :after) orig dest new-chess))])))
-    ; destination not available
+    ; destination is not available, move is canceled but there are different cases:
     (if (= orig dest)
-      ; dragging to same square: don't change state, replace piece to origin
-      [state (fn [root chans] (show/move root orig dest))]
-      ; moving to a non allowed square: cancel move means unselect orig square and replace
-      ; piece to origin
-      (let [new-state (dissoc state :selected)
-            ; TODO: try to save dragging piece in state to avoid to check in DOM directly
-            ; FIXME: dest square don't have class drag-over at the moment of the test (it should)
-            ; instead dest square have class "selected" (it should not)
-            dest-square (common/$ (str ".square[data-key=" dest "]") (:element state))]
-        (if (and (not (common/has-class dest-square "drag-over")) (data/is-movable? new-state dest))
-          ; when not dragging, allow to reselect movable pieces on single click/touch
-          (move-start state dest)
-          ; otherwise cancel move 
+      ; dragging to same square: replace piece to origin
+      (let [new-state (-> state (assoc :dragging false))]
+        [state (fn [root chans] (show/move root orig dest))])
+      ; moving to a non allowed square:
+      (if (and (not (:dragging state)) (data/is-movable? state dest))
+        ; when not dragging, allow to reselect movable pieces with a single click/touch
+        (move-start state dest)
+        ; otherwise cancel move 
+        (let [new-state (-> state (dissoc :selected) (assoc :dragging false))]
           [new-state
            (fn [root chans]
              (show/un-move root orig)

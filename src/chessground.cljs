@@ -24,6 +24,7 @@
               :clear (a/chan)
               :select-square (a/chan)
               :move-start (a/chan)
+              :drag-start (a/chan)
               :move-piece (a/chan)
               :set-pieces (a/chan)
               :drop-off (a/chan)
@@ -36,6 +37,7 @@
                :clear ctrl/clear
                :select-square ctrl/select-square
                :move-start ctrl/move-start
+               :drag-start ctrl/drag-start
                :move-piece ctrl/move-piece
                :set-pieces ctrl/set-pieces
                :drop-off ctrl/drop-off
