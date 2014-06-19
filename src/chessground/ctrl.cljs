@@ -120,6 +120,7 @@
       [new-state
        (fn [root chans]
          (show/selected root nil)
+         (show/dests root nil)
          (show/un-move root key))])))
 
 (defn clear [state]
