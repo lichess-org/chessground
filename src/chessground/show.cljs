@@ -25,7 +25,7 @@
         dest-square (square root dest)
         piece (common/$ ".piece" orig-square)]
     (drag/unfuck piece)
-    (when-let [dest-piece (common/$ ".piece" dest-square)] (.removeChild dest-square dest-piece))
+    (when-let [dest-piece (common/$ ".piece" dest-square)] (common/remove-el dest-piece))
     (.appendChild dest-square piece)))
 
 (defn un-move [root orig]

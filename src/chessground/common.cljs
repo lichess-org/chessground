@@ -26,6 +26,14 @@
       (aset el exp setid)
       (swap! store assoc-in [setid key] value))))
 
+(defn remove-el [el]
+  "Remove a dom element, and ensure that any data associated with in store is removed too"
+  (when (.-parentNode el)
+    (do
+      (-> el .-parentNode (.removeChild el))
+      (when-let [id (aget el exp)]
+        (swap! store dissoc id)))))
+
 (defn pp [& exprs]
   (when debug
     (doseq [expr exprs] (.log js/console (clj->js expr))))
