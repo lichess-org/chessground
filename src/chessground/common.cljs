@@ -7,11 +7,17 @@
 
 (def debug true)
 
-(def exp (str "Chessground" (js/Date.)))
+(def exp 
+  "Chessground namespace used to add a unique property to dom elements"
+  (str "Chessground" (js/Date.)))
 
-(def uid (atom 0))
+(def uid 
+  "Unique ID generator (increment)"
+  (atom 0))
 
-(def store (atom {}))
+(def store 
+  "Data store used to associate objects to dom elements"
+  (atom {}))
 
 (defn get-dom-data [el key]
   "Alternative to jquery .data(key): retrieve an object associated to a dom element"
