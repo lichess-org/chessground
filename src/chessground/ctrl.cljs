@@ -51,7 +51,7 @@
     (if (= orig dest)
       ; dragging to same square: replace piece to origin
       (let [new-state (-> state (assoc :dragging false))]
-        [state (fn [root chans] (show/move root orig dest))])
+        [new-state (fn [root chans] (show/move root orig dest))])
       ; moving to a non allowed square:
       (if (and (not (:dragging state)) (data/is-movable? state dest))
         ; when not dragging, allow to reselect movable pieces with a single click/touch
