@@ -18,7 +18,7 @@
                        :optimizations :advanced
                        :foreign-libs [{:file "libs/interact.js"
                                        :provides ["window.interact"]}]
-                       :externs ["externs/misc.js" "externs/jquery.js"]
+                       :externs ["externs/misc.js"]
                        :pretty-print true
                        :language-in :ecmascript5
                        :closure-warnings {:non-standard-jsdoc :off}}}}})
