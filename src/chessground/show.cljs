@@ -1,6 +1,7 @@
 (ns chessground.show
   "Mutates the DOM to show state changes"
   (:require [chessground.render :as render]
+            [chessground.dom-data :as dom-data]
             [chessground.drag :as drag]
             [chessground.select :as select]
             [chessground.common :as common :refer [pp]]))
@@ -25,7 +26,7 @@
         dest-square (square root dest)
         piece (common/$ ".piece" orig-square)]
     (drag/unfuck piece)
-    (when-let [dest-piece (common/$ ".piece" dest-square)] (common/remove-el dest-piece))
+    (when-let [dest-piece (common/$ ".piece" dest-square)] (dom-data/remove-el dest-piece))
     (.appendChild dest-square piece)))
 
 (defn un-move [root orig]
@@ -41,7 +42,7 @@
 (defn piece-interactions [root state chans]
   (let [movable-color (-> state :movable :color)]
     (doseq [p (common/$$ ".piece" root)
-            :let [instance (common/get-dom-data p :interact)
+            :let [instance (dom-data/fetch p :interact)
                   owner (if (common/has-class p "white") "white" "black")
                   draggable (or (= movable-color "both") (= movable-color owner))]]
       (if instance

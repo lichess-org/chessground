@@ -7,42 +7,8 @@
 
 (def debug true)
 
-(def exp 
-  "Chessground namespace used to add a unique property to dom elements"
-  (str "Chessground" (js/Date.)))
-
-(def uid 
-  "Unique ID generator (increment)"
-  (atom 0))
-
-(def store 
-  "Data store used to associate objects to dom elements"
-  (atom {}))
-
-(defn get-dom-data [el key]
-  "Alternative to jquery .data(key): retrieve an object associated to a dom element"
-  (when-let [id (aget el exp)]
-    (get-in @store [id key])))
-
-(defn set-dom-data [el key value]
-  "Alternative to of jquery .data(key, value): set an object associated to a dom element"
-  (if-let [id (aget el exp)]
-    (swap! store assoc-in [id key] value)
-    (let [setid (swap! uid inc)]
-      (aset el exp setid)
-      (swap! store assoc-in [setid key] value))))
-
-(defn remove-el [el]
-  "Remove a dom element, and ensure that any data associated with in store is removed too"
-  (when (.-parentNode el)
-    (do
-      (-> el .-parentNode (.removeChild el))
-      (when-let [id (aget el exp)]
-        (swap! store dissoc id)))))
-
 (defn pp [& exprs]
-  (when debug
-    (doseq [expr exprs] (.log js/console (clj->js expr))))
+  (when debug (doseq [expr exprs] (.log js/console (clj->js expr))))
   (first exprs))
 
 (defn set-contains? [set val] (some #{val} set))

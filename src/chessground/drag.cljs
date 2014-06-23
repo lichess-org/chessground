@@ -1,6 +1,7 @@
 (ns chessground.drag
   "Make pieces draggable, and squares droppable"
   (:require [chessground.common :as common :refer [pp push!]]
+            [chessground.dom-data :as dom-data]
             [chessground.chess :as chess]))
 
 (def dragging-class "dragging")
@@ -25,17 +26,17 @@
     (push! (:drop-off chans) (-> event .-target .-parentNode (.getAttribute "data-key")))))
 
 (defn make-draggable [el chans state]
-  (common/set-dom-data el :interact (-> (js/interact el)
+  (dom-data/store el :interact (-> (js/interact el)
                                 (.draggable true)
                                 (.on "dragstart" #(on-start % chans))
                                 (.on "dragmove" on-move)
                                 (.on "dragend" #(on-end % chans)))))
 
 (defn piece-on [el state]
-  (.set (common/get-dom-data el :interact) (js-obj "draggable" true)))
+  (.set (dom-data/fetch el :interact) (js-obj "draggable" true)))
 
 (defn piece-off [el state]
-  (.set (common/get-dom-data el :interact) (js-obj "draggable" false)))
+  (.set (dom-data/fetch el :interact) (js-obj "draggable" false)))
 
 (defn on-drop [event chans]
   (let [orig (-> event .-relatedTarget .-parentNode)
