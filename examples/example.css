@@ -85,7 +85,7 @@ section p {
   height: 100%;
   background-size: cover;
 }
-.chessground .piece.is-dragging {
+.chessground .piece.dragging {
   cursor: move;
   z-index: 9;
 }
