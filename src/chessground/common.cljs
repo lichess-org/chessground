@@ -53,9 +53,3 @@
   (if (map? (get-in hashmap path))
     (update-in hashmap path keywordize-keys)
     hashmap))
-
-(defn nodelist-to-seq
-  "Converts nodelist to (not lazy) seq."
-  [nl]
-  (let [result-seq (map #(.item nl %) (range (.length nl)))]
-    (doall result-seq)))
