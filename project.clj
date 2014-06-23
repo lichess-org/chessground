@@ -21,7 +21,7 @@
              :optimizations :simple
              :libs ["libs/interact.js"]
              ; :externs ["externs/misc.js"]
-             :pretty-print true
+             :pretty-print false
              ; :source-map "generated-stage/map"
              :language-in :ecmascript5
              :closure-warnings {:non-standard-jsdoc :off}}}
