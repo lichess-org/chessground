@@ -23,16 +23,21 @@
 (defn $$ [selector context]
   (.querySelectorAll (or context js/document) selector))
 
+(defn is-in [obj prop] (js* "prop in obj"))
+
 ; is there a better way to do that?
 (def is-touch-device (js* "'ontouchstart' in document"))
 
-(def transform-prop "webkitTransform")
-; (let [style (.-style (.querySelector js/document "body"))]
-; (if (js* "'transform' in style") "transform"
-;   (if (js* "'webkitTransform' in style") "webkitTransform"
-;     (if (js* "'mozTransform' in style") "mozTransform"
-;       (if (js* "'oTransform' in style") "oTransform"
-;         "transform"))))))
+(def transform-prop
+  "Fun fact: this won't work if chessground is included in the <head>
+   Because the <body> element must exist at the time this code runs."
+  (do
+    (or (.-body js/document) (throw "chessground must be included in the <body> tag!"))
+    (if (js* "'transform' in document.body.style") "transform"
+      (if (js* "'webkitTransform' in document.body.style") "webkitTransform"
+        (if (js* "'mozTransform' in document.body.style") "mozTransform"
+          (if (js* "'oTransform' in document.body.style") "oTransform"
+            "transform"))))))
 
 (defn square-element [dom-element]
   "If element is a square, return it. If it's a piece, return its parent"
