@@ -17,6 +17,7 @@
    :channels {:toggle-orientation (a/chan)
               :set-orientation (a/chan)
               :set-fen (a/chan)
+              :start-pos (a/chan)
               :set-dests (a/chan)
               :set-color (a/chan)
               :clear (a/chan)
@@ -30,6 +31,7 @@
    :consumers {:toggle-orientation ctrl/toggle-orientation
                :set-orientation ctrl/set-orientation
                :set-fen ctrl/set-fen
+               :start-pos ctrl/start-pos
                :set-dests ctrl/set-dests
                :set-color ctrl/set-color
                :clear ctrl/clear

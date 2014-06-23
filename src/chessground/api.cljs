@@ -11,6 +11,7 @@
       {"toggleOrientation" (fn [] (push-in :toggle-orientation true))
        "setOrientation" (fn [orientation] (push-in :set-orientation orientation))
        "setFen" (fn [fen] (push-in :set-fen fen))
+       "startPos" (fn [] (push-in :start-pos true))
        "setDests" (fn [dests] (push-in :set-dests (js->clj dests)))
        "setColor" (fn [color] (push-in :set-color color))
        "setPieces" (fn [pieces] (push-in :set-pieces
@@ -20,4 +21,3 @@
        "getOrientation" (fn [] (:orientation @state-atom))
        "getColor" (fn [] (:color (:movable @state-atom)))
        "getPosition" (fn [] (clj->js (chess/get-pieces (:chess @state-atom))))})))
-

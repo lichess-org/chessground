@@ -107,6 +107,9 @@
     [new-state
      (fn [root chans] (show/board root new-state chans))]))
 
+(defn start-pos [state]
+  (set-fen state))
+
 (defn set-pieces [state pieces]
   (let [new-state (update-in state [:chess] #(chess/set-pieces % pieces))]
     [new-state
