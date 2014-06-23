@@ -4,3 +4,4 @@ checkouts/
 .nrepl-port
 generated*
 debug
+chessground.js

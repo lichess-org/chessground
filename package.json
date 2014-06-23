@@ -1,0 +1,29 @@
+{
+  "name": "chessground",
+  "version": "0.0.1",
+  "description": "Base chessboard library meant to replace all lichess.org chessboards",
+  "main": "chessground.js",
+  "directories": {
+    "example": "examples"
+  },
+  "scripts": {
+    "build": "./scripts/build.sh"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/ornicar/chessground.git"
+  },
+  "keywords": [
+    "chess",
+    "chessboard"
+  ],
+  "author": "Thibault Duplessis (https://github.com/ornicar)",
+  "contributors": [
+    "Vincent Velociter (https://github.com/veloce)"
+  ],
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/ornicar/chessground/issues"
+  },
+  "homepage": "https://github.com/ornicar/chessground"
+}
