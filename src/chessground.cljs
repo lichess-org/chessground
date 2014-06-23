@@ -7,9 +7,7 @@
             [chessground.ctrl :as ctrl])
   (:require-macros [cljs.core.async.macros :as am]))
 
-(extend-type js/NodeList
-  ISeqable
-  (-seq [array] (array-seq array 0)))
+(extend-type js/NodeList ISeqable (-seq [array] (array-seq array 0)))
 
 (defn load-app
   "Return a map containing the initial application"
