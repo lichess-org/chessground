@@ -17,12 +17,12 @@
 
 (defn has-class [dom-element class] (.contains (.-classList dom-element) class))
 
-(defn $ [selector & [context]]
+(defn $ [selector context]
   (if context
     (.querySelector context selector)
     (.querySelector js/document selector)))
 
-(defn $$ [selector & [context]]
+(defn $$ [selector context]
   (if context
     (.querySelectorAll context selector)
     (.querySelectorAll js/document selector)))
