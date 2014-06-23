@@ -29,7 +29,6 @@
 (defn remove-el [el]
   "Remove a dom element, and ensure that any data associated with in store is removed too"
   (when (.-parentNode el)
-    (do
       (-> el .-parentNode (.removeChild el))
       (when-let [id (aget el exp)]
-        (swap! data-store dissoc id)))))
+        (swap! data-store dissoc id))))
