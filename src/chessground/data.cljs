@@ -7,6 +7,7 @@
 (def defaults
   "Default state, overridable by user configuration"
   {:fen nil ; replaced by :chess by data/make
+   :chess {} ; representation of a chess game
    :orientation "white"
    :movable {:free true ; all moves are valid - board editor
              :color "both" ; color that can move. white or black or both
