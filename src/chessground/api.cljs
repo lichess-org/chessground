@@ -4,7 +4,7 @@
 
 (defn build
   "Creates JavaScript functions that push to the channels"
-  [channels]
+  [channels state-atom]
   (clj->js
     (letfn [(push-in [ch val] (push! (get channels ch) val))]
       {"toggleOrientation" (fn [] (push-in :toggle-orientation true))
@@ -15,5 +15,6 @@
        "setPieces" (fn [pieces] (push-in :set-pieces
                                          (into {} (for [[k v] (js->clj pieces)]
                                                     [k (common/keywordize-keys v)]))))
-       "clear" (fn [] (push-in :clear true))})))
+       "clear" (fn [] (push-in :clear true))
+       "getOrientation" (fn [] (:orientation @state-atom))})))
 

@@ -40,7 +40,8 @@
       <div class="chessground wood small merida coordinates" id="ground1"></div>
       <p>Default options, with CSS coordinates</p>
       <script>
-        chessground.main(document.getElementById('ground1'));
+        var ground = chessground.main(document.getElementById('ground1'));
+        console.log(ground.getOrientation());
       </script>
     </section>
     <!-- <section> -->
