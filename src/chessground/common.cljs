@@ -18,14 +18,10 @@
 (defn has-class [dom-element class] (.contains (.-classList dom-element) class))
 
 (defn $ [selector context]
-  (if context
-    (.querySelector context selector)
-    (.querySelector js/document selector)))
+  (.querySelector (or context js/document) selector))
 
 (defn $$ [selector context]
-  (if context
-    (.querySelectorAll context selector)
-    (.querySelectorAll js/document selector)))
+  (.querySelectorAll (or context js/document) selector))
 
 ; is there a better way to do that?
 (def is-touch-device (js* "'ontouchstart' in document"))
