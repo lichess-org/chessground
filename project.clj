@@ -27,13 +27,11 @@
              :closure-warnings {:non-standard-jsdoc :off}}}
     :prod {:source-paths ["src"]
            :compiler
-           {:output-to "generated-prod/chessground.prod.js"
+           {:output-dir "generated-prod"
+            :output-to "generated-prod/chessground.prod.js"
             :optimizations :advanced
-            :foreign-libs [{:file "libs/interact.js"
-                            :provides ["window.interact"]}]
-            :externs ["externs/misc.js"]
+            :libs ["libs/interact.js"]
             :pretty-print false
-            :source-map false
             :language-in :ecmascript5
             :closure-warnings {:non-standard-jsdoc :off}}}}})
 

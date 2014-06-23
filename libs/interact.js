@@ -427,7 +427,7 @@ taye.interact = {
 
         // Events wrapper
         events = (function () {
-            var Event = window.Event,
+            var Event = window['Event'],
                 useAttachEvent = 'attachEvent' in window && !('addEventListener' in window),
                 addEvent = !useAttachEvent?  'addEventListener': 'attachEvent',
                 removeEvent = !useAttachEvent?  'removeEventListener': 'detachEvent',
