@@ -1,6 +1,7 @@
 (ns chessground.drag
   "Make pieces draggable, and squares droppable"
-  (:require [chessground.common :as common :refer [pp push!]]
+  (:require [taye.interact :as interact]
+            [chessground.common :as common :refer [pp push!]]
             [chessground.dom-data :as dom-data]
             [chessground.chess :as chess]))
 
@@ -26,7 +27,7 @@
     (push! (:drop-off chans) (-> event .-target .-parentNode (.getAttribute "data-key")))))
 
 (defn make-draggable [el chans state]
-  (dom-data/store el :interact (-> (js/interact el)
+  (dom-data/store el :interact (-> (interact/make el)
                                 (.draggable true)
                                 (.on "dragstart" #(on-start % chans))
                                 (.on "dragmove" on-move)
@@ -45,7 +46,7 @@
     (.remove (.-classList dest) drag-over-class)))
 
 (defn square [el chans]
-  (-> (js/interact el)
+  (-> (interact/make el)
       (.dropzone true)
       (.on "dragenter" #(-> % .-target .-classList (.add drag-over-class)))
       (.on "dragleave" #(-> % .-target .-classList (.remove drag-over-class)))

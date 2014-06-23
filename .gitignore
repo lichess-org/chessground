@@ -2,5 +2,5 @@
 target/
 checkouts/
 .nrepl-port
-generated
+generated*
 debug

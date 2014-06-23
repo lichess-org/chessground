@@ -1,3 +1,6 @@
+// ==ClosureCompiler==
+// @compilation_level ADVANCED_OPTIMIZATIONS
+// ==/ClosureCompiler==
 /**
  * interact.js v1.0.17
  *
@@ -5,8 +8,9 @@
  * Open source under the MIT License.
  * https://raw.github.com/taye/interact.js/master/LICENSE
  */
-(function (window) {
-    'use strict';
+goog.provide('taye.interact');
+taye.interact = {
+  make: (function () {
 
     var document           = window.document,
         console            = window.console,
@@ -802,7 +806,7 @@
             pageX: (touches[0].pageX + touches[1].pageX) / 2,
             pageY: (touches[0].pageY + touches[1].pageY) / 2,
             clientX: (touches[0].clientX + touches[1].clientX) / 2,
-            clientY: (touches[0].clientY + touches[1].clientY) / 2,
+            clientY: (touches[0].clientY + touches[1].clientY) / 2
         };
     }
 
@@ -4791,24 +4795,7 @@
         }
     }());
 
-    /* global exports: true, module, define */
+    return interact;
 
-    // http://documentcloud.github.io/underscore/docs/underscore.html#section-11
-    if (typeof exports !== 'undefined') {
-        if (typeof module !== 'undefined' && module.exports) {
-            exports = module.exports = interact;
-        }
-        exports.interact = interact;
-    }
-    // AMD
-    else if (typeof define === 'function' && define.amd) {
-        define('interact', function() {
-            return interact;
-        });
-    }
-    else {
-      console.log('in window');
-        window.interact = interact;
-    }
-
-} (this));
+} ())
+};
