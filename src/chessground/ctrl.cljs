@@ -46,6 +46,7 @@
              (show/move root orig dest)
              (show/selected root nil)
              (show/dests root nil)
+             (show/moved root orig dest)
              (callback (-> new-state :movable :events :after) orig dest new-chess))])))
     ; destination is not available, move is canceled but there are different cases:
     (if (= orig dest)

@@ -14,6 +14,12 @@
     (-> anySelected .-classList (.remove "selected")))
   (when selected (-> (square root selected) .-classList (.add "selected"))))
 
+(defn moved [root orig dest]
+  (doseq [anyMoved (common/$$ ".square.moved" root)]
+    (-> anyMoved .-classList (.remove "moved")))
+  (-> (square root orig) .-classList (.add "moved"))
+  (-> (square root dest) .-classList (.add "moved")))
+
 (defn dests [root dests]
   ; this is probably not the best approach, performance-wise.
   (doseq [square (common/$$ ".square" root)]
