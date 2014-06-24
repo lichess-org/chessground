@@ -23,6 +23,7 @@
              ; :externs ["externs/misc.js"]
              :pretty-print false
              ; :source-map "generated-stage/map"
+             :output-wrapper false
              :language-in :ecmascript5
              :closure-warnings {:non-standard-jsdoc :off}}}
     :prod {:source-paths ["src"]
