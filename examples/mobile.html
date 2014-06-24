@@ -10,8 +10,7 @@
     <link rel="stylesheet" href="mobile.css">
   </head>
   <body class="mobile">
-    <script src="../libs/interact.js"></script>
-    <script src="../generated/chessground.min.js" type="text/javascript"></script>
+    <script src="../generated-stage/chessground.stage.js" type="text/javascript"></script>
 
     <script>
       function include(script) {
@@ -42,7 +41,7 @@
           ground.setDests(chessToDests(chess));
           ground.setColor(chessToColor(chess));
         };
-        chessground.main(document.getElementById('ground1'), {
+        ground = chessground.main(document.getElementById('ground1'), {
           movable: {
             free: false,
             color: chessToColor(chess),
