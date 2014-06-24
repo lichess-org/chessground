@@ -17,7 +17,7 @@
        "setPieces" (fn [pieces] (push-in :set-pieces
                                          (into {} (for [[k v] (js->clj pieces)]
                                                     [k (common/keywordize-keys v)]))))
-       "move" (fn [orig dest] (push-in :move-piece [orig dest])) ; TODO: accept several move format?
+       "move" (fn [orig dest] (push-in :api-move [orig dest]))
        "clear" (fn [] (push-in :clear true))
        "getOrientation" (fn [] (:orientation @state-atom))
        "getColor" (fn [] (:color (:movable @state-atom)))

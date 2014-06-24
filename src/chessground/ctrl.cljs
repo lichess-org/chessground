@@ -32,7 +32,18 @@
        (when (not (:free (:movable state)))
          (show/dests root (data/dests-of state orig))))]))
 
+(defn api-move [state [orig dest]]
+  "A move initiated via API: we just update chess and show the move"
+  (if-let [new-chess (chess/move-piece (:chess state) orig dest)]
+    (let [new-state (-> state (assoc :chess new-chess))]
+      [new-state
+       (fn [root chans]
+         (show/move root orig dest)
+         (show/moved root orig dest))])
+    [state noop]))
+
 (defn move-piece [state [orig dest]]
+  "A move initiated through the UI"
   (or 
     ; destination is available: return new state, move the piece
     (when (data/can-move? state orig dest)
