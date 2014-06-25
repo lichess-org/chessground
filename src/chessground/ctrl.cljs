@@ -44,7 +44,7 @@
 
 (defn move-piece [state [orig dest]]
   "A move initiated through the UI"
-  (or 
+  (or
     ; destination is available: return new state, move the piece
     (when (data/can-move? state orig dest)
       (when-let [new-chess (chess/move-piece (:chess state) orig dest)]
@@ -68,7 +68,7 @@
       (if (and (not (:dragging state)) (data/is-movable? state dest))
         ; when not dragging, allow to reselect movable pieces with a single click/touch
         (move-start state dest)
-        ; otherwise cancel move 
+        ; otherwise cancel move
         (let [new-state (-> state (dissoc :selected) (assoc :dragging false))]
           [new-state
            (fn [root chans]
@@ -83,7 +83,7 @@
       [state noop])
     (if (data/is-movable? state key)
       (move-start state key)
-      [state 
+      [state
        (fn [root chans]
          (show/selected root nil)
          (show/dests root nil))])))
@@ -118,9 +118,6 @@
   (let [new-state (data/with-fen state fen)]
     [new-state
      (fn [root chans] (show/board root new-state chans))]))
-
-(defn start-pos [state]
-  (set-fen state nil))
 
 (defn set-pieces [state pieces]
   (let [new-state (update-in state [:chess] #(chess/set-pieces % pieces))]

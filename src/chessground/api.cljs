@@ -11,7 +11,7 @@
       {"toggleOrientation" (fn [] (push-in :toggle-orientation true))
        "setOrientation" (fn [orientation] (push-in :set-orientation orientation))
        "setFen" (fn [fen] (push-in :set-fen fen))
-       "startPos" (fn [] (push-in :start-pos true))
+       "startPos" (fn [] (push-in :set-fen true))
        "setDests" (fn [dests] (push-in :set-dests (js->clj dests)))
        "setColor" (fn [color] (push-in :set-color color))
        "setPieces" (fn [pieces] (push-in :set-pieces
