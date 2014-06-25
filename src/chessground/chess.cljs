@@ -14,7 +14,7 @@
 (def clear {:pieces {}})
 
 (defn make [fen]
-  {:pieces (forsyth/parse fen)})
+  {:pieces (forsyth/parse (when (not= fen "start") fen))})
 
 (defn get-piece [chess key] (get-in chess [:pieces key]))
 

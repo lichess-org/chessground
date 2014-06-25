@@ -23,9 +23,6 @@
                     piece {:role role :color color}]
                 (recur (assoc pieces key piece) (inc pos) next))))))
 
-(defn parse [fen]
-  (if (= fen "start")
-    default
-    (parse-squares (->> (or fen default)
-                        (remove #(= "/" %))
-                        (take-while #(not= \space %))))))
+(defn parse [fen] (parse-squares (->> (or fen default)
+                                      (remove #(= "/" %))
+                                      (take-while #(not= \space %)))))
