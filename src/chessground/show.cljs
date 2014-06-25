@@ -6,37 +6,37 @@
             [chessground.select :as select]
             [chessground.common :as common :refer [pp]]))
 
-(defn- square [root key]
+(defn- square-of [root key]
   (common/$ (str ".square[data-key=" key "]") root))
 
 (defn selected [root selected]
   (doseq [anySelected (common/$$ ".square.selected" root)]
     (-> anySelected .-classList (.remove "selected")))
-  (when selected (-> (square root selected) .-classList (.add "selected"))))
+  (when selected (-> (square-of root selected) .-classList (.add "selected"))))
 
 (defn moved [root orig dest]
-  (doseq [anyMoved (common/$$ ".square.moved" root)]
-    (-> anyMoved .-classList (.remove "moved")))
-  (-> (square root orig) .-classList (.add "moved"))
-  (-> (square root dest) .-classList (.add "moved")))
+  (doseq [any-moved (common/$$ ".square.moved" root)]
+    (-> any-moved .-classList (.remove "moved")))
+  (doseq [key [orig dest]]
+    (-> (square-of root key) .-classList (.add "moved"))))
 
 (defn dests [root dests]
   ; this is probably not the best approach, performance-wise.
-  (doseq [square (common/$$ ".square" root)]
-    (if (common/set-contains? dests (.getAttribute square "data-key"))
-      (-> square .-classList (.add "dest"))
-      (-> square .-classList (.remove "dest")))))
+  (doseq [sq (common/$$ ".square" root)]
+    (if (common/set-contains? dests (.getAttribute sq "data-key"))
+      (-> sq .-classList (.add "dest"))
+      (-> sq .-classList (.remove "dest")))))
 
 (defn move [root orig dest]
-  (let [orig-square (square root orig)
-        dest-square (square root dest)
+  (let [orig-square (square-of root orig)
+        dest-square (square-of root dest)
         piece (common/$ ".piece" orig-square)]
     (drag/unfuck piece)
     (when-let [dest-piece (common/$ ".piece" dest-square)] (dom-data/remove-el dest-piece))
     (.appendChild dest-square piece)))
 
 (defn un-move [root orig]
-  (let [orig-square (square root orig)
+  (let [orig-square (square-of root orig)
         piece (common/$ ".piece" orig-square)]
     (when piece (drag/unfuck piece))))
 
