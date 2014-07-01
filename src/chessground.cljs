@@ -63,4 +63,4 @@
   (let [app (load-app element (or (js->clj config) {}))]
     (show/app (:element app) @(:state app) (:channels app))
     (init-updates app)
-    (api/build (:channels app) (:state app))))
+    (api/build (:channels app) (:state app) (:element app))))

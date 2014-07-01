@@ -1,11 +1,12 @@
 (ns chessground.api
   "External JavaScript API exposed to the end user"
   (:require [chessground.common :as common :refer [pp push!]]
+            [chessground.show :as show]
             [chessground.chess :as chess]))
 
 (defn build
   "Creates JavaScript functions that push to the channels"
-  [channels state-atom]
+  [channels state-atom root]
   (clj->js
     (letfn [(push-in [ch val] (push! (get channels ch) val))]
       {"toggleOrientation" (fn [] (push-in :toggle-orientation true))
@@ -18,6 +19,7 @@
                                          (into {} (for [[k v] (js->clj pieces)]
                                                     [k (common/keywordize-keys v)]))))
        "move" (fn [orig dest] (push-in :api-move [orig dest]))
+       "showMoved" (fn [orig dest] (show/moved root orig dest))
        "clear" (fn [] (push-in :clear true))
        "getOrientation" (fn [] (:orientation @state-atom))
        "getColor" (fn [] (:color (:movable @state-atom)))
