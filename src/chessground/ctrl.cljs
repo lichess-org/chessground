@@ -88,6 +88,11 @@
          (show/selected root nil)
          (show/dests root nil))])))
 
+(defn show-moved [state [orig dest]]
+  [state
+   (fn [root chans]
+     (show/moved root orig dest))])
+
 (defn set-orientation [state orientation]
   (if (common/set-contains? chess/colors orientation)
     (let [new-state (assoc state :orientation orientation)]

@@ -1,7 +1,6 @@
 (ns chessground.api
   "External JavaScript API exposed to the end user"
   (:require [chessground.common :as common :refer [pp push!]]
-            [chessground.show :as show]
             [chessground.chess :as chess]))
 
 (defn build
@@ -19,7 +18,7 @@
                                          (into {} (for [[k v] (js->clj pieces)]
                                                     [k (common/keywordize-keys v)]))))
        "move" (fn [orig dest] (push-in :api-move [orig dest]))
-       "showMoved" (fn [orig dest] (show/moved root orig dest))
+       "showMoved" (fn [orig dest] (push-in :show-moved [orig dest]))
        "clear" (fn [] (push-in :clear true))
        "getOrientation" (fn [] (:orientation @state-atom))
        "getColor" (fn [] (:color (:movable @state-atom)))
