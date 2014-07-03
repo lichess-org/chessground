@@ -8,8 +8,10 @@
 
 (defn square [key pos p]
   (let [style (apply str (map (fn [[k v]] (str (name k) ":" v ";")) pos))
+        coord-y (if (= (subs key 0 1) "a") (str "data-coord-y='" (subs key 1 2) "' ") "")
+        coord-x (if (= (subs key 1 2) "1") (str "data-coord-x='" (subs key 0 1) "' ") "")
         piece-html (when p (piece p))]
-    (str "<div class='square' data-key='" key "' style='" style "'>" piece-html "</div>")))
+    (str "<div class='square' " coord-y coord-x "data-key='" key "' style='" style "'>" piece-html "</div>")))
 
 (defn board [state]
   (let [white (= (:orientation state) "white")
