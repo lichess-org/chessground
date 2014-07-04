@@ -15,7 +15,7 @@
   (let [target (.-target event)
         x (+ (or (.-x target) 0) (.-dx event))
         y (+ (or (.-y target) 0) (.-dy event))
-        transform (str "translate(" x "px, " y "px)")]
+        transform (str "translate3d(" x "px, " y "px, 0)")]
     (set! (.-x target) x)
     (set! (.-y target) y)
     (aset (.-style target) common/transform-prop transform)))
