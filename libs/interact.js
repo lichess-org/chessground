@@ -1,16 +1,15 @@
-// ==ClosureCompiler==
-// @compilation_level ADVANCED_OPTIMIZATIONS
-// ==/ClosureCompiler==
 /**
  * interact.js v1.0.17
  *
  * Copyright (c) 2012, 2013, 2014 Taye Adeyemi <dev@taye.me>
  * Open source under the MIT License.
  * https://raw.github.com/taye/interact.js/master/LICENSE
+ *
+ * We modified the wrapper function and env detection to allow interact to
+ * be packaged with chessground
  */
-goog.provide('taye.interact');
-taye.interact = {
-  make: (function () {
+(function () {
+    'use strict';
 
     var document           = window.document,
         console            = window.console,
@@ -427,7 +426,7 @@ taye.interact = {
 
         // Events wrapper
         events = (function () {
-            var Event = window['Event'],
+            var Event = window.Event,
                 useAttachEvent = 'attachEvent' in window && !('addEventListener' in window),
                 addEvent = !useAttachEvent?  'addEventListener': 'attachEvent',
                 removeEvent = !useAttachEvent?  'removeEventListener': 'detachEvent',
@@ -806,7 +805,7 @@ taye.interact = {
             pageX: (touches[0].pageX + touches[1].pageX) / 2,
             pageY: (touches[0].pageY + touches[1].pageY) / 2,
             clientX: (touches[0].clientX + touches[1].clientX) / 2,
-            clientY: (touches[0].clientY + touches[1].clientY) / 2
+            clientY: (touches[0].clientY + touches[1].clientY) / 2,
         };
     }
 
@@ -1509,7 +1508,7 @@ taye.interact = {
                 || !(event instanceof downEvent.constructor)
                 || downEvent.target !== event.target) {
                 return;
-            }    
+            }
         }
 
         var tapTargets = [],
@@ -3075,7 +3074,7 @@ taye.interact = {
          * Gets or sets whether resizing is forced 1:1 aspect
          *
          = (boolean) Current setting
-         * 
+         *
          * or
          *
          - newValue (boolean) #optional
@@ -3257,7 +3256,7 @@ taye.interact = {
          |     // do not snap during normal movement.
          |     // Instead, trigger only one snapped move event
          |     // immediately before the end event.
-         |     endOnly: true       
+         |     endOnly: true
          | });
         \*/
         snap: function (options) {
@@ -3435,7 +3434,7 @@ taye.interact = {
          = (object) The object's bounding rectangle. The properties are numbers with no units.
          o {
          o     top: -,
-         o     left: -, 
+         o     left: -,
          o     bottom: -,
          o     right: -,
          o     width: -,
@@ -3583,7 +3582,7 @@ taye.interact = {
          |     // do not restrict during normal movement.
          |     // Instead, trigger only one restricted move event
          |     // immediately before the end event.
-         |     endOnly: true       
+         |     endOnly: true
          | });
         \*/
         restrict: function (newValue) {
@@ -4795,7 +4794,6 @@ taye.interact = {
         }
     }());
 
-    return interact;
+    window.interact = interact;
 
-} ())
-};
+} ());

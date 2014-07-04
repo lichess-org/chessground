@@ -1,12 +1,15 @@
 #!/bin/sh
 
-ROOT=$(cd `dirname $0` && pwd)/../
-
-echo "Compiling chessground.js"
+ROOT=$(cd `dirname $0` && pwd)/..
 
 cd $ROOT
-lein cljsbuild once stage
+lein cljsbuild clean
+lein cljsbuild once prod
 
 echo "Finalizing chessground.js"
 
-(cat $ROOT/scripts/wrapper.beg.txt; cat $ROOT/generated-stage/chessground.stage.js; cat $ROOT/scripts/wrapper.end.txt) > $ROOT/chessground.js
+(cat $ROOT/libs/interact.js; cat $ROOT/scripts/wrapper.beg.txt; cat $ROOT/generated-prod/chessground.prod.js; cat $ROOT/scripts/wrapper.end.txt) > $ROOT/scripts/chessground.tmp.js
+
+$ROOT/node_modules/.bin/uglifyjs $ROOT/scripts/chessground.tmp.js -o $ROOT/chessground.js
+
+rm $ROOT/scripts/chessground.tmp.js

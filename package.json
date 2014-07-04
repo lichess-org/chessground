@@ -1,6 +1,6 @@
 {
   "name": "chessground",
-  "version": "0.0.1",
+  "version": "0.1.0",
   "description": "Base chessboard library meant to replace all lichess.org chessboards",
   "main": "chessground.js",
   "directories": {
@@ -25,5 +25,8 @@
   "bugs": {
     "url": "https://github.com/ornicar/chessground/issues"
   },
-  "homepage": "https://github.com/ornicar/chessground"
+  "homepage": "https://github.com/ornicar/chessground",
+  "devDependencies": {
+    "uglify-js": "~2.4.14"
+  }
 }

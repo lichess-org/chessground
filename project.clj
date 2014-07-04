@@ -10,30 +10,17 @@
           {:output-dir "generated"
            :output-to "generated/chessground.dev.js"
            :optimizations :none
-           :libs ["libs/interact.js"]
            :source-map true
            }}
-    :stage {:source-paths ["src"]
-            :compiler
-            {:output-dir "generated-stage"
-             :output-to "generated-stage/chessground.stage.js"
-             ; :optimizations :advanced
-             :optimizations :simple
-             :libs ["libs/interact.js"]
-             ; :externs ["externs/misc.js"]
-             :pretty-print false
-             ; :source-map "generated-stage/map"
-             :output-wrapper false
-             :language-in :ecmascript5
-             :closure-warnings {:non-standard-jsdoc :off}}}
     :prod {:source-paths ["src"]
            :compiler
            {:output-dir "generated-prod"
             :output-to "generated-prod/chessground.prod.js"
             :optimizations :advanced
-            :libs ["libs/interact.js"]
+            :externs ["libs/interact.js"]
             :pretty-print false
+            :output-wrapper false
             :language-in :ecmascript5
-            :closure-warnings {:non-standard-jsdoc :off}}}}})
-
+            :closure-warnings {:externs-validation :off
+                               :non-standard-jsdoc :off}}}}})
 

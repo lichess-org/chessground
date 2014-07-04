@@ -14,9 +14,7 @@
       include("../libs/jquery.min.js");
       if (window.location.search.indexOf('prod') !== -1) {
         // production
-        include("../generated-prod/chessground.prod.js");
-      } else if (window.location.search.indexOf('stage') !== -1) {
-        include("../generated-stage/chessground.stage.js");
+        include("../chessground.js");
       } else {
         // development
         include("../generated/goog/base.js");

@@ -5,3 +5,4 @@ checkouts/
 generated*
 debug
 chessground.js
+node_modules

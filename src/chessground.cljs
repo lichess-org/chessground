@@ -54,7 +54,7 @@
   (doseq [[ch update-fn] (:consumers app)]
     (am/go (while true
              (let [val (a/<! (get (:channels app) ch))
-                   _ (common/pp (str "on channel [" ch "], received value [" val "]"))
+                   _ (pp (str "on channel [" ch "], received value [" val "]"))
                    [new-state mutate-dom] (update-fn @(:state app) val)]
                (reset! (:state app) new-state)
                (mutate-dom (:element app) (:channels app)))))))
