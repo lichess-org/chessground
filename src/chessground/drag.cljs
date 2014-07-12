@@ -8,17 +8,27 @@
 (def drag-over-class "drag-over")
 
 (defn on-start [event chans]
-  (-> event .-target .-classList (.add dragging-class))
-  (push! (:drag-start chans) (common/square-key (.-target event))))
+  "Shift piece right under the cursor"
+  (let [piece (.-target event)]
+    (when-not common/is-touch-device
+      (let [pos (common/offset piece)
+            center-x (+ (:left pos) (/ (.-offsetWidth piece) 2))
+            center-y (+ (:top pos) (/ (.-offsetHeight piece) 2))
+            decay-x (- (.-pageX event) center-x)
+            decay-y (- (.-pageY event) center-y)]
+        (set! (.-x piece) decay-x)
+        (set! (.-y piece) decay-y)))
+    (-> piece .-classList (.add dragging-class))
+    (push! (:drag-start chans) (common/square-key piece))))
 
 (defn on-move [event]
-  (let [target (.-target event)
-        x (+ (or (.-x target) 0) (.-dx event))
-        y (+ (or (.-y target) 0) (.-dy event))
+  (let [piece (.-target event)
+        x (+ (or (.-x piece) 0) (.-dx event))
+        y (+ (or (.-y piece) 0) (.-dy event))
         transform (str "translate3d(" x "px, " y "px, 0)")]
-    (set! (.-x target) x)
-    (set! (.-y target) y)
-    (aset (.-style target) common/transform-prop transform)))
+    (set! (.-x piece) x)
+    (set! (.-y piece) y)
+    (aset (.-style piece) common/transform-prop transform)))
 
 (defn on-end [event chans]
   (let [orig (-> event .-target .-parentNode)

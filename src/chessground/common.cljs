@@ -23,7 +23,10 @@
 (defn $$ [selector context]
   (.querySelectorAll (or context js/document) selector))
 
-(defn is-in [obj prop] (js* "prop in obj"))
+(defn offset [element]
+  (let [rect (.getBoundingClientRect element)]
+    {:top (+ (.-top rect) (-> js/document .-body .-scrollTop))
+     :left (+ (.-left rect) (-> js/document .-body .-scrollLeft))}))
 
 ; is there a better way to do that?
 (def is-touch-device (js* "'ontouchstart' in document"))
