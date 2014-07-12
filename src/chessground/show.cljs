@@ -56,7 +56,7 @@
         (when draggable (drag/make-draggable p chans state))))))
 
 (defn board [root state chans]
-  (set! (.-innerHTML (common/$ ".board" root)) (render/board state))
+  (set! (.-outerHTML (common/$ ".board" root)) (render/board state))
   (square-interactions root state chans)
   (piece-interactions root state chans))
 
