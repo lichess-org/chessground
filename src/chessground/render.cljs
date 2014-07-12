@@ -8,13 +8,8 @@
 
 (defn square [key pos p white]
   (let [style (apply str (map (fn [[k v]] (str (name k) ":" v ";")) pos))
-        coord-y (if white
-                  (if (= (subs key 0 1) "a") (str "data-coord-y='" (subs key 1 2) "' ") "")
-                  (if (= (subs key 0 1) "h") (str "data-coord-y='" (subs key 1 2) "' ") ""))
-
-        coord-x (if white
-                  (if (= (subs key 1 2) "1") (str "data-coord-x='" (subs key 0 1) "' ") "")
-                  (if (= (subs key 1 2) "8") (str "data-coord-x='" (subs key 0 1) "' ") ""))
+        coord-y (if (= (subs key 0 1) (if white "a" "h")) (str "data-coord-y='" (subs key 1 2) "' ") "")
+        coord-x (if (= (subs key 1 2) (if white "1" "8")) (str "data-coord-x='" (subs key 0 1) "' ") "")
         piece-html (when p (piece p))]
     (str "<div class='square' " coord-y coord-x "data-key='" key "' style='" style "'>" piece-html "</div>")))
 
