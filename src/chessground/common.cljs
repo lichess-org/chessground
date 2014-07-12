@@ -11,6 +11,13 @@
   (when debug (doseq [expr exprs] (.log js/console (clj->js expr))))
   (first exprs))
 
+(defn deep-merge [a b]
+  (letfn [(smart-merge [x y]
+            (if (and (map? x) (map? y))
+              (merge x y)
+              (or y x)))]
+    (merge-with smart-merge a b)))
+
 (defn set-contains? [set val] (some #{val} set))
 
 (defn push! [chan msg] (am/go (a/>! chan msg)))

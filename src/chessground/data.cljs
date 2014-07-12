@@ -29,7 +29,7 @@
                    common/keywordize-keys
                    (common/keywordize-keys-in [:movable])
                    (common/keywordize-keys-in [:movable :events]))]
-    (-> (merge defaults config)
+    (-> (common/deep-merge defaults config)
         (with-fen (:fen config))
         (dissoc :fen))))
 
