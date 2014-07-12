@@ -3,7 +3,7 @@
 
 (def exp
   "Chessground namespace used to add a unique property to dom elements"
-  (str "Chessground" (js/Date.)))
+  (str "chessground-" (-> (.random js/Math) (.toString 36) (.substring 2))))
 
 (def uid
   "Unique ID generator (increment)"
@@ -29,6 +29,6 @@
 (defn remove-el [el]
   "Remove a dom element, and ensure that any data associated with in store is removed too"
   (when (.-parentNode el)
-      (-> el .-parentNode (.removeChild el))
-      (when-let [id (aget el exp)]
-        (swap! data-store dissoc id))))
+    (-> el .-parentNode (.removeChild el))
+    (when-let [id (aget el exp)]
+      (swap! data-store dissoc id))))
