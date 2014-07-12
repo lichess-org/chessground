@@ -7,11 +7,9 @@
 (def dragging-class "dragging")
 (def drag-over-class "drag-over")
 
-(defn on-start [event chans]
 (defn on-start [event chans center-piece]
   "Shift piece right under the cursor"
   (let [piece (.-target event)]
-    (when-not common/is-touch-device
     (when center-piece
       (let [pos (common/offset piece)
             center-x (+ (:left pos) (/ (.-offsetWidth piece) 2))
@@ -44,7 +42,6 @@
 (defn make-draggable [el chans state]
   (dom-data/store el :interact (-> (js/interact el)
                                    (.draggable true)
-                                   (.on "dragstart" #(on-start % chans))
                                    (.on "dragstart" #(on-start % chans (-> state :movable :drag-center)))
                                    (.on "dragmove" on-move)
                                    (.on "dragend" #(on-end % chans)))))
