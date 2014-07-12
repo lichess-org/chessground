@@ -35,7 +35,7 @@
   (let [piece (.-target event)
         orig (.-parentNode piece)
         dest (.-dropzone event)]
-    (-> dest .-classList (.remove drag-over-class))
+    (when dest (-> dest .-classList (.remove drag-over-class)))
     (-> piece .-classList (.remove dragging-class))
     (when-let [orig-key (common/square-key orig)]
       (if (and dest (= (.-parentNode orig) (.-parentNode dest)))
