@@ -21,9 +21,13 @@
     (aset (.-style target) common/transform-prop transform)))
 
 (defn on-end [event chans]
-  (-> event .-target .-classList (.remove dragging-class))
-  (when (not (.-dropzone event))
-    (push! (:drop-off chans) (common/square-key (.-target event)))))
+  (let [orig (-> event .-target .-parentNode)
+        dest (.-dropzone event)]
+    (if (and dest (= (.-parentNode orig) (.-parentNode dest)))
+      (push! (:move-piece chans) (map common/square-key [orig dest]))
+      (push! (:drop-off chans) (common/square-key orig)))
+    (-> dest .-classList (.remove drag-over-class))
+    (-> event .-target .-classList (.remove dragging-class))))
 
 (defn make-draggable [el chans state]
   (dom-data/store el :interact (-> (js/interact el)
@@ -38,18 +42,11 @@
 (defn piece-off [el state]
   (.set (dom-data/fetch el :interact) (js-obj "draggable" false)))
 
-(defn on-drop [event chans]
-  (let [orig (-> event .-relatedTarget .-parentNode)
-        dest (.-target event)]
-    (push! (:move-piece chans) (map common/square-key [orig dest]))
-    (.remove (.-classList dest) drag-over-class)))
-
 (defn square [el chans]
   (-> (js/interact el)
       (.dropzone true)
       (.on "dragenter" #(-> % .-target .-classList (.add drag-over-class)))
-      (.on "dragleave" #(-> % .-target .-classList (.remove drag-over-class)))
-      (.on "drop" #(on-drop % chans))))
+      (.on "dragleave" #(-> % .-target .-classList (.remove drag-over-class)))))
 
 (defn unfuck [piece-el]
   (set! (.-x piece-el) 0)
