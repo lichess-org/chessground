@@ -1,7 +1,7 @@
 (defproject chessground "0.1.0"
   :plugins [[lein-cljsbuild "1.0.3"]]
   :dependencies [[org.clojure/clojure "1.6.0"]
-                 [org.clojure/clojurescript "0.0-2234"]
+                 [org.clojure/clojurescript "0.0-2268"]
                  [org.clojure/core.async "0.1.303.0-886421-alpha"]]
   :cljsbuild
   {:builds
@@ -23,4 +23,3 @@
             :language-in :ecmascript5
             :closure-warnings {:externs-validation :off
                                :non-standard-jsdoc :off}}}}})
-
