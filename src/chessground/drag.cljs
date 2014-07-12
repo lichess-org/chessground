@@ -10,16 +10,17 @@
 (defn on-start [event chans center-piece]
   "Shift piece right under the cursor"
   (let [piece (.-target event)]
-    (when center-piece
-      (let [pos (common/offset piece)
-            center-x (+ (:left pos) (/ (.-offsetWidth piece) 2))
-            center-y (+ (:top pos) (/ (.-offsetHeight piece) 2))
-            decay-x (- (.-pageX event) center-x)
-            decay-y (- (.-pageY event) center-y)]
-        (set! (.-x piece) decay-x)
-        (set! (.-y piece) decay-y)))
-    (-> piece .-classList (.add dragging-class))
-    (push! (:drag-start chans) (common/square-key piece))))
+    (when-let [key (common/square-key piece)]
+      (when center-piece
+        (let [pos (common/offset piece)
+              center-x (+ (:left pos) (/ (.-offsetWidth piece) 2))
+              center-y (+ (:top pos) (/ (.-offsetHeight piece) 2))
+              decay-x (- (.-pageX event) center-x)
+              decay-y (- (.-pageY event) center-y)]
+          (set! (.-x piece) decay-x)
+          (set! (.-y piece) decay-y)))
+      (-> piece .-classList (.add dragging-class))
+      (push! (:drag-start chans) key))))
 
 (defn on-move [event]
   (let [piece (.-target event)
@@ -31,13 +32,15 @@
     (aset (.-style piece) common/transform-prop transform)))
 
 (defn on-end [event chans]
-  (let [orig (-> event .-target .-parentNode)
+  (let [piece (.-target event)
+        orig (.-parentNode piece)
         dest (.-dropzone event)]
-    (if (and dest (= (.-parentNode orig) (.-parentNode dest)))
-      (push! (:move-piece chans) (map common/square-key [orig dest]))
-      (push! (:drop-off chans) (common/square-key orig)))
     (-> dest .-classList (.remove drag-over-class))
-    (-> event .-target .-classList (.remove dragging-class))))
+    (-> piece .-classList (.remove dragging-class))
+    (when-let [orig-key (common/square-key orig)]
+      (if (and dest (= (.-parentNode orig) (.-parentNode dest)))
+        (push! (:move-piece chans) (map common/square-key [orig dest]))
+        (push! (:drop-off chans) orig-key)))))
 
 (defn make-draggable [el chans state]
   (dom-data/store el :interact (-> (js/interact el)

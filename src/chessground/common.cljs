@@ -22,7 +22,8 @@
 
 (defn push! [chan msg] (am/go (a/>! chan msg)))
 
-(defn has-class [dom-element class] (.contains (.-classList dom-element) class))
+(defn has-class [dom-element class]
+  (and dom-element (.contains (.-classList dom-element) class)))
 
 (defn $ [selector context]
   (.querySelector (or context js/document) selector))
@@ -59,7 +60,8 @@
 
 (defn square-key [dom-element]
   "Gets the square key from the element, or its parent"
-  (.getAttribute (square-element dom-element) "data-key"))
+  (when-let [sq (square-element dom-element)]
+    (.getAttribute sq "data-key")))
 
 (defn keywordize-keys [hashmap]
   (into {} (for [[k v] hashmap] [(keyword k) v])))
