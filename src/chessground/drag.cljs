@@ -9,7 +9,7 @@
 
 (defn on-start [event chans]
   (-> event .-target .-classList (.add dragging-class))
-  (push! (:drag-start chans) (-> event .-target .-parentNode (.getAttribute "data-key"))))
+  (push! (:drag-start chans) (common/square-key (.-target event))))
 
 (defn on-move [event]
   (let [target (.-target event)
@@ -23,14 +23,14 @@
 (defn on-end [event chans]
   (-> event .-target .-classList (.remove dragging-class))
   (when (not (.-dropzone event))
-    (push! (:drop-off chans) (-> event .-target .-parentNode (.getAttribute "data-key")))))
+    (push! (:drop-off chans) (common/square-key (.-target event)))))
 
 (defn make-draggable [el chans state]
   (dom-data/store el :interact (-> (js/interact el)
-                                (.draggable true)
-                                (.on "dragstart" #(on-start % chans))
-                                (.on "dragmove" on-move)
-                                (.on "dragend" #(on-end % chans)))))
+                                   (.draggable true)
+                                   (.on "dragstart" #(on-start % chans))
+                                   (.on "dragmove" on-move)
+                                   (.on "dragend" #(on-end % chans)))))
 
 (defn piece-on [el state]
   (.set (dom-data/fetch el :interact) (js-obj "draggable" true)))

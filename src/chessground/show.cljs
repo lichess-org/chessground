@@ -52,9 +52,7 @@
                   owner (if (common/has-class p "white") "white" "black")
                   draggable (or (= movable-color "both") (= movable-color owner))]]
       (if instance
-        (if draggable
-          (drag/piece-on p state)
-          (drag/piece-off p state))
+        ((if draggable drag/piece-on drag/piece-off) p state)
         (when draggable (drag/make-draggable p chans state))))))
 
 (defn board [root state chans]
