@@ -11,6 +11,7 @@
   "Shift piece right under the cursor"
   (let [piece (.-target event)]
     (when-let [key (common/square-key piece)]
+      (-> piece .-classList (.add dragging-class))
       (when center-piece
         (let [pos (common/offset piece)
               center-x (+ (:left pos) (/ (.-offsetWidth piece) 2))
@@ -19,7 +20,6 @@
               decay-y (- (.-pageY event) center-y)]
           (set! (.-x piece) decay-x)
           (set! (.-y piece) decay-y)))
-      (-> piece .-classList (.add dragging-class))
       (push! (:drag-start chans) key))))
 
 (defn on-move [event]

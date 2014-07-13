@@ -2,6 +2,10 @@
   box-shadow: none;
   background: rgba(216, 85, 0, 0.3);
 }
+.chessground .piece.dragging {
+  width: 200%;
+  height: 200%;
+}
 
 .mobile .chessground.cburnett .piece.pawn.white {
   background-image: url('http://static.lichess.org/assets/piece-png/cburnett/wP.png');
