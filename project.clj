@@ -11,14 +11,13 @@
           {:output-dir "generated"
            :output-to "generated/chessground.dev.js"
            :optimizations :none
-           :source-map true
-           }}
+           :source-map true}}
     :prod {:source-paths ["src"]
            :compiler
            {:output-dir "generated-prod"
             :output-to "generated-prod/chessground.prod.js"
             :optimizations :advanced
-            :externs ["libs/interact.js"]
+            :externs ["libs/interact.min.js"]
             :pretty-print false
             :output-wrapper false
             ; :language-in :ecmascript5
