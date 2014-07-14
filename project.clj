@@ -20,5 +20,7 @@
             :externs ["libs/interact.js"]
             :pretty-print false
             :output-wrapper false
+            ; :language-in :ecmascript5
+            ; :language-out :ecmascript5
             :closure-warnings {:externs-validation :off
                                :non-standard-jsdoc :off}}}}})
