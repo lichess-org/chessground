@@ -50,12 +50,7 @@
         };
         ground = chessground.main(document.getElementById('ground7'), {
           movable: {
-            free: false,
-            color: chessToColor(chess),
-            dests: chessToDests(chess),
-          events: {
-            after: onMove
-            }
+            free: true
         }
         });
       </script>

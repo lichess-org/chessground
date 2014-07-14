@@ -7,6 +7,10 @@
 
 (def debug false)
 
+(def ground-id
+  "Ground unique ID generator (increment)"
+  (atom 0))
+
 (defn pp [& exprs]
   (when debug (doseq [expr exprs] (.log js/console (clj->js expr))))
   (first exprs))

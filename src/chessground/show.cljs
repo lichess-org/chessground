@@ -7,7 +7,7 @@
             [chessground.common :as common :refer [pp]]))
 
 (defn- square-of [root key]
-  (common/$ (str ".square[data-key=" key "]") root))
+  (.getElementById js/document (str (.-id root) key)))
 
 (defn selected [root selected]
   (doseq [any-selected (common/$$ ".square.selected" root)]
@@ -56,11 +56,11 @@
         (when draggable (drag/make-draggable p chans state))))))
 
 (defn board [root state chans]
-  (set! (.-outerHTML (common/$ ".board" root)) (render/board state))
+  (set! (.-outerHTML (common/$ ".board" root)) (render/board state root))
   (square-interactions root state chans)
   (piece-interactions root state chans))
 
 (defn app [root state chans]
-  (set! (.-innerHTML root) (render/app state))
+  (set! (.-innerHTML root) (render/app state root))
   (square-interactions root state chans)
   (piece-interactions root state chans))
