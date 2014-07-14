@@ -1,6 +1,5 @@
 (defproject chessground "0.1.0"
-  :plugins [[lein-cljsbuild "1.0.3"]
-            [lein-voom "0.1.0-20140621_212303-g0e280b9"]]
+  :plugins [[lein-cljsbuild "1.0.3"]]
   :dependencies [[org.clojure/clojure "1.6.0"]
                  [org.clojure/clojurescript "0.0-2268"]
                  [org.clojure/core.async "0.1.303.0-886421-alpha"]]
