@@ -11,7 +11,7 @@
       function include(script) {
         document.write('\x3Cscript type="text/javascript" src="'+script+'">\x3C/script>');
       }
-      include("../libs/interact.min.js");
+      include("../libs/interact.js");
       if (window.location.search.indexOf('prod') !== -1) {
         // production
         include("../generated-prod/chessground.prod.js");
