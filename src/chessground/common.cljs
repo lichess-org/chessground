@@ -44,11 +44,12 @@
    Because the <body> element must exist at the time this code runs."
   (do
     (or (.-body js/document) (throw "chessground must be included in the <body> tag!"))
-    (if (js* "'transform' in document.body.style") "transform"
-      (if (js* "'webkitTransform' in document.body.style") "webkitTransform"
-        (if (js* "'mozTransform' in document.body.style") "mozTransform"
-          (if (js* "'oTransform' in document.body.style") "oTransform"
-            "transform"))))))
+    (cond
+      (js* "'transform' in document.body.style") "transform"
+      (js* "'webkitTransform' in document.body.style") "webkitTransform"
+      (js* "'mozTransform' in document.body.style") "mozTransform"
+      (js* "'oTransform' in document.body.style") "oTransform"
+      :else "transform")))
 
 (defn square-element [dom-element]
   "If element is a square, return it. If it's a piece, return its parent"
