@@ -6,15 +6,19 @@
   :dependencies [[org.clojure/clojure "1.6.0"]
                  [org.clojure/clojurescript "0.0-2268"]
                  [org.clojure/core.async "0.1.303.0-886421-alpha"]]
+
+  :profiles {:dev {:dependencies [[weasel "0.3.0"]
+                                  [com.cemerick/piggieback "0.1.3"]]
+                   :source-paths ["src" "dev-src"]
+                   :repl-options {:nrepl-middleware [cemerick.piggieback/wrap-cljs-repl]}}}
   :cljsbuild
   {:builds
-   {:dev {:source-paths ["src"]
+   {:dev {:source-paths ["src" "dev-src"]
           :compiler
           {:output-dir "generated"
            :output-to "generated/chessground.dev.js"
            :optimizations :none
-           :source-map true
-           }}
+           :source-map "generated/chessground.dev.js.map"}}
     :prod {:source-paths ["src"]
            :compiler
            {:output-dir "generated-prod"
