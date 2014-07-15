@@ -7,12 +7,17 @@
 
 (def role-names {"p" "pawn" "r" "rook" "n" "knight" "b" "bishop" "q" "queen" "k" "king"})
 
-(defn- pos-to-key [pos] (str (get "abcdefgh" (mod pos 8)) (- 8 (int (/ pos 8)))))
+(defn- pos-to-key [pos]
+  (str (get "abcdefgh" (mod pos 8))
+       (- 8 (int (/ pos 8)))))
 
 (defn- parse-squares [fen-chars]
-  (loop [pieces {} pos 0 [current & next] fen-chars]
+  (loop [pieces {}
+         pos 0
+         [current & next] fen-chars]
     (let [as-int (js/parseInt current)
-          spaces (when (not (js/isNaN as-int)) as-int)]
+          spaces (when-not (js/isNaN as-int) as-int)]
+      (println (str "pos: " pos ", current: " current ", as-int: " as-int "\n"))
       (cond
         (nil? current) pieces
         (not (nil? spaces)) (recur pieces (+ pos spaces) next)
@@ -23,6 +28,8 @@
                     piece {:role role :color color}]
                 (recur (assoc pieces key piece) (inc pos) next))))))
 
-(defn parse [fen] (parse-squares (->> (or fen default)
-                                      (remove #(= "/" %))
-                                      (take-while #(not= \space %)))))
+(defn parse [fen]
+  (parse-squares
+    (->> (or fen default)
+      (remove #(= "/" %))
+      (take-while #(not= \space %)))))

@@ -1,6 +1,5 @@
 (ns chessground.data
   "Representation and manipulation of the application data"
-  (:refer-clojure :exclude [filter])
   (:require [chessground.common :as common :refer [pp]]
             [chessground.chess :as chess]))
 

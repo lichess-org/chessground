@@ -1,5 +1,6 @@
 .lein-repl-history
 target/
+out/
 checkouts/
 .nrepl-port
 generated*

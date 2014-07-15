@@ -10,8 +10,8 @@
   (common/$ (str ".square[data-key=" key "]") root))
 
 (defn selected [root selected]
-  (doseq [anySelected (common/$$ ".square.selected" root)]
-    (-> anySelected .-classList (.remove "selected")))
+  (doseq [any-selected (common/$$ ".square.selected" root)]
+    (-> any-selected .-classList (.remove "selected")))
   (when selected (-> (square-of root selected) .-classList (.add "selected"))))
 
 (defn moved [root orig dest]

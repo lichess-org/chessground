@@ -3,10 +3,11 @@
   (:require [chessground.common :refer [pp]]
             [chessground.fen :as forsyth]))
 
-; Representation of a chess game:
-; {:pieces {"a1" {:color "white" :role "rook"}
-;           "b1" {:color "white" :role "knight"}
-;          }}
+(comment
+  ; Representation of a chess game:
+  {:pieces {"a1" {:color "white" :role "rook"}
+            "b1" {:color "white" :role "knight"}}}
+  )
 
 (def colors ["white" "black"])
 (def roles ["pawn" "rook" "knight" "bishop" "queen" "king"])
@@ -26,9 +27,9 @@
 
 (defn set-pieces [chess changes]
   (update-in chess [:pieces]
-             (fn [pieces] (reduce (fn [ps [key p]]
-                                    (if p (assoc ps key p) (dissoc ps key)))
-                                  pieces changes))))
+    (fn [pieces] (reduce (fn [ps [key p]]
+                           (if p (assoc ps key p) (dissoc ps key)))
+                   pieces changes))))
 
 (defn- count-pieces [chess] (count (:pieces chess)))
 

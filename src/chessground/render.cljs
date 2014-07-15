@@ -18,10 +18,10 @@
         c (:chess state)
         squares (for [rank (range 1 9)
                       file-n (range 1 9)
-                      :let [file (get "abcdefgh" (- file-n 1))
+                      :let [file (get "abcdefgh" (dec file-n))
                             key (str file rank)
-                            pos {(if white :left :right) (str (* (- file-n 1) 12.5) "%")
-                                 (if white :bottom :top) (str (* (- rank 1) 12.5) "%")}
+                            pos {(if white :left :right) (str (* (dec file-n) 12.5) "%")
+                                 (if white :bottom :top) (str (* (dec rank) 12.5) "%")}
                             p (chess/get-piece c key)]]
                   (square key pos p white))]
     (str "<div class='board'>" (apply str squares) "</div>")))

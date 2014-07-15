@@ -1,8 +1,6 @@
 (ns chessground.ctrl
-  "Changes to state.
-   Each function returns a new state
-   and a function taking a root element and channels,
-   and mutating the dom"
+  "Changes to state. Each function returns a new state and a function
+  taking a root element and channels, and mutating the dom."
   (:require [chessground.common :as common :refer [pp]]
             [chessground.show :as show]
             [chessground.data :as data]
