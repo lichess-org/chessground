@@ -2,6 +2,7 @@
 target/
 out/
 checkouts/
+.repl/
 .nrepl-port
 generated*
 debug
