@@ -11,15 +11,18 @@
   (str (get "abcdefgh" (mod pos 8))
        (- 8 (int (/ pos 8)))))
 
-(defn- parse-squares [fen-chars]
+(defn- parse-squares
+  "Parses a FEN-notation of a chess board into a map of locations ->
+  piece, where piece is represented as {:role r, :color c}."
+  [fen-chars]
   (loop [pieces {}
          pos 0
          [current & next] fen-chars]
     (let [as-int (js/parseInt current)
           spaces (when-not (js/isNaN as-int) as-int)]
-      (println (str "pos: " pos ", current: " current ", as-int: " as-int "\n"))
       (cond
-        (nil? current) pieces
+        (> pos 63) pieces
+        (= current "/") (recur pieces pos next)
         (not (nil? spaces)) (recur pieces (+ pos spaces) next)
         :else (let [key (pos-to-key pos)
                     lower (lower-case current)
