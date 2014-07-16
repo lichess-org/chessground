@@ -1,4 +1,5 @@
 .lein-repl-history
+out/
 target/
 out/
 checkouts/
