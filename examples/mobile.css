@@ -7,6 +7,10 @@
   height: 200%;
 }
 
+.chessground .square:hover {
+  box-shadow: none;
+}
+
 #chessground-moving-square {
   display: none;
   position: absolute;
