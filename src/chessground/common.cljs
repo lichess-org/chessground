@@ -5,7 +5,7 @@
 
 (enable-console-print!)
 
-(def debug true)
+(def debug false)
 
 (defn pp [& exprs]
   (when debug (doseq [expr exprs] (.log js/console (clj->js expr))))
