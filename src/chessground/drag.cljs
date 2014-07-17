@@ -16,19 +16,20 @@
                        (set! (.-id div) "chessground-moving-square")
                        (.appendChild (.-body js/document) div))))
 
-
 ; from interact.js
-(def scroll-xy
+(def get-scroll-xy
   {:x (or js/scrollX (-> js/document .-documentElement .-scrollLeft))
    :y (or js/scrollY (-> js/document .-documentElement .-scrollTop))})
 
+(def iStuffRe (js/RegExp. (.-source "ipad|iphone|ipod") "i"))
+
+(def scroll (if (.test iStuffRe (.-userAgent js/navigator))
+              {:x 0 :y 0}
+              get-scroll-xy))
+
 ; from interact.js with some differences
 (defn get-element-rect [element]
-  (let [re (js/RegExp. (.-source "ipad|iphone|ipod") "i")
-        scroll (if (.test re (.-userAgent js/navigator))
-                 {:x 0 :y 0}
-                 scroll-xy)
-        rect (.getBoundingClientRect element)]
+  (let [rect (.getBoundingClientRect element)]
     {:left (+ (.-left rect) (:x scroll))
      :right (+ (.-right rect) (:x scroll))
      :top (+ (.-top rect) (:y scroll))
@@ -99,7 +100,7 @@
         h2 (* h 2)
         w2 (* w 2)
         dragging-div (.getElementById js/document "chessground-moving-square")]
-    (when (common/is-hidden? dragging-div)
+    (when (common/hidden? dragging-div)
       (set! (-> dragging-div .-style .-height) (str h2 "px"))
       (set! (-> dragging-div .-style .-width) (str w2 "px"))
       (set! (-> dragging-div .-style .-left) (str (- (:left rect) (/ w 2)) "px"))
@@ -116,8 +117,8 @@
 (defn square [el chans]
   (-> (js/interact el)
       (.dropzone true)
-      (.on "dragenter" (if common/is-touch-device on-touch-dragenter on-click-dragenter))
-      (.on "dragleave" (if common/is-touch-device on-touch-dragleave on-click-dragleave))))
+      (.on "dragenter" (if common/touch-device? on-touch-dragenter on-click-dragenter))
+      (.on "dragleave" (if common/touch-device? on-touch-dragleave on-click-dragleave))))
 
 (defn unfuck [piece-el]
   (set! (.-x piece-el) 0)

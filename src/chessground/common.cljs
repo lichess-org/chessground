@@ -5,7 +5,7 @@
 
 (enable-console-print!)
 
-(def debug false)
+(def debug true)
 
 (defn pp [& exprs]
   (when debug (doseq [expr exprs] (.log js/console (clj->js expr))))
@@ -37,9 +37,9 @@
      :left (+ (.-left rect) (-> js/document .-body .-scrollLeft))}))
 
 ; is there a better way to do that?
-(def is-touch-device (js* "'ontouchstart' in document"))
+(def touch-device? (js* "'ontouchstart' in document"))
 
-(defn is-hidden? [element]
+(defn hidden? [element]
   (nil? (js->clj (.-offsetParent element))))
 
 (def transform-prop
