@@ -7,6 +7,35 @@
 (def dragging-class "dragging")
 (def drag-over-class "drag-over")
 
+(def dragging-div-pos
+  (atom {}))
+
+(.addEventListener js/document "DOMContentLoaded"
+                   (fn []
+                     (let [div (.createElement js/document "div")]
+                       (set! (.-id div) "chessground-moving-square")
+                       (.appendChild (.-body js/document) div))))
+
+
+; from interact.js
+(def scroll-xy
+  {:x (or js/scrollX (-> js/document .-documentElement .-scrollLeft))
+   :y (or js/scrollY (-> js/document .-documentElement .-scrollTop))})
+
+; from interact.js with some differences
+(defn get-element-rect [element]
+  (let [re (js/RegExp. (.-source "ipad|iphone|ipod") "i")
+        scroll (if (.test re (.-userAgent js/navigator))
+                 {:x 0 :y 0}
+                 scroll-xy)
+        rect (.getBoundingClientRect element)]
+    {:left (+ (.-left rect) (:x scroll))
+     :right (+ (.-right rect) (:x scroll))
+     :top (+ (.-top rect) (:y scroll))
+     :bottom (+ (.-bottom rect) (:y scroll))
+     :width (or (.-width rect) (- (.-right rect) (.-left rect)))
+     :height (or (.-height rect) (- (.-bottom rect) (.-top rect)))}))
+
 (defn on-start [event chans center-piece]
   "Shift piece right under the cursor"
   (let [piece (.-target event)]
@@ -34,7 +63,9 @@
 (defn on-end [event chans]
   (let [piece (.-target event)
         orig (.-parentNode piece)
-        dest (.-dropzone event)]
+        dest (.-dropzone event)
+        dragging-div (.getElementById js/document "chessground-moving-square")]
+    (set! (-> dragging-div .-style .-display) "none")
     (when dest (-> dest .-classList (.remove drag-over-class)))
     (-> piece .-classList (.remove dragging-class))
     (when-let [orig-key (common/square-key orig)]
@@ -55,11 +86,38 @@
 (defn piece-off [el state]
   (.set (dom-data/fetch el :interact) (js-obj "draggable" false)))
 
+(defn on-click-dragenter [event]
+  (-> event .-target .-classList (.add drag-over-class)))
+
+(defn on-click-dragleave [event]
+  (-> event .-target .-classList (.remove drag-over-class)))
+
+(defn on-touch-dragenter [event]
+  (let [rect (get-element-rect (.-target event))
+        h (- (:height rect) 1)
+        w (- (:width rect) 1)
+        h2 (* h 2)
+        w2 (* w 2)
+        dragging-div (.getElementById js/document "chessground-moving-square")]
+    (when (common/is-hidden? dragging-div)
+      (set! (-> dragging-div .-style .-height) (str h2 "px"))
+      (set! (-> dragging-div .-style .-width) (str w2 "px"))
+      (set! (-> dragging-div .-style .-left) (str (- (:left rect) (/ w 2)) "px"))
+      (set! (-> dragging-div .-style .-top) (str (- (:top rect) (/ h 2)) "px"))
+      (set! (-> dragging-div .-style .-display) "block")
+      (reset! dragging-div-pos rect))
+    (let [dx (- (:left rect) (:left @dragging-div-pos))
+          dy (- (:top rect) (:top @dragging-div-pos))]
+      (aset (.-style dragging-div)
+            common/transform-prop (str "translate3d(" dx "px, " dy "px, 0)")))))
+
+(defn on-touch-dragleave [] nil)
+
 (defn square [el chans]
   (-> (js/interact el)
       (.dropzone true)
-      (.on "dragenter" #(-> % .-target .-classList (.add drag-over-class)))
-      (.on "dragleave" #(-> % .-target .-classList (.remove drag-over-class)))))
+      (.on "dragenter" (if common/is-touch-device on-touch-dragenter on-click-dragenter))
+      (.on "dragleave" (if common/is-touch-device on-touch-dragleave on-click-dragleave))))
 
 (defn unfuck [piece-el]
   (set! (.-x piece-el) 0)

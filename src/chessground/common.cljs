@@ -39,6 +39,9 @@
 ; is there a better way to do that?
 (def is-touch-device (js* "'ontouchstart' in document"))
 
+(defn is-hidden? [element]
+  (nil? (js->clj (.-offsetParent element))))
+
 (def transform-prop
   "Fun fact: this won't work if chessground is included in the <head>
    Because the <body> element must exist at the time this code runs."

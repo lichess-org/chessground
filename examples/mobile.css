@@ -7,6 +7,13 @@
   height: 200%;
 }
 
+#chessground-moving-square {
+  display: none;
+  position: absolute;
+  background-color: transparent;
+  border: 1px solid rgba(255, 255, 255, 0.5);
+}
+
 .mobile .chessground.cburnett .piece.pawn.white {
   background-image: url('http://static.lichess.org/assets/piece-png/cburnett/wP.png');
 }
