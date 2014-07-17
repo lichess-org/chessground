@@ -107,8 +107,9 @@
       (set! (-> dragging-div .-style .-top) (str (- (:top rect) (/ h 2)) "px"))
       (set! (-> dragging-div .-style .-display) "block")
       (reset! dragging-div-pos rect))
-    (let [dx (- (:left rect) (:left @dragging-div-pos))
-          dy (- (:top rect) (:top @dragging-div-pos))]
+    (let [pos @dragging-div-pos
+          dx (- (:left rect) (:left pos))
+          dy (- (:top rect) (:top pos))]
       (aset (.-style dragging-div)
             common/transform-prop (str "translate3d(" dx "px, " dy "px, 0)")))))
 
