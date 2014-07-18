@@ -14,19 +14,21 @@
 
 (defn move-start [state orig]
   "A move has been started, by clicking on a piece"
-  (let [new-state (assoc state :selected orig)]
+  (let [dests (data/dests-of state orig)
+        new-state (assoc state :selected orig :showed-dests dests)]
     [new-state
      (fn [root chans]
        (show/selected root orig)
-       (show/dests root (data/dests-of state orig)))]))
+       (show/dests root state dests))]))
 
 (defn drag-start [state orig]
   "A move has been started, by dragging a piece"
-  (let [new-state (assoc state :selected orig :dragging true)]
+  (let [dests (data/dests-of state orig)
+        new-state (assoc state :selected orig :dragging true :showed-dests dests)]
     [new-state
      (fn [root chans]
        (show/selected root orig)
-       (show/dests root (data/dests-of state orig)))]))
+       (show/dests root state dests))]))
 
 (defn api-move [state [orig dest]]
   "A move initiated via API: we just update chess and show the move"
@@ -52,7 +54,7 @@
            (fn [root chans]
              (show/move root orig dest)
              (show/selected root nil)
-             (show/dests root nil)
+             (show/dests root state nil)
              (show/moved root orig dest)
              (callback (-> new-state :movable :events :after) orig dest new-chess))])))
     ; destination is not available, move is canceled but there are different cases:
@@ -70,7 +72,7 @@
            (fn [root chans]
              (show/un-move root orig)
              (show/selected root nil)
-             (show/dests root nil))])))))
+             (show/dests root state nil))])))))
 
 (defn select-square [state key]
   (if-let [orig (:selected state)]
@@ -82,7 +84,7 @@
       [state
        (fn [root chans]
          (show/selected root nil)
-         (show/dests root nil))])))
+         (show/dests root state nil))])))
 
 (defn show-moved [state [orig dest]]
   [state
@@ -133,7 +135,7 @@
       [new-state
        (fn [root chans]
          (show/selected root nil)
-         (show/dests root nil)
+         (show/dests root state nil)
          (show/un-move root key))])))
 
 (defn clear [state]

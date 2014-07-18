@@ -24,18 +24,8 @@
       }
       // chess.js is NOT required by chessground.
       // We include it for the examples
-      include("../libs/chess.min.js")
-      function chessToDests(chess) {
-        var dests = {};
-        chess.SQUARES.forEach(function(s) {
-          var ms = chess.moves({square: s});
-          if (ms.length) dests[s] = ms.map(function(m) { return m.substr(-2); });
-        });
-        return dests;
-      }
-      function chessToColor(chess) {
-        return (chess.turn() == "w") ? "white" : "black";
-      }
+      include("../libs/chess.min.js");
+      include('example.js');
     </script>
     <section>
       <div class="chessground wood small merida coordinates" id="ground1"></div>

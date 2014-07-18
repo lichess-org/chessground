@@ -10,12 +10,13 @@
    :orientation "white"
    :movable {:free true ; all moves are valid - board editor
              :color "both" ; color that can move. white or black or both
-             :dests nil ; valid moves. {"a2" ["a3" "a4"] "b1" ["a3" "c3"]} | nil
+             :dests nil ; valid moves. {"a2" {:a3 true :a4 true} "b1" {:a3 true :c3 true}} | nil
              :drop-off "revert" ; when a piece is dropped outside the board. "revert" | "trash"
              :drag-center true ; whether to center the piece under the cursor on drag start
              :events {:after (fn [orig dest chess] nil) ; called after the moves has been played
                       }
              }
+   :showed-dests nil ; dests showed on board. We keep track of them for performance.
    :selected nil ; square key of the currently moving piece. "a2" | nil
    :dragging false ; currently dragging?
    :spare-pieces false ; provide extra pieces to put on the board)
@@ -48,7 +49,7 @@
   "The piece on orig can definitely be moved to dest"
   (and (is-movable? state orig)
        (or (-> state :movable :free)
-           (common/set-contains? (get-in state [:movable :dests orig]) dest))))
+           (contains? (get-in state [:movable :dests orig]) dest))))
 
 (defn dests-of [state orig]
   "List of destinations square keys for this origin"

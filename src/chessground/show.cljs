@@ -20,12 +20,13 @@
   (doseq [key [orig dest]]
     (-> (square-of root key) .-classList (.add "moved"))))
 
-(defn dests [root dests]
-  ; this is probably not the best approach, performance-wise.
-  (doseq [sq (common/$$ ".square" root)]
-    (if (common/set-contains? dests (.getAttribute sq "data-key"))
-      (-> sq .-classList (.add "dest"))
-      (-> sq .-classList (.remove "dest")))))
+(defn dests [root state dests]
+  (doseq [[key _] (:showed-dests state)]
+    (if-let [sq (square-of root key)]
+      (-> sq .-classList (.remove "dest"))))
+  (doseq [[key _] dests]
+    (if-let [sq (square-of root key)]
+      (-> sq .-classList (.add "dest")))))
 
 (defn move [root orig dest]
   (let [orig-square (square-of root orig)
