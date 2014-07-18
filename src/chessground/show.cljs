@@ -19,8 +19,8 @@
   (doseq [key [orig dest]]
     (-> (square-of root key) .-classList (.add "moved"))))
 
-(defn dests [root state dests]
-  (doseq [[key _] (:showed-dests state)]
+(defn dests [root dests previous]
+  (doseq [[key _] previous]
     (if-let [sq (square-of root key)]
       (-> sq .-classList (.remove "dest"))))
   (doseq [[key _] dests]

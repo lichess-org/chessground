@@ -19,7 +19,7 @@
     [new-state
      (fn [root chans]
        (show/selected root orig (:selected state))
-       (show/dests root state dests))]))
+       (show/dests root dests (:showed-dests state)))]))
 
 (defn drag-start [state orig]
   "A move has been started, by dragging a piece"
@@ -28,7 +28,7 @@
     [new-state
      (fn [root chans]
        (show/selected root orig (:selected state))
-       (show/dests root state dests))]))
+       (show/dests root dests (:showed-dests state)))]))
 
 (defn api-move [state [orig dest]]
   "A move initiated via API: we just update chess and show the move"
@@ -54,7 +54,7 @@
            (fn [root chans]
              (show/move root orig dest)
              (show/selected root nil (:selected state))
-             (show/dests root state nil)
+             (show/dests root nil (:showed-dests state))
              (show/moved root orig dest (:moved state))
              (callback (-> new-state :movable :events :after) orig dest new-chess))])))
     ; destination is not available, move is canceled but there are different cases:
@@ -72,7 +72,7 @@
            (fn [root chans]
              (show/un-move root orig)
              (show/selected root nil (:selected state))
-             (show/dests root state nil))])))))
+             (show/dests root nil (:showed-dests state)))])))))
 
 (defn select-square [state key]
   (if-let [orig (:selected state)]
@@ -84,7 +84,7 @@
       [state
        (fn [root chans]
          (show/selected root nil (:selected state))
-         (show/dests root state nil))])))
+         (show/dests root nil (:showed-dests state)))])))
 
 (defn show-moved [state [orig dest]]
   [state
@@ -135,7 +135,7 @@
       [new-state
        (fn [root chans]
          (show/selected root nil (:selected state))
-         (show/dests root state nil)
+         (show/dests root nil (:showed-dests state))
          (show/un-move root key))])))
 
 (defn clear [state]
