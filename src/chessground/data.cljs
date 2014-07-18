@@ -2,7 +2,7 @@
   "Representation and manipulation of the application data"
   (:require [chessground.common :as common :refer [pp]]
             [chessground.chess :as chess]
-            [chessground.schemas :refer [ChessState]]
+            [chessground.schemas :refer [ChessState Square]]
             [schema.core :as s :refer [Str Bool]])
   (:require-macros [schema.macros :as sm :refer [defschema]]))
 
