@@ -18,8 +18,7 @@
     [new-state
      (fn [root chans]
        (show/selected root orig)
-       (when (not (:free (:movable state)))
-         (show/dests root (data/dests-of state orig))))]))
+       (show/dests root (data/dests-of state orig)))]))
 
 (defn drag-start [state orig]
   "A move has been started, by dragging a piece"
@@ -27,8 +26,7 @@
     [new-state
      (fn [root chans]
        (show/selected root orig)
-       (when (not (:free (:movable state)))
-         (show/dests root (data/dests-of state orig))))]))
+       (show/dests root (data/dests-of state orig)))]))
 
 (defn api-move [state [orig dest]]
   "A move initiated via API: we just update chess and show the move"
