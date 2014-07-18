@@ -43,7 +43,7 @@
 
 (sm/defn set-pieces :- PiecesMap
   [chess :- PiecesMap
-   changes :- [[Square ChessPiece]]]
+   changes :- {Square ChessPiece}]
   (update-in chess [:pieces]
     (fn [pieces]
       (reduce (fn [ps [key p]]
