@@ -2,6 +2,29 @@
   (:require [schema.core :as s :refer [Any Str Bool]])
   (:require-macros [schema.macros :as sm :refer [defschema]]))
 
+(comment
+  ;; The main benefit of schemas is that they offer code as documentation. They
+  ;; are not a replacement for a type system, but can nevertheless be used for
+  ;; input and output validation similar to how one would use :pre and :post
+  ;; conditions. Schemas should never get in the users way, and thus in order to
+  ;; use the validation capabilities you need to explicitly declare so by:
+  ;;   - Using schema.core/validate or schema.core/check, e.g.
+
+  (s/validate Square "a1") ; => "a1"
+  (s/validate Square "i4") ; => Throws
+
+  (s/check ChessPiece {:role "knight" :color "white"}) ; => nil
+  (s/check ChessPiece {:role "janitor" :colr "white"})
+  ; => {:role (not (#{"bishop" "rook" "queen" "pawn" "king" "knight"} "janitor"))
+  ;     :color missing-required-key, :colr disallowed-key}
+
+  ;;   - Enabling namespace wide validation as a part of running tests with
+  (cemerick.cljs.test/use-fixtures :once schema-test/validate-schemas)
+
+  ;;   - Or by forcing validation for key functions:
+  (sm/defn ^:always-validate make :- Str [fen :- Str] ...)
+  )
+
 (defschema AnyMap {Any Any})
 
 (defschema Square
