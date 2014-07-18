@@ -9,9 +9,8 @@
 (defn- square-of [root key]
   (.getElementById js/document (str (.-id root) key)))
 
-(defn selected [root selected]
-  (doseq [any-selected (common/$$ ".square.selected" root)]
-    (-> any-selected .-classList (.remove "selected")))
+(defn selected [root selected previous]
+  (when previous (-> (square-of root previous) .-classList (.remove "selected")))
   (when selected (-> (square-of root selected) .-classList (.add "selected"))))
 
 (defn moved [root orig dest]

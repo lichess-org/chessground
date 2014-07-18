@@ -18,7 +18,7 @@
         new-state (assoc state :selected orig :showed-dests dests)]
     [new-state
      (fn [root chans]
-       (show/selected root orig)
+       (show/selected root orig (:selected state))
        (show/dests root state dests))]))
 
 (defn drag-start [state orig]
@@ -27,7 +27,7 @@
         new-state (assoc state :selected orig :dragging true :showed-dests dests)]
     [new-state
      (fn [root chans]
-       (show/selected root orig)
+       (show/selected root orig (:selected state))
        (show/dests root state dests))]))
 
 (defn api-move [state [orig dest]]
@@ -53,7 +53,7 @@
           [new-state
            (fn [root chans]
              (show/move root orig dest)
-             (show/selected root nil)
+             (show/selected root nil (:selected state))
              (show/dests root state nil)
              (show/moved root orig dest)
              (callback (-> new-state :movable :events :after) orig dest new-chess))])))
@@ -71,7 +71,7 @@
           [new-state
            (fn [root chans]
              (show/un-move root orig)
-             (show/selected root nil)
+             (show/selected root nil (:selected state))
              (show/dests root state nil))])))))
 
 (defn select-square [state key]
@@ -83,7 +83,7 @@
       (move-start state key)
       [state
        (fn [root chans]
-         (show/selected root nil)
+         (show/selected root nil (:selected state))
          (show/dests root state nil))])))
 
 (defn show-moved [state [orig dest]]
@@ -134,7 +134,7 @@
     (let [new-state (dissoc state :selected)]
       [new-state
        (fn [root chans]
-         (show/selected root nil)
+         (show/selected root nil (:selected state))
          (show/dests root state nil)
          (show/un-move root key))])))
 
