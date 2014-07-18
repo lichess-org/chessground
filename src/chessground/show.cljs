@@ -13,9 +13,9 @@
   (when previous (-> (square-of root previous) .-classList (.remove "selected")))
   (when selected (-> (square-of root selected) .-classList (.add "selected"))))
 
-(defn moved [root orig dest]
-  (doseq [any-moved (common/$$ ".square.moved" root)]
-    (-> any-moved .-classList (.remove "moved")))
+(defn moved [root orig dest previous]
+  (doseq [key previous]
+    (-> (square-of root key) .-classList (.remove "moved")))
   (doseq [key [orig dest]]
     (-> (square-of root key) .-classList (.add "moved"))))
 
