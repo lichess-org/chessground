@@ -1,20 +1,24 @@
 (ns chessground.fen
   "Forsyth Edwards notation"
   (:require [chessground.common :refer [pp]]
-            [clojure.string :refer [lower-case]]))
+            [chessground.schemas :refer [ChessPiece BoardState]]
+            [clojure.string :refer [lower-case]]
+            [schema.core :as s])
+  (:require-macros [schema.macros :as sm :refer [defschema]]))
 
 (def default "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1")
 
 (def role-names {"p" "pawn" "r" "rook" "n" "knight" "b" "bishop" "q" "queen" "k" "king"})
 
-(defn- pos-to-key [pos]
+(sm/defn pos-to-key :- s/Str
+  [pos :- s/Num]
   (str (get "abcdefgh" (mod pos 8))
        (- 8 (int (/ pos 8)))))
 
-(defn- parse-squares
+(sm/defn parse-squares :- (s/maybe BoardState)
   "Parses a FEN-notation of a chess board into a map of locations ->
   piece, where piece is represented as {:role r, :color c}."
-  [fen-chars]
+  [fen-chars :- s/Str]
   (loop [pieces {}
          pos 0
          [current & next] fen-chars]
@@ -31,8 +35,6 @@
                     piece {:role role :color color}]
                 (recur (assoc pieces key piece) (inc pos) next))))))
 
-(defn parse [fen]
-  (parse-squares
-    (->> (or fen default)
-      (remove #(= "/" %))
-      (take-while #(not= \space %)))))
+(sm/defn parse :- BoardState
+  [fen :- s/Str]
+  (parse-squares (or fen default)))
