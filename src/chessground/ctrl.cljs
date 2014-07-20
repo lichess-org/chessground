@@ -15,20 +15,20 @@
 (defn move-start [state orig]
   "A move has been started, by clicking on a piece"
   (let [dests (data/dests-of state orig)
-        new-state (assoc state :selected orig :showed-dests dests)]
+        new-state (assoc state :selected orig :shown-dests dests)]
     [new-state
      (fn [root chans]
        (show/selected root orig (:selected state))
-       (show/dests root dests (:showed-dests state)))]))
+       (show/dests root dests (:shown-dests state)))]))
 
 (defn drag-start [state orig]
   "A move has been started, by dragging a piece"
   (let [dests (data/dests-of state orig)
-        new-state (assoc state :selected orig :dragging true :showed-dests dests)]
+        new-state (assoc state :selected orig :dragging true :shown-dests dests)]
     [new-state
      (fn [root chans]
        (show/selected root orig (:selected state))
-       (show/dests root dests (:showed-dests state)))]))
+       (show/dests root dests (:shown-dests state)))]))
 
 (defn api-move [state [orig dest]]
   "A move initiated via API: we just update chess and show the move"
@@ -54,7 +54,7 @@
            (fn [root chans]
              (show/move root orig dest)
              (show/selected root nil (:selected state))
-             (show/dests root nil (:showed-dests state))
+             (show/dests root nil (:shown-dests state))
              (show/moved root orig dest (:moved state))
              (callback (-> new-state :movable :events :after) orig dest new-chess))])))
     ; destination is not available, move is canceled but there are different cases:
@@ -72,7 +72,7 @@
            (fn [root chans]
              (show/un-move root orig)
              (show/selected root nil (:selected state))
-             (show/dests root nil (:showed-dests state)))])))))
+             (show/dests root nil (:shown-dests state)))])))))
 
 (defn select-square [state key]
   (if-let [orig (:selected state)]
@@ -84,7 +84,7 @@
       [state
        (fn [root chans]
          (show/selected root nil (:selected state))
-         (show/dests root nil (:showed-dests state)))])))
+         (show/dests root nil (:shown-dests state)))])))
 
 (defn show-moved [state [orig dest]]
   [state
@@ -135,7 +135,7 @@
       [new-state
        (fn [root chans]
          (show/selected root nil (:selected state))
-         (show/dests root nil (:showed-dests state))
+         (show/dests root nil (:shown-dests state))
          (show/un-move root key))])))
 
 (defn clear [state]

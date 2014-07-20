@@ -19,7 +19,7 @@
              :events {:after (fn [orig dest chess] nil) ; called after the moves has been played
                       }
              }
-   :showed-dests nil ; dests showed on board. We keep track of them for performance.
+   :shown-dests nil ; dests shown on board. We keep track of them for performance.
    :moved nil ; last move
    :selected nil ; square key of the currently moving piece. "a2" | nil
    :dragging false ; currently dragging?

@@ -59,4 +59,4 @@
    :dragging Bool
    :spare-pieces Bool
    :moved (s/maybe Str)
-   :showed-dests [Str]})
+   :shown-dests [Str]})
