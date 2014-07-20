@@ -54,4 +54,6 @@
              :events {Keyword js/Function}}
    :selected (s/maybe Str)
    :dragging Bool
-   :spare-pieces Bool})
+   :spare-pieces Bool
+   :moved (s/maybe Str)
+   :showed-dests [Str]})
