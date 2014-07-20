@@ -27,10 +27,13 @@
 
 (defschema AnyMap {Any Any})
 
+(def valid-files (set (seq "abcdefgh")))
+(def valid-ranks (set (seq "12345678")))
+
 (defschema Square
   (s/both
-    (s/pred #(contains? (set (seq "abcdefgh")) (first %)) 'proper-file)
-    (s/pred #(contains? (set (seq "12345678")) (second %)) 'proper-rank)))
+    (s/pred #(contains? valid-files (first %)) 'proper-file)
+    (s/pred #(contains? valid-ranks (second %)) 'proper-rank)))
 
 (defschema ChessPiece
   {:role  (s/enum "pawn" "rook" "knight" "bishop" "queen" "king")
