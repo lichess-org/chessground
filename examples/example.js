@@ -2,11 +2,7 @@ function chessToDests(chess) {
   var dests = {};
   chess.SQUARES.forEach(function(s) {
     var ms = chess.moves({square: s});
-
-    if (ms.length) dests[s] = ms.reduce(function(a, m) {
-        a[m.substr(-2)] = true;
-      return a;
-    }, {});
+    if (ms.length) dests[s] = ms.map(function(m) { return m.substr(-2); });
   });
   return dests;
 }

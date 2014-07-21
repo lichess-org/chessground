@@ -20,10 +20,10 @@
     (-> (square-of root key) .-classList (.add "moved"))))
 
 (defn dests [root dests previous]
-  (doseq [[key _] previous]
+  (doseq [key previous]
     (if-let [sq (square-of root key)]
       (-> sq .-classList (.remove "dest"))))
-  (doseq [[key _] dests]
+  (doseq [key dests]
     (if-let [sq (square-of root key)]
       (-> sq .-classList (.add "dest")))))
 
