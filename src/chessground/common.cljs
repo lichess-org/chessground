@@ -5,7 +5,7 @@
 
 (enable-console-print!)
 
-(def debug false)
+(def debug true)
 
 (def ground-id
   "Ground unique ID generator (increment)"
@@ -40,23 +40,23 @@
     {:top (+ (.-top rect) (-> js/document .-body .-scrollTop))
      :left (+ (.-left rect) (-> js/document .-body .-scrollLeft))}))
 
-; is there a better way to do that?
-(def touch-device? (js* "'ontouchstart' in document"))
-
 (defn hidden? [element]
   (nil? (js->clj (.-offsetParent element))))
+
+; mimics the JavaScript `in` operator
+(defn js-in [obj prop]
+  (and obj (or (.hasOwnProperty obj prop)
+               (js-in (.-__proto__ obj) prop))))
+
+(def touch-device? (js-in js/document "ontouchstart"))
 
 (def transform-prop
   "Fun fact: this won't work if chessground is included in the <head>
    Because the <body> element must exist at the time this code runs."
-  (do
-    (or (.-body js/document) (throw "chessground must be included in the <body> tag!"))
-    (cond
-      (js* "'transform' in document.body.style") "transform"
-      (js* "'webkitTransform' in document.body.style") "webkitTransform"
-      (js* "'mozTransform' in document.body.style") "mozTransform"
-      (js* "'oTransform' in document.body.style") "oTransform"
-      :else "transform")))
+  (do (or (.-body js/document) (throw "chessground must be included in the <body> tag!"))
+      (let [style (-> js/document .-body .-style)
+            props ["transform" "webkitTransform" "mozTransform" "oTransform"]]
+        (first (or (filter #(js-in style %) props) props)))))
 
 (defn square-element [dom-element]
   "If element is a square, return it. If it's a piece, return its parent"
