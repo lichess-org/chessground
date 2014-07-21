@@ -58,5 +58,5 @@
    :selected (s/maybe Str)
    :dragging Bool
    :spare-pieces Bool
-   :moved (s/maybe Str)
+   :last-move (s/maybe Str)
    :shown-dests [Str]})
