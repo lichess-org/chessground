@@ -92,7 +92,7 @@
      (show/moved root orig dest (:last-move state)))])
 
 (defn set-orientation [state orientation]
-  (if (common/set-contains? chess/colors orientation)
+  (if (common/seq-contains? chess/colors orientation)
     (let [new-state (assoc state :orientation orientation)]
       [new-state
        (fn [root chans] (show/board root new-state chans))])
@@ -110,7 +110,7 @@
        (show/piece-interactions root new-state chans))]))
 
 (defn set-color [state color]
-  (if (common/set-contains? (conj chess/colors "both") color)
+  (if (common/seq-contains? (conj chess/colors "both") color)
     (let [new-state (assoc-in state [:movable :color] color)]
       [new-state
        (fn [root chans]

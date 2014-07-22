@@ -50,7 +50,7 @@
   "The piece on orig can definitely be moved to dest"
   (and (is-movable? state orig)
        (or (-> state :movable :free)
-           (contains? (set (get-in state [:movable :dests orig])) dest))))
+           (common/seq-contains? (get-in state [:movable :dests orig]) dest))))
 
 (defn dests-of [state orig]
   "List of destinations square keys for this origin"

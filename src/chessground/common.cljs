@@ -22,7 +22,7 @@
               (or y x)))]
     (merge-with smart-merge a b)))
 
-(defn set-contains? [set val] (some #{val} set))
+(defn seq-contains? [coll target] (some #{target} coll))
 
 (defn push! [chan msg] (am/go (a/>! chan msg)))
 
