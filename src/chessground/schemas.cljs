@@ -25,6 +25,9 @@
   (sm/defn ^:always-validate make :- Str [fen :- Str] ...)
   )
 
+;; Setting this true will enable Schema's function validation globally
+(s/set-fn-validation! false)
+
 (defschema AnyMap {Any Any})
 
 (def valid-files (set (seq "abcdefgh")))
