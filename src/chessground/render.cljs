@@ -4,7 +4,7 @@
             [chessground.chess :as chess]))
 
 (defn piece [{color :color role :role}]
-  (str "<div class='piece " color " " role "'></div>"))
+  (str "<div class='chessground-piece " color " " role "'></div>"))
 
 (defn square [root key pos p white]
   (let [style (apply str (map (fn [[k v]] (str (name k) ":" v ";")) pos))
@@ -12,7 +12,7 @@
         coord-x (if (= (subs key 1 2) (if white "1" "8")) (str "data-coord-x='" (subs key 0 1) "' ") "")
         piece-html (when p (piece p))]
     (when (empty? (.-id root)) (set! (.-id root) (str "chessground" (swap! common/ground-id inc))))
-    (str "<div class='square' " coord-y coord-x "id='" (str (.-id root) key) "' data-key='" key "' style='" style "'>" piece-html "</div>")))
+    (str "<div class='chessground-square' " coord-y coord-x "id='" (str (.-id root) key) "' data-key='" key "' style='" style "'>" piece-html "</div>")))
 
 (defn board [state root]
   (let [white (= (:orientation state) "white")
@@ -25,12 +25,12 @@
                                  (if white :bottom :top) (str (* (dec rank) 12.5) "%")}
                             p (chess/get-piece c key)]]
                   (square root key pos p white))]
-    (str "<div class='board'>" (apply str squares) "</div>")))
+    (str "<div class='chessground-board'>" (apply str squares) "</div>")))
 
 (defn spare-pieces [state color klass]
   (when (:spare-pieces state)
     (str "<div class='spare-pieces " klass " " color "'>"
-         (apply str (map #(str "<div class='piece " % " " color "'></div>") chess/roles))
+         (apply str (map #(str "<div class='chessground-piece " % " " color "'></div>") chess/roles))
          "</div>")))
 
 (defn app [state root]

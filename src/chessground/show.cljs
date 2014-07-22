@@ -6,12 +6,14 @@
             [chessground.select :as select]
             [chessground.common :as common :refer [pp]]))
 
+(def selected-class "selected")
+
 (defn- square-of [root key]
   (.getElementById js/document (str (.-id root) key)))
 
 (defn selected [root selected previous]
-  (when previous (-> (square-of root previous) .-classList (.remove "selected")))
-  (when selected (-> (square-of root selected) .-classList (.add "selected"))))
+  (when previous (-> (square-of root previous) .-classList (.remove selected-class)))
+  (when selected (-> (square-of root selected) .-classList (.add selected-class))))
 
 (defn moved [root orig dest previous]
   (doseq [key previous]
@@ -30,24 +32,24 @@
 (defn move [root orig dest]
   (let [orig-square (square-of root orig)
         dest-square (square-of root dest)
-        piece (common/$ ".piece" orig-square)]
+        piece (common/$ ".chessground-piece" orig-square)]
     (drag/unfuck piece)
-    (when-let [dest-piece (common/$ ".piece" dest-square)] (dom-data/remove-el dest-piece))
+    (when-let [dest-piece (common/$ ".chessground-piece" dest-square)] (dom-data/remove-el dest-piece))
     (.appendChild dest-square piece)))
 
 (defn un-move [root orig]
   (let [orig-square (square-of root orig)
-        piece (common/$ ".piece" orig-square)]
+        piece (common/$ ".chessground-piece" orig-square)]
     (when piece (drag/unfuck piece))))
 
 (defn square-interactions [root state chans]
-  (doseq [sq (common/$$ ".square" root)]
+  (doseq [sq (common/$$ ".chessground-square" root)]
     (drag/square sq chans)
     (select/square sq chans)))
 
 (defn piece-interactions [root state chans]
   (let [movable-color (-> state :movable :color)]
-    (doseq [p (common/$$ ".piece" root)
+    (doseq [p (common/$$ ".chessground-piece" root)
             :let [instance (dom-data/fetch p :interact)
                   owner (if (common/has-class p "white") "white" "black")
                   draggable (or (= movable-color "both") (= movable-color owner))]]

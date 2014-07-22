@@ -60,11 +60,11 @@
 
 (defn square-element [dom-element]
   "If element is a square, return it. If it's a piece, return its parent"
-  (if (has-class dom-element "square")
+  (if (has-class dom-element "chessground-square")
     dom-element
-    (when (has-class dom-element "piece")
+    (when (has-class dom-element "chessground-piece")
       (let [parent (.-parentNode dom-element)]
-        (when (has-class parent "square") parent)))))
+        (when (has-class parent "chessground-square") parent)))))
 
 (defn square-key [dom-element]
   "Gets the square key from the element, or its parent"

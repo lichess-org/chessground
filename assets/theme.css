@@ -1,0 +1,130 @@
+/*
+ * Board
+ */
+.blue > .chessground-board {
+  background-image: url('images/board/blue2.jpg');
+}
+.wood > .chessground-board {
+  background-image: url('images/board/wood2.jpg');
+}
+.marble > .chessground-board {
+  background-image: url('images/board/marble.jpg');
+}
+
+/*
+ * Pieces
+ */
+.pirouetti .chessground-piece {
+  bottom: 0;
+  left: -15%;
+  width: 130%;
+  height: 130%;
+}
+.pirouetti .chessground-piece.pawn.white {
+  background-image: url('images/pieces/pirouetti/wP.svg');
+}
+.pirouetti .chessground-piece.bishop.white {
+  background-image: url('images/pieces/pirouetti/wB.svg');
+}
+.pirouetti .chessground-piece.knight.white {
+  background-image: url('images/pieces/pirouetti/wN.svg');
+}
+.pirouetti .chessground-piece.rook.white {
+  background-image: url('images/pieces/pirouetti/wR.svg');
+}
+.pirouetti .chessground-piece.queen.white {
+  background-image: url('images/pieces/pirouetti/wQ.svg');
+}
+.pirouetti .chessground-piece.king.white {
+  background-image: url('images/pieces/pirouetti/wK.svg');
+}
+.pirouetti .chessground-piece.pawn.black {
+  background-image: url('images/pieces/pirouetti/bP.svg');
+}
+.pirouetti .chessground-piece.bishop.black {
+  background-image: url('images/pieces/pirouetti/bB.svg');
+}
+.pirouetti .chessground-piece.knight.black {
+  background-image: url('images/pieces/pirouetti/bN.svg');
+}
+.pirouetti .chessground-piece.rook.black {
+  background-image: url('images/pieces/pirouetti/bR.svg');
+}
+.pirouetti .chessground-piece.queen.black {
+  background-image: url('images/pieces/pirouetti/bQ.svg');
+}
+.pirouetti .chessground-piece.king.black {
+  background-image: url('images/pieces/pirouetti/bK.svg');
+}
+.cburnett .chessground-piece.pawn.white {
+  background-image: url('images/pieces/cburnett/wP.svg');
+}
+.cburnett .chessground-piece.bishop.white {
+  background-image: url('images/pieces/cburnett/wB.svg');
+}
+.cburnett .chessground-piece.knight.white {
+  background-image: url('images/pieces/cburnett/wN.svg');
+}
+.cburnett .chessground-piece.rook.white {
+  background-image: url('images/pieces/cburnett/wR.svg');
+}
+.cburnett .chessground-piece.queen.white {
+  background-image: url('images/pieces/cburnett/wQ.svg');
+}
+.cburnett .chessground-piece.king.white {
+  background-image: url('images/pieces/cburnett/wK.svg');
+}
+.cburnett .chessground-piece.pawn.black {
+  background-image: url('images/pieces/cburnett/bP.svg');
+}
+.cburnett .chessground-piece.bishop.black {
+  background-image: url('images/pieces/cburnett/bB.svg');
+}
+.cburnett .chessground-piece.knight.black {
+  background-image: url('images/pieces/cburnett/bN.svg');
+}
+.cburnett .chessground-piece.rook.black {
+  background-image: url('images/pieces/cburnett/bR.svg');
+}
+.cburnett .chessground-piece.queen.black {
+  background-image: url('images/pieces/cburnett/bQ.svg');
+}
+.cburnett .chessground-piece.king.black {
+  background-image: url('images/pieces/cburnett/bK.svg');
+}
+.merida .chessground-piece.pawn.white {
+  background-image: url('images/pieces/merida/wP.svg');
+}
+.merida .chessground-piece.bishop.white {
+  background-image: url('images/pieces/merida/wB.svg');
+}
+.merida .chessground-piece.knight.white {
+  background-image: url('images/pieces/merida/wN.svg');
+}
+.merida .chessground-piece.rook.white {
+  background-image: url('images/pieces/merida/wR.svg');
+}
+.merida .chessground-piece.queen.white {
+  background-image: url('images/pieces/merida/wQ.svg');
+}
+.merida .chessground-piece.king.white {
+  background-image: url('images/pieces/merida/wK.svg');
+}
+.merida .chessground-piece.pawn.black {
+  background-image: url('images/pieces/merida/bP.svg');
+}
+.merida .chessground-piece.bishop.black {
+  background-image: url('images/pieces/merida/bB.svg');
+}
+.merida .chessground-piece.knight.black {
+  background-image: url('images/pieces/merida/bN.svg');
+}
+.merida .chessground-piece.rook.black {
+  background-image: url('images/pieces/merida/bR.svg');
+}
+.merida .chessground-piece.queen.black {
+  background-image: url('images/pieces/merida/bQ.svg');
+}
+.merida .chessground-piece.king.black {
+  background-image: url('images/pieces/merida/bK.svg');
+}

@@ -1,0 +1,14 @@
+.chessground-square.selected, .chessground-square.drag-over {
+  background: rgba(216, 85, 0, 0.3);
+}
+.chessground-piece.dragging {
+  width: 200%;
+  height: 200%;
+}
+#chessground-moving-square {
+  display: none;
+  position: absolute;
+  background-color: transparent;
+  border: 1px solid rgba(255, 255, 255, 0.5);
+  -webkit-transform: translate3d(0,0,0);
+}
