@@ -1,12 +1,9 @@
 (ns chessground.data
   "Representation and manipulation of the application data"
   (:require [chessground.common :as common :refer [pp]]
-            [chessground.chess :as chess]
-            [chessground.schemas :refer [ChessState Square]]
-            [schema.core :as s :refer [Str Bool]])
-  (:require-macros [schema.macros :as sm :refer [defschema]]))
+            [chessground.chess :as chess]))
 
-(sm/def defaults :- ChessState
+(def defaults
   "Default state, overridable by user configuration"
   {:fen nil ; replaced by :chess by data/make
    :chess {} ; representation of a chess game
@@ -26,14 +23,9 @@
    :spare-pieces false ; provide extra pieces to put on the board)
    })
 
+(defn with-fen [state fen] (assoc state :chess (chess/make fen)))
 
-(sm/defn with-fen :- ChessState
-  [state :- ChessState
-   fen :- Str]
-  (assoc state :chess (chess/make fen)))
-
-(sm/defn make :- ChessState
-  [js-config :- js/Object]
+(defn make [js-config]
   (let [config (-> js-config
                    common/keywordize-keys
                    (common/keywordize-keys-in [:movable])
@@ -42,33 +34,25 @@
         (with-fen (:fen config))
         (dissoc :fen))))
 
-(sm/defn clear :- ChessState
-  [state :- ChessState]
+(defn clear [state]
   (-> state
       (assoc :chess chess/clear)
       (assoc-in [:movable :dests] nil)))
 
-(sm/defn is-movable? :- Bool
+(defn is-movable? [state key]
   "Piece on this square may be moved somewhere, if the validation allows it"
-  [state :- ChessState
-   key :- Str]
   (let [owner (chess/owner-color (:chess state) key)
         movable (:movable state)
         color (:color movable)]
     (and owner (or (= color "both") (= color owner)))))
 
-(sm/defn can-move? :- Bool
+(defn can-move? [state orig dest]
   "The piece on orig can definitely be moved to dest"
-  [state :- ChessState
-   orig :- Str
-   dest :- Str]
   (and (is-movable? state orig)
        (or (-> state :movable :free)
            (contains? (set (get-in state [:movable :dests orig])) dest))))
 
-(sm/defn dests-of :- (s/maybe [Square])
+(defn dests-of [state orig]
   "List of destinations square keys for this origin"
-  [state :- ChessState
-   orig :- Str]
   (when (is-movable? state orig)
     (get-in state [:movable :dests orig])))
