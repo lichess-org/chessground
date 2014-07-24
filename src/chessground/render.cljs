@@ -8,7 +8,7 @@
 
 (defn square [root key pos p white]
   (let [style (apply str (map (fn [[k v]] (str (name k) ":" v ";")) pos))
-        coord-y (if (= (subs key 0 1) (if white "a" "h")) (str "data-coord-y='" (subs key 1 2) "' ") "")
+        coord-y (if (= (subs key 0 1) (if white "h" "a")) (str "data-coord-y='" (subs key 1 2) "' ") "")
         coord-x (if (= (subs key 1 2) (if white "1" "8")) (str "data-coord-x='" (subs key 0 1) "' ") "")
         piece-html (when p (piece p))]
     (when (empty? (.-id root)) (set! (.-id root) (str "chessground" (swap! common/ground-id inc))))
