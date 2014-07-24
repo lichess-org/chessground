@@ -92,7 +92,9 @@
      (show/moved root orig dest (:last-move state)))])
 
 (defn set-orientation [state orientation]
-  (if (common/seq-contains? chess/colors orientation)
+  (if (and
+        (common/seq-contains? chess/colors orientation)
+        (not= orientation (:orientation state)))
     (let [new-state (assoc state :orientation orientation)]
       [new-state
        (fn [root chans] (show/board root new-state chans))])
