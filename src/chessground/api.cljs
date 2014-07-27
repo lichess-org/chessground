@@ -19,7 +19,7 @@
                                (into {} (for [[k v] (js->clj pieces)]
                                           [k (common/keywordize-keys v)]))))
        "move"              (fn [orig dest] (push-in :api-move [orig dest]))
-       "showMoved"         (fn [orig dest] (push-in :show-moved [orig dest]))
+       "showLastMove"      (fn [orig dest] (push-in :show-last-move [orig dest]))
        "clear"             (fn [] (push-in :clear true))
        "getOrientation"    (fn [] (:orientation @state-atom))
        "getColor"          (fn [] (:color (:movable @state-atom)))

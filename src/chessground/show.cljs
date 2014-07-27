@@ -7,6 +7,7 @@
             [chessground.common :as common :refer [pp]]))
 
 (def selected-class "selected")
+(def lastmove-class "moved")
 
 (defn- square-of [root key]
   (.getElementById js/document (str (.-id root) key)))
@@ -15,11 +16,11 @@
   (when previous (-> (square-of root previous) .-classList (.remove selected-class)))
   (when selected (-> (square-of root selected) .-classList (.add selected-class))))
 
-(defn moved [root orig dest previous]
+(defn last-move [root orig dest previous]
   (doseq [key previous]
-    (-> (square-of root key) .-classList (.remove "moved")))
+    (-> (square-of root key) .-classList (.remove lastmove-class)))
   (doseq [key [orig dest]]
-    (-> (square-of root key) .-classList (.add "moved"))))
+    (-> (square-of root key) .-classList (.add lastmove-class))))
 
 (defn dests [root dests previous]
   (doseq [key previous]

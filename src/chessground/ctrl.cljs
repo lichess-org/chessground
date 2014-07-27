@@ -37,7 +37,7 @@
       [new-state
        (fn [root chans]
          (show/move root orig dest)
-         (show/moved root orig dest (:last-move state)))])
+         (show/last-move root orig dest (:last-move state)))])
     [state noop]))
 
 (defn move-piece [state [orig dest]]
@@ -55,7 +55,7 @@
              (show/move root orig dest)
              (show/selected root nil (:selected state))
              (show/dests root nil (:shown-dests state))
-             (show/moved root orig dest (:last-move state))
+             (show/last-move root orig dest (:last-move state))
              (callback (-> new-state :movable :events :after) orig dest new-chess))])))
     ; destination is not available, move is canceled but there are different cases:
     (if (= orig dest)
@@ -86,10 +86,11 @@
          (show/selected root nil (:selected state))
          (show/dests root nil (:shown-dests state)))])))
 
-(defn show-moved [state [orig dest]]
-  [state
-   (fn [root chans]
-     (show/moved root orig dest (:last-move state)))])
+(defn show-last-move [state [orig dest]]
+  (let [new-state (-> state (assoc :last-move [orig dest]))]
+    [new-state
+     (fn [root chans]
+       (show/last-move root orig dest (:last-move state)))]))
 
 (defn set-orientation [state orientation]
   (if (and
