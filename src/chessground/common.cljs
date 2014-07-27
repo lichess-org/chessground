@@ -5,7 +5,7 @@
 
 (enable-console-print!)
 
-(def debug true)
+(def debug false)
 
 (def ground-id
   "Ground unique ID generator (increment)"
