@@ -52,10 +52,10 @@
                             (assoc-in [:movable :dests] nil))]
           [new-state
            (fn [root chans]
-             (show/move root orig dest)
              (show/selected root nil (:selected state))
              (show/dests root nil (:shown-dests state))
              (show/last-move root orig dest (:last-move state))
+             (show/move root orig dest)
              (callback (-> new-state :movable :events :after) orig dest new-chess))])))
     ; destination is not available, move is canceled but there are different cases:
     (if (= orig dest)
