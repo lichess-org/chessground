@@ -6,8 +6,7 @@
 (comment
   ; Representation of a chess game:
   {:pieces {"a1" {:color "white" :role "rook"}
-            "b1" {:color "white" :role "knight"}}}
-  )
+            "b8" {:color "black" :role "knight"}}})
 
 (def colors ["white" "black"])
 (def roles ["pawn" "rook" "knight" "bishop" "queen" "king"])
@@ -21,17 +20,28 @@
 
 (defn get-pieces [chess] (:pieces chess))
 
+(comment
+  {"white" {"pawn" 3 "queen" 1}
+   "black" {"bishop" 2}})
+(defn material-diff [chess]
+  (reduce (fn [diff [role value]]
+            (if (= value 0) diff
+              (assoc-in diff [(if (> value 0) "white" "black") role] (Math/abs value))))
+          {"white" {} "black" {}}
+          (reduce (fn [acc [_ {color :color role :role}]]
+                    (update-in acc [role] (if (= color "white") inc dec)))
+                  {}
+                  (get-pieces chess))))
+
 (defn remove-piece [chess key] (update-in chess [:pieces] dissoc key))
 
 (defn put-piece [chess key piece] (assoc-in chess [:pieces key] piece))
 
 (defn set-pieces [chess changes]
   (update-in chess [:pieces]
-    (fn [pieces] (reduce (fn [ps [key p]]
-                           (if p (assoc ps key p) (dissoc ps key)))
-                   pieces changes))))
-
-(defn- count-pieces [chess] (count (:pieces chess)))
+             (fn [pieces] (reduce (fn [ps [key p]]
+                                    (if p (assoc ps key p) (dissoc ps key)))
+                                  pieces changes))))
 
 (defn move-piece [chess orig dest]
   "Return nil if orig and dest make no sense"
