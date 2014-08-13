@@ -113,7 +113,7 @@
        (show/piece-interactions root new-state chans))]))
 
 (defn set-color [state color]
-  (if (common/seq-contains? (conj chess/colors "both") color)
+  (if (common/seq-contains? (conj chess/colors "both" "none") color)
     (let [new-state (assoc-in state [:movable :color] color)]
       [new-state
        (fn [root chans]
