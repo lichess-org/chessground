@@ -33,10 +33,13 @@
 (defn api-move [state [orig dest]]
   "A move initiated via API: we just update chess and show the move"
   (if-let [new-chess (chess/move-piece (:chess state) orig dest)]
-    (let [new-state (-> state (assoc :chess new-chess :last-move [orig dest]))]
+    (let [new-state (-> state
+                        (assoc :chess new-chess :last-move [orig dest])
+                        (dissoc :checked))]
       [new-state
        (fn [root chans]
          (show/move root orig dest)
+         (when-let [key (:checked state)] (show/uncheck root key))
          (show/last-move root orig dest (:last-move state)))])
     [state noop]))
 
@@ -48,6 +51,7 @@
       (when-let [new-chess (chess/move-piece (:chess state) orig dest)]
         (let [new-state (-> state
                             (assoc :chess new-chess :dragging false :last-move [orig dest])
+                            (dissoc :checked)
                             (dissoc :selected)
                             (assoc-in [:movable :dests] nil))]
           [new-state
@@ -55,6 +59,7 @@
              (show/selected root nil (:selected state))
              (show/dests root nil (:shown-dests state))
              (show/last-move root orig dest (:last-move state))
+             (when-let [key (:checked state)] (show/uncheck root key))
              (show/move root orig dest)
              (callback (-> new-state :movable :events :after) orig dest new-chess))])))
     ; destination is not available, move is canceled but there are different cases:
@@ -91,6 +96,12 @@
     [new-state
      (fn [root chans]
        (show/last-move root orig dest (:last-move state)))]))
+
+(defn show-check [state [key]]
+  (let [new-state (-> state (assoc :checked key))]
+    [new-state
+     (fn [root chans]
+       (show/check root key))]))
 
 (defn set-orientation [state orientation]
   (if (and

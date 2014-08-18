@@ -20,6 +20,7 @@
                                           [k (common/keywordize-keys v)]))))
        "move"              (fn [orig dest] (push-in :api-move [orig dest]))
        "showLastMove"      (fn [orig dest] (push-in :show-last-move [orig dest]))
+       "showCheck"         (fn [cell] (push-in :show-check [cell]))
        "clear"             (fn [] (push-in :clear true))
        "getOrientation"    (fn [] (:orientation @state-atom))
        "getColor"          (fn [] (:color (:movable @state-atom)))

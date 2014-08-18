@@ -28,6 +28,7 @@
               :drop-off (a/chan)
               :api-move (a/chan)
               :show-last-move (a/chan)
+              :show-check (a/chan)
               }
    :consumers {:toggle-orientation ctrl/toggle-orientation
                :set-orientation ctrl/set-orientation
@@ -43,6 +44,7 @@
                :drop-off ctrl/drop-off
                :api-move ctrl/api-move
                :show-last-move ctrl/show-last-move
+               :show-check ctrl/show-check
                }
    })
 

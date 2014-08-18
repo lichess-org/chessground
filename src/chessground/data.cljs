@@ -18,6 +18,7 @@
              }
    :shown-dests nil ; dests shown on board. We keep track of them for performance.
    :last-move nil ; last move
+   :checked nil ; square 'in check'
    :selected nil ; square key of the currently moving piece. "a2" | nil
    :dragging false ; currently dragging?
    :spare-pieces false ; provide extra pieces to put on the board)

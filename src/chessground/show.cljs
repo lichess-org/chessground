@@ -8,6 +8,7 @@
 
 (def selected-class "selected")
 (def lastmove-class "moved")
+(def checked-class "checked")
 
 (defn- square-of [root key]
   (.getElementById js/document (str (.-id root) key)))
@@ -21,6 +22,12 @@
     (-> (square-of root key) .-classList (.remove lastmove-class)))
   (doseq [key [orig dest]]
     (-> (square-of root key) .-classList (.add lastmove-class))))
+
+(defn check [root key]
+  (-> (square-of root key) .-classList (.add checked-class)))
+
+(defn uncheck [root key]
+  (-> (square-of root key) .-classList (.remove checked-class)))
 
 (defn dests [root dests previous]
   (doseq [key previous]
