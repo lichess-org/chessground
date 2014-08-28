@@ -50,3 +50,9 @@
   "List of destinations square keys for this origin"
   (when (is-movable? state orig)
     (get-in state [:movable :dests orig])))
+
+(defn set-orientation [prev next]
+  (if (common/seq-contains? chess/colors next) next prev))
+
+(defn toggle-orientation [prev]
+  (set-orientation prev (if (= prev "white") "black" "white")))

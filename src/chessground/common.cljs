@@ -1,5 +1,7 @@
 (ns chessground.common
-  "Shared utilities for the library")
+  "Shared utilities for the library"
+  (:require [cljs.core.async :as a])
+  (:require-macros [cljs.core.async.macros :as am]))
 
 (enable-console-print!)
 
@@ -12,6 +14,8 @@
 (defn pp [& exprs]
   (when debug (doseq [expr exprs] (.log js/console (clj->js expr))))
   (first exprs))
+
+(defn push! [chan msg] (am/go (a/>! chan msg)))
 
 (defn deep-merge [a b]
   (letfn [(smart-merge [x y]
@@ -66,6 +70,9 @@
   "Gets the square key from the element, or its parent"
   (when-let [sq (square-element dom-element)]
     (.getAttribute sq "data-key")))
+
+(defn map-values [f hmap]
+  (into {} (for [[k v] hmap] [k (f v)])))
 
 (defn keywordize-keys [hashmap]
   (into {} (for [[k v] hashmap] [(keyword k) v])))

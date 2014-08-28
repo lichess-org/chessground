@@ -22,6 +22,7 @@
   position: absolute;
   width: 12.5%;
   height: 12.5%;
+  -webkit-transform: translate3d(0,0,0);
 }
 .cg-board > div[data-coord-x]::after {
   position: absolute;
@@ -54,8 +55,11 @@
 .cg-square.selected {
   background: rgba(20, 85, 30, 0.5);
 }
-.cg-square.moved {
+.cg-square.last-move {
   background: rgba(155, 199, 0, 0.41);
+}
+.cg-square.check {
+  background: radial-gradient(ellipse at center, rgba(255, 0, 0, 1) 0%, rgba(231, 0, 0, 1) 25%, rgba(169, 0, 0, 0) 89%, rgba(158, 0, 0, 0) 100%);
 }
 .cg-piece {
   position: absolute;
