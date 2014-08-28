@@ -1,6 +1,7 @@
 (ns chessground.common
   "Shared utilities for the library"
-  (:require [cljs.core.async :as a])
+  (:require [cljs.core.async :as a]
+            [chessground.klass :as klass])
   (:require-macros [cljs.core.async.macros :as am]))
 
 (enable-console-print!)
@@ -60,11 +61,11 @@
 
 (defn square-element [dom-element]
   "If element is a square, return it. If it's a piece, return its parent"
-  (if (has-class dom-element "chessground-square")
+  (if (has-class dom-element klass/square)
     dom-element
-    (when (has-class dom-element "chessground-piece")
+    (when (has-class dom-element klass/piece)
       (let [parent (.-parentNode dom-element)]
-        (when (has-class parent "chessground-square") parent)))))
+        (when (has-class parent klass/square) parent)))))
 
 (defn square-key [dom-element]
   "Gets the square key from the element, or its parent"

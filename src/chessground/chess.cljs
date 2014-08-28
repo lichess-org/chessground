@@ -29,6 +29,10 @@
     clear
     (forsyth/parse (if (= fen "start") forsyth/default fen))))
 
+(defn- transform
+  "f takes a key and a square, and returns a square"
+  [chess f] (into {} (for [[k v] chess] [k (f k v)])))
+
 (defn get-piece [chess key] (get-in chess [key :piece]))
 
 (defn get-pieces [chess] (into {} (filter second (for [[k v] chess] [k (:piece v)]))))
@@ -55,10 +59,21 @@
             (if p (put-piece c key p) (remove-piece c key)))
           chess changes))
 
-(defn- transform
-  "f takes a key and a square, and returns a square"
-  [chess f]
-  (into {} (for [[k v] chess] [k (f k v)])))
+(defn get-selected [chess] (->> chess (filter (comp :selected? second)) first first))
+
+(defn get-dragging [chess] (->> chess (filter (comp :dragging? second)) first first))
+
+(defn update-dests [chess all-dests]
+  (let [dests (set (when-let [orig (or (get-selected chess) (get-dragging chess))]
+                     (get all-dests orig)))]
+    (transform chess (fn [k sq] (if (contains? dests k)
+                                  (assoc sq :dest? true)
+                                  (dissoc sq :dest?))))))
+
+(defn set-selected [chess key all-dests]
+  (-> chess
+      (transform (fn [k sq] (if (= k key) (assoc sq :selected? true) (dissoc sq :selected?))))
+      (update-dests all-dests)))
 
 (defn set-check [chess key]
   (transform chess (fn [k sq] (if (= k key)
@@ -70,20 +85,15 @@
                                 (assoc sq :last-move? true)
                                 (dissoc sq :last-move?)))))
 
-(defn set-dests [chess dests]
-  (transform chess (fn [k sq] (if (common/seq-contains? dests k)
-                                (assoc sq :dest? true)
-                                (dissoc sq :dest?)))))
-
 (defn move-piece [prev [orig dest]]
   "Return nil if orig and dest make no sense"
   (or (when (not= orig dest)
         (when-let [piece (get-piece prev orig)]
-          (pp (-> prev
-                  (set-check nil)
-                  (set-last-move [orig dest])
-                  (remove-piece orig)
-                  (put-piece dest piece)))))
+          (-> prev
+              (set-check nil)
+              (set-last-move [orig dest])
+              (remove-piece orig)
+              (put-piece dest piece))))
       prev))
 
 (defn owner-color [chess key]

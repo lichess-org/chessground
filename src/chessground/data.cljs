@@ -51,6 +51,15 @@
   (when (is-movable? state orig)
     (get-in state [:movable :dests orig])))
 
+(defn- update-chess-dests [state]
+  (update-in state [:chess] chess/update-dests (-> state :movable :dests)))
+
+(defn set-dests [state dests]
+  (-> state
+      (assoc-in [:movable :dests] dests)
+      (assoc-in [:movable :free] false)
+      update-chess-dests))
+
 (defn set-orientation [prev next]
   (if (common/seq-contains? chess/colors next) next prev))
 

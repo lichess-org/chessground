@@ -3,14 +3,14 @@
   (:require [chessground.common :as common :refer [pp]]
             [chessground.data :as data]
             [chessground.chess :as chess]
-            [om.core :as om :include-macros true]
+            [om.core :as om]
             [cljs.core.async :as a])
   (:require-macros [cljs.core.async.macros :as am]))
 
 (defn build
   "Creates JavaScript functions that push to the channel"
   [chan]
-  (letfn [(tell [function data] (common/push! chan [function data]))
+  (letfn [(tell [function msg] (common/push! chan [function msg]))
           (ask [question callback]
             (let [response-chan (a/chan)]
               (am/go (a/>! chan [question response-chan])
@@ -34,18 +34,19 @@
        :setDests          #(tell :set-dests (js->clj %))})))
 
 (defn handler [cursor chan]
-  (am/go
-    (while true
-      (let [[function data] (a/<! chan)]
-        (case function
-          :set-orientation (om/transact! cursor :orientation #(data/set-orientation % data))
-          :toggle-orientation (om/transact! cursor :orientation data/toggle-orientation)
-          :get-orientation (a/>! data (:orientation @cursor))
-          :get-position (a/>! data (chess/get-pieces (:chess @cursor)))
-          :set-fen (om/update! cursor :chess (chess/make (or data "start")))
-          :clear (om/update! cursor :chess chess/clear)
-          :api-move (om/transact! cursor :chess #(chess/move-piece % data))
-          :set-last-move (om/transact! cursor :chess #(chess/set-last-move % data))
-          :set-check (om/transact! cursor :chess #(chess/set-check % data))
-          :set-pieces (om/transact! cursor :chess #(chess/set-pieces % data))
-          :set-dests (om/transact! cursor :chess #(chess/set-dests % data)))))))
+  (am/go-loop
+    []
+    (let [[function msg] (a/<! chan)]
+      (case function
+        :set-orientation (om/transact! cursor :orientation #(data/set-orientation % msg))
+        :toggle-orientation (om/transact! cursor :orientation data/toggle-orientation)
+        :get-orientation (a/>! msg (:orientation @cursor))
+        :get-position (a/>! msg (chess/get-pieces (:chess @cursor)))
+        :set-fen (om/update! cursor :chess (chess/make (or msg "start")))
+        :clear (om/update! cursor :chess chess/clear)
+        :api-move (om/transact! cursor :chess #(chess/move-piece % msg))
+        :set-last-move (om/transact! cursor :chess #(chess/set-last-move % msg))
+        :set-check (om/transact! cursor :chess #(chess/set-check % msg))
+        :set-pieces (om/transact! cursor :chess #(chess/set-pieces % msg))
+        :set-dests (om/transact! cursor #(data/set-dests % msg))))
+    (recur)))

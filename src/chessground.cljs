@@ -13,7 +13,8 @@
   (let [api-chan (a/chan)]
     (om/root
       ui/board-view
-      (atom (data/make {}))
+      (atom (data/make (or (js->clj config {:keywordize-keys true}) {})))
       {:target element
-       :shared {:api-chan api-chan}})
+       :shared {:api-chan api-chan
+                :ctrl-chan (a/chan)}})
     (api/build api-chan)))

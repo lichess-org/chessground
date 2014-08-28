@@ -1,38 +1,45 @@
 (ns chessground.ui
   (:require [om.core :as om :include-macros true]
-            [om.dom :as dom :include-macros true])
+            [om.dom :as dom :include-macros true]
+            [cljs.core.async :as a]
+            [chessground.common :as common :refer [pp]]
+            [chessground.ctrl :as ctrl]
+            [chessground.api :as api]
+            [chessground.klass :as klass])
   (:require-macros [cljs.core.async.macros :as am]))
-
-(def board-class "cg-board")
-(def square-class "cg-square")
-(def piece-class "cg-piece")
-(def last-move-class "last-move")
-(def check-class "check")
-(def dest-class "dest")
-
-(defn- classes [cs] (clojure.string/join " " (filter identity cs)))
 
 (defn square-view [square owner]
   (reify
+    om/IDidMount
+    (did-mount [_]
+      (let [el (om/get-node owner)
+            chan (om/get-shared owner :ctrl-chan)]
+        (doseq [ev ["touchstart" "mousedown"]]
+          (.addEventListener
+            el ev (fn [e]
+                    (.preventDefault e)
+                    (a/put! chan [:select-square (common/square-key (.-target e))]))))))
     om/IRender
     (render [_]
-      (dom/div #js {:className (classes [square-class
-                                         (when (:check? square) check-class)
-                                         (when (:last-move? square) last-move-class)
-                                         (when (:dest? square) dest-class)])
+      (dom/div #js {:className (klass/join [klass/square
+                                         (when (:selected? square) klass/selected)
+                                         (when (:check? square) klass/check)
+                                         (when (:last-move? square) klass/last-move)
+                                         (when (:dest? square) klass/dest)])
                     :data-key (:key square)}
                (when-let [piece (:piece square)]
-                 (dom/div #js {:className (classes [piece-class (:color piece) (:role piece)])}))))))
+                 (dom/div #js {:className (klass/join [klass/piece (:color piece) (:role piece)])}))))))
 
 (defn board-view [app owner]
   (reify
     om/IWillMount
     (will-mount [_]
-      (chessground.api/handler app (om/get-shared owner :api-chan)))
+      (api/handler app (om/get-shared owner :api-chan))
+      (ctrl/handler app (om/get-shared owner :ctrl-chan)))
     om/IRender
     (render [_]
       (let [white (= (:orientation app) "white")]
-        (apply dom/div #js {:className board-class}
+        (apply dom/div #js {:className klass/board}
                (for [rank (range 1 9)
                      file-n (range 1 9)
                      :let [file (get "abcdefgh" (dec file-n))
