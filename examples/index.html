@@ -1,166 +1,25 @@
-<!doctype html>
 <html>
   <head>
-    <meta charset="utf-8">
-    <title>ChessGround</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <link rel="stylesheet" href="example.css">
     <link rel="stylesheet" href="../assets/base.css">
     <link rel="stylesheet" href="../assets/theme.css">
     <link rel="stylesheet" href="../assets/desktop.css">
-    <link rel="stylesheet" href="example.css">
   </head>
   <body>
-    <script>
-      function include(script) {
-        document.write('\x3Cscript type="text/javascript" src="'+script+'">\x3C/script>');
-      }
-      include("../libs/interact.min.js");
-      if (window.location.search.indexOf('prod') !== -1) {
-        // production
-        include("../generated-prod/chessground.prod.js");
-      } else {
-        // development
-        include("../generated/goog/base.js");
-        include("../generated/chessground.dev.js");
-        document.write('\x3Cscript type="text/javascript">goog.require("browser_repl");\x3C/script>');
-        document.write('\x3Cscript type="text/javascript">goog.require("chessground");\x3C/script>');
-      }
-      // chess.js is NOT required by chessground.
-      // We include it for the examples
-      include("../libs/chess.min.js");
-      include('example.js');
-    </script>
+    <div id="app"></div>
+    <script src="../libs/react-0.11.1.js"></script>
+    <script src="../out/goog/base.js" type="text/javascript"></script>
+    <script src="../chessground.js" type="text/javascript"></script>
+    <script type="text/javascript">goog.require("chessground.core");</script>
+
     <section>
       <div class="chessground wood small merida coordinates" id="ground1"></div>
       <p>Default options, with CSS coordinates</p>
       <script>
-        var ground = chessground.main(document.getElementById('ground1'));
-        console.log(ground.getOrientation());
+        var ground = chessground.core.main(document.getElementById('ground1'));
       </script>
     </section>
-    <!-- <section> -->
-    <!--   <div class="chessground blue small pirouetti coordinates" id="ground2"></div> -->
-    <!--   <p>Black, zoomed pieces, no drag center</p> -->
-    <!--   <script> -->
-    <!--     (function() { -->
-    <!--       var ground = chessground.main(document.getElementById('ground2'), { -->
-    <!--         orientation: 'black', -->
-    <!--         movable: { -->
-    <!--           'drag-center': false -->
-    <!--         } -->
-    <!--       }); -->
-    <!--       // setTimeout(function() { -->
-    <!--       //   ground.toggleOrientation(); -->
-    <!--       //   setTimeout(function() { -->
-    <!--       //     ground.setPieces({ -->
-    <!--       //       a1: null, -->
-    <!--       //       a2: null, -->
-    <!--       //       c5: {color: 'white', role: 'queen'}, -->
-    <!--       //       d5: {color: 'black', role: 'knight'} -->
-    <!--       //     }); -->
-    <!--       //     setTimeout(function() { -->
-    <!--       //       ground.clear(); -->
-    <!--       //     }, 1000); -->
-    <!--       //   }, 1000); -->
-    <!--       // }, 1000); -->
-    <!--     })(); -->
-    <!--   </script> -->
-    <!-- </section> -->
-    <!-- <section> -->
-    <!--   <div class="chessground marble small cburnett" id="ground3"></div> -->
-    <!--   <p>Custom FEN positions</p> -->
-    <!--   <script> -->
-    <!--     (function() { -->
-    <!--       var ground = chessground.main(document.getElementById('ground3'), { -->
-    <!--         fen: 'rnbqkb1r/ppp1np2/3p1N1p/6p1/2PPPp2/3B1N2/PP4PP/R1BQK2R b KQkq - 2 9' -->
-    <!--       }); -->
-    <!--       setTimeout(function() { -->
-    <!--         ground.setFen('r4rk1/qb4pp/p3p3/2Rpp1b1/7P/1P1P1PP1/PB1NKQ2/2R5 b - - 0 23'); -->
-    <!--       }, 3000); -->
-    <!--     })(); -->
-    <!--   </script> -->
-    <!-- </section> -->
-    <!-- <section> -->
-    <!--   <div class="chessground wood small cburnett" id="ground4"></div> -->
-    <!--   <p>Disable moving pieces</p> -->
-    <!--   <script> -->
-    <!--     chessground.main(document.getElementById('ground4'), { -->
-    <!--       movable: {free: false} -->
-    <!--     }); -->
-    <!--   </script> -->
-    <!-- </section> -->
-    <!-- <section> -->
-    <!--   <div class="chessground blue small cburnett" id="ground5"></div> -->
-    <!--   <p>Valid moves: white plays</p> -->
-    <!--   <script> -->
-    <!--     var chess = new Chess(); -->
-    <!--     chessground.main(document.getElementById('ground5'), { -->
-    <!--       movable: { -->
-    <!--         free: false, -->
-    <!--         color: "white", -->
-    <!--         dests: chessToDests(chess) -->
-    <!--       } -->
-    <!--     }); -->
-    <!--   </script> -->
-    <!-- </section> -->
-    <!-- <section> -->
-    <!--   <div class="chessground marble small merida" id="ground6"></div> -->
-    <!--   <p>Valid moves: custom FEN, black plays</p> -->
-    <!--   <script> -->
-    <!--     var fen = '1r2r1k1/p4pbp/2pn2p1/q1N1pb2/3Pp3/1P3PP1/PB4BP/2RQR1K1 b - - 0 20' ; -->
-    <!--     var chess = new Chess(fen); -->
-    <!--     chessground.main(document.getElementById('ground6'), { -->
-    <!--       fen: fen, -->
-    <!--       movable: { -->
-    <!--         free: false, -->
-    <!--         color: chessToColor(chess), -->
-    <!--         dests: chessToDests(chess) -->
-    <!--       } -->
-    <!--     }); -->
-    <!--   </script> -->
-    <!-- </section> -->
-    <!-- <section> -->
-    <!--   <div class="chessground wood small merida" id="ground7"></div> -->
-    <!--   <p>Actually play a game</p> -->
-    <!--   <script> -->
-    <!--     var ground; -->
-    <!--     var chess = new Chess(); -->
-    <!--     function onMove(orig, dest) { -->
-    <!--       chess.move({from: orig, to: dest}); -->
-    <!--       ground.setDests(chessToDests(chess)); -->
-    <!--       ground.setColor(chessToColor(chess)); -->
-    <!--     }; -->
-    <!--     ground = chessground.main(document.getElementById('ground7'), { -->
-    <!--       movable: { -->
-    <!--         free: false, -->
-    <!--         color: chessToColor(chess), -->
-    <!--         dests: chessToDests(chess), -->
-    <!--         events: { -->
-    <!--           after: onMove -->
-    <!--         } -->
-    <!--       } -->
-    <!--     }); -->
-    <!--   </script> -->
-    <!-- </section> -->
-    <!-- <section> -->
-    <!--   <div class="chessground blue small merida coordinates" id="ground8"></div> -->
-    <!--   <p>Drop off to trash pieces</p> -->
-    <!--   <script> -->
-    <!--     chessground.main(document.getElementById('ground8'), { -->
-    <!--       movable: { -->
-    <!--         'drop-off': 'trash' -->
-    <!--       } -->
-    <!--     }); -->
-    <!--   </script> -->
-    <!-- </section> -->
-    <!-- <section> -->
-    <!--   <div class="chessground marble small merida" id="ground9"></div> -->
-    <!--   <p>Spare pieces</p> -->
-    <!--   <script> -->
-    <!--     chessground.main(document.getElementById('ground9'), { -->
-    <!--       'spare-pieces': true -->
-    <!--     }); -->
-    <!--   </script> -->
-    <!-- </section> -->
   </body>
 </html>
 

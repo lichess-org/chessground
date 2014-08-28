@@ -5,20 +5,33 @@
 
 (comment
   ; Representation of a chess game:
-  {:pieces {"a1" {:color "white" :role "rook"}
-            "b8" {:color "black" :role "knight"}}})
+  {"a1" {:key "a1"}
+   "a2" {:key "a2"
+         :piece {:color "white" :role "king"}
+         :check true
+         :last-move true
+         :selected true
+         :dragging true
+         :destination true}})
 
 (def colors ["white" "black"])
 (def roles ["pawn" "rook" "knight" "bishop" "queen" "king"])
 
-(def clear {:pieces {}})
+(def clear
+  (into {} (for [rank (range 1 9)
+                 file ["a" "b" "c" "d" "e" "f" "g" "h"]
+                 :let [key (str file rank)]]
+             [key {:key key}])))
 
 (defn make [fen]
-  {:pieces (forsyth/parse (when (not= fen "start") fen))})
+  (merge-with
+    #(assoc %1 :piece %2)
+    clear
+    (forsyth/parse (if (= fen "start") forsyth/default fen))))
 
-(defn get-piece [chess key] (get-in chess [:pieces key]))
+(defn get-piece [chess key] (get-in chess [key :piece]))
 
-(defn get-pieces [chess] (:pieces chess))
+(defn get-pieces [chess] (filter identity (map :piece (vals chess))))
 
 (comment
   {"white" {"pawn" 3 "queen" 1}
@@ -33,15 +46,14 @@
                   {}
                   (get-pieces chess))))
 
-(defn remove-piece [chess key] (update-in chess [:pieces] dissoc key))
+(defn remove-piece [chess key] (update-in chess [key] dissoc :piece))
 
-(defn put-piece [chess key piece] (assoc-in chess [:pieces key] piece))
+(defn put-piece [chess key piece] (update-in chess [key] assoc :piece piece))
 
 (defn set-pieces [chess changes]
-  (update-in chess [:pieces]
-             (fn [pieces] (reduce (fn [ps [key p]]
-                                    (if p (assoc ps key p) (dissoc ps key)))
-                                  pieces changes))))
+  (fn [pieces] (reduce (fn [ps [key p]]
+                         (if p (assoc ps key p) (dissoc ps key)))
+                       pieces changes)))
 
 (defn move-piece [chess orig dest]
   "Return nil if orig and dest make no sense"

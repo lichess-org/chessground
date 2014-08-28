@@ -1,11 +1,9 @@
 (ns chessground.common
-  "Shared utilities for the library"
-  (:require [cljs.core.async :as a])
-  (:require-macros [cljs.core.async.macros :as am]))
+  "Shared utilities for the library")
 
 (enable-console-print!)
 
-(def debug false)
+(def debug true)
 
 (def ground-id
   "Ground unique ID generator (increment)"
@@ -23,8 +21,6 @@
     (merge-with smart-merge a b)))
 
 (defn seq-contains? [coll target] (some #{target} coll))
-
-(defn push! [chan msg] (am/go (a/>! chan msg)))
 
 (defn has-class [dom-element class]
   (and dom-element (.contains (.-classList dom-element) class)))
@@ -44,11 +40,11 @@
   (nil? (js->clj (.-offsetParent element))))
 
 ; mimics the JavaScript `in` operator
-(defn js-in [obj prop]
+(defn js-in? [obj prop]
   (and obj (or (.hasOwnProperty obj prop)
-               (js-in (.-__proto__ obj) prop))))
+               (js-in? (.-__proto__ obj) prop))))
 
-(def touch-device? (js-in js/document "ontouchstart"))
+(def touch-device? (js-in? js/document "ontouchstart"))
 
 (def transform-prop
   "Fun fact: this won't work if chessground is included in the <head>
@@ -56,7 +52,7 @@
   (do (or (.-body js/document) (throw "chessground must be included in the <body> tag!"))
       (let [style (-> js/document .-body .-style)
             props ["transform" "webkitTransform" "mozTransform" "oTransform"]]
-        (first (or (filter #(js-in style %) props) props)))))
+        (first (or (filter #(js-in? style %) props) props)))))
 
 (defn square-element [dom-element]
   "If element is a square, return it. If it's a piece, return its parent"

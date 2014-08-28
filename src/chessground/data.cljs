@@ -14,17 +14,10 @@
              :drop-off "revert" ; when a piece is dropped outside the board. "revert" | "trash"
              :drag-center true ; whether to center the piece under the cursor on drag start
              :events {:after (fn [orig dest chess] nil) ; called after the moves has been played
-                      }
-             }
-   :shown-dests nil ; dests shown on board. We keep track of them for performance.
-   :last-move nil ; last move
-   :checked nil ; square 'in check'
-   :selected nil ; square key of the currently moving piece. "a2" | nil
-   :dragging false ; currently dragging?
-   :spare-pieces false ; provide extra pieces to put on the board)
-   })
+                      }}})
 
-(defn with-fen [state fen] (assoc state :chess (chess/make fen)))
+(defn with-fen [state fen]
+  (assoc state :chess (chess/make (or fen "start"))))
 
 (defn make [js-config]
   (let [config (-> js-config
