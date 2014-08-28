@@ -3,7 +3,7 @@
             [om.dom :as dom :include-macros true]
             [chessground.data :as data]
             [chessground.chess :as chess]
-            [chessground.common :refer [pp]]
+            [chessground.common :as common :refer [pp]]
             [cljs.core.async :as a])
   (:require-macros [cljs.core.async.macros :as am]))
 
@@ -35,6 +35,8 @@
         (case function
           :set-orientation (om/transact! app :orientation #(data/set-orientation % data))
           :toggle-orientation (om/transact! app :orientation data/toggle-orientation)
+          :get-orientation (a/>! data (:orientation @app))
+          :get-position (a/>! data (chess/get-pieces (:chess @app)))
           :set-fen (om/update! app :chess (chess/make (or data "start")))
           :clear (om/update! app :chess chess/clear)
           :api-move (om/transact! app :chess #(chess/move-piece % data))

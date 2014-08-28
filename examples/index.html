@@ -18,6 +18,7 @@
       <p>Default options, with CSS coordinates</p>
       <script>
         var ground = chessground.main(document.getElementById('ground1'));
+        ground.getPosition(function(res) { console.log(res); });
       </script>
     </section>
   </body>

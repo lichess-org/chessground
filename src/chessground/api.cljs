@@ -1,7 +1,9 @@
 (ns chessground.api
   "External JavaScript API exposed to the end user"
   (:require [chessground.common :as common :refer [pp]]
-            [chessground.chess :as chess]))
+            [chessground.chess :as chess]
+            [cljs.core.async :as a])
+  (:require-macros [cljs.core.async.macros :as am]))
 
 (defn build
   "Creates JavaScript functions that push to the channel"
@@ -10,6 +12,16 @@
     (clj->js
       {:toggleOrientation #(push :toggle-orientation nil)
        :setOrientation    #(push :set-orientation %)
+       :getOrientation    (fn [callback]
+                            (let [response-chan (a/chan)]
+                              (am/go (a/>! chan [:get-orientation response-chan])
+                                     (callback (a/<! response-chan))
+                                     (a/close! response-chan))))
+       :getPosition       (fn [callback]
+                            (let [response-chan (a/chan)]
+                              (am/go (a/>! chan [:get-position response-chan])
+                                     (callback (clj->js (a/<! response-chan)))
+                                     (a/close! response-chan))))
        :setFen            #(push :set-fen %)
        :setStartPos       #(push :set-fen "start")
        :clear             #(push :clear nil)
