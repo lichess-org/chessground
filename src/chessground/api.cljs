@@ -1,7 +1,9 @@
 (ns chessground.api
   "External JavaScript API exposed to the end user"
   (:require [chessground.common :as common :refer [pp]]
+            [chessground.data :as data]
             [chessground.chess :as chess]
+            [om.core :as om :include-macros true]
             [cljs.core.async :as a])
   (:require-macros [cljs.core.async.macros :as am]))
 
@@ -30,19 +32,20 @@
                                                 common/keywordize-keys
                                                 (js->clj pieces {:keywordize-keys true}))))
        :setDests          #(tell :set-dests (js->clj %))})))
-; "setFen"            (fn [fen] (push-in :set-fen fen))
-; "startPos"          (fn [] (push-in :set-fen "start"))
-; "setDests"          (fn [dests] (push-in :set-dests (js->clj dests)))
-; "setColor"          (fn [color] (push-in :set-color color))
-; "setPieces"         (fn [pieces]
-;                       (push-in :set-pieces
-;                         (into {} (for [[k v] (js->clj pieces)]
-;                                    [k (common/keywordize-keys v)]))))
-; "move"              (fn [orig dest] (push-in :api-move [orig dest]))
-; "showLastMove"      (fn [orig dest] (push-in :show-last-move [orig dest]))
-; "showCheck"         (fn [cell] (push-in :show-check [cell]))
-; "clear"             (fn [] (push-in :clear true))
-; "getOrientation"    (fn [] (:orientation @state-atom))
-; "getColor"          (fn [] (:color (:movable @state-atom)))
-; "getPosition"       (fn [] (clj->js (chess/get-pieces (:chess @state-atom))))})))
 
+(defn handler [cursor chan]
+  (am/go
+    (while true
+      (let [[function data] (a/<! chan)]
+        (case function
+          :set-orientation (om/transact! cursor :orientation #(data/set-orientation % data))
+          :toggle-orientation (om/transact! cursor :orientation data/toggle-orientation)
+          :get-orientation (a/>! data (:orientation @cursor))
+          :get-position (a/>! data (chess/get-pieces (:chess @cursor)))
+          :set-fen (om/update! cursor :chess (chess/make (or data "start")))
+          :clear (om/update! cursor :chess chess/clear)
+          :api-move (om/transact! cursor :chess #(chess/move-piece % data))
+          :set-last-move (om/transact! cursor :chess #(chess/set-last-move % data))
+          :set-check (om/transact! cursor :chess #(chess/set-check % data))
+          :set-pieces (om/transact! cursor :chess #(chess/set-pieces % data))
+          :set-dests (om/transact! cursor :chess #(chess/set-dests % data)))))))

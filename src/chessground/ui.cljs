@@ -1,10 +1,6 @@
 (ns chessground.ui
   (:require [om.core :as om :include-macros true]
-            [om.dom :as dom :include-macros true]
-            [chessground.data :as data]
-            [chessground.chess :as chess]
-            [chessground.common :as common :refer [pp]]
-            [cljs.core.async :as a])
+            [om.dom :as dom :include-macros true])
   (:require-macros [cljs.core.async.macros :as am]))
 
 (def board-class "cg-board")
@@ -28,28 +24,11 @@
                (when-let [piece (:piece square)]
                  (dom/div #js {:className (classes [piece-class (:color piece) (:role piece)])}))))))
 
-(defn- api-handler [app chan]
-  (am/go
-    (while true
-      (let [[function data] (a/<! chan)]
-        (case function
-          :set-orientation (om/transact! app :orientation #(data/set-orientation % data))
-          :toggle-orientation (om/transact! app :orientation data/toggle-orientation)
-          :get-orientation (a/>! data (:orientation @app))
-          :get-position (a/>! data (chess/get-pieces (:chess @app)))
-          :set-fen (om/update! app :chess (chess/make (or data "start")))
-          :clear (om/update! app :chess chess/clear)
-          :api-move (om/transact! app :chess #(chess/move-piece % data))
-          :set-last-move (om/transact! app :chess #(chess/set-last-move % data))
-          :set-check (om/transact! app :chess #(chess/set-check % data))
-          :set-pieces (om/transact! app :chess #(chess/set-pieces % data))
-          :set-dests (om/transact! app :chess #(chess/set-dests % data)))))))
-
 (defn board-view [app owner]
   (reify
     om/IWillMount
     (will-mount [_]
-      (api-handler app (om/get-shared owner :api-chan)))
+      (chessground.api/handler app (om/get-shared owner :api-chan)))
     om/IRender
     (render [_]
       (let [white (= (:orientation app) "white")]
