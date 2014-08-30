@@ -11,7 +11,6 @@
          :check? true
          :last-move? true
          :selected? true
-         :dragging? true
          :dest? true}})
 
 (def colors ["white" "black"])
@@ -61,19 +60,21 @@
 
 (defn get-selected [chess] (->> chess (filter (comp :selected? second)) first first))
 
-(defn get-dragging [chess] (->> chess (filter (comp :dragging? second)) first first))
-
 (defn update-dests [chess all-dests]
-  (let [dests (set (when-let [orig (or (get-selected chess) (get-dragging chess))]
+  (let [dests (set (when-let [orig (get-selected chess)]
                      (get all-dests orig)))]
     (transform chess (fn [k sq] (if (contains? dests k)
                                   (assoc sq :dest? true)
                                   (dissoc sq :dest?))))))
 
+(defn remove-dests [chess] (common/map-values #(dissoc % :dest?) chess))
+
 (defn set-selected [chess key all-dests]
   (-> chess
       (transform (fn [k sq] (if (= k key) (assoc sq :selected? true) (dissoc sq :selected?))))
       (update-dests all-dests)))
+
+(defn set-unselected [chess] (common/map-values #(dissoc % :selected?) chess))
 
 (defn set-check [chess key]
   (transform chess (fn [k sq] (if (= k key)
@@ -85,16 +86,18 @@
                                 (assoc sq :last-move? true)
                                 (dissoc sq :last-move?)))))
 
-(defn move-piece [prev [orig dest]]
+(defn move-piece [chess [orig dest]]
   "Return nil if orig and dest make no sense"
   (or (when (not= orig dest)
-        (when-let [piece (get-piece prev orig)]
-          (-> prev
+        (when-let [piece (get-piece chess orig)]
+          (-> chess
               (set-check nil)
+              set-unselected
+              remove-dests
               (set-last-move [orig dest])
               (remove-piece orig)
               (put-piece dest piece))))
-      prev))
+      chess))
 
 (defn owner-color [chess key]
   "Returns the color of the piece on this square key, or nil"

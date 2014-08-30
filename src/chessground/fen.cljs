@@ -5,7 +5,7 @@
 
 (def default "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1")
 
-(def role-names {"p" "pawn"
+(def ^private role-names {"p" "pawn"
                  "r" "rook"
                  "n" "knight"
                  "b" "bishop"

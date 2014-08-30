@@ -31,7 +31,8 @@
                             (tell :set-pieces (common/map-values
                                                 common/keywordize-keys
                                                 (js->clj pieces {:keywordize-keys true}))))
-       :setDests          #(tell :set-dests (js->clj %))})))
+       :setDests          #(tell :set-dests (js->clj %))
+       :setColor          #(tell :set-color %)})))
 
 (defn handler [cursor chan]
   (am/go-loop
@@ -48,5 +49,6 @@
         :set-last-move (om/transact! cursor :chess #(chess/set-last-move % msg))
         :set-check (om/transact! cursor :chess #(chess/set-check % msg))
         :set-pieces (om/transact! cursor :chess #(chess/set-pieces % msg))
-        :set-dests (om/transact! cursor #(data/set-dests % msg))))
+        :set-dests (om/transact! cursor #(data/set-dests % msg))
+        :set-color (om/transact! cursor #(data/set-color % msg))))
     (recur)))

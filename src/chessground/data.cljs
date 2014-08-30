@@ -8,6 +8,7 @@
   {:fen nil ; replaced by :chess by data/make
    :chess {} ; representation of a chess game
    :orientation "white"
+   :dragging false ; currently dragging?
    :movable {:free true ; all moves are valid - board editor
              :color "both" ; color that can move. white or black or both
              :dests nil ; valid moves. {"a2" ["a3" "a4"] "b1" ["a3" "c3"]} | nil
@@ -59,6 +60,11 @@
       (assoc-in [:movable :dests] dests)
       (assoc-in [:movable :free] false)
       update-chess-dests))
+
+(defn set-color [state color]
+  (if (common/seq-contains? (conj chess/colors "both" "none") color)
+    (assoc-in state [:movable :color] color)
+    state))
 
 (defn set-orientation [prev next]
   (if (common/seq-contains? chess/colors next) next prev))
