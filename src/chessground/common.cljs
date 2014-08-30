@@ -16,8 +16,6 @@
   (when debug (doseq [expr exprs] (.log js/console (clj->js expr))))
   (first exprs))
 
-(defn push! [chan msg] (am/go (a/>! chan msg)))
-
 (defn deep-merge [a b]
   (letfn [(smart-merge [x y]
             (if (and (map? x) (map? y))
@@ -71,6 +69,8 @@
   "Gets the square key from the element, or its parent"
   (when-let [sq (square-element dom-element)]
     (.getAttribute sq "data-key")))
+
+(defn square-board [el] (.-parentNode (.-parentNode el)))
 
 (defn map-values [f hmap]
   (into {} (for [[k v] hmap] [k (f v)])))

@@ -74,7 +74,8 @@
       (transform (fn [k sq] (if (= k key) (assoc sq :selected? true) (dissoc sq :selected?))))
       (update-dests all-dests)))
 
-(defn set-unselected [chess] (common/map-values #(dissoc % :selected?) chess))
+(defn set-unselected [chess]
+  (remove-dests (common/map-values #(dissoc % :selected?) chess)))
 
 (defn set-check [chess key]
   (transform chess (fn [k sq] (if (= k key)

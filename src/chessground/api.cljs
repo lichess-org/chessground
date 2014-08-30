@@ -10,7 +10,7 @@
 (defn build
   "Creates JavaScript functions that push to the channel"
   [chan]
-  (letfn [(tell [function msg] (common/push! chan [function msg]))
+  (letfn [(tell [function msg] (a/put! chan [function msg]))
           (ask [question callback]
             (let [response-chan (a/chan)]
               (am/go (a/>! chan [question response-chan])

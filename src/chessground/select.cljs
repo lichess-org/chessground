@@ -1,12 +1,12 @@
 (ns chessground.select
   "Make squares selectable"
-  (:require [chessground.common :as common :refer [pp push!]]
-            [chessground.chess :as chess]))
+  (:require [chessground.common :as common :refer [pp]]
+            [chessground.chess :as chess]
+            [cljs.core.async :as a]))
 
-(defn handler [event chans]
-  (.preventDefault event)
-  (push! (:select-square chans) (common/square-key (.-target event))))
-
-(defn square [el chans]
-  (doseq [event-name ["touchstart" "mousedown"]]
-    (.addEventListener el event-name #(handler % chans))))
+(defn handler [el chan]
+  (doseq [ev ["touchstart" "mousedown"]]
+    (.addEventListener
+      el ev (fn [e]
+              (.preventDefault e)
+              (a/put! chan [:select-square (common/square-key (.-target e))])))))

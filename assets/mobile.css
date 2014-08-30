@@ -4,6 +4,7 @@
 .cg-piece.dragging {
   width: 200%;
   height: 200%;
+  z-index: 1;
 }
 #cg-moving-square {
   display: none;

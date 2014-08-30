@@ -7,6 +7,8 @@
             [chessground.data :as data]
             [chessground.common :refer [pp]]))
 
+(extend-type js/NodeList ISeqable (-seq [array] (array-seq array 0)))
+
 (defn ^:export main
   "Application entry point; returns the public JavaScript API"
   [element config]

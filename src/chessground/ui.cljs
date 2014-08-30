@@ -3,7 +3,10 @@
             [om.dom :as dom :include-macros true]
             [cljs.core.async :as a]
             [chessground.common :as common :refer [pp]]
+            [chessground.dom-data :as dom-data]
             [chessground.ctrl :as ctrl]
+            [chessground.select :as select]
+            [chessground.drag :as drag]
             [chessground.api :as api]
             [chessground.klass :as klass])
   (:require-macros [cljs.core.async.macros :as am]))
@@ -14,18 +17,15 @@
     (did-mount [_]
       (let [el (om/get-node owner)
             chan (om/get-shared owner :ctrl-chan)]
-        (doseq [ev ["touchstart" "mousedown"]]
-          (.addEventListener
-            el ev (fn [e]
-                    (.preventDefault e)
-                    (a/put! chan [:select-square (common/square-key (.-target e))]))))))
+        (select/handler el chan)
+        (drag/square el)))
     om/IRender
     (render [_]
       (dom/div #js {:className (klass/join [klass/square
-                                         (when (:selected? square) klass/selected)
-                                         (when (:check? square) klass/check)
-                                         (when (:last-move? square) klass/last-move)
-                                         (when (:dest? square) klass/dest)])
+                                            (when (:selected? square) klass/selected)
+                                            (when (:check? square) klass/check)
+                                            (when (:last-move? square) klass/last-move)
+                                            (when (:dest? square) klass/dest)])
                     :data-key (:key square)}
                (when-let [piece (:piece square)]
                  (dom/div #js {:className (klass/join [klass/piece (:color piece) (:role piece)])}))))))
@@ -36,6 +36,12 @@
     (will-mount [_]
       (api/handler app (om/get-shared owner :api-chan))
       (ctrl/handler app (om/get-shared owner :ctrl-chan)))
+    om/IDidMount
+    (did-mount [_]
+      (drag/pieces (om/get-node owner) (om/get-shared owner :ctrl-chan) app))
+    om/IDidUpdate
+    (did-update [_ _ _]
+      (drag/pieces (om/get-node owner) (om/get-shared owner :ctrl-chan) app))
     om/IRender
     (render [_]
       (let [white (= (:orientation app) "white")]

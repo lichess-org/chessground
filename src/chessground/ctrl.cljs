@@ -18,7 +18,6 @@
 (defn move-cancel [app]
   (-> app
       (update-in [:chess] chess/set-unselected)
-      (update-in [:chess] chess/remove-dests)
       (assoc :dragging false)))
 
 (defn move-piece [app [orig dest]]
@@ -52,10 +51,26 @@
         (move-start app key)))
     app))
 
+(defn- drag-start [app orig]
+  "A move has been started, by dragging a piece"
+  (-> app
+      (assoc :dragging true)
+      (update-in [:chess] chess/set-selected orig (-> app :movable :dests))))
+
+(defn- drop-off [app key]
+  (update-in
+    (if (= "trash" (-> app :movable :drop-off))
+      (update-in app [:chess] chess/set-pieces {key nil})
+      app)
+    [:chess] chess/set-unselected))
+
 (defn handler [cursor chan]
   (am/go-loop
     []
     (let [[function data] (a/<! chan)]
       (case function
-        :select-square (om/transact! cursor #(select-square % data))))
+        :select-square (om/transact! cursor #(select-square % data))
+        :drag-start (om/transact! cursor #(drag-start % data))
+        :drop-off (om/transact! cursor #(drop-off % data))
+        :move-piece (om/transact! cursor #(move-piece % data))))
     (recur)))
