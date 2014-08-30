@@ -2,10 +2,12 @@
 out/
 target/
 out/
+out-prod/
 checkouts/
 .repl/
 .nrepl-port
 generated*
 debug
 chessground.js
+chessground.prod.js
 node_modules

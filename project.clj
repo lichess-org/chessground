@@ -7,9 +7,21 @@
                  [org.clojure/core.async "0.1.338.0-5c5012-alpha"]
                  [om "0.7.1"]]
   :cljsbuild
-  {:builds [{:id "dev"
-             :source-paths ["src"]
-             :compiler {:output-to "chessground.js"
-                        :output-dir "out"
-                        :optimizations :none
-                        :source-map true}}]})
+  {:builds
+   {:dev
+    {:source-paths ["src"]
+     :compiler {:output-to "chessground.js"
+                :output-dir "out"
+                :optimizations :none
+                :source-map true}}
+    :prod
+    {:source-paths ["src"]
+     :compiler {:output-to "out-prod/chessground.prod.js"
+                :output-dir "out-prod"
+                ; :optimizations :advanced
+                :optimizations :advanced
+                :externs ["libs/interact.js", "libs/react-externs.js"]
+                :pretty-print false
+                :output-wrapper false
+                :closure-warnings {:externs-validation :off
+                                   :non-standard-jsdoc :off}}}}})

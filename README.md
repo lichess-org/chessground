@@ -33,8 +33,6 @@ You will need the Java SDK,
 [Leiningen](https://github.com/technomancy/leiningen) and
 [npm](https://github.com/npm/npm) to build chessground.
 
-You also need to install [voom](https://github.com/LonoCloud/lein-voom) in your ~/.lein/profiles.clj file.
-
 ### Development
 
 ```sh
