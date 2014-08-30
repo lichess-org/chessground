@@ -9,11 +9,12 @@
 (def dragging-div-pos
   (atom {}))
 
-(.addEventListener js/document "DOMContentLoaded"
-                   (fn []
-                     (let [div (.createElement js/document "div")]
-                       (set! (.-id div) "chessground-moving-square")
-                       (.appendChild (.-body js/document) div))))
+(when common/touch-device?
+  (.addEventListener js/document "DOMContentLoaded"
+                     (fn []
+                       (let [div (.createElement js/document "div")]
+                         (set! (.-id div) "chessground-moving-square")
+                         (.appendChild (.-body js/document) div)))))
 
 ; from interact.js
 (def get-scroll-xy
@@ -68,12 +69,13 @@
 (defn on-end [event chan]
   (let [piece (.-target event)
         orig (.-parentNode piece)
-        dest (.-dropzone event)
-        dragging-div (.getElementById js/document "chessground-moving-square")]
-    (.setTimeout js/window #(unfuck piece) 10)
-    (set! (-> dragging-div .-style .-display) "none")
-    (when dest (-> dest .-classList (.remove klass/drag-over)))
+        dest (.-dropzone event)]
+    (when-let [dragging-div (.getElementById js/document "chessground-moving-square")]
+      (set! (-> dragging-div .-style .-display) "none"))
+    (when dest
+      (-> dest .-classList (.remove klass/drag-over)))
     (-> piece .-classList (.remove klass/dragging))
+    (.setTimeout js/window #(unfuck piece) 20)
     (when-let [orig-key (common/square-key orig)]
       (if (and dest (= (common/square-board orig) (common/square-board dest)))
         (a/put! chan [:move-piece (map common/square-key [orig dest])])
