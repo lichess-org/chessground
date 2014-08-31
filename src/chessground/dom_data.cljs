@@ -26,9 +26,7 @@
       (aset el exp setid)
       (swap! data-store assoc-in [setid key] value))))
 
-(defn remove-el [el]
-  "Remove a dom element, and ensure that any data associated with in store is removed too"
-  (when (.-parentNode el)
-    (-> el .-parentNode (.removeChild el))
-    (when-let [id (aget el exp)]
-      (swap! data-store dissoc id))))
+(defn delete [el]
+  "Ensure that any data associated with el is removed"
+  (when-let [id (aget el exp)]
+    (swap! data-store dissoc id)))

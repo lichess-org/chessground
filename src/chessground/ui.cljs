@@ -19,6 +19,11 @@
             chan (om/get-shared owner :ctrl-chan)]
         (select/handler el chan)
         (drag/square el)))
+    om/IWillUpdate
+    (will-update [_ next-props _]
+      (when (and (:piece (om/get-props owner))
+                 (not (:piece next-props)))
+        (dom-data/delete (common/$ (str "." klass/piece) (om/get-node owner)))))
     om/IRender
     (render [_]
       (dom/div #js {:className (klass/join [klass/square
