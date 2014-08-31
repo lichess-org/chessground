@@ -1,8 +1,5 @@
 (ns chessground.common
-  "Shared utilities for the library"
-  (:require [cljs.core.async :as a]
-            [chessground.klass :as klass])
-  (:require-macros [cljs.core.async.macros :as am]))
+  "Shared utilities for the library")
 
 (enable-console-print!)
 
