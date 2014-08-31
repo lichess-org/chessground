@@ -34,7 +34,7 @@
 
 (defn get-piece [chess key] (get-in chess [key :piece]))
 
-(defn get-pieces [chess] (into {} (filter second (for [[k v] chess] [k (:piece v)]))))
+(defn get-pieces [chess] (into {} (filter second (common/map-values :piece chess))))
 
 (comment
   {"white" {"pawn" 3 "queen" 1}

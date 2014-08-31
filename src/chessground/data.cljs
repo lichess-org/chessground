@@ -47,11 +47,6 @@
        (or (-> state :movable :free)
            (common/seq-contains? (get-in state [:movable :dests orig]) dest))))
 
-(defn dests-of [state orig]
-  "List of destinations square keys for this origin"
-  (when (is-movable? state orig)
-    (get-in state [:movable :dests orig])))
-
 (defn- update-chess-dests [state]
   (update-in state [:chess] chess/update-dests (-> state :movable :dests)))
 
