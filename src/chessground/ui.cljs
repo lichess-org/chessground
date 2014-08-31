@@ -40,8 +40,9 @@
     (did-mount [_]
       (drag/pieces (om/get-node owner) (om/get-shared owner :ctrl-chan) app))
     om/IDidUpdate
-    (did-update [_ _ _]
-      (drag/pieces (om/get-node owner) (om/get-shared owner :ctrl-chan) app))
+    (did-update [_ prev _]
+      (when (not= (-> prev :movable :color) (-> app :movable :color))
+        (drag/pieces (om/get-node owner) (om/get-shared owner :ctrl-chan) app)))
     om/IRender
     (render [_]
       (let [white (= (:orientation app) "white")]

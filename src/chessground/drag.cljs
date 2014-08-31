@@ -135,5 +135,6 @@
                   owner (if (common/has-class p "white") "white" "black")
                   draggable (or (= movable-color "both") (= movable-color owner))]]
       (if instance
-        ((if draggable piece-on piece-off) p app)
-        (when draggable (make-draggable p chan (-> app :movable :drag-center)))))))
+        ((if draggable piece-on piece-off) p)
+        (when draggable
+          (make-draggable p chan (-> app :movable :drag-center)))))))
