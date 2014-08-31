@@ -13,7 +13,9 @@
 
 (defn- move-start [app orig]
   "A move has been started by clicking on a piece"
-  (update-in app [:chess] chess/set-selected orig (-> app :movable :dests)))
+  (-> app
+      data/cancel-premove
+      (update-in [:chess] chess/set-selected orig (-> app :movable :dests))))
 
 (defn- move-piece [app [orig dest]]
   "A move initiated through the UI"
@@ -41,7 +43,7 @@
           (move-piece app [orig key]))
         (when (or (data/movable? app key) (data/premovable? app key))
           (move-start app key)))
-      app))
+      (data/cancel-premove app)))
 
 (defn- drag-start [app orig]
   "A move has been started, by dragging a piece"

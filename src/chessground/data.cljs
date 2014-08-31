@@ -95,6 +95,11 @@
       (update-in [:chess] chess/set-unselected)
       (update-in [:chess] chess/set-current-premove keys)))
 
+(defn cancel-premove [state]
+  (if (-> state :premovable :current)
+    (set-premove-current state nil)
+    state))
+
 (defn set-orientation [prev next]
   (if (common/seq-contains? chess/colors next) next prev))
 

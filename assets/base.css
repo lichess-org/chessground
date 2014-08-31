@@ -50,10 +50,10 @@
   height: 100%;
 }
 .cg-square.move-dest {
-  background: radial-gradient(rgba(20, 85, 30, 0.5) 22%, #208030 0, rgba(0, 0, 0, 0.3) 0, rgba(0, 0, 0, 0) 0);
+  background: radial-gradient(rgba(20, 85, 30, 0.5) 22%, #208530 0, rgba(0, 0, 0, 0.3) 0, rgba(0, 0, 0, 0) 0);
 }
 .cg-square.premove-dest {
-  background: radial-gradient(rgba(85, 20, 30, 0.5) 22%, #802030 0, rgba(0, 0, 0, 0.3) 0, rgba(0, 0, 0, 0) 0);
+  background: radial-gradient(rgba(20, 30, 85, 0.5) 22%, #203085 0, rgba(0, 0, 0, 0.3) 0, rgba(0, 0, 0, 0) 0);
 }
 .cg-square.selected {
   background-color: rgba(20, 85, 30, 0.5);
