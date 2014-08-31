@@ -18,8 +18,8 @@
              :events {:after (fn [orig dest chess] nil) ; called after the moves has been played
                       }}})
 
-(defn- update-chess-draggables [state]
-  (update-in state [:chess] chess/update-draggables (-> state :movable :color)))
+(defn- update-chess-movables [state color]
+  (update-in state [:chess] chess/update-movables color))
 
 (defn with-fen [state fen]
   (assoc state :chess (chess/make (or fen "start"))))
@@ -28,27 +28,25 @@
   (let [config (-> js-config
                    common/keywordize-keys
                    (common/keywordize-keys-in [:movable])
-                   (common/keywordize-keys-in [:movable :events]))]
-    (-> (common/deep-merge defaults config)
-        (with-fen (:fen config))
-        (dissoc :fen)
-        update-chess-draggables)))
+                   (common/keywordize-keys-in [:movable :events]))
+        state (-> (common/deep-merge defaults config)
+                  (with-fen (:fen config))
+                  (dissoc :fen))]
+    (-> state
+        (update-chess-movables (-> state :movable :color))
+        (update-in [:movable] dissoc :color))))
 
 (defn clear [state]
   (-> state
       (assoc :chess chess/clear)
       (assoc-in [:movable :dests] nil)))
 
-(defn is-movable? [state key]
-  "Piece on this square may be moved somewhere, if the validation allows it"
-  (let [owner (chess/owner-color (:chess state) key)
-        movable (:movable state)
-        color (:color movable)]
-    (and owner (or (= color "both") (= color owner)))))
+(defn movable? [state orig]
+  (chess/movable? (:chess state) orig))
 
 (defn can-move? [state orig dest]
   "The piece on orig can definitely be moved to dest"
-  (and (is-movable? state orig)
+  (and (movable? state orig)
        (or (-> state :movable :free)
            (common/seq-contains? (get-in state [:movable :dests orig]) dest))))
 
@@ -63,9 +61,7 @@
 
 (defn set-color [state color]
   (if (common/seq-contains? (conj chess/colors "both") color)
-    (-> state
-        (assoc-in [:movable :color] color)
-        update-chess-draggables)
+    (update-chess-movables state color)
     state))
 
 (defn set-orientation [prev next]

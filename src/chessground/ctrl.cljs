@@ -36,7 +36,7 @@
       ; dragging to same square: replace piece to origin
       (-> app (assoc :dragging false))
       ; moving to a non allowed square:
-      (if (and (not (:dragging app)) (data/is-movable? app dest))
+      (if (and (not (:dragging app)) (data/movable? app dest))
         ; when not dragging, allow to reselect movable pieces with a single click/touch
         (move-start app dest)
         ; otherwise cancel move
@@ -47,7 +47,7 @@
     (if-let [orig (chess/get-selected (:chess app))]
       (when (not (= orig key))
         (move-piece app [orig key]))
-      (when (data/is-movable? app key)
+      (when (data/movable? app key)
         (move-start app key)))
     app))
 

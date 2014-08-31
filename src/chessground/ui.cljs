@@ -19,8 +19,8 @@
                                                  (om/get-shared owner :ctrl-chan))))
     om/IWillUpdate
     (will-update [_ next-prop next-state]
-      (if (not= (:draggable (om/get-props owner)) (:draggable next-prop))
-        (drag/piece-switch (:draggable-instance next-state) (:draggable next-prop))))
+      (if (not= (:movable? (om/get-props owner)) (:movable? next-prop))
+        (drag/piece-switch (:draggable-instance next-state) (:movable? next-prop))))
     om/IWillUnmount
     (will-unmount [_]
       (.unset (om/get-state owner :draggable-instance)))

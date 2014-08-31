@@ -9,7 +9,7 @@
    "a2" {:key "a2"
          :piece {:color "white"
                  :role "king"
-                 :draggable false}
+                 :movable? false}
          :check? true
          :last-move? true
          :selected? true
@@ -37,6 +37,8 @@
 (defn get-piece [chess key] (get-in chess [key :piece]))
 
 (defn get-pieces [chess] (into {} (filter second (common/map-values :piece chess))))
+
+(defn movable? [chess key] (:movable? (get-piece chess key)))
 
 (comment
   {"white" {"pawn" 3 "queen" 1}
@@ -69,10 +71,10 @@
                                   (assoc sq :dest? true)
                                   (dissoc sq :dest?))))))
 
-(defn update-draggables [chess color]
+(defn update-movables [chess color]
   (common/map-values (fn [sq]
                        (if-let [p (:piece sq)]
-                         (assoc-in sq [:piece :draggable] (or (= color "both") (= color (:color p))))
+                         (assoc-in sq [:piece :movable?] (or (= color "both") (= color (:color p))))
                          sq))
                      chess))
 
@@ -108,7 +110,3 @@
               (remove-piece orig)
               (put-piece dest piece))))
       chess))
-
-(defn owner-color [chess key]
-  "Returns the color of the piece on this square key, or nil"
-  (:color (get-piece chess key)))
