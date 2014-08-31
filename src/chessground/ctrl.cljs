@@ -15,11 +15,6 @@
   "A move has been started by clicking on a piece"
   (update-in app [:chess] chess/set-selected orig (-> app :movable :dests)))
 
-(defn- move-cancel [app]
-  (-> app
-      (update-in [:chess] chess/set-unselected)
-      (assoc :dragging false)))
-
 (defn- move-piece [app [orig dest]]
   "A move initiated through the UI"
   (or
@@ -31,31 +26,26 @@
                           (assoc-in [:movable :dests] nil))]
           (callback (-> new-app :movable :events :after) orig dest new-chess)
           new-app)))
+    (when (data/can-premove? app orig dest)
+      (data/set-premove-current app [orig dest]))
     ; destination is not available, move is canceled but there are different cases:
     (if (= orig dest)
-      ; dragging to same square: replace piece to origin
-      (-> app (assoc :dragging false))
-      ; moving to a non allowed square:
-      (if (and (not (:dragging app)) (data/movable? app dest))
-        ; when not dragging, allow to reselect movable pieces with a single click/touch
+      app
+      (if (or (data/movable? app dest) (data/premovable? app dest))
         (move-start app dest)
-        ; otherwise cancel move
-        (move-cancel app)))))
+        (update-in app [:chess] chess/set-unselected)))))
 
 (defn- select-square [app key]
-  (or
-    (if-let [orig (chess/get-selected (:chess app))]
-      (when (not (= orig key))
-        (move-piece app [orig key]))
-      (when (data/movable? app key)
-        (move-start app key)))
-    app))
+  (or (if-let [orig (chess/get-selected (:chess app))]
+        (when (not (= orig key))
+          (move-piece app [orig key]))
+        (when (or (data/movable? app key) (data/premovable? app key))
+          (move-start app key)))
+      app))
 
 (defn- drag-start [app orig]
   "A move has been started, by dragging a piece"
-  (-> app
-      (assoc :dragging true)
-      (update-in [:chess] chess/set-selected orig (-> app :movable :dests))))
+  (update-in app [:chess] chess/set-selected orig (-> app :movable :dests)))
 
 (defn- drop-off [app]
   (update-in

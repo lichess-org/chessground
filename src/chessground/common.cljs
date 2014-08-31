@@ -9,6 +9,25 @@
   (when debug (doseq [expr exprs] (.log js/console (clj->js expr))))
   (first exprs))
 
+(defn file->pos [key]
+  (inc (.indexOf "abcdefgh" (first key))))
+
+(defn key->pos [key]
+  [(file->pos (first key)) (js/parseInt (second key))])
+
+(defn pos->key [pos]
+  (str (get "abcdefgh" (dec (first pos))) (second pos)))
+
+(defn opposite-color [color] (case color
+                               "white" "black"
+                               "black" "white"
+                               nil))
+
+(defn toggle [hashmap field value]
+  (if value
+    (assoc hashmap field true)
+    (dissoc hashmap field)))
+
 (defn deep-merge [a b]
   (letfn [(smart-merge [x y]
             (if (and (map? x) (map? y))

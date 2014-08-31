@@ -8,17 +8,20 @@
             [chessground.api :as api]
             [chessground.klass :as klass]))
 
+(defn- draggable? [piece] (or (:movable? piece) (:premovable? piece)))
+
 (defn piece-view [piece owner]
   (reify
     om/IDidMount
     (did-mount [_]
       (om/set-state! owner :draggable-instance (drag/piece
                                                  (om/get-node owner)
-                                                 (om/get-shared owner :ctrl-chan))))
+                                                 (om/get-shared owner :ctrl-chan)
+                                                 (draggable? piece))))
     om/IWillUpdate
     (will-update [_ next-prop next-state]
-      (if (not= (:movable? (om/get-props owner)) (:movable? next-prop))
-        (drag/piece-switch (:draggable-instance next-state) (:movable? next-prop))))
+      (if (not= (draggable? (om/get-props owner)) (draggable? next-prop))
+        (drag/piece-switch (:draggable-instance next-state) (draggable? next-prop))))
     om/IWillUnmount
     (will-unmount [_]
       (.unset (om/get-state owner :draggable-instance)))
@@ -39,7 +42,9 @@
                                             (when (:selected? square) klass/selected)
                                             (when (:check? square) klass/check)
                                             (when (:last-move? square) klass/last-move)
-                                            (when (:dest? square) klass/dest)])
+                                            (when (:move-dest? square) klass/move-dest)
+                                            (when (:premove-dest? square) klass/premove-dest)
+                                            (when (:current-premove? square) klass/current-premove)])
                     :data-key (:key square)}
                (when-let [piece (:piece square)]
                  (om/build piece-view (get square :piece)))))))

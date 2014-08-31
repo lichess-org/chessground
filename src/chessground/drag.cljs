@@ -124,9 +124,9 @@
       (.on "dragenter" (if common/touch-device? on-touch-dragenter on-click-dragenter))
       (.on "dragleave" (if common/touch-device? on-touch-dragleave on-click-dragleave))))
 
-(defn piece [el chan]
+(defn piece [el chan draggable?]
   (-> (js/interact el)
-      (.draggable true)
+      (.draggable draggable?)
       (.on "dragstart" #(on-start % chan true))
       (.on "dragmove" on-move)
       (.on "dragend" #(on-end % chan))))

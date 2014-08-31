@@ -21,6 +21,7 @@
        :setOrientation    #(tell :set-orientation %)
        :getOrientation    #(ask :get-orientation %)
        :getPosition       #(ask :get-position %)
+       :getState          #(ask :get-state %)
        :setFen            #(tell :set-fen %)
        :setStartPos       #(tell :set-fen "start")
        :clear             #(tell :clear nil)
@@ -32,7 +33,9 @@
                                                 common/keywordize-keys
                                                 (js->clj pieces {:keywordize-keys true}))))
        :setDests          #(tell :set-dests (js->clj %))
-       :setColor          #(tell :set-color %)})))
+       :setTurnColor      #(tell :set-turn-color %)
+       :setMovableColor   #(tell :set-movable-color %)
+       :setPremovable     #(tell :set-premovable %)})))
 
 (defn handler [cursor chan]
   (am/go-loop
@@ -43,6 +46,7 @@
         :toggle-orientation (om/transact! cursor :orientation data/toggle-orientation)
         :get-orientation (a/>! msg (:orientation @cursor))
         :get-position (a/>! msg (chess/get-pieces (:chess @cursor)))
+        :get-state (a/>! msg @cursor)
         :set-fen (om/update! cursor :chess (chess/make (or msg "start")))
         :clear (om/update! cursor :chess chess/clear)
         :api-move (om/transact! cursor :chess #(chess/move-piece % msg))
@@ -50,5 +54,7 @@
         :set-check (om/transact! cursor :chess #(chess/set-check % msg))
         :set-pieces (om/transact! cursor :chess #(chess/set-pieces % msg))
         :set-dests (om/transact! cursor #(data/set-dests % msg))
-        :set-color (om/transact! cursor #(data/set-color % msg))))
+        :set-turn-color (om/transact! cursor #(data/set-turn-color % msg))
+        :set-movable-color (om/transact! cursor #(data/set-movable-color % msg))
+        :set-premovable (om/transact! cursor #(data/set-premovable % msg))))
     (recur)))
