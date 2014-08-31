@@ -93,7 +93,7 @@
         h2 (* h 2)
         w2 (* w 2)
         dragging-div (.getElementById js/document "chessground-moving-square")]
-    (when (common/hidden? dragging-div)
+    (when (not (.-offsetParent dragging-div))
       (set! (-> dragging-div .-style .-height) (str h2 "px"))
       (set! (-> dragging-div .-style .-width) (str w2 "px"))
       (set! (-> dragging-div .-style .-left) (str (- (:left rect) (/ w 2)) "px"))

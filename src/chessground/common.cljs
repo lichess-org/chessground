@@ -8,10 +8,6 @@
 
 (def debug true)
 
-(def ground-id
-  "Ground unique ID generator (increment)"
-  (atom 0))
-
 (defn pp [& exprs]
   (when debug (doseq [expr exprs] (.log js/console (clj->js expr))))
   (first exprs))
@@ -25,22 +21,10 @@
 
 (defn seq-contains? [coll target] (some #{target} coll))
 
-(defn has-class [dom-element class]
-  (and dom-element (.contains (.-classList dom-element) class)))
-
-(defn $ [selector context]
-  (.querySelector (or context js/document) selector))
-
-(defn $$ [selector context]
-  (.querySelectorAll (or context js/document) selector))
-
 (defn offset [element]
   (let [rect (.getBoundingClientRect element)]
     {:top (+ (.-top rect) (-> js/document .-body .-scrollTop))
      :left (+ (.-left rect) (-> js/document .-body .-scrollLeft))}))
-
-(defn hidden? [element]
-  (nil? (js->clj (.-offsetParent element))))
 
 ; mimics the JavaScript `in` operator
 (defn js-in? [obj prop]

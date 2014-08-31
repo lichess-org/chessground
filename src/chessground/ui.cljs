@@ -1,14 +1,12 @@
 (ns chessground.ui
   (:require [om.core :as om :include-macros true]
-            [om.dom :as dom :include-macros true]
-            [cljs.core.async :as a]
+            [om.dom :as dom]
             [chessground.common :as common :refer [pp]]
             [chessground.ctrl :as ctrl]
             [chessground.select :as select]
             [chessground.drag :as drag]
             [chessground.api :as api]
-            [chessground.klass :as klass])
-  (:require-macros [cljs.core.async.macros :as am]))
+            [chessground.klass :as klass]))
 
 (defn piece-view [piece owner]
   (reify
