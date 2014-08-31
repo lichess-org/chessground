@@ -8,6 +8,16 @@
 (def ^private dragging-div-pos
   (atom {}))
 
+(def ^private touch-device? (common/js-in? js/document "ontouchstart"))
+
+(def ^private transform-prop
+  "Fun fact: this won't work if chessground is included in the <head>
+   Because the <body> element must exist at the time this code runs."
+  (do (or (.-body js/document) (throw "chessground must be included in the <body> tag!"))
+      (let [style (-> js/document .-body .-style)
+            props ["transform" "webkitTransform" "mozTransform" "oTransform"]]
+        (first (or (filter #(common/js-in? style %) props) props)))))
+
 (when common/touch-device?
   (.addEventListener js/document "DOMContentLoaded"
                      (fn []
