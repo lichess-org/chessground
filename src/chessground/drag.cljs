@@ -67,12 +67,12 @@
         transform (str "translate3d(" x "px, " y "px, 0)")]
     (set! (.-x piece) x)
     (set! (.-y piece) y)
-    (aset (.-style piece) common/transform-prop transform)))
+    (aset (.-style piece) transform-prop transform)))
 
 (defn- unfuck [piece]
   (set! (.-x piece) 0)
   (set! (.-y piece) 0)
-  (aset (.-style piece) common/transform-prop ""))
+  (aset (.-style piece) transform-prop ""))
 
 (defn- on-end [event chan]
   (let [piece (.-target event)
@@ -114,7 +114,7 @@
           dx (- (:left rect) (:left pos))
           dy (- (:top rect) (:top pos))]
       (aset (.-style dragging-div)
-            common/transform-prop (str "translate3d(" dx "px, " dy "px, 0)")))))
+            transform-prop (str "translate3d(" dx "px, " dy "px, 0)")))))
 
 (defn- on-touch-dragleave [] nil)
 
