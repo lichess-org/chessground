@@ -89,7 +89,7 @@
 (defn set-premovable [state enabled]
   (assoc-in state [:premovable :enabled?] (boolean enabled)))
 
-(defn set-premove-current [state keys]
+(defn set-current-premove [state keys]
   (-> state
       (assoc-in [:premovable :current] keys)
       (update-in [:chess] chess/set-unselected)
@@ -97,7 +97,7 @@
 
 (defn cancel-premove [state]
   (if (-> state :premovable :current)
-    (set-premove-current state nil)
+    (set-current-premove state nil)
     state))
 
 (defn set-orientation [prev next]

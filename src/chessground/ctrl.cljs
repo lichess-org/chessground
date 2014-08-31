@@ -29,7 +29,7 @@
           (callback (-> new-app :movable :events :after) orig dest new-chess)
           new-app)))
     (when (data/can-premove? app orig dest)
-      (data/set-premove-current app [orig dest]))
+      (data/set-current-premove app [orig dest]))
     ; destination is not available, move is canceled but there are different cases:
     (if (= orig dest)
       app
