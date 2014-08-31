@@ -21,6 +21,10 @@
                 :current nil ; keys of the current saved premove ["e2" "e4"] | nil.
                 }})
 
+(defn- callback [function & args]
+  "Call a user supplied callback function, if any"
+  (when function (apply function (map clj->js args))))
+
 (defn- update-chess-movables [state]
   (update-in state [:chess] chess/update-movables
              (:turn-color state)
@@ -105,3 +109,18 @@
 
 (defn toggle-orientation [prev]
   (set-orientation prev (if (= prev "white") "black" "white")))
+
+(defn move-piece [state orig dest]
+  (if-let [next-chess (chess/move-piece (:chess state) [orig dest])]
+    (let [next-state (-> state
+                         (assoc :chess next-chess)
+                         (assoc-in [:movable :dests] nil))]
+      (callback (-> next-state :movable :events :after) orig dest next-chess)
+      next-state)
+    state))
+
+(defn play-premove [state]
+  (or (when-let [[orig dest] (-> state :premovable :current)]
+        (when (can-move? state orig dest)
+          (move-piece state orig dest)))
+      state))

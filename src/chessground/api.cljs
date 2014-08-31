@@ -36,7 +36,8 @@
        :setDests          #(tell :set-dests (js->clj %))
        :setTurnColor      #(tell :set-turn-color %)
        :setMovableColor   #(tell :set-movable-color %)
-       :setPremovable     #(tell :set-premovable %)})))
+       :setPremovable     #(tell :set-premovable %)
+       :playPremove       #(tell :play-premove nil)})))
 
 (defn handler [cursor chan]
   (am/go-loop
@@ -58,5 +59,6 @@
         :set-dests (om/transact! cursor #(data/set-dests % msg))
         :set-turn-color (om/transact! cursor #(data/set-turn-color % msg))
         :set-movable-color (om/transact! cursor #(data/set-movable-color % msg))
-        :set-premovable (om/transact! cursor #(data/set-premovable % msg))))
+        :set-premovable (om/transact! cursor #(data/set-premovable % msg))
+        :play-premove (om/transact! cursor data/play-premove)))
     (recur)))
