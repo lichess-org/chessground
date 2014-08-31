@@ -2,7 +2,6 @@
   "Make pieces draggable, and squares droppable"
   (:require [chessground.common :as common :refer [pp]]
             [chessground.klass :as klass]
-            [chessground.dom-data :as dom-data]
             [chessground.chess :as chess]
             [cljs.core.async :as a]))
 
@@ -81,19 +80,6 @@
       (a/put! chan [:drop-on (.getAttribute dest "data-key")])
       (a/put! chan [:drop-off]))))
 
-(defn- make-draggable [el chan center-piece]
-  (dom-data/store el :interact (-> (js/interact el)
-                                   (.draggable true)
-                                   (.on "dragstart" #(on-start % chan center-piece))
-                                   (.on "dragmove" on-move)
-                                   (.on "dragend" #(on-end % chan)))))
-
-(defn- piece-on [el]
-  (.set (dom-data/fetch el :interact) (js-obj "draggable" true)))
-
-(defn- piece-off [el]
-  (.set (dom-data/fetch el :interact) (js-obj "draggable" false)))
-
 (defn- on-click-dragenter [event]
   (-> event .-target .-classList (.add klass/drag-over)))
 
@@ -128,13 +114,12 @@
       (.on "dragenter" (if common/touch-device? on-touch-dragenter on-click-dragenter))
       (.on "dragleave" (if common/touch-device? on-touch-dragleave on-click-dragleave))))
 
-(defn pieces [el chan app]
-  (let [movable-color (-> app :movable :color)]
-    (doseq [p (common/$$ (str "." klass/piece) el)
-            :let [instance (dom-data/fetch p :interact)
-                  owner (if (common/has-class p "white") "white" "black")
-                  draggable (or (= movable-color "both") (= movable-color owner))]]
-      (if instance
-        ((if draggable piece-on piece-off) p)
-        (when draggable
-          (make-draggable p chan (-> app :movable :drag-center)))))))
+(defn piece [el chan]
+  (-> (js/interact el)
+      (.draggable true)
+      (.on "dragstart" #(on-start % chan true))
+      (.on "dragmove" on-move)
+      (.on "dragend" #(on-end % chan))))
+
+(defn piece-switch [instance draggable?]
+  (.set instance (js-obj "draggable" draggable?)))

@@ -12,10 +12,14 @@
    :movable {:free true ; all moves are valid - board editor
              :color "both" ; color that can move. white or black or both
              :dests nil ; valid moves. {"a2" ["a3" "a4"] "b1" ["a3" "c3"]} | nil
+             ; :premove true ; allow premoves for color that can not move
              :drop-off "revert" ; when a piece is dropped outside the board. "revert" | "trash"
              :drag-center true ; whether to center the piece under the cursor on drag start
              :events {:after (fn [orig dest chess] nil) ; called after the moves has been played
                       }}})
+
+(defn- update-chess-draggables [state]
+  (update-in state [:chess] chess/update-draggables (-> state :movable :color)))
 
 (defn with-fen [state fen]
   (assoc state :chess (chess/make (or fen "start"))))
@@ -27,7 +31,8 @@
                    (common/keywordize-keys-in [:movable :events]))]
     (-> (common/deep-merge defaults config)
         (with-fen (:fen config))
-        (dissoc :fen))))
+        (dissoc :fen)
+        update-chess-draggables)))
 
 (defn clear [state]
   (-> state
@@ -57,8 +62,10 @@
       update-chess-dests))
 
 (defn set-color [state color]
-  (if (common/seq-contains? (conj chess/colors "both" "none") color)
-    (assoc-in state [:movable :color] color)
+  (if (common/seq-contains? (conj chess/colors "both") color)
+    (-> state
+        (assoc-in [:movable :color] color)
+        update-chess-draggables)
     state))
 
 (defn set-orientation [prev next]

@@ -3,7 +3,6 @@
             [om.dom :as dom :include-macros true]
             [cljs.core.async :as a]
             [chessground.common :as common :refer [pp]]
-            [chessground.dom-data :as dom-data]
             [chessground.ctrl :as ctrl]
             [chessground.select :as select]
             [chessground.drag :as drag]
@@ -11,19 +10,31 @@
             [chessground.klass :as klass])
   (:require-macros [cljs.core.async.macros :as am]))
 
+(defn piece-view [piece owner]
+  (reify
+    om/IDidMount
+    (did-mount [_]
+      (om/set-state! owner :draggable-instance (drag/piece
+                                                 (om/get-node owner)
+                                                 (om/get-shared owner :ctrl-chan))))
+    om/IWillUpdate
+    (will-update [_ next-prop next-state]
+      (if (not= (:draggable (om/get-props owner)) (:draggable next-prop))
+        (drag/piece-switch (:draggable-instance next-state) (:draggable next-prop))))
+    om/IWillUnmount
+    (will-unmount [_]
+      (.unset (om/get-state owner :draggable-instance)))
+    om/IRender
+    (render [_]
+      (dom/div #js {:className (klass/join [klass/piece (:color piece) (:role piece)])}))))
+
 (defn square-view [square owner]
   (reify
     om/IDidMount
     (did-mount [_]
-      (let [el (om/get-node owner)
-            chan (om/get-shared owner :ctrl-chan)]
-        (select/handler el chan)
+      (let [el (om/get-node owner)]
+        (select/handler el (om/get-shared owner :ctrl-chan))
         (drag/square el)))
-    om/IWillUpdate
-    (will-update [_ next-props _]
-      (when (and (:piece (om/get-props owner))
-                 (not (:piece next-props)))
-        (dom-data/delete (common/$ (str "." klass/piece) (om/get-node owner)))))
     om/IRender
     (render [_]
       (dom/div #js {:className (klass/join [klass/square
@@ -33,7 +44,7 @@
                                             (when (:dest? square) klass/dest)])
                     :data-key (:key square)}
                (when-let [piece (:piece square)]
-                 (dom/div #js {:className (klass/join [klass/piece (:color piece) (:role piece)])}))))))
+                 (om/build piece-view (get square :piece)))))))
 
 (defn board-view [app owner]
   (reify
@@ -41,13 +52,6 @@
     (will-mount [_]
       (api/handler app (om/get-shared owner :api-chan))
       (ctrl/handler app (om/get-shared owner :ctrl-chan)))
-    om/IDidMount
-    (did-mount [_]
-      (drag/pieces (om/get-node owner) (om/get-shared owner :ctrl-chan) app))
-    om/IDidUpdate
-    (did-update [_ prev _]
-      (when (not= (-> prev :movable :color) (-> app :movable :color))
-        (drag/pieces (om/get-node owner) (om/get-shared owner :ctrl-chan) app)))
     om/IRender
     (render [_]
       (let [white (= (:orientation app) "white")]

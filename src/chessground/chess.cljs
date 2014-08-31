@@ -7,7 +7,9 @@
   ; Representation of a chess game:
   {"a1" {:key "a1"}
    "a2" {:key "a2"
-         :piece {:color "white" :role "king"}
+         :piece {:color "white"
+                 :role "king"
+                 :draggable false}
          :check? true
          :last-move? true
          :selected? true
@@ -66,6 +68,13 @@
     (transform chess (fn [k sq] (if (contains? dests k)
                                   (assoc sq :dest? true)
                                   (dissoc sq :dest?))))))
+
+(defn update-draggables [chess color]
+  (common/map-values (fn [sq]
+                       (if-let [p (:piece sq)]
+                         (assoc-in sq [:piece :draggable] (or (= color "both") (= color (:color p))))
+                         sq))
+                     chess))
 
 (defn remove-dests [chess] (common/map-values #(dissoc % :dest?) chess))
 
