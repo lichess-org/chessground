@@ -3,8 +3,8 @@
 ROOT=$(cd `dirname $0` && pwd)/..
 
 cd $ROOT
-# lein cljsbuild clean
-# lein cljsbuild once prod
+lein cljsbuild clean
+lein cljsbuild once prod
 
 echo "Finalizing chessground.js"
 
