@@ -9,4 +9,7 @@
     (.addEventListener
       el ev (fn [e]
               (.preventDefault e)
-              (a/put! chan [:select-square (common/square-key (.-target e))])))))
+              (let [el (.-target e)
+                    key (or (.getAttribute el "data-key")
+                            (.getAttribute (.-parentNode el) "data-key"))]
+                (a/put! chan [:select-square key]))))))

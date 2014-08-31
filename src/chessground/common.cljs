@@ -57,21 +57,6 @@
             props ["transform" "webkitTransform" "mozTransform" "oTransform"]]
         (first (or (filter #(js-in? style %) props) props)))))
 
-(defn square-element [dom-element]
-  "If element is a square, return it. If it's a piece, return its parent"
-  (if (has-class dom-element klass/square)
-    dom-element
-    (when (has-class dom-element klass/piece)
-      (let [parent (.-parentNode dom-element)]
-        (when (has-class parent klass/square) parent)))))
-
-(defn square-key [dom-element]
-  "Gets the square key from the element, or its parent"
-  (when-let [sq (square-element dom-element)]
-    (.getAttribute sq "data-key")))
-
-(defn square-board [el] (.-parentNode (.-parentNode el)))
-
 (defn map-values [f hmap]
   (into {} (for [[k v] hmap] [k (f v)])))
 

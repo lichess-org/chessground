@@ -11,16 +11,16 @@
   "Call a user supplied callback function, if any"
   (when function (apply function (map clj->js args))))
 
-(defn move-start [app orig]
+(defn- move-start [app orig]
   "A move has been started by clicking on a piece"
   (update-in app [:chess] chess/set-selected orig (-> app :movable :dests)))
 
-(defn move-cancel [app]
+(defn- move-cancel [app]
   (-> app
       (update-in [:chess] chess/set-unselected)
       (assoc :dragging false)))
 
-(defn move-piece [app [orig dest]]
+(defn- move-piece [app [orig dest]]
   "A move initiated through the UI"
   (or
     ; destination is available: return new app
@@ -57,12 +57,18 @@
       (assoc :dragging true)
       (update-in [:chess] chess/set-selected orig (-> app :movable :dests))))
 
-(defn- drop-off [app key]
+(defn- drop-off [app]
   (update-in
-    (if (= "trash" (-> app :movable :drop-off))
-      (update-in app [:chess] chess/set-pieces {key nil})
-      app)
+    (or (when (= "trash" (-> app :movable :drop-off))
+          (when-let [key (chess/get-selected (:chess app))]
+            (update-in app [:chess] chess/set-pieces {key nil})))
+        app)
     [:chess] chess/set-unselected))
+
+(defn- drop-on [app dest]
+  (if-let [orig (chess/get-selected (:chess app))]
+    (move-piece app [orig dest])
+    (drop-off app)))
 
 (defn handler [cursor chan]
   (am/go-loop
@@ -71,6 +77,6 @@
       (case function
         :select-square (om/transact! cursor #(select-square % data))
         :drag-start (om/transact! cursor #(drag-start % data))
-        :drop-off (om/transact! cursor #(drop-off % data))
-        :move-piece (om/transact! cursor #(move-piece % data))))
+        :drop-off (om/transact! cursor drop-off)
+        :drop-on (om/transact! cursor #(drop-on % data))))
     (recur)))
