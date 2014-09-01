@@ -8,11 +8,9 @@ lein cljsbuild once prod
 
 echo "Finalizing chessground.js"
 
-(cat $ROOT/libs/interact.js;
+$ROOT/node_modules/.bin/uglifyjs $ROOT/libs/interact.js -o $ROOT/libs/interact.min.js
+
+(cat $ROOT/libs/interact.min.js;
 cat $ROOT/scripts/wrapper.beg.txt;
 cat $ROOT/out-prod/chessground.prod.js;
-cat $ROOT/scripts/wrapper.end.txt) > $ROOT/scripts/chessground.tmp.js
-
-$ROOT/node_modules/.bin/uglifyjs $ROOT/scripts/chessground.tmp.js -o $ROOT/chessground.prod.js
-
-rm $ROOT/scripts/chessground.tmp.js
+cat $ROOT/scripts/wrapper.end.txt) > $ROOT/chessground.prod.js
