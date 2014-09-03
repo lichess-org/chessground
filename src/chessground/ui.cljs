@@ -73,7 +73,7 @@
       (apply dom/div #js {:className klass/board}
              (om/build-all
                square-view
-               (for [y (range 1 8)
+               (for [y (range 1 9)
                      x "abcdefgh"]
                  (get-in app [:chess (str x y)]))
                {:key :key
