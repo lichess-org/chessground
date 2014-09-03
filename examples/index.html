@@ -29,13 +29,13 @@
       }
     </script>
 
-    <section>
-      <div class="chessground wood small merida coordinates" id="ground1"></div>
-      <p>Default options, with CSS coordinates</p>
-      <script>
-        var ground = chessground.main(document.getElementById('ground1'));
-      </script>
-    </section>
+    <!-- <section> -->
+    <!--   <div class="chessground wood small merida coordinates" id="ground1"></div> -->
+    <!--   <p>Default options, with CSS coordinates</p> -->
+    <!--   <script> -->
+    <!--     var ground = chessground.main(document.getElementById('ground1')); -->
+    <!--   </script> -->
+    <!-- </section> -->
     <section>
       <div class="chessground blue small cburnett" id="ground5"></div>
       <p>Valid moves: white plays, then premoves</p>
@@ -64,36 +64,36 @@
         })();
       </script>
     </section>
-    <section>
-      <div class="chessground wood small merida" id="ground7"></div>
-      <p>Play a game on a single board</p>
-      <script>
-        (function() {
-          var ground;
-          var chess = new Chess();
-          var onMove = function(orig, dest) {
-            chess.move({from: orig, to: dest});
-            ground.setTurnColor(chessToColor(chess));
-            ground.setMovableColor(chessToColor(chess));
-            ground.setDests(chessToDests(chess));
-            ground.getState(function(s) { console.log(s); });
-          };
-          ground = chessground.main(document.getElementById('ground7'), {
-            'turn-color': 'white',
-            movable: {
-              'free?': false,
-              color: chessToColor(chess),
-              'premove?': true,
-              dests: chessToDests(chess),
-              events: {
-                after: onMove
-              }
-            }
-          });
-        })();
-        ground.getState(function(s) { console.log(s); });
-      </script>
-    </section>
+    <!-- <section> -->
+    <!--   <div class="chessground wood small merida" id="ground7"></div> -->
+    <!--   <p>Play a game on a single board</p> -->
+    <!--   <script> -->
+    <!--     (function() { -->
+    <!--       var ground; -->
+    <!--       var chess = new Chess(); -->
+    <!--       var onMove = function(orig, dest) { -->
+    <!--         chess.move({from: orig, to: dest}); -->
+    <!--         ground.setTurnColor(chessToColor(chess)); -->
+    <!--         ground.setMovableColor(chessToColor(chess)); -->
+    <!--         ground.setDests(chessToDests(chess)); -->
+    <!--         ground.getState(function(s) { console.log(s); }); -->
+    <!--       }; -->
+    <!--       ground = chessground.main(document.getElementById('ground7'), { -->
+    <!--         'turn-color': 'white', -->
+    <!--         movable: { -->
+    <!--           'free?': false, -->
+    <!--           color: chessToColor(chess), -->
+    <!--           'premove?': true, -->
+    <!--           dests: chessToDests(chess), -->
+    <!--           events: { -->
+    <!--             after: onMove -->
+    <!--           } -->
+    <!--         } -->
+    <!--       }); -->
+    <!--     })(); -->
+    <!--     ground.getState(function(s) { console.log(s); }); -->
+    <!--   </script> -->
+    <!-- </section> -->
   </body>
 </html>
 

@@ -85,8 +85,7 @@
     (-> piece .-classList (.remove klass/dragging))
     (.setTimeout js/window #(unfuck piece) 20)
     ; are orig and dest from the same chess board?
-    (if (and dest (= (.-parentNode (.-parentNode orig))
-                     (.-parentNode (.-parentNode dest))))
+    (if (and dest (= (.-parentNode orig) (.-parentNode dest)))
       (a/put! chan [:drop-on (.getAttribute dest "data-key")])
       (a/put! chan [:drop-off]))))
 

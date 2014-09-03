@@ -12,6 +12,7 @@
 
 (defn piece-view [piece owner]
   (reify
+    om/IDisplayName (display-name [_] "Piece")
     om/IDidMount
     (did-mount [_]
       (om/set-state! owner :draggable-instance (drag/piece
@@ -31,6 +32,7 @@
 
 (defn square-view [square owner]
   (reify
+    om/IDisplayName (display-name [_] "Square")
     om/IDidMount
     (did-mount [_]
       (let [el (om/get-node owner)]
@@ -38,39 +40,41 @@
         (drag/square el)))
     om/IRender
     (render [_]
-      (dom/div #js {:className (klass/join [klass/square
-                                            (when (:selected? square) klass/selected)
-                                            (when (:check? square) klass/check)
-                                            (when (:last-move? square) klass/last-move)
-                                            (when (:move-dest? square) klass/move-dest)
-                                            (when (:premove-dest? square) klass/premove-dest)
-                                            (when (:current-premove? square) klass/current-premove)])
-                    :data-key (:key square)}
-               (when-let [piece (:piece square)]
-                 (om/build piece-view (get square :piece)))))))
+      (let [white (= (om/get-state owner :orientation) "white")
+            [x y] (common/key->pos (:key square))
+            style {(if white "left" "right") (str (* (dec x) 12.5) "%")
+                   (if white "bottom" "top") (str (* (dec y) 12.5) "%")}
+            coord-x (when (= y (if white 1 8)) (first (:key square)))
+            coord-y (when (= x (if white 8 1)) y)
+            class-name (klass/join [klass/square
+                                    (when (:selected? square) klass/selected)
+                                    (when (:check? square) klass/check)
+                                    (when (:last-move? square) klass/last-move)
+                                    (when (:move-dest? square) klass/move-dest)
+                                    (when (:premove-dest? square) klass/premove-dest)
+                                    (when (:current-premove? square) klass/current-premove)])]
+        (dom/div (clj->js (cond-> {:style style
+                                   :className class-name
+                                   :data-key (:key square)}
+                            coord-x (merge {:data-coord-x coord-x})
+                            coord-y (merge {:data-coord-y coord-y})))
+                 (when-let [piece (:piece square)]
+                   (om/build piece-view (get square :piece))))))))
 
 (defn board-view [app owner]
   (reify
+    om/IDisplayName (display-name [_] "Board")
     om/IWillMount
     (will-mount [_]
       (api/handler app (om/get-shared owner :api-chan))
       (ctrl/handler app (om/get-shared owner :ctrl-chan)))
     om/IRender
     (render [_]
-      (let [white (= (:orientation app) "white")]
-        (apply dom/div #js {:className klass/board}
-               (for [rank (range 1 9)
-                     file-n (range 1 9)
-                     :let [file (get "abcdefgh" (dec file-n))
-                           key (str file rank)
-                           pos {(if white "left" "right") (str (* (dec file-n) 12.5) "%")
-                                (if white "bottom" "top") (str (* (dec rank) 12.5) "%")}
-                           coord-x (when (= rank (if white 1 8)) file)
-                           coord-y (when (= file-n (if white 8 1)) rank)]]
-                 (dom/div (clj->js (cond-> {:style pos}
-                                     coord-x (merge {:data-coord-x coord-x})
-                                     coord-y (merge {:data-coord-y coord-y})))
-                          (om/build
-                            square-view
-                            (get-in app [:chess key])
-                            {:react-key key}))))))))
+      (apply dom/div #js {:className klass/board}
+             (om/build-all
+               square-view
+               (for [y (range 1 8)
+                     x "abcdefgh"]
+                 (get-in app [:chess (str x y)]))
+               {:key :key
+                :init-state {:orientation (:orientation app)}})))))
