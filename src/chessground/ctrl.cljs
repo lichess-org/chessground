@@ -3,15 +3,12 @@
   (:require [chessground.common :as common :refer [pp]]
             [chessground.data :as data]
             [chessground.chess :as chess]
-            [om.core :as om]
             [cljs.core.async :as a])
   (:require-macros [cljs.core.async.macros :as am]))
 
 (defn- move-start [app orig]
   "A move has been started by clicking on a piece"
-  (-> app
-      data/cancel-premove
-      (update-in [:chess] chess/set-selected orig (-> app :movable :dests))))
+  (update-in app [:chess] chess/set-selected orig (-> app :movable :dests)))
 
 (defn- move-piece [app [orig dest]]
   "A move initiated through the UI"
@@ -33,9 +30,9 @@
           (move-start app key)))
       (data/cancel-premove app)))
 
-(defn- drag-start [app orig]
-  "A move has been started, by dragging a piece"
-  (update-in app [:chess] chess/set-selected orig (-> app :movable :dests)))
+; (defn- drag-start [app orig]
+;   "A move has been started, by dragging a piece"
+;   (update-in app [:chess] chess/set-selected orig (-> app :movable :dests)))
 
 (defn- drop-off [app]
   (update-in
@@ -50,13 +47,13 @@
     (move-piece app [orig dest])
     (drop-off app)))
 
-(defn handler [cursor chan]
+(defn handler [chan app-atom render]
   (am/go-loop
     []
     (let [[function data] (a/<! chan)]
-      (case function
-        :select-square (om/transact! cursor #(select-square % data))
-        :drag-start (om/transact! cursor #(drag-start % data))
-        :drop-off (om/transact! cursor drop-off)
-        :drop-on (om/transact! cursor #(drop-on % data))))
+      (render (case function
+                :select-square (swap! app-atom #(select-square % data))
+                ; :drag-start (swap! app-atom #(drag-start % data))
+                :drop-off (swap! app-atom drop-off)
+                :drop-on (swap! app-atom #(drop-on % data)))))
     (recur)))

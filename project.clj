@@ -5,7 +5,6 @@
   :dependencies [[org.clojure/clojure "1.6.0"]
                  [org.clojure/clojurescript "0.0-2311"]
                  [org.clojure/core.async "0.1.338.0-5c5012-alpha"]
-                 [om "0.7.1"]
                  [com.facebook/react "0.11.1"]]
   :cljsbuild
   {:builds
@@ -17,9 +16,8 @@
                 :source-map true}}
     :prod
     {:source-paths ["src"]
-     :compiler {:output-to "out-prod/chessground.prod.js"
+     :compiler {:output-to "chessground.prod.js"
                 :output-dir "out-prod"
-                ; :optimizations :advanced
                 :optimizations :advanced
                 :externs ["libs/interact.js" "react/externs/react.js"]
                 :pretty-print false

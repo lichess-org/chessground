@@ -3,12 +3,6 @@
 (def board "cg-board")
 (def square "cg-square")
 (def piece "cg-piece")
-(def last-move "last-move")
-(def check "check")
-(def move-dest "move-dest")
-(def premove-dest "premove-dest")
-(def current-premove "current-premove")
-(def selected "selected")
 (def dragging "dragging")
 (def drag-over "drag-over")
 
