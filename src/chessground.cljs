@@ -13,16 +13,9 @@
   "Application entry point; returns the public JavaScript API"
   [element config]
   (let [api-chan (a/chan)
-        ui-chan (a/chan)
-        app-atom (atom (merge (data/make (or (js->clj config {:keywordize-keys true}) {}))
-                              {:chan ui-chan}))
-        render (fn [props]
-                 (js/window.requestAnimationFrame
-                   #(.renderComponent js/React (ui/board-component (clj->js props)) element)))]
-    (render @app-atom)
-    (ctrl/handler ui-chan app-atom render)
-    (am/go-loop []
-                (a/<! (a/timeout 1))
-                (a/>! ui-chan [:select-square (str (get "abcdefgh" (rand-int 8)) 2)])
-                (recur))
+        app-data (data/make (or (js->clj config {:keywordize-keys true}) {}))
+        app-atom (atom app-data)
+        handler (ctrl/handler app-atom)
+        props (merge @app-atom {:ctrl handler})]
+    (.renderComponent js/React (ui/board-component (clj->js props)) element)
     (api/build api-chan)))

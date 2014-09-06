@@ -6,9 +6,8 @@
 
 (comment
   ; Representation of a chess game:
-  {"a1" {:key "a1"}
-   "a2" {:key "a2" ; denormalization for UI rendering
-         :piece {:color "white" ; piece color
+  {"a1" {}
+   "a2" {:piece {:color "white" ; piece color
                  :role "king" ; piece role
                  :movable? false ; can the piece be moved by the user
                  :premovable? false} ; can the piece be premoved by the user
@@ -27,7 +26,7 @@
   (into {} (for [rank (range 1 9)
                  file ["a" "b" "c" "d" "e" "f" "g" "h"]
                  :let [key (str file rank)]]
-             [key {:key key}])))
+             [key {}])))
 
 (defn make [fen]
   (merge-with

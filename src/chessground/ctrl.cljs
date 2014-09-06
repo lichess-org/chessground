@@ -47,13 +47,10 @@
     (move-piece app [orig dest])
     (drop-off app)))
 
-(defn handler [chan app-atom render]
-  (am/go-loop
-    []
-    (let [[function data] (a/<! chan)]
-      (render (case function
-                :select-square (swap! app-atom #(select-square % data))
-                ; :drag-start (swap! app-atom #(drag-start % data))
-                :drop-off (swap! app-atom drop-off)
-                :drop-on (swap! app-atom #(drop-on % data)))))
-    (recur)))
+(defn handler [app-atom]
+  (fn [function data]
+    (case function
+      :select-square (swap! app-atom #(select-square % data))
+      ; :drag-start (swap! app-atom #(drag-start % data))
+      :drop-off (swap! app-atom drop-off)
+      :drop-on (swap! app-atom #(drop-on % data)))))

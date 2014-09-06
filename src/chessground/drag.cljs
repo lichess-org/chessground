@@ -1,9 +1,11 @@
 (ns chessground.drag
   "Make pieces draggable, and squares droppable"
   (:require [chessground.common :as common :refer [pp]]
-            [chessground.klass :as klass]
             [chessground.chess :as chess]
             [cljs.core.async :as a]))
+
+(def ^private class-dragging "dragging")
+(def ^private class-drag-over "drag-over")
 
 (def ^private dragging-div-pos
   (atom {}))
@@ -46,10 +48,10 @@
      :width (or (.-width rect) (- (.-right rect) (.-left rect)))
      :height (or (.-height rect) (- (.-bottom rect) (.-top rect)))}))
 
-(defn- on-start [event chan center-piece]
+(defn- on-start [event center-piece]
   "Shift piece right under the cursor"
   (let [piece (.-target event)]
-    (-> piece .-classList (.add klass/dragging))
+    (-> piece .-classList (.add class-dragging))
     (when center-piece
       (let [pos (common/offset piece)
             center-x (+ (:left pos) (/ (.-offsetWidth piece) 2))
@@ -57,8 +59,7 @@
             decay-x (- (.-pageX event) center-x)
             decay-y (- (.-pageY event) center-y)]
         (set! (.-x piece) decay-x)
-        (set! (.-y piece) decay-y)))
-    (a/put! chan [:drag-start (-> piece .-parentNode (.getAttribute "data-key"))])))
+        (set! (.-y piece) decay-y)))))
 
 (defn- on-move [event]
   (let [piece (.-target event)
@@ -74,26 +75,26 @@
   (set! (.-y piece) 0)
   (aset (.-style piece) transform-prop ""))
 
-(defn- on-end [event chan]
+(defn- on-end [event ctrl]
   (let [piece (.-target event)
         orig (.-parentNode piece)
         dest (.-dropzone event)]
     (when-let [dragging-div (.getElementById js/document "chessground-moving-square")]
       (set! (-> dragging-div .-style .-display) "none"))
     (when dest
-      (-> dest .-classList (.remove klass/drag-over)))
-    (-> piece .-classList (.remove klass/dragging))
+      (-> dest .-classList (.remove class-drag-over)))
+    (-> piece .-classList (.remove class-dragging))
     (.setTimeout js/window #(unfuck piece) 20)
     ; are orig and dest from the same chess board?
     (if (and dest (= (.-parentNode orig) (.-parentNode dest)))
-      (a/put! chan [:drop-on (.getAttribute dest "data-key")])
-      (a/put! chan [:drop-off]))))
+      (ctrl :drop-on (.getAttribute dest "data-key"))
+      (ctrl :drop-off))))
 
 (defn- on-click-dragenter [event]
-  (-> event .-target .-classList (.add klass/drag-over)))
+  (-> event .-target .-classList (.add class-drag-over)))
 
 (defn- on-click-dragleave [event]
-  (-> event .-target .-classList (.remove klass/drag-over)))
+  (-> event .-target .-classList (.remove class-drag-over)))
 
 (defn- on-touch-dragenter [event]
   (let [rect (get-element-rect (.-target event))
@@ -123,12 +124,12 @@
       (.on "dragenter" (if common/touch-device? on-touch-dragenter on-click-dragenter))
       (.on "dragleave" (if common/touch-device? on-touch-dragleave on-click-dragleave))))
 
-(defn piece [el chan draggable?]
+(defn piece [el ctrl draggable?]
   (-> (js/interact el)
       (.draggable draggable?)
-      (.on "dragstart" #(on-start % chan true))
+      (.on "dragstart" #(on-start % true))
       (.on "dragmove" on-move)
-      (.on "dragend" #(on-end % chan))))
+      (.on "dragend" #(on-end % ctrl))))
 
 (defn piece-switch [instance draggable?]
   (.set instance (js-obj "draggable" draggable?)))
