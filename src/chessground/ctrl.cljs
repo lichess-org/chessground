@@ -30,10 +30,6 @@
           (move-start app key)))
       (data/cancel-premove app)))
 
-; (defn- drag-start [app orig]
-;   "A move has been started, by dragging a piece"
-;   (update-in app [:chess] chess/set-selected orig (-> app :movable :dests)))
-
 (defn- drop-off [app]
   (update-in
     (or (when (= "trash" (-> app :movable :drop-off))
@@ -51,6 +47,5 @@
   (fn [function data]
     (case function
       :select-square (swap! app-atom #(select-square % data))
-      ; :drag-start (swap! app-atom #(drag-start % data))
       :drop-off (swap! app-atom drop-off)
       :drop-on (swap! app-atom #(drop-on % data)))))
