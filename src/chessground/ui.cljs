@@ -23,21 +23,21 @@
      :componentDidMount
      (fn []
        (this-as this
-                (.setapp this #js {:draggable-instance (drag/piece
+                (.setState this #js {:draggable-instance (drag/piece
                                                            (.getDOMNode this)
-                                                           (aget (.-props this) "swap")
+                                                           (aget (.-props this) "ctrl")
                                                            (draggable? (aget (.-props this) "piece")))})))
      :componentWillUpdate
      (fn [next-prop _]
        (this-as this
                 (when (not= (draggable? (aget next-prop "piece"))
                             (draggable? (aget (.-props this) "piece")))
-                  (drag/piece-switch (aget (.-app this) "draggable-instance")
+                  (drag/piece-switch (aget (.-state this) "draggable-instance")
                                      (draggable? (aget (.-props this) "piece"))))))
      :componentWillUnmount
      (fn []
        (this-as this
-                (-> this .-app (aget "draggable-instance") .unset)))
+                (-> this .-state (aget "draggable-instance") .unset)))
      :render
      (fn []
        (this-as this
@@ -66,16 +66,16 @@
        (this-as this
                 (let [el (.getDOMNode this)
                       key (aget (.-props this) "key")
-                      swap (aget (.-props this) "swap")]
+                      ctrl (aget (.-props this) "ctrl")]
                   (doseq [ev ["touchstart" "mousedown"]]
-                    (.addEventListener el ev #(swap ctrl/select-square key)))
+                    (.addEventListener el ev #(ctrl :select-square key)))
                   (drag/square el))))
      :render
      (fn []
        (this-as this
                 (let [square (aget (.-props this) "square")
                       orientation (aget (.-props this) "orientation")
-                      swap (aget (.-props this) "swap")
+                      ctrl (aget (.-props this) "ctrl")
                       key (aget (.-props this) "key")
                       read #(aget square %)
                       white? (= orientation "white")
@@ -102,7 +102,7 @@
                                   :data-coord-y coord-y}
                              (when-let [piece (aget square "piece")]
                                (piece-component #js {:piece piece
-                                                     :swap swap}))))))}))
+                                                     :ctrl ctrl}))))))}))
 
 (def board-component
   (js/React.createClass
@@ -113,21 +113,16 @@
        (this-as this
                 #js {:chess (aget (.-props this) "chess")
                      :orientation (aget (.-props this) "orientation")}))
-     :swap
-     (fn [f & args]
-       (this-as this
-                (let [app (js->clj (.-app this) :keywordize-keys true)]
-                  (.setapp this (clj->js (apply f app args))))))
      :render
      (fn []
        (this-as this
-                (let [swap (.-swap this)
-                      chess (aget (.-app this) "chess")
-                      orientation (aget (.-app this) "orientation")]
+                (let [ctrl #(.setState this (clj->js ((aget (.-props this) "ctrl") %1 %2)))
+                      chess (aget (.-state this) "chess")
+                      orientation (aget (.-state this) "orientation")]
                   (react/div #js {:className "cg-board"}
                              (.map (js/Object.keys chess)
                                    (fn [key] (square-component
                                                #js {:key key
-                                                    :swap swap
+                                                    :ctrl ctrl
                                                     :orientation orientation
                                                     :square (aget chess key)})))))))}))

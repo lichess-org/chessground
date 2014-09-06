@@ -12,7 +12,10 @@
 (defn ^:export main
   "Application entry point; returns the public JavaScript API"
   [element config]
-  (let [app-data (data/make (or (js->clj config {:keywordize-keys true}) {}))
-        render #(.renderComponent js/React (ui/board-component (clj->js %)) element)]
-    (render app-data)
-    (api/build render)))
+  (let [api-chan (a/chan)
+        app-data (data/make (or (js->clj config {:keywordize-keys true}) {}))
+        app-atom (atom app-data)
+        handler (ctrl/handler app-atom)
+        props (merge @app-atom {:ctrl handler})]
+    (.renderComponent js/React (ui/board-component (clj->js props)) element)
+    (api/build api-chan)))

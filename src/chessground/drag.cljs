@@ -1,7 +1,6 @@
 (ns chessground.drag
   "Make pieces draggable, and squares droppable"
   (:require [chessground.common :as common :refer [pp]]
-            [chessground.ctrl :as ctrl]
             [chessground.chess :as chess]
             [cljs.core.async :as a]))
 
@@ -76,7 +75,7 @@
   (set! (.-y piece) 0)
   (aset (.-style piece) transform-prop ""))
 
-(defn- on-end [event swap]
+(defn- on-end [event ctrl]
   (let [piece (.-target event)
         orig (.-parentNode piece)
         dest (.-dropzone event)]
@@ -88,8 +87,8 @@
     (.setTimeout js/window #(unfuck piece) 20)
     ; are orig and dest from the same chess board?
     (if (and dest (= (.-parentNode orig) (.-parentNode dest)))
-      (swap ctrl/drop-on (.getAttribute dest "data-key"))
-      (swap ctrl/drop-off))))
+      (ctrl :drop-on (.getAttribute dest "data-key"))
+      (ctrl :drop-off))))
 
 (defn- on-click-dragenter [event]
   (-> event .-target .-classList (.add class-drag-over)))
@@ -125,12 +124,12 @@
       (.on "dragenter" (if common/touch-device? on-touch-dragenter on-click-dragenter))
       (.on "dragleave" (if common/touch-device? on-touch-dragleave on-click-dragleave))))
 
-(defn piece [el swap draggable?]
+(defn piece [el ctrl draggable?]
   (-> (js/interact el)
       (.draggable draggable?)
       (.on "dragstart" #(on-start % true))
       (.on "dragmove" on-move)
-      (.on "dragend" #(on-end % swap))))
+      (.on "dragend" #(on-end % ctrl))))
 
 (defn piece-switch [instance draggable?]
   (.set instance (js-obj "draggable" draggable?)))

@@ -22,7 +22,7 @@
           (move-start app dest)
           (update-in app [:chess] chess/set-unselected)))))
 
-(defn select-square [app key]
+(defn- select-square [app key]
   (or (if-let [orig (chess/get-selected (:chess app))]
         (when (not (= orig key))
           (move-piece app [orig key]))
@@ -30,7 +30,7 @@
           (move-start app key)))
       (data/cancel-premove app)))
 
-(defn drop-off [app]
+(defn- drop-off [app]
   (update-in
     (or (when (= "trash" (-> app :movable :drop-off))
           (when-let [key (chess/get-selected (:chess app))]
@@ -38,7 +38,14 @@
         app)
     [:chess] chess/set-unselected))
 
-(defn drop-on [app dest]
+(defn- drop-on [app dest]
   (if-let [orig (chess/get-selected (:chess app))]
     (move-piece app [orig dest])
     (drop-off app)))
+
+(defn handler [app-atom]
+  (fn [function data]
+    (case function
+      :select-square (swap! app-atom #(select-square % data))
+      :drop-off (swap! app-atom drop-off)
+      :drop-on (swap! app-atom #(drop-on % data)))))
