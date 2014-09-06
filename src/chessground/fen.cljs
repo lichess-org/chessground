@@ -29,7 +29,7 @@
         (> pos 63) pieces
         (= current "/") (recur pieces pos next)
         (not (nil? spaces)) (recur pieces (+ pos spaces) next)
-        :else (let [key (pos-to-key pos)
+        :else (let [key (keyword (pos-to-key pos))
                     lower (lower-case current)
                     piece {:role (get role-names lower)
                            :color (if (= current lower) "black" "white")}]

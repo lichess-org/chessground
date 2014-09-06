@@ -6,8 +6,8 @@
 
 (comment
   ; Representation of a chess game:
-  {"a1" {}
-   "a2" {:piece {:color "white" ; piece color
+  {:a1 {}
+   :a2 {:piece {:color "white" ; piece color
                  :role "king" ; piece role
                  :movable? false ; can the piece be moved by the user
                  :premovable? false} ; can the piece be premoved by the user
@@ -24,8 +24,8 @@
 
 (def clear
   (into {} (for [rank (range 1 9)
-                 file ["a" "b" "c" "d" "e" "f" "g" "h"]
-                 :let [key (str file rank)]]
+                 file "abcdefgh"
+                 :let [key (keyword (str file rank))]]
              [key {}])))
 
 (defn make [fen]
