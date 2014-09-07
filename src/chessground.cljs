@@ -13,12 +13,13 @@
   "Application entry point; returns the public JavaScript API"
   [element config]
   (let [chan (a/chan)
+        ctrl #(a/put! chan [%1 %2])
         app-data (data/make (or (js->clj config {:keywordize-keys true}) {}))
         app-atom (atom app-data)
         render (fn [app]
-                 (js/React.renderComponent
-                   (ui/board-component (clj->js (merge app {:chan chan})))
-                   element))]
+                 (let [props (clj->js app)]
+                   (set! (.-ctrl props) ctrl)
+                   (js/React.renderComponent (ui/board-component props) element)))]
     (render app-data)
     (am/go-loop []
                 (let [[k msg] (a/<! chan)]

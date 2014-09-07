@@ -119,7 +119,7 @@
      :render
      (fn []
        (this-as this
-                (let [ctrl #(a/put! (aget (.-props this) "chan") [%1 %2])
+                (let [ctrl (aget (.-props this) "ctrl")
                       chess (aget (.-props this) "chess")
                       orientation (aget (.-props this) "orientation")]
                   (react/div #js {:className "cg-board"}
