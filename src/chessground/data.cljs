@@ -104,11 +104,13 @@
     (set-current-premove state nil)
     state))
 
-(defn set-orientation [prev next]
-  (if (common/seq-contains? chess/colors next) next prev))
+(defn set-orientation [state color]
+  (if (common/seq-contains? chess/colors color)
+    (assoc state :orientation color)
+    state))
 
-(defn toggle-orientation [prev]
-  (set-orientation prev (if (= prev "white") "black" "white")))
+(defn toggle-orientation [state]
+  (set-orientation state (if (= (:orientation state) "white") "black" "white")))
 
 (defn move-piece [state orig dest]
   (if-let [next-chess (chess/move-piece (:chess state) [orig dest])]

@@ -1,7 +1,7 @@
 (ns chessground
   (:require [cljs.core.async :as a]
             [chessground.api :as api]
-            [chessground.ctrl :as ctrl]
+            [chessground.handler :as handler]
             [chessground.ui :as ui]
             [chessground.data :as data]
             [chessground.common :refer [pp]])
@@ -12,10 +12,16 @@
 (defn ^:export main
   "Application entry point; returns the public JavaScript API"
   [element config]
-  (let [api-chan (a/chan)
+  (let [chan (a/chan)
         app-data (data/make (or (js->clj config {:keywordize-keys true}) {}))
         app-atom (atom app-data)
-        handler (ctrl/handler app-atom)
-        props (merge @app-atom {:ctrl handler})]
-    (.renderComponent js/React (ui/board-component (clj->js props)) element)
-    (api/build api-chan)))
+        render (fn [app]
+                 (js/React.renderComponent
+                   (ui/board-component (clj->js (merge app {:chan chan})))
+                   element))]
+    (render app-data)
+    (am/go-loop []
+                (let [[k msg] (a/<! chan)]
+                  (render (swap! app-atom (handler/process k msg)))
+                  (recur)))
+    (api/build chan)))

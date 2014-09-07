@@ -51,7 +51,7 @@
   (into {} (for [[k v] hmap] [k (f v)])))
 
 (defn keywordize-keys [hashmap]
-  (into {} (for [[k v] hashmap] [(keyword k) v])))
+  (when hashmap (into {} (for [[k v] hashmap] [(keyword k) v]))))
 
 (defn keywordize-keys-in [hashmap path]
   (if (map? (get-in hashmap path))

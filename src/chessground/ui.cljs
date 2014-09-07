@@ -7,7 +7,8 @@
             [chessground.api :as api])
   (:require-macros [cljs.core.async.macros :as am]))
 
-(defn- draggable? [piece] (or (aget piece "movable?") (aget piece "premovable?")))
+(defn- draggable? [piece]
+  (boolean (or (aget piece "movable?") (aget piece "premovable?"))))
 
 (defn- make-diff [name prev next]
   (fn [k]
@@ -51,16 +52,18 @@
     #js
     {:displayName "Square"
      :shouldComponentUpdate
-     (fn [next-props _]
-       (this-as this
-                (let [diff? (make-diff "square" (.-props this) next-props)]
-                  (or (diff? "selected?")
-                      (diff? "move-dest?")
-                      (diff? "premove-dest?")
-                      (diff? "check?")
-                      (diff? "last-move?")
-                      (diff? "current-premove?")
-                      (diff? "orientation")))))
+     (fn [next-props _] true)
+     ; (this-as this
+     ;          (let [diff? (make-diff "square" (.-props this) next-props)]
+     ;            (or (diff? "selected?")
+     ;                (diff? "move-dest?")
+     ;                (diff? "premove-dest?")
+     ;                (diff? "check?")
+     ;                (diff? "last-move?")
+     ;                (diff? "current-premove?")
+     ;                (diff? "piece")
+     ;                (not= (aget (.-props this) "orientation")
+     ;                      (aget next-props "orientation"))))))
      :componentDidMount
      (fn []
        (this-as this
@@ -108,17 +111,12 @@
   (js/React.createClass
     #js
     {:displayName "Board"
-     :getInitialState
-     (fn []
-       (this-as this
-                #js {:chess (aget (.-props this) "chess")
-                     :orientation (aget (.-props this) "orientation")}))
      :render
      (fn []
        (this-as this
-                (let [ctrl #(.setState this (clj->js ((aget (.-props this) "ctrl") %1 %2)))
-                      chess (aget (.-state this) "chess")
-                      orientation (aget (.-state this) "orientation")]
+                (let [ctrl #(a/put! (aget (.-props this) "chan") [%1 %2])
+                      chess (aget (.-props this) "chess")
+                      orientation (aget (.-props this) "orientation")]
                   (react/div #js {:className "cg-board"}
                              (.map (js/Object.keys chess)
                                    (fn [key] (square-component
