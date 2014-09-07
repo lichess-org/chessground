@@ -8,29 +8,30 @@
 
 (defn build
   "Creates JavaScript functions that push to the channel"
-  [chan]
-  (letfn [(tell [function msg] (a/put! chan [function msg]))
-          (ask [question callback]
+  [ctrl]
+  (letfn [(ask [question callback]
             (let [response-chan (a/chan)]
-              (am/go (a/>! chan [question response-chan])
-                     (callback (clj->js (a/<! response-chan)))
-                     (a/close! response-chan))))]
+              (am/go
+                (ctrl question response-chan)
+                (callback (clj->js (a/<! response-chan)))
+                (a/close! response-chan))
+              nil))]
     (clj->js
-      {:toggleOrientation #(tell :toggle-orientation nil)
-       :setOrientation    #(tell :set-orientation %)
+      {:toggleOrientation #(ctrl :toggle-orientation nil)
+       :setOrientation    #(ctrl :set-orientation %)
        :getOrientation    #(ask :get-orientation %)
        :getPosition       #(ask :get-position %)
        :getState          #(ask :get-state %)
        :getCurrentPremove #(ask :get-current-premove %)
-       :setFen            #(tell :set-fen %)
-       :setStartPos       #(tell :set-fen "start")
-       :move              #(tell :api-move [%1 %2])
-       :setLastMove       #(tell :set-last-move [%1 %2])
-       :setCheck          #(tell :set-check %)
+       :setFen            #(ctrl :set-fen %)
+       :setStartPos       #(ctrl :set-fen "start")
+       :move              #(ctrl :api-move [%1 %2])
+       :setLastMove       #(ctrl :set-last-move [%1 %2])
+       :setCheck          #(ctrl :set-check %)
        :setPieces         (fn [pieces]
-                            (tell :set-pieces (common/map-values common/keywordize-keys (js->clj pieces))))
-       :setDests          #(tell :set-dests (js->clj %))
-       :setTurnColor      #(tell :set-turn-color %)
-       :setMovableColor   #(tell :set-movable-color %)
-       :setPremovable     #(tell :set-premovable %)
-       :playPremove       #(tell :play-premove nil)})))
+                            (ctrl :set-pieces (common/map-values common/keywordize-keys (js->clj pieces))))
+       :setDests          #(ctrl :set-dests (js->clj %))
+       :setTurnColor      #(ctrl :set-turn-color %)
+       :setMovableColor   #(ctrl :set-movable-color %)
+       :setPremovable     #(ctrl :set-premovable %)
+       :playPremove       #(ctrl :play-premove nil)})))

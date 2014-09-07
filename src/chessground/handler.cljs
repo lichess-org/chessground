@@ -17,7 +17,6 @@
     :get-state #(a/put! msg %)
     :get-current-premove #(a/put! msg (-> % :premovable :current))
     :set-fen #(assoc % :chess (chess/make (or msg "start")))
-    :clear #(assoc % :chess chess/clear)
     :api-move (fn [app] (update-in app [:chess] #(chess/move-piece % msg)))
     :set-last-move (fn [app] (update-in app :chess #(chess/set-last-move % msg)))
     :set-check (fn [app] (update-in app [:chess] #(chess/set-check % msg)))
