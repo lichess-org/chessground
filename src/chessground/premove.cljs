@@ -26,8 +26,8 @@
 
 (defn- rook-files-of [ch color]
   (set (map (comp common/file->pos first first)
-            (filter (fn [[k sq]] (and (= (-> sq :piece :role) "rook")
-                                      (= (-> sq :piece :color) color))) ch))))
+            (filter (fn [[k p]] (and (= (:role p) "rook")
+                                     (= (:color p) color))) ch))))
 
 (defn- king [rook-files color [x1 y1] [x2 y2]]
   (or (and (< (diff x1 x2) 2)

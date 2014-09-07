@@ -14,13 +14,12 @@
   [element config]
   (let [chan (a/chan)
         ctrl #(a/put! chan [%1 %2])
-        app-data (data/make (or (js->clj config {:keywordize-keys true}) {}))
-        app-atom (atom app-data)
+        app (data/make (or (js->clj config :keywordize-keys true) {}))
+        app-atom (atom app)
         render (fn [app]
-                 (let [props (clj->js app)]
-                   (set! (.-ctrl props) ctrl)
+                 (let [props (ui/make-props app ctrl)]
                    (js/React.renderComponent (ui/board-component props) element)))]
-    (render app-data)
+    (render app)
     (am/go-loop []
                 (let [[k msg] (a/<! chan)]
                   (render (swap! app-atom (handler/process k msg)))

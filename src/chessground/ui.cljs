@@ -2,18 +2,12 @@
   (:require [cljs.core.async :as a]
             [chessground.common :as common :refer [pp]]
             [chessground.react :as react]
-            [chessground.ctrl :as ctrl]
+            [chessground.data :as data]
+            [chessground.chess :as chess]
+            [chessground.premove :as premove]
             [chessground.drag :as drag]
             [chessground.api :as api])
   (:require-macros [cljs.core.async.macros :as am]))
-
-(defn- draggable? [piece]
-  (boolean (or (aget piece "movable?") (aget piece "premovable?"))))
-
-(defn- make-diff [name prev next]
-  (fn [k]
-    (not= (-> prev (aget name) (aget k))
-          (-> next (aget name) (aget k)))))
 
 (def piece-component
   (js/React.createClass
@@ -27,14 +21,14 @@
                 (.setState this #js {:draggable-instance (drag/piece
                                                            (.getDOMNode this)
                                                            (aget (.-props this) "ctrl")
-                                                           (draggable? (aget (.-props this) "piece")))})))
+                                                           (aget (.-props this) "draggable?"))})))
      :componentWillUpdate
      (fn [next-prop _]
        (this-as this
-                (when (not= (draggable? (aget next-prop "piece"))
-                            (draggable? (aget (.-props this) "piece")))
+                (when (not= (aget next-prop "draggable?")
+                            (aget (.-props this) "draggable?"))
                   (drag/piece-switch (aget (.-state this) "draggable-instance")
-                                     (draggable? (aget (.-props this) "piece"))))))
+                                     (aget (.-props this) "draggable?")))))
      :componentWillUnmount
      (fn []
        (this-as this
@@ -42,14 +36,15 @@
      :render
      (fn []
        (this-as this
-                (let [piece (aget (.-props this) "piece")]
-                  (react/div #js {:className (str "cg-piece" " "
-                                                  (aget piece "color") " "
-                                                  (aget piece "role"))}))))}))
+                (react/div #js {:className (str "cg-piece" " "
+                                                (aget (.-props this) "color") " "
+                                                (aget (.-props this) "role"))})))}))
 (defn- piece-hash [props]
-  (when-let [piece (aget props "square" "piece")]
-    (str (aget piece "color") (aget piece "role"))))
+  (when-let [piece (aget props "piece")]
+    (str (aget piece "color") (aget piece "role") (aget piece "draggable?"))))
 
+(defn- make-diff [prev next]
+  (fn [k] (not= (aget prev k) (aget next k))))
 
 (def square-component
   (js/React.createClass
@@ -58,7 +53,7 @@
      :shouldComponentUpdate
      (fn [next-props _]
        (this-as this
-                (let [diff? (make-diff "square" (.-props this) next-props)]
+                (let [diff? (make-diff (.-props this) next-props)]
                   (or (diff? "selected?")
                       (diff? "move-dest?")
                       (diff? "premove-dest?")
@@ -81,11 +76,10 @@
      :render
      (fn []
        (this-as this
-                (let [square (aget (.-props this) "square")
-                      orientation (aget (.-props this) "orientation")
-                      ctrl (aget (.-props this) "ctrl")
-                      key (aget (.-props this) "key")
-                      read #(aget square %)
+                (let [read #(aget (.-props this) %)
+                      orientation (read "orientation")
+                      ctrl (read "ctrl")
+                      key (read "key")
                       white? (= orientation "white")
                       x (inc (.indexOf "abcdefgh" (get key 0)))
                       y (js/parseInt (get key 1))
@@ -108,9 +102,43 @@
                                   :data-key key
                                   :data-coord-x coord-x
                                   :data-coord-y coord-y}
-                             (when-let [piece (aget square "piece")]
-                               (piece-component #js {:piece piece
-                                                     :ctrl ctrl}))))))}))
+                             (when-let [piece (read "piece")]
+                               (piece-component piece))))))}))
+
+(def all-keys (clj->js (keys chess/clear)))
+
+(defn- square-props [state ctrl]
+  (let [orientation (:orientation state)
+        move-dests (set (when-let [orig (:selected state)]
+                          (when (data/movable? state orig)
+                            (get-in state [:movable :dests orig]))))
+        premove-dests (set (when-let [orig (:selected state)]
+                             (when (data/premovable? state orig)
+                               (when-let [piece (get-in state [:chess orig])]
+                                 (premove/possible (:chess state) orig piece)))))]
+    (fn [key]
+      #js {:key key
+           :ctrl ctrl
+           :orientation orientation
+           :piece (when-let [piece (get-in state [:chess key])]
+                    #js {:ctrl ctrl
+                         :color (:color piece)
+                         :role (:role piece)
+                         :draggable? (or (data/movable? state key)
+                                         (data/premovable? state key))})
+           :selected? (= (:selected state) key)
+           :check? (= (:check state) key)
+           :last-move? (when-let [move (:last-move state)]
+                         (or (= (first move) key)
+                             (= (second move) key)))
+           :move-dest? (contains? move-dests key)
+           :premove-dest? (contains? premove-dests key)
+           :current-premove? (when-let [move (-> state :premovable :current)]
+                               (or (= (first move) key)
+                                   (= (second move) key)))})))
+
+(defn make-props [state ctrl]
+  #js {:chess (.map all-keys (square-props state ctrl))})
 
 (def board-component
   (js/React.createClass
@@ -119,13 +147,6 @@
      :render
      (fn []
        (this-as this
-                (let [ctrl (aget (.-props this) "ctrl")
-                      chess (aget (.-props this) "chess")
-                      orientation (aget (.-props this) "orientation")]
-                  (react/div #js {:className "cg-board"}
-                             (.map (js/Object.keys chess)
-                                   (fn [key] (square-component
-                                               #js {:key key
-                                                    :ctrl ctrl
-                                                    :orientation orientation
-                                                    :square (aget chess key)})))))))}))
+                (react/div #js {:className "cg-board"}
+                           (.map (aget (.-props this) "chess")
+                                 square-component))))}))

@@ -24,7 +24,6 @@
        :getCurrentPremove #(ask :get-current-premove %)
        :setFen            #(tell :set-fen %)
        :setStartPos       #(tell :set-fen "start")
-       :clear             #(tell :clear nil)
        :move              #(tell :api-move [%1 %2])
        :setLastMove       #(tell :set-last-move [%1 %2])
        :setCheck          #(tell :set-check %)
