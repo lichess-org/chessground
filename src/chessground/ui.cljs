@@ -131,8 +131,8 @@
            :last-move? (when-let [move (:last-move state)]
                          (or (= (first move) key)
                              (= (second move) key)))
-           :move-dest? (contains? move-dests key)
-           :premove-dest? (contains? premove-dests key)
+           :move-dest? (move-dests key)
+           :premove-dest? (premove-dests key)
            :current-premove? (when-let [move (-> state :premovable :current)]
                                (or (= (first move) key)
                                    (= (second move) key)))})))
