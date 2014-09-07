@@ -10,10 +10,11 @@
         (data/move-piece app orig dest))
       (when (data/can-premove? app orig dest)
         (data/set-current-premove app [orig dest]))
-      (data/set-selected app (when (and (= orig dest)
-                                        (or (data/movable? app dest)
-                                            (data/premovable? app dest)))
-                               orig))))
+      (if (= orig dest)
+        app
+        (data/set-selected app (when (or (data/movable? app dest)
+                                         (data/premovable? app dest))
+                                 dest)))))
 
 (defn select-square [app key]
   (or (if-let [orig (:selected app)]

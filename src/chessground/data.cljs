@@ -101,11 +101,6 @@
 
 (defn set-last-move [state last-move] (assoc state :last-move last-move))
 
-(defn set-current-premove [state premove]
-  (-> state
-      (assoc-in [:premovable :current] premove)
-      (set-selected nil)))
-
 (defn move-piece [state orig dest]
   (if-let [next-chess (chess/move-piece (:chess state) [orig dest])]
     (let [next-state (-> state
