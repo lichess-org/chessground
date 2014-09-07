@@ -20,11 +20,11 @@
             props ["transform" "webkitTransform" "mozTransform" "oTransform"]]
         (first (or (filter #(common/js-in? style %) props) props)))))
 
-(when common/touch-device?
+(when touch-device?
   (.addEventListener js/document "DOMContentLoaded"
                      (fn []
                        (let [div (.createElement js/document "div")]
-                         (set! (.-id div) "chessground-moving-square")
+                         (set! (.-id div) "cg-moving-square")
                          (.appendChild (.-body js/document) div)))))
 
 ; from interact.js
@@ -79,7 +79,7 @@
   (let [piece (.-target event)
         orig (.-parentNode piece)
         dest (.-dropzone event)]
-    (when-let [dragging-div (.getElementById js/document "chessground-moving-square")]
+    (when-let [dragging-div (.getElementById js/document "cg-moving-square")]
       (set! (-> dragging-div .-style .-display) "none"))
     (when dest
       (-> dest .-classList (.remove class-drag-over)))
@@ -102,7 +102,7 @@
         w (- (:width rect) 1)
         h2 (* h 2)
         w2 (* w 2)
-        dragging-div (.getElementById js/document "chessground-moving-square")]
+        dragging-div (.getElementById js/document "cg-moving-square")]
     (when (not (.-offsetParent dragging-div))
       (set! (-> dragging-div .-style .-height) (str h2 "px"))
       (set! (-> dragging-div .-style .-width) (str w2 "px"))
@@ -121,8 +121,8 @@
 (defn square [el]
   (-> (js/interact el)
       (.dropzone true)
-      (.on "dragenter" (if common/touch-device? on-touch-dragenter on-click-dragenter))
-      (.on "dragleave" (if common/touch-device? on-touch-dragleave on-click-dragleave))))
+      (.on "dragenter" (if touch-device? on-touch-dragenter on-click-dragenter))
+      (.on "dragleave" (if touch-device? on-touch-dragleave on-click-dragleave))))
 
 (defn piece [el ctrl draggable?]
   (-> (js/interact el)
