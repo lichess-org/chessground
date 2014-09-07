@@ -46,24 +46,29 @@
                   (react/div #js {:className (str "cg-piece" " "
                                                   (aget piece "color") " "
                                                   (aget piece "role"))}))))}))
+(defn- piece-hash [props]
+  (when-let [piece (aget props "square" "piece")]
+    (str (aget piece "color") (aget piece "role"))))
+
 
 (def square-component
   (js/React.createClass
     #js
     {:displayName "Square"
      :shouldComponentUpdate
-     (fn [next-props _] true)
-     ; (this-as this
-     ;          (let [diff? (make-diff "square" (.-props this) next-props)]
-     ;            (or (diff? "selected?")
-     ;                (diff? "move-dest?")
-     ;                (diff? "premove-dest?")
-     ;                (diff? "check?")
-     ;                (diff? "last-move?")
-     ;                (diff? "current-premove?")
-     ;                (diff? "piece")
-     ;                (not= (aget (.-props this) "orientation")
-     ;                      (aget next-props "orientation"))))))
+     (fn [next-props _]
+       (this-as this
+                (let [diff? (make-diff "square" (.-props this) next-props)]
+                  (or (diff? "selected?")
+                      (diff? "move-dest?")
+                      (diff? "premove-dest?")
+                      (diff? "check?")
+                      (diff? "last-move?")
+                      (diff? "current-premove?")
+                      (not= (piece-hash (.-props this))
+                            (piece-hash next-props))
+                      (not= (aget (.-props this) "orientation")
+                            (aget next-props "orientation"))))))
      :componentDidMount
      (fn []
        (this-as this

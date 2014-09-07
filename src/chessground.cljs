@@ -24,4 +24,8 @@
                 (let [[k msg] (a/<! chan)]
                   (render (swap! app-atom (handler/process k msg)))
                   (recur)))
+    ; (am/go-loop []
+    ;             (a/<! (a/timeout 1))
+    ;             (a/>! chan [:select-square (str (get "abcdefgh" (rand-int 8)) 2)])
+    ;             (recur))
     (api/build chan)))
