@@ -27,16 +27,17 @@
 
 (defn- callback [function & args]
   "Call a user supplied callback function, if any"
-  (when function (apply function (map clj->js args))))
+  (when function
+    (js/setTimeout #(apply function (map clj->js args)) 40)))
 
 (defn with-fen [state fen]
   (assoc state :chess (chess/make (or fen "start"))))
 
 (defn make [config]
-    (-> (common/deep-merge defaults config)
-        (with-fen (:fen config))
-        (dissoc :fen)
-        (update-in [:movable :dests] common/stringify-keys)))
+  (-> (common/deep-merge defaults config)
+      (with-fen (:fen config))
+      (dissoc :fen)
+      (update-in [:movable :dests] common/stringify-keys)))
 
 (defn movable? [state orig]
   (when-let [piece (chess/get-piece (:chess state) orig)]
