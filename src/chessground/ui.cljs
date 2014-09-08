@@ -16,7 +16,7 @@
 (defn- make-diff [prev next]
   (fn [k] (not= (aget prev k) (aget next k))))
 
-(def piece-component
+(def ^private piece-component
   (js/React.createClass
     #js
     {:displayName "Piece"
@@ -50,7 +50,7 @@
                                                 (aget (.-props this) "color") " "
                                                 (aget (.-props this) "role"))})))}))
 
-(def square-component
+(def ^private square-component
   (js/React.createClass
     #js
     {:displayName "Square"
@@ -109,7 +109,18 @@
                              (when-let [piece (read "piece")]
                                (piece-component piece))))))}))
 
-(def all-keys (clj->js (keys chess/clear)))
+(def ^private board-component
+  (js/React.createClass
+    #js
+    {:displayName "Board"
+     :render
+     (fn []
+       (this-as this
+                (react/div #js {:className "cg-board"}
+                           (.map (aget (.-props this) "chess")
+                                 square-component))))}))
+
+(def ^private all-keys (clj->js (keys chess/clear)))
 
 (defn- square-props [state ctrl]
   (let [orientation (:orientation state)
@@ -141,16 +152,5 @@
                                (or (= (first move) key)
                                    (= (second move) key)))})))
 
-(defn make-props [state ctrl]
-  #js {:chess (.map all-keys (square-props state ctrl))})
-
-(def board-component
-  (js/React.createClass
-    #js
-    {:displayName "Board"
-     :render
-     (fn []
-       (this-as this
-                (react/div #js {:className "cg-board"}
-                           (.map (aget (.-props this) "chess")
-                                 square-component))))}))
+(defn root [state ctrl]
+  (board-component #js {:chess (.map all-keys (square-props state ctrl))}))

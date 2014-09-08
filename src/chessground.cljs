@@ -16,16 +16,10 @@
         ctrl #(a/put! chan [%1 %2])
         app (data/make (or (js->clj config :keywordize-keys true) {}))
         app-atom (atom app)
-        render (fn [app]
-                 (let [props (ui/make-props app ctrl)]
-                   (js/React.renderComponent (ui/board-component props) element)))]
+        render #(js/React.renderComponent (ui/root % ctrl) element)]
     (render app)
     (am/go-loop []
                 (let [[k msg] (a/<! chan)]
                   (render (swap! app-atom (handler/process k msg)))
                   (recur)))
-    ; (am/go-loop []
-    ;             (a/<! (a/timeout 1))
-    ;             (a/>! chan [:select-square (str (get "abcdefgh" (rand-int 8)) 2)])
-    ;             (recur))
     (api/build ctrl)))
