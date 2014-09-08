@@ -42,7 +42,7 @@
           var onMove = function(orig, dest) {
             chess.move({from: orig, to: dest});
             ground.setTurnColor(chessToColor(chess));
-            ground.setDests([]);
+            ground.setDests(chessToDests(chess));
             ground.getState(function(s) { console.log(s); });
           };
           ground = chessground.main(document.getElementById('ground'), {
@@ -50,8 +50,7 @@
             'orientation': 'white',
             movable: {
               'free?': false,
-              'premove?': true,
-              color: 'white',
+              color: 'both',
               dests: chessToDests(chess),
               events: {
                 after: onMove
