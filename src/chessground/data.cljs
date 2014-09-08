@@ -48,10 +48,11 @@
 
 (defn premovable? [state orig]
   (when-let [piece (chess/get-piece (:chess state) orig)]
-    (and (-> state :premovable :enabled?)
-         (= (-> state :movable :color)
-            (-> state :turn-color common/opposite-color)
-            (:color piece)))))
+    (let [movable-color (-> state :movable :color)]
+      (and (-> state :premovable :enabled?)
+           (= (if (= movable-color "both") (:color piece) movable-color)
+              (-> state :turn-color common/opposite-color)
+              (:color piece))))))
 
 (defn can-move? [state orig dest]
   "The piece on orig can definitely be moved to dest"
