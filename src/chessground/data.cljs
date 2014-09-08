@@ -28,7 +28,7 @@
 (defn- callback [function & args]
   "Call a user supplied callback function, if any"
   (when function
-    (js/setTimeout #(apply function (map clj->js args)) 40)))
+    (js/setTimeout #(apply function (map clj->js args)) 50)))
 
 (defn with-fen [state fen]
   (assoc state :chess (chess/make (or fen "start"))))
@@ -48,11 +48,10 @@
 
 (defn premovable? [state orig]
   (when-let [piece (chess/get-piece (:chess state) orig)]
-    (let [movable-color (-> state :movable :color)]
-      (and (-> state :premovable :enabled?)
-           (= (if (= movable-color "both") (:color piece) movable-color)
-              (-> state :turn-color common/opposite-color)
-              (:color piece))))))
+    (and (-> state :premovable :enabled?)
+         (= (-> state :movable :color)
+            (-> state :turn-color common/opposite-color)
+            (:color piece)))))
 
 (defn can-move? [state orig dest]
   "The piece on orig can definitely be moved to dest"
