@@ -130,10 +130,7 @@
        "g1" "g2" "g3" "g4" "g5" "g6" "g7" "g8"
        "h1" "h2" "h3" "h4" "h5" "h6" "h7" "h8"])
 
-(defn- array-of [coll]
-  (if coll
-    (let [arr (array)] (doseq [x coll] (.push arr x)) arr)
-    (array)))
+(defn- array-of [coll] (if coll (clj->js coll) (array)))
 
 (defn- clj->react [app ctrl]
   (let [orientation (get app :orientation)
