@@ -120,37 +120,55 @@
                            (.map (aget (.-props this) "chess")
                                  square-component))))}))
 
-(def ^private all-keys (clj->js (keys chess/clear)))
+(def ^private all-keys
+  #js ["a1" "a2" "a3" "a4" "a5" "a6" "a7" "a8"
+       "b1" "b2" "b3" "b4" "b5" "b6" "b7" "b8"
+       "c1" "c2" "c3" "c4" "c5" "c6" "c7" "c8"
+       "d1" "d2" "d3" "d4" "d5" "d6" "d7" "d8"
+       "e1" "e2" "e3" "e4" "e5" "e6" "e7" "e8"
+       "f1" "f2" "f3" "f4" "f5" "f6" "f7" "f8"
+       "g1" "g2" "g3" "g4" "g5" "g6" "g7" "g8"
+       "h1" "h2" "h3" "h4" "h5" "h6" "h7" "h8"])
 
-(defn- square-props [state ctrl]
-  (let [orientation (:orientation state)
-        move-dests (set (when-let [orig (:selected state)]
-                          (when (data/movable? state orig)
-                            (get-in state [:movable :dests orig]))))
-        premove-dests (set (when-let [orig (:selected state)]
-                             (when (data/premovable? state orig)
-                               (when-let [piece (get-in state [:chess orig])]
-                                 (premove/possible (:chess state) orig piece)))))]
+(defn- array-of [coll]
+  (if coll
+    (let [arr (array)] (doseq [x coll] (.push arr x)) arr)
+    (array)))
+
+(defn- clj->react [app ctrl]
+  (let [orientation (get app :orientation)
+        chess (get app :chess)
+        draggable-color (data/draggable-color app)
+        last-move (array-of (get app :last-move))
+        selected (array-of (get app :selected))
+        check (array-of (get app :check))
+        current-premove (array-of (get (get app :premovable) :current))
+        move-dests (array-of (when-let [orig (get app :selected)]
+                               (when (data/movable? app orig)
+                                 (get-in app [:movable :dests orig]))))
+        premove-dests (array-of (when-let [orig (get app :selected)]
+                                  (when (data/premovable? app orig)
+                                    (when-let [piece (get chess orig)]
+                                      (premove/possible chess orig piece)))))]
     (fn [key]
       #js {:key key
            :ctrl ctrl
            :orientation orientation
-           :piece (when-let [piece (get-in state [:chess key])]
-                    #js {:ctrl ctrl
-                         :color (:color piece)
-                         :role (:role piece)
-                         :draggable? (or (data/movable? state key)
-                                         (data/premovable? state key))})
-           :selected? (= (:selected state) key)
-           :check? (= (:check state) key)
-           :last-move? (when-let [move (:last-move state)]
-                         (or (= (first move) key)
-                             (= (second move) key)))
-           :move-dest? (move-dests key)
-           :premove-dest? (premove-dests key)
-           :current-premove? (when-let [move (-> state :premovable :current)]
-                               (or (= (first move) key)
-                                   (= (second move) key)))})))
+           :piece (when-let [piece (get chess key)]
+                    (let [color (get piece :color)]
+                      #js {:ctrl ctrl
+                           :color color
+                           :role (get piece :role)
+                           :draggable? (= draggable-color color)}))
+           :selected? (= selected key)
+           :check? (= check key)
+           :last-move? (not= -1 (.indexOf last-move key))
+           :move-dest? (not= -1 (.indexOf move-dests key))
+           :premove-dest? (not= -1 (.indexOf premove-dests key))
+           :current-premove? (not= -1 (.indexOf current-premove key))})))
 
-(defn root [state ctrl]
-  (board-component #js {:chess (.map all-keys (square-props state ctrl))}))
+(defn root [app ctrl]
+  ; (js/console.time "root")
+  (let [data #js {:chess (.map all-keys (clj->react app ctrl))}]
+    ; (js/console.timeEnd "root")
+    (board-component data)))
