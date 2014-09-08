@@ -1,20 +1,24 @@
 (ns chessground.ui
   (:require [cljs.core.async :as a]
             [chessground.common :as common :refer [pp]]
-            [chessground.react :as react]
             [chessground.data :as data]
             [chessground.chess :as chess]
             [chessground.premove :as premove]
-            [chessground.drag :as drag]
-            [chessground.api :as api])
+            [chessground.drag :as drag])
   (:require-macros [cljs.core.async.macros :as am]))
+
+(def ^private dom (.-DOM js/React))
+
+(def ^private div (.-div dom))
+
+(defn- class-set [obj] (-> obj js/Object.keys (.filter #(aget obj %)) (.join " ")))
 
 (defn- piece-hash [props]
   (when-let [piece (aget props "piece")]
-    (str (aget piece "color") (aget piece "role") (aget piece "draggable?"))))
+    (.join #js [(aget piece "color") (aget piece "role") (aget piece "draggable?")])))
 
 (defn- make-diff [prev next]
-  (fn [k] (not= (aget prev k) (aget next k))))
+  (fn [k] (not (== (aget prev k) (aget next k)))))
 
 (def ^private piece-component
   (js/React.createClass
@@ -23,8 +27,8 @@
      :shouldComponentUpdate
      (fn [next-props _]
        (this-as this
-                (or (not= (aget (.-props this) "color") (aget next-props "color"))
-                    (not= (aget (.-props this) "role") (aget next-props "role")))))
+                (or (not (== (aget (.-props this) "color") (aget next-props "color")))
+                    (not (== (aget (.-props this) "role") (aget next-props "role"))))))
      :componentDidMount
      (fn []
        (this-as this
@@ -46,9 +50,9 @@
      :render
      (fn []
        (this-as this
-                (react/div #js {:className (str "cg-piece" " "
-                                                (aget (.-props this) "color") " "
-                                                (aget (.-props this) "role"))})))}))
+                (div #js {:className (str "cg-piece" " "
+                                          (aget (.-props this) "color") " "
+                                          (aget (.-props this) "role"))})))}))
 
 (def ^private square-component
   (js/React.createClass
@@ -64,10 +68,10 @@
                       (diff? "check?")
                       (diff? "last-move?")
                       (diff? "current-premove?")
-                      (not= (piece-hash (.-props this))
-                            (piece-hash next-props))
-                      (not= (aget (.-props this) "orientation")
-                            (aget next-props "orientation"))))))
+                      (not (== (piece-hash (.-props this))
+                               (piece-hash next-props)))
+                      (not (== (aget (.-props this) "orientation")
+                               (aget next-props "orientation")))))))
      :componentDidMount
      (fn []
        (this-as this
@@ -88,26 +92,23 @@
                       x (inc (.indexOf "abcdefgh" (get key 0)))
                       y (js/parseInt (get key 1))
                       style-x (str (* (dec x) 12.5) "%")
-                      style-y (str (* (dec y) 12.5) "%")
-                      style (if white?
-                              #js {"left" style-x "bottom" style-y}
-                              #js {"right" style-x "top" style-y})
-                      coord-x (when (= y (if white? 1 8)) (get key 0))
-                      coord-y (when (= x (if white? 8 1)) y)
-                      classes #js {"cg-square" true
-                                   "selected" (read "selected?")
-                                   "check" (read "check?")
-                                   "last-move" (read "last-move?")
-                                   "move-dest" (read "move-dest?")
-                                   "premove-dest" (read "premove-dest?")
-                                   "current-premove" (read "current-premove?")}]
-                  (react/div #js {:style style
-                                  :className (react/class-set classes)
-                                  :data-key key
-                                  :data-coord-x coord-x
-                                  :data-coord-y coord-y}
-                             (when-let [piece (read "piece")]
-                               (piece-component piece))))))}))
+                      style-y (str (* (dec y) 12.5) "%")]
+                  (div #js
+                       {:style (if white?
+                                 #js {"left" style-x "bottom" style-y}
+                                 #js {"right" style-x "top" style-y})
+                        :className (class-set #js {"cg-square" true
+                                                   "selected" (read "selected?")
+                                                   "check" (read "check?")
+                                                   "last-move" (read "last-move?")
+                                                   "move-dest" (read "move-dest?")
+                                                   "premove-dest" (read "premove-dest?")
+                                                   "current-premove" (read "current-premove?")})
+                        :data-key key
+                        :data-coord-x (when (== y (if white? 1 8)) (get key 0))
+                        :data-coord-y (when (== x (if white? 8 1)) y)}
+                       (when-let [piece (read "piece")]
+                         (piece-component piece))))))}))
 
 (def ^private board-component
   (js/React.createClass
@@ -116,9 +117,9 @@
      :render
      (fn []
        (this-as this
-                (react/div #js {:className "cg-board"}
-                           (.map (aget (.-props this) "chess")
-                                 square-component))))}))
+                (div #js {:className "cg-board"}
+                     (.map (aget (.-props this) "chess")
+                           square-component))))}))
 
 (def ^private all-keys
   (let [arr (array)]
@@ -136,8 +137,8 @@
         chess (get app :chess)
         draggable-color (data/draggable-color app)
         last-move (array-of (get app :last-move))
-        selected (array-of (get app :selected))
-        check (array-of (get app :check))
+        selected (get app :selected)
+        check (get app :check)
         current-premove (array-of (get (get app :premovable) :current))
         move-dests (array-of (when-let [orig (get app :selected)]
                                (when (data/movable? app orig)
@@ -155,13 +156,13 @@
                       #js {:ctrl ctrl
                            :color color
                            :role (get piece :role)
-                           :draggable? (= draggable-color color)}))
-           :selected? (= selected key)
-           :check? (= check key)
-           :last-move? (not= -1 (.indexOf last-move key))
-           :move-dest? (not= -1 (.indexOf move-dests key))
-           :premove-dest? (not= -1 (.indexOf premove-dests key))
-           :current-premove? (not= -1 (.indexOf current-premove key))})))
+                           :draggable? (== draggable-color color)}))
+           :selected? (== selected key)
+           :check? (== check key)
+           :last-move? (not (== -1 (.indexOf last-move key)))
+           :move-dest? (not (== -1 (.indexOf move-dests key)))
+           :premove-dest? (not (== -1 (.indexOf premove-dests key)))
+           :current-premove? (not (== -1 (.indexOf current-premove key)))})))
 
 (defn root [app ctrl]
   ; (js/console.time "root")
