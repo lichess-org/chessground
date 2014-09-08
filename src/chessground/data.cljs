@@ -108,8 +108,7 @@
                          (assoc-in [:movable :dests] nil)
                          (set-selected nil)
                          (set-check nil)
-                         (set-last-move [orig dest])
-                         (set-current-premove nil))]
+                         (set-last-move [orig dest]))]
       (callback (-> next-state :movable :events :after) orig dest next-chess)
       next-state)
     state))

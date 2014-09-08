@@ -9,12 +9,22 @@
             [chessground.api :as api])
   (:require-macros [cljs.core.async.macros :as am]))
 
+(defn- piece-hash [props]
+  (when-let [piece (aget props "piece")]
+    (str (aget piece "color") (aget piece "role") (aget piece "draggable?"))))
+
+(defn- make-diff [prev next]
+  (fn [k] (not= (aget prev k) (aget next k))))
+
 (def piece-component
   (js/React.createClass
     #js
     {:displayName "Piece"
      :shouldComponentUpdate
-     (fn [_ _] false)
+     (fn [next-props _]
+       (this-as this
+                (or (not= (aget (.-props this) "color") (aget next-props "color"))
+                    (not= (aget (.-props this) "role") (aget next-props "role")))))
      :componentDidMount
      (fn []
        (this-as this
@@ -39,12 +49,6 @@
                 (react/div #js {:className (str "cg-piece" " "
                                                 (aget (.-props this) "color") " "
                                                 (aget (.-props this) "role"))})))}))
-(defn- piece-hash [props]
-  (when-let [piece (aget props "piece")]
-    (str (aget piece "color") (aget piece "role") (aget piece "draggable?"))))
-
-(defn- make-diff [prev next]
-  (fn [k] (not= (aget prev k) (aget next k))))
 
 (def square-component
   (js/React.createClass
