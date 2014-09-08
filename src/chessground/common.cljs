@@ -47,6 +47,8 @@
   (and obj (or (.hasOwnProperty obj prop)
                (js-in? (.-__proto__ obj) prop))))
 
+(def touch-device? (js-in? js/document "ontouchstart"))
+
 (defn map-values [f hmap]
   (into {} (for [[k v] hmap] [k (f v)])))
 

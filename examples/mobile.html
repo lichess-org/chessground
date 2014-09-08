@@ -43,7 +43,6 @@
             chess.move({from: orig, to: dest});
             ground.setTurnColor(chessToColor(chess));
             ground.setDests(chessToDests(chess));
-            ground.getState(function(s) { console.log(s); });
           };
           ground = chessground.main(document.getElementById('ground'), {
             'turn-color': 'white',
@@ -55,6 +54,9 @@
               events: {
                 after: onMove
               }
+            },
+            premovable: {
+              'enabled?': false
             }
           });
           window.ground = ground;

@@ -10,8 +10,6 @@
 (def ^private dragging-div-pos
   (atom {}))
 
-(def ^private touch-device? (common/js-in? js/document "ontouchstart"))
-
 (def ^private transform-prop
   "Fun fact: this won't work if chessground is included in the <head>
    Because the <body> element must exist at the time this code runs."
@@ -20,7 +18,7 @@
             props ["transform" "webkitTransform" "mozTransform" "oTransform"]]
         (first (or (filter #(common/js-in? style %) props) props)))))
 
-(when touch-device?
+(when common/touch-device?
   (.addEventListener js/document "DOMContentLoaded"
                      (fn []
                        (let [div (.createElement js/document "div")]
@@ -121,8 +119,8 @@
 (defn square [el]
   (-> (js/interact el)
       (.dropzone true)
-      (.on "dragenter" (if touch-device? on-touch-dragenter on-click-dragenter))
-      (.on "dragleave" (if touch-device? on-touch-dragleave on-click-dragleave))))
+      (.on "dragenter" (if common/touch-device? on-touch-dragenter on-click-dragenter))
+      (.on "dragleave" (if common/touch-device? on-touch-dragleave on-click-dragleave))))
 
 (defn piece [el ctrl draggable?]
   (-> (js/interact el)

@@ -74,7 +74,7 @@
                 (let [el (.getDOMNode this)
                       key (aget (.-props this) "key")
                       ctrl (aget (.-props this) "ctrl")]
-                  (doseq [ev ["touchstart" "mousedown"]]
+                  (let [ev (if common/touch-device? "touchstart" "mousedown")]
                     (.addEventListener el ev #(ctrl :select-square key)))
                   (drag/square el))))
      :render
