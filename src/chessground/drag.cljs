@@ -130,4 +130,4 @@
       (.on "dragend" #(on-end % ctrl))))
 
 (defn piece-switch [instance draggable?]
-  (.set instance (js-obj "draggable" draggable?)))
+  (.set instance #js {:draggable draggable?}))

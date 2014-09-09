@@ -13,9 +13,9 @@
 
 (defn- class-set [obj] (-> obj js/Object.keys (.filter #(aget obj %)) (.join " ")))
 
-(defn- piece-hash [props]
-  (when-let [piece (aget props "piece")]
-    (.join #js [(aget piece "color") (aget piece "role") (aget piece "draggable?")])))
+(defn- piece-hash [piece]
+  (when piece
+    (.join #js [(aget piece "color") (aget piece "role") (aget piece "draggable?")] "")))
 
 (defn- make-diff [prev next]
   (fn [k] (not (== (aget prev k) (aget next k)))))
@@ -27,8 +27,8 @@
      :shouldComponentUpdate
      (fn [next-props _]
        (this-as this
-                (or (not (== (aget (.-props this) "color") (aget next-props "color")))
-                    (not (== (aget (.-props this) "role") (aget next-props "role"))))))
+                (not (== (piece-hash (.-props this))
+                         (piece-hash next-props)))))
      :componentDidMount
      (fn []
        (this-as this
@@ -37,12 +37,12 @@
                                                            (aget (.-props this) "ctrl")
                                                            (aget (.-props this) "draggable?"))})))
      :componentWillUpdate
-     (fn [next-prop _]
+     (fn [next-props _]
        (this-as this
-                (when (not= (aget next-prop "draggable?")
+                (when (not= (aget next-props "draggable?")
                             (aget (.-props this) "draggable?"))
                   (drag/piece-switch (aget (.-state this) "draggable-instance")
-                                     (aget (.-props this) "draggable?")))))
+                                     (aget next-props "draggable?")))))
      :componentWillUnmount
      (fn []
        (this-as this
@@ -50,9 +50,9 @@
      :render
      (fn []
        (this-as this
-                (div #js {:className (str "cg-piece" " "
-                                          (aget (.-props this) "color") " "
-                                          (aget (.-props this) "role"))})))}))
+                (div #js {:className (.join #js ["cg-piece"
+                                                 (aget (.-props this) "color")
+                                                 (aget (.-props this) "role")] " ")})))}))
 
 (def ^private square-component
   (js/React.createClass
@@ -68,10 +68,9 @@
                       (diff? "check?")
                       (diff? "last-move?")
                       (diff? "current-premove?")
-                      (not (== (piece-hash (.-props this))
-                               (piece-hash next-props)))
-                      (not (== (aget (.-props this) "orientation")
-                               (aget next-props "orientation")))))))
+                      (diff? "orientation")
+                      (not (== (piece-hash (aget (.-props this) "piece"))
+                               (piece-hash (aget next-props "piece"))))))))
      :componentDidMount
      (fn []
        (this-as this
