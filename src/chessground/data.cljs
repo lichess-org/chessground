@@ -111,6 +111,14 @@
 
 (defn set-last-move [state last-move] (assoc state :last-move last-move))
 
+(defn api-move-piece [state [orig dest]]
+  (if-let [next-chess (chess/move-piece (:chess state) [orig dest])]
+    (-> state
+        (assoc :chess next-chess)
+        (set-check nil)
+        (set-last-move [orig dest]))
+    state))
+
 (defn move-piece [state orig dest]
   (if-let [next-chess (chess/move-piece (:chess state) [orig dest])]
     (let [next-state (-> state
