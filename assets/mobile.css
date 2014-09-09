@@ -1,3 +1,6 @@
+.cg-square {
+  -webkit-transform: translate3d(0,0,0);
+}
 .cg-square.selected {
   background: rgba(216, 85, 0, 0.3);
 }
