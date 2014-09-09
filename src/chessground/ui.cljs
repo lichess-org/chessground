@@ -78,7 +78,9 @@
                       key (aget (.-props this) "key")
                       ctrl (aget (.-props this) "ctrl")]
                   (let [ev (if common/touch-device? "touchstart" "mousedown")]
-                    (.addEventListener el ev #(ctrl :select-square key)))
+                    (.addEventListener el ev (fn [e]
+                                               (.preventDefault e)
+                                               (ctrl :select-square key))))
                   (drag/square el))))
      :render
      (fn []
