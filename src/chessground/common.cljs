@@ -1,12 +1,8 @@
 (ns chessground.common
   "Shared utilities for the library")
 
-(enable-console-print!)
-
-(def debug true)
-
 (defn pp [& exprs]
-  (when debug (doseq [expr exprs] (.log js/console (clj->js expr))))
+  (doseq [expr exprs] (.log js/console (clj->js expr)))
   (first exprs))
 
 (defn file->pos [key]
@@ -35,7 +31,7 @@
               (or y x)))]
     (merge-with smart-merge a b)))
 
-(defn seq-contains? [coll target] (some #{target} coll))
+(defn seq-contains? [coll target] (some #(== target %) coll))
 
 (defn offset [element]
   (let [rect (.getBoundingClientRect element)]
