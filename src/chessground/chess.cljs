@@ -6,7 +6,7 @@
 
 (comment
   ; Representation of a chess game:
-  {"a1" {}
+  {"a1" nil
    "a2" {:color "white" ; piece color
          :role "king" ; piece role
          }})
@@ -24,10 +24,6 @@
   (merge
     clear
     (forsyth/parse (if (= fen "start") forsyth/default fen))))
-
-(defn transform
-  "f takes a key and a square, and returns a square"
-  [chess f] (into {} (for [[k v] chess] [k (f k v)])))
 
 (defn get-piece [chess key] (get chess key))
 
