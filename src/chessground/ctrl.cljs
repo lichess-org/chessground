@@ -23,10 +23,9 @@
     (if (= orig key)
       app
       (move-piece app [orig key]))
-    (let [app2 (data/set-premovable-current app nil)]
-      (if (or (data/movable? app2 key) (data/premovable? app2 key))
-        (data/set-selected app2 key)
-        app2))))
+    (if (or (data/movable? app key) (data/premovable? app key))
+      (data/set-selected app key)
+      (data/set-premovable-current app nil))))
 
 (defn drop-off [app]
   (data/set-selected
