@@ -45,9 +45,12 @@
           var chess = new Chess();
           var onMove = function(orig, dest) {
             chess.move({from: orig, to: dest});
-            ground.setTurnColor(chessToColor(chess));
-            ground.setDests([]);
-            ground.getState(function(s) { console.log(s); });
+            ground.set({
+              'turn-color': chessToColor(chess),
+              movable: {
+                dests: []
+              }
+            });
           };
           ground = chessground.main(document.getElementById('ground5'), {
             'turn-color': 'white',

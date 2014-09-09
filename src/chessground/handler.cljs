@@ -7,25 +7,18 @@
 
 (defn- do-process [k msg]
   (case k
-    :select-square #(ctrl/select-square % msg)
-    :drop-off ctrl/drop-off
-    :drop-on #(ctrl/drop-on % msg)
-    :set-orientation #(data/set-orientation % msg)
-    :toggle-orientation data/toggle-orientation
-    :get-orientation #(a/put! msg (:orientation %))
-    :get-position #(a/put! msg (chess/get-pieces (:chess %)))
-    :get-state #(a/put! msg %)
-    :get-current-premove #(a/put! msg (-> % :premovable :current))
-    :set-fen #(assoc % :chess (chess/make (or msg "start")))
-    :api-move #(data/api-move-piece % msg)
-    :set-last-move #(data/set-last-move % msg)
-    :set-check #(data/set-check % msg)
-    :set-pieces (fn [app] (update-in app [:chess] #(chess/set-pieces % msg)))
-    :set-dests #(data/set-dests % msg)
-    :set-turn-color #(data/set-turn-color % msg)
-    :set-movable-color #(data/set-movable-color % msg)
-    :set-premovable #(data/set-premovable % msg)
-    :play-premove data/play-premove))
+    :select-square        #(ctrl/select-square % msg)
+    :drop-off             ctrl/drop-off
+    :drop-on              #(ctrl/drop-on % msg)
+    :set                  #(data/set-config % msg)
+    :toggle-orientation   data/toggle-orientation
+    :get-orientation      #(a/put! msg (:orientation %))
+    :get-position         #(a/put! msg (chess/get-pieces (:chess %)))
+    :get-state            #(a/put! msg %)
+    :get-current-premove  #(a/put! msg (-> % :premovable :current))
+    :api-move             #(data/api-move-piece % msg)
+    :set-pieces           (fn [app] (update-in app [:chess] #(chess/set-pieces % msg)))
+    :play-premove         data/play-premove))
 
 (defn process
   "Return a function that transforms an app data"

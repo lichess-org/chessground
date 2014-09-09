@@ -10,7 +10,7 @@
         (data/move-piece app orig dest))
       (when (data/can-premove? app orig dest)
         (-> app
-            (data/set-current-premove [orig dest])
+            (data/set-premovable-current [orig dest])
             (data/set-selected nil)))
       (if (= orig dest)
         app
@@ -23,7 +23,7 @@
     (if (= orig key)
       app
       (move-piece app [orig key]))
-    (let [app2 (data/set-current-premove app nil)]
+    (let [app2 (data/set-premovable-current app nil)]
       (if (or (data/movable? app2 key) (data/premovable? app2 key))
         (data/set-selected app2 key)
         app2))))
