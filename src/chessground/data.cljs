@@ -126,10 +126,12 @@
     state))
 
 (defn play-premove [state]
-  (or (when-let [[orig dest] (-> state :premovable :current)]
-        (when (can-move? state orig dest)
-          (move-piece state orig dest)))
-      state))
+  (set-premovable-current
+    (or (when-let [[orig dest] (-> state :premovable :current)]
+          (when (can-move? state orig dest)
+            (move-piece state orig dest)))
+        state)
+    nil))
 
 (defn set-config [state raw-config]
   (let [config (update-in raw-config [:movable :dests] common/stringify-keys)]
