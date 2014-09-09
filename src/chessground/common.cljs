@@ -19,11 +19,6 @@
                                "black" "white"
                                nil))
 
-(defn toggle [hashmap field value]
-  (if value
-    (assoc hashmap field true)
-    (dissoc hashmap field)))
-
 (defn deep-merge [a b]
   (letfn [(smart-merge [x y]
             (if (and (map? x) (map? y))
@@ -48,8 +43,9 @@
 (defn map-values [f hmap]
   (into {} (for [[k v] hmap] [k (f v)])))
 
-(defn keywordize-keys [hashmap]
-  (when hashmap (into {} (for [[k v] hashmap] [(keyword k) v]))))
+(defn- convert-keys [hashmap f]
+  (when hashmap (into {} (for [[k v] hashmap] [(f k) v]))))
 
-(defn stringify-keys [hashmap]
-  (when hashmap (into {} (for [[k v] hashmap] [(name k) v]))))
+(def keywordize-keys #(convert-keys % keyword))
+
+(def stringify-keys #(convert-keys % name))

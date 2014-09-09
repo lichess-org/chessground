@@ -25,9 +25,9 @@
 (defn- queen [p1 p2] (or (bishop p1 p2) (rook p1 p2)))
 
 (defn- rook-files-of [ch color]
-  (set (map (comp common/file->pos first first)
-            (filter (fn [[k p]] (and (= (:role p) "rook")
-                                     (= (:color p) color))) ch))))
+  (map (comp common/file->pos first first)
+       (filter (fn [[k p]] (and (= (:role p) "rook")
+                                (= (:color p) color))) ch)))
 
 (defn- king [rook-files color [x1 y1] [x2 y2]]
   (or (and (< (diff x1 x2) 2)
@@ -35,7 +35,7 @@
       (and (= y1 y2 (if (= color "white") 1 8))
            (or (and (= x1 5)
                     (or (= x2 3) (= x2 7)))
-               (contains? rook-files x2)))))
+               (common/seq-contains? rook-files x2)))))
 
 (defn possible [ch key piece]
   (let [orig (common/key->pos key)
