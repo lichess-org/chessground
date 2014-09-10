@@ -8,8 +8,8 @@
   "A move initiated through the UI"
   (or (when (data/can-move? app orig dest)
         (-> app
-          (data/move-piece orig dest)
-          data/unselect))
+            (data/move-piece orig dest)
+            data/unselect))
       (when (data/can-premove? app orig dest)
         (-> app
             (data/set-premovable-current [orig dest])
@@ -37,7 +37,6 @@
         app)))
 
 (defn drop-on [app dest]
-  (data/unselect
-    (if-let [orig (:selected app)]
-      (move-piece app [orig dest])
-      (drop-off app))))
+  (if-let [orig (:selected app)]
+    (move-piece app [orig dest])
+    (drop-off app)))
