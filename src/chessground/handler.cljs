@@ -2,6 +2,7 @@
   (:require [chessground.common :as common :refer [pp]]
             [chessground.data :as data]
             [chessground.chess :as chess]
+            [chessground.fen :as fen]
             [chessground.ctrl :as ctrl]
             [cljs.core.async :as a]))
 
@@ -14,6 +15,7 @@
     :toggle-orientation   data/toggle-orientation
     :get-orientation      #(a/put! msg (:orientation %))
     :get-position         #(a/put! msg (chess/get-pieces (:chess %)))
+    :get-fen              #(a/put! msg (fen/dump (:chess %)))
     :get-state            #(a/put! msg %)
     :get-current-premove  #(a/put! msg (-> % :premovable :current))
     :api-move             #(data/api-move-piece % msg)

@@ -1,18 +1,21 @@
 (ns chessground.fen
   "Forsyth Edwards notation"
   (:require [chessground.common :refer [pp]]
-            [clojure.string :refer [lower-case]]))
+            [clojure.string :refer [lower-case upper-case join]]))
 
 (def default "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1")
 
 (def ^private role-names {"p" "pawn"
-                 "r" "rook"
-                 "n" "knight"
-                 "b" "bishop"
-                 "q" "queen"
-                 "k" "king"})
+                          "r" "rook"
+                          "n" "knight"
+                          "b" "bishop"
+                          "q" "queen"
+                          "k" "king"})
 
-(defn- pos-to-key [pos]
+(def ^private role-keys
+  (into {} (map (fn [[k v]] [v k]) role-names)))
+
+(defn- num->key [pos]
   (str (get "abcdefgh" (mod pos 8))
        (- 8 (int (/ pos 8)))))
 
@@ -29,7 +32,7 @@
         (> pos 63) pieces
         (= current "/") (recur pieces pos next)
         (not (nil? spaces)) (recur pieces (+ pos spaces) next)
-        :else (let [key (pos-to-key pos)
+        :else (let [key (num->key pos)
                     lower (lower-case current)
                     piece {:role (get role-names lower)
                            :color (if (= current lower) "black" "white")}]
@@ -40,3 +43,19 @@
     (->> (or fen default)
          (remove #(= "/" %))
          (take-while #(not= \space %)))))
+
+(defn- piece->str [piece]
+  (cond-> (get role-keys (:role piece))
+    (= "white" (:color piece)) upper-case))
+
+(defn dump [chess]
+  (reduce #(.replace %1 (js/RegExp. (apply str (repeat %2 1)) "g") %2)
+          (join "/"
+                (for [rank (range 8 0 -1)]
+                  (apply str
+                         (for [file "abcdefgh"]
+                           (if-let [piece (get chess (str file rank))]
+                             (piece->str piece)
+                             1)))))
+          (range 8 1 -1)))
+

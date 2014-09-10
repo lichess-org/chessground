@@ -20,6 +20,7 @@
       {:set               #(tell :set (js->clj % :keywordize-keys true))
        :getOrientation    #(ask :get-orientation %)
        :getPosition       #(ask :get-position %)
+       :getFen            #(ask :get-fen %)
        :getState          #(ask :get-state %)
        :getCurrentPremove #(ask :get-current-premove %)
        :toggleOrientation #(tell :toggle-orientation nil)
