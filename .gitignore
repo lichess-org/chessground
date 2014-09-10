@@ -11,3 +11,4 @@ debug
 chessground.js
 chessground.prod.js
 node_modules
+pom.xml
