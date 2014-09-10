@@ -97,6 +97,8 @@
 
 (defn set-selected [state key] (assoc state :selected key))
 
+(defn unselect [state] (set-selected state nil))
+
 (defn set-check [state key] (assoc state :check key))
 
 (defn set-last-move [state last-move] (assoc state :last-move last-move))
@@ -118,7 +120,6 @@
     (let [next-state (-> state
                          (assoc :chess next-chess)
                          (assoc-in [:movable :dests] nil)
-                         (set-selected nil)
                          (set-check nil)
                          (set-last-move [orig dest]))]
       (callback (-> next-state :movable :events :after) orig dest next-chess)

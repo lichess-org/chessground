@@ -7,11 +7,13 @@
 (defn- move-piece [app [orig dest]]
   "A move initiated through the UI"
   (or (when (data/can-move? app orig dest)
-        (data/move-piece app orig dest))
+        (-> app
+          (data/move-piece orig dest)
+          data/unselect))
       (when (data/can-premove? app orig dest)
         (-> app
             (data/set-premovable-current [orig dest])
-            (data/set-selected nil)))
+            data/unselect))
       (if (= orig dest)
         app
         (data/set-selected app (when (or (data/movable? app dest)
@@ -28,14 +30,14 @@
       (data/set-premovable-current app nil))))
 
 (defn drop-off [app]
-  (data/set-selected
+  (data/unselect
     (or (when (= "trash" (-> app :movable :drop-off))
           (when-let [key (:selected app)]
             (update-in app [:chess] chess/set-pieces {key nil})))
-        app)
-    nil))
+        app)))
 
 (defn drop-on [app dest]
-  (if-let [orig (:selected app)]
-    (move-piece app [orig dest])
-    (drop-off app)))
+  (data/unselect
+    (if-let [orig (:selected app)]
+      (move-piece app [orig dest])
+      (drop-off app))))
