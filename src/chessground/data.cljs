@@ -134,7 +134,9 @@
     nil))
 
 (defn set-config [state raw-config]
-  (let [config (update-in raw-config [:movable :dests] common/stringify-keys)]
+  (let [config (if (get-in raw-config [:movable :dests])
+                 (update-in raw-config [:movable :dests] common/stringify-keys)
+                 raw-config)]
     (reduce (fn [st [cfg k f]]
               (if (contains? cfg k)
                 (f st (get cfg k))
