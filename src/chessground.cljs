@@ -16,7 +16,7 @@
         ctrl #(a/put! chan [%1 %2])
         app (data/make (or (js->clj config :keywordize-keys true) {}))
         app-atom (atom app)
-        render #(js/React.renderComponent (ui/root % ctrl) element)]
+        render #(js/React.renderComponent (ui/board-component (ui/clj->react % ctrl)) element)]
     (render app)
     (am/go-loop []
                 (let [[k msg] (a/<! chan)]
