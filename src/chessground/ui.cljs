@@ -157,8 +157,8 @@
                                       #js {:ctrl ctrl
                                            :color color
                                            :role (get piece :role)
-                                           :draggable? (or (== draggable-color "both")
-                                                           (== draggable-color color))}))
+                                           :draggable? (or (= draggable-color "both")
+                                                           (= draggable-color color))}))
                            :selected? (== selected key)
                            :check? (== check key)
                            :last-move? (not (== -1 (.indexOf last-move key)))
