@@ -13,7 +13,7 @@
     <script src="../out/goog/base.js" type="text/javascript"></script>
     <script src="../chessground.js" type="text/javascript"></script>
     <script>goog.require("chessground");</script>
-      <!-- chess.js is NOT required by chessground. We include it for the examples. -->
+    <!-- chess.js is NOT required by chessground. We include it for the examples. -->
     <script src="../libs/chess.min.js"></script>
     <script>
       function chessToDests(chess) {
@@ -29,24 +29,37 @@
       }
     </script>
 
+    <section>
+      <div class="chessground wood small merida coordinates" id="ground1"></div>
+      <p>Default options, with CSS coordinates</p>
+      <script>
+        var ground = chessground.main(document.getElementById('ground1'));
+      </script>
+    </section>
+    <section>
+      <div class="chessground wood small merida coordinates" id="ground2"></div>
+      <p>Free as a birrd</p>
+      <script>
+        var ground = chessground.main(document.getElementById('ground2'), {
+          movable: {
+            free: true,
+            color: 'both',
+            dropOff: 'trash'
+          }
+        });
+      </script>
+    </section>
     <!-- <section> -->
-    <!--   <div class="chessground wood small merida coordinates" id="ground1"></div> -->
-    <!--   <p>Default options, with CSS coordinates</p> -->
-    <!--   <script> -->
-    <!--     var ground = chessground.main(document.getElementById('ground1')); -->
-    <!--   </script> -->
-    <!-- </section> -->
-    <!-- <section> -->
-    <!--   <div class="chessground blue small cburnett" id="ground5"></div> -->
-    <!--   <p>Valid moves: white plays, then premoves</p> -->
-    <!--   <script> -->
-    <!--     (function() { -->
+      <!--   <div class="chessground blue small cburnett" id="ground5"></div> -->
+      <!--   <p>Valid moves: white plays, then premoves</p> -->
+      <!--   <script> -->
+        <!--     (function() { -->
     <!--       var ground; -->
     <!--       var chess = new Chess(); -->
     <!--       var onMove = function(orig, dest) { -->
     <!--         chess.move({from: orig, to: dest}); -->
     <!--         ground.set({ -->
-    <!--           'turn-color': chessToColor(chess), -->
+    <!--           turnColor: chessToColor(chess), -->
     <!--           movable: { -->
     <!--             dests: [] -->
     <!--           } -->
@@ -56,8 +69,8 @@
     <!--         'turn-color': 'white', -->
     <!--         'orientation': 'white', -->
     <!--         movable: { -->
-    <!--           'free?': false, -->
-    <!--           'premove?': true, -->
+    <!--           free: false, -->
+    <!--           premove: true, -->
     <!--           color: 'white', -->
     <!--           dests: chessToDests(chess), -->
     <!--           events: { -->
@@ -67,19 +80,19 @@
     <!--       }); -->
     <!--       window.ground = ground; -->
     <!--     })(); -->
-    <!--   </script> -->
+      <!--   </script> -->
     <!-- </section> -->
-    <section>
-      <div class="chessground wood small merida" id="ground7"></div>
-      <p>Play a game on a single board</p>
-      <script>
-        (function() {
-          var ground;
+  <section>
+    <div class="chessground wood small merida" id="ground7"></div>
+    <p>Play a game on a single board</p>
+    <script>
+      (function() {
+        var ground;
           var chess = new Chess();
           var onMove = function(orig, dest) {
             chess.move({from: orig, to: dest});
             ground.set({
-              'turn-color': chessToColor(chess),
+              turnColor: chessToColor(chess),
               movable: {
                 color: chessToColor(chess),
                 dests: chessToDests(chess)
@@ -88,11 +101,11 @@
             ground.getFen(function(s) { console.log(s); });
           };
           ground = chessground.main(document.getElementById('ground7'), {
-            'turn-color': 'white',
+            turnColor: 'white',
             movable: {
-              'free?': false,
+              free: false,
               color: chessToColor(chess),
-              'premove?': true,
+              premove: true,
               dests: chessToDests(chess),
               events: {
                 after: onMove
@@ -100,9 +113,9 @@
             }
           });
           window.ground = ground;
-        })();
-      </script>
-    </section>
-  </body>
+      })();
+    </script>
+  </section>
+</body>
 </html>
 

@@ -145,16 +145,16 @@
             state
             [[config :fen with-fen]
              [config :orientation set-orientation]
-             [config :turn-color set-turn-color]
+             [config :turnColor set-turn-color]
              [config :check set-check]
-             [config :last-move set-last-move]
+             [config :lastMove set-last-move]
              [config :selected set-selected]
-             [(:movable config) :free? set-movable-free?]
+             [(:movable config) :free set-movable-free?]
              [(:movable config) :color set-movable-color]
              [(:movable config) :dests set-movable-dests]
-             [(:movable config) :drop-off set-drop-off]
+             [(:movable config) :dropOff set-drop-off]
              [(get-in config [:movable :events]) :after set-movable-after]
-             [(:premovable config) :enabled? set-premovable-enabled?]
+             [(:premovable config) :enabled set-premovable-enabled?]
              [(:premovable config) :current set-premovable-current]
              ])))
 
