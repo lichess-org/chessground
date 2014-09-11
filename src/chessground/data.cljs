@@ -32,7 +32,9 @@
 
 (defn movable? [state orig]
   (when-let [piece (chess/get-piece (:chess state) orig)]
-    (or (= (-> state :movable :color) "both")
+    (or (and
+          (= (-> state :movable :color) "both")
+          (= (:turn-color state) (:color piece)))
         (= (-> state :movable :color)
            (:turn-color state)
            (:color piece)))))
