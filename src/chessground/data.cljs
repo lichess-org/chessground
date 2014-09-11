@@ -47,12 +47,13 @@
 (defn draggable-color [state]
   (let [movable-color (-> state :movable :color)
         turn-color (:turn-color state)]
-    (when (and movable-color turn-color)
-      (if (or (= movable-color "both")
-              (= movable-color turn-color))
-        turn-color
-        (when (-> state :premovable :enabled?)
-          (common/opposite-color turn-color))))))
+    (if (= movable-color "both")
+      "both"
+      (when (and movable-color turn-color)
+        (if (= movable-color turn-color)
+          turn-color
+          (when (-> state :premovable :enabled?)
+            (common/opposite-color turn-color)))))))
 
 (defn can-move? [state orig dest]
   "The piece on orig can definitely be moved to dest"
