@@ -6,7 +6,7 @@
             [cljs.core.async :as a])
   (:require-macros [cljs.core.async.macros :as am]))
 
-(defn build
+(defn functions
   "Creates JavaScript functions that push to the channel"
   [tell]
   (letfn [(ask [question callback]
@@ -28,3 +28,29 @@
        :setPieces         (fn [pieces]
                             (tell :set-pieces (common/map-values common/keywordize-keys (js->clj pieces))))
        :playPremove       #(tell :play-premove nil)})))
+
+(defn set-config [state raw-config]
+  (let [config (if (get-in raw-config [:movable :dests])
+                 (update-in raw-config [:movable :dests] common/stringify-keys)
+                 raw-config)]
+    (reduce (fn [st [cfg k f]]
+              (if (contains? cfg k)
+                (f st (get cfg k))
+                st))
+            state
+            [[config :fen data/with-fen]
+             [config :orientation data/set-orientation]
+             [config :turnColor data/set-turn-color]
+             [config :check data/set-check]
+             [config :lastMove data/set-last-move]
+             [config :selected data/set-selected]
+             [(:movable config) :free data/set-movable-free?]
+             [(:movable config) :color data/set-movable-color]
+             [(:movable config) :dests data/set-movable-dests]
+             [(:movable config) :dropOff data/set-drop-off]
+             [(get-in config [:movable :events]) :after data/set-movable-after]
+             [(:premovable config) :enabled data/set-premovable-enabled?]
+             [(:premovable config) :current data/set-premovable-current]
+             ])))
+
+(defn main [config] (set-config data/defaults config))

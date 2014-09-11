@@ -3,7 +3,6 @@
             [chessground.api :as api]
             [chessground.handler :as handler]
             [chessground.ui :as ui]
-            [chessground.data :as data]
             [chessground.common :refer [pp]])
   (:require-macros [cljs.core.async.macros :as am]))
 
@@ -14,7 +13,7 @@
   [element config]
   (let [chan (a/chan)
         ctrl #(a/put! chan [%1 %2])
-        app (data/make (or (js->clj config :keywordize-keys true) {}))
+        app (api/main (or (js->clj config :keywordize-keys true) {}))
         app-atom (atom app)
         render #(js/React.renderComponent (ui/board-component (ui/clj->react % ctrl)) element)]
     (render app)
@@ -22,4 +21,4 @@
                 (let [[k msg] (a/<! chan)]
                   (render (swap! app-atom (handler/process k msg)))
                   (recur)))
-    (api/build ctrl)))
+    (api/functions ctrl)))

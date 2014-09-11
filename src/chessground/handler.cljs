@@ -4,14 +4,15 @@
             [chessground.chess :as chess]
             [chessground.fen :as fen]
             [chessground.ctrl :as ctrl]
+            [chessground.api :as api]
             [cljs.core.async :as a]))
 
 (defn- do-process [k msg]
   (case k
+    :set                  #(api/set-config % msg)
     :select-square        #(ctrl/select-square % msg)
     :drop-off             ctrl/drop-off
     :drop-on              #(ctrl/drop-on % msg)
-    :set                  #(data/set-config % msg)
     :toggle-orientation   data/toggle-orientation
     :get-orientation      #(a/put! msg (:orientation %))
     :get-position         #(a/put! msg (chess/get-pieces (:chess %)))

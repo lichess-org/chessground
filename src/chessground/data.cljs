@@ -133,30 +133,3 @@
             (move-piece state orig dest)))
         state)
     nil))
-
-(defn set-config [state raw-config]
-  (let [config (if (get-in raw-config [:movable :dests])
-                 (update-in raw-config [:movable :dests] common/stringify-keys)
-                 raw-config)]
-    (reduce (fn [st [cfg k f]]
-              (if (contains? cfg k)
-                (f st (get cfg k))
-                st))
-            state
-            [[config :fen with-fen]
-             [config :orientation set-orientation]
-             [config :turnColor set-turn-color]
-             [config :check set-check]
-             [config :lastMove set-last-move]
-             [config :selected set-selected]
-             [(:movable config) :free set-movable-free?]
-             [(:movable config) :color set-movable-color]
-             [(:movable config) :dests set-movable-dests]
-             [(:movable config) :dropOff set-drop-off]
-             [(get-in config [:movable :events]) :after set-movable-after]
-             [(:premovable config) :enabled set-premovable-enabled?]
-             [(:premovable config) :current set-premovable-current]
-             ])))
-
-(defn make [config]
-  (set-config defaults config))
