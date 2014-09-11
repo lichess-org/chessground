@@ -9,8 +9,9 @@
     <link rel="stylesheet" href="../assets/base.css">
     <link rel="stylesheet" href="../assets/theme.css">
     <link rel="stylesheet" href="../assets/mobile.css">
+    <link rel="stylesheet" href="example.css">
   </head>
-  <body class="mobile">
+  <body>
     <script src="../libs/interact.min.js"></script>
     <!-- <script src="../libs/react-0.11.1.min.js"></script> -->
     <script src="../libs/react-0.11.1.js"></script>
@@ -68,7 +69,7 @@
     </script>
     <script>
       window.onload = function() {
-        var size = (window.innerWidth - 5) + 'px';
+        var size = (window.innerWidth) + 'px';
         setTimeout(function() {
           document.getElementById('ground').style.width = size;
           document.getElementById('ground').style.height = size;
