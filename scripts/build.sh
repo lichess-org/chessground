@@ -3,14 +3,15 @@
 ROOT=$(cd `dirname $0` && pwd)/..
 
 cd $ROOT
-lein cljsbuild clean
+# lein cljsbuild clean
 lein cljsbuild once prod
 
 echo "Finalizing chessground.js"
 
-$ROOT/node_modules/.bin/uglifyjs $ROOT/libs/interact.js -o $ROOT/libs/interact.min.js
+(cat $ROOT/scripts/wrapper.beg.txt;
+cat $ROOT/chessground.prod.js;
+cat $ROOT/scripts/wrapper.end.txt) > $ROOT/chessground.tmp.js
 
-(cat $ROOT/libs/interact.min.js;
-cat $ROOT/scripts/wrapper.beg.txt;
-cat $ROOT/out-prod/chessground.prod.js;
-cat $ROOT/scripts/wrapper.end.txt) > $ROOT/chessground.prod.js
+$ROOT/node_modules/browserify/bin/cmd.js $ROOT/chessground.tmp.js --s chessground > $ROOT/dist/chessground.js
+
+rm $ROOT/chessground.tmp.js

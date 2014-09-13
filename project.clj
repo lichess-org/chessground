@@ -23,6 +23,6 @@
       :optimizations :advanced
       :externs ["libs/interact.js" "react/externs/react.js"]
       :pretty-print false
-      :output-wrapper true
+      :output-wrapper false
       :closure-warnings {:externs-validation :off
                          :non-standard-jsdoc :off}}}}})
