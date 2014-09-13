@@ -1,4 +1,4 @@
-(defproject org.lichess/chessground "0.3.5"
+(defproject org.lichess/chessground "0.3.7"
   :description "Extendable basics for chess UIs."
   :license {:name "MIT" :url "http://opensource.org/licenses/MIT"}
   :plugins [[lein-cljsbuild "1.0.3"]]
@@ -11,8 +11,8 @@
    {:dev
     {:source-paths ["src"]
      :compiler
-     {:output-to "chessground.js"
-      :output-dir "out"
+     {:output-to "chessground.dev.js"
+      :output-dir "out-dev"
       :optimizations :none
       :source-map true}}
     :prod
@@ -23,6 +23,6 @@
       :optimizations :advanced
       :externs ["libs/interact.js" "react/externs/react.js"]
       :pretty-print false
-      :output-wrapper true
+      :output-wrapper false
       :closure-warnings {:externs-validation :off
                          :non-standard-jsdoc :off}}}}})

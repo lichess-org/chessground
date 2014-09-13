@@ -1,1 +1,1 @@
-;return this.chessground;}.call({});});
+module.exports = this.chessground;
