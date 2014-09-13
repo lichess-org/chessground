@@ -7,7 +7,7 @@
     "example": "examples"
   },
   "scripts": {
-    "build": "./scripts/build.sh"
+    "dist": "./scripts/dist.sh"
   },
   "repository": {
     "type": "git",
