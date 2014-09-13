@@ -51,6 +51,8 @@
              [(get-in config [:movable :events]) :after data/set-movable-after]
              [(:premovable config) :enabled data/set-premovable-enabled?]
              [(:premovable config) :current data/set-premovable-current]
+             [(:animation config) :enabled #(assoc-in %1 [:animation :enabled?] %2)]
+             [(:animation config) :duration #(assoc-in %1 [:animation :duration] %2)]
              [(:events config) :change data/set-event-change]
              ])))
 
