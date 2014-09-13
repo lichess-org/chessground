@@ -78,12 +78,10 @@
       (assoc-in [:movable :free?] false)))
 
 (defn set-turn-color [state color]
-  (cond-> state
-    (common/seq-contains? chess/colors color) (assoc :turn-color color)))
+  (assoc state :turn-color color))
 
 (defn set-movable-color [state color]
-  (cond-> state
-    (common/seq-contains? (conj chess/colors "both") color) (assoc-in [:movable :color] color)))
+  (assoc-in state [:movable :color] color))
 
 (defn set-premovable-enabled? [state enabled?]
   (assoc-in state [:premovable :enabled?] (boolean enabled?)))
