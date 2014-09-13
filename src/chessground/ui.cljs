@@ -173,6 +173,7 @@
                                              :color color
                                              :role (get piece :role)
                                              :anim (when (and (== last-move-dest key)
+                                                              (not= draggable-color color)
                                                               (get-in app [:animation :enabled?]))
                                                      #js {:orig last-move-orig
                                                           :dest key
