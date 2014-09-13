@@ -19,11 +19,13 @@
              :dests nil ; valid moves. {"a2" ["a3" "a4"] "b1" ["a3" "c3"]} | nil
              :drop-off "revert" ; when a piece is dropped outside the board. "revert" | "trash"
              ; :drag-center? true ; whether to center the piece under the cursor on drag start
-             :events {:after (fn [orig dest chess] nil) ; called after the moves has been played
+             :events {:after (fn [orig dest] nil) ; called after the move has been played
                       }}
    :premovable {:enabled? true ; allow premoves for color that can not move
                 :current nil ; keys of the current saved premove ["e2" "e4"] | nil
-                }})
+                }
+   :events {:change (fn [] nil) ; called after the situation changes on the board
+            }})
 
 (defn- callback [function & args]
   "Call asynchronously a user supplied callback function, if any"
@@ -108,12 +110,21 @@
 
 (defn set-movable-after [state callback] (assoc-in state [:movable :events :after] callback))
 
+(defn set-event-change [state callback] (assoc-in state [:events :change] callback))
+
+(defn set-pieces [state pieces]
+  (let [next-state (update-in state [:chess] #(chess/set-pieces % pieces))]
+    (callback (-> state :events :change))
+    next-state))
+
 (defn api-move-piece [state [orig dest]]
   (if-let [next-chess (chess/move-piece (:chess state) [orig dest])]
-    (-> state
-        (assoc :chess next-chess)
-        (set-check nil)
-        (set-last-move [orig dest]))
+    (let [next-state (-> state
+                         (assoc :chess next-chess)
+                         (set-check nil)
+                         (set-last-move [orig dest]))]
+      (callback (-> next-state :events :change))
+      next-state)
     state))
 
 (defn move-piece [state orig dest]
@@ -123,7 +134,8 @@
                          (assoc-in [:movable :dests] nil)
                          (set-check nil)
                          (set-last-move [orig dest]))]
-      (callback (-> next-state :movable :events :after) orig dest next-chess)
+      (callback (-> next-state :movable :events :after) orig dest)
+      (callback (-> next-state :events :change))
       next-state)
     state))
 

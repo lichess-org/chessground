@@ -20,7 +20,7 @@
     :get-state            #(a/put! msg %)
     :get-current-premove  #(a/put! msg (-> % :premovable :current))
     :api-move             #(data/api-move-piece % msg)
-    :set-pieces           (fn [app] (update-in app [:chess] #(chess/set-pieces % msg)))
+    :set-pieces           #(data/set-pieces % msg)
     :play-premove         data/play-premove))
 
 (defn process

@@ -51,6 +51,7 @@
              [(get-in config [:movable :events]) :after data/set-movable-after]
              [(:premovable config) :enabled data/set-premovable-enabled?]
              [(:premovable config) :current data/set-premovable-current]
+             [(:events config) :change data/set-event-change]
              ])))
 
 (defn main [config] (set-config data/defaults config))
