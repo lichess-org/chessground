@@ -1,6 +1,6 @@
 {
   "name": "chessground",
-  "version": "0.3.7",
+  "version": "0.3.8",
   "description": "Base chessboard library meant to replace all lichess.org chessboards",
   "main": "chessground.js",
   "directories": {
