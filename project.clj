@@ -1,4 +1,4 @@
-(defproject org.lichess/chessground "0.3.5"
+(defproject org.lichess/chessground "0.3.6"
   :description "Extendable basics for chess UIs."
   :license {:name "MIT" :url "http://opensource.org/licenses/MIT"}
   :plugins [[lein-cljsbuild "1.0.3"]]
