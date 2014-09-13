@@ -25,12 +25,11 @@
     #js
     {:displayName "Piece"
      :getInitialState (fn [] #js {:x 0 :y 0})
-     ; :shouldComponentUpdate
-     ; (fn [next-props next-state]
-     ;   (this-as this
-     ;            (or (not= 0 (aget next-state "x") (aget next-state "y"))
-     ;                (not (== (piece-hash (.-props this))
-     ;                         (piece-hash next-props))))))
+     :shouldComponentUpdate
+     (fn [next-props next-state]
+       (this-as this
+                (not (== (piece-hash (.-props this))
+                         (piece-hash next-props)))))
      :componentDidMount
      (fn []
        (this-as this
