@@ -8,9 +8,7 @@
   (:require-macros [cljs.core.async.macros :as am]))
 
 (def ^private dom (.-DOM js/React))
-
 (def ^private div (.-div dom))
-
 (defn- class-set [obj] (-> obj js/Object.keys (.filter #(aget obj %)) (.join " ")))
 
 (defn- piece-hash [piece]
@@ -142,7 +140,10 @@
       (when (< rank 8) (recur (inc rank))))
     arr))
 
-(defn- array-of [coll] (if coll (clj->js coll) (array)))
+(defn- array-of [coll]
+  (let [ar (array)]
+    (when coll (doseq [x coll] (.push ar x)))
+    ar))
 
 (defn clj->react [app ctrl]
   (let [orientation (get app :orientation)
