@@ -10,8 +10,6 @@ echo "Finalizing chessground.js"
 
 (cat $ROOT/scripts/wrapper.beg.txt;
 cat $ROOT/chessground.prod.js;
-cat $ROOT/scripts/wrapper.end.txt) > $ROOT/chessground.tmp.js
+cat $ROOT/scripts/wrapper.end.txt) > $ROOT/chessground.js
 
-$ROOT/node_modules/browserify/bin/cmd.js $ROOT/chessground.tmp.js --s chessground > $ROOT/dist/chessground.js
-
-rm $ROOT/chessground.tmp.js
+$ROOT/node_modules/browserify/bin/cmd.js $ROOT/chessground.js --s chessground > $ROOT/dist/chessground.standalone.js

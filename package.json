@@ -2,7 +2,7 @@
   "name": "chessground",
   "version": "0.3.6",
   "description": "Base chessboard library meant to replace all lichess.org chessboards",
-  "main": "dist/chessground.js",
+  "main": "chessground.js",
   "directories": {
     "example": "examples"
   },
@@ -31,7 +31,7 @@
     "browserify": "~5.11.2"
   },
   "dependencies": {
-    "react": "~0.11.1",
+    "react": "0.11.1",
     "interact": "git://github.com/veloce/interact.js#v1.0.25"
   }
 }

@@ -8,8 +8,7 @@ checkouts/
 .nrepl-port
 generated*
 debug
-chessground.js
+chessground.dev.js
 chessground.prod.js
 node_modules
 pom.xml
-!dist/chessground.js

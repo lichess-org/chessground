@@ -11,8 +11,8 @@
    {:dev
     {:source-paths ["src"]
      :compiler
-     {:output-to "chessground.js"
-      :output-dir "out"
+     {:output-to "chessground.dev.js"
+      :output-dir "out-dev"
       :optimizations :none
       :source-map true}}
     :prod
