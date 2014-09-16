@@ -5,14 +5,14 @@
   (doseq [expr exprs] (.log js/console (clj->js expr)))
   (first exprs))
 
-(defn file->pos [key]
-  (inc (.indexOf "abcdefgh" (first key))))
+(def ^private files "abcdefgh")
+(def ^private file-numbers #js {"a" 1 "b" 2 "c" 3 "d" 4 "e" 5 "f" 6 "g" 7 "h" 8})
 
 (defn key->pos [key]
-  [(file->pos (first key)) (js/parseInt (second key))])
+  #js [(aget file-numbers (aget key 0)) (js/parseInt (aget key 1))])
 
 (defn pos->key [pos]
-  (str (get "abcdefgh" (dec (first pos))) (second pos)))
+  (str (get files (dec (aget pos 0))) (aget pos 1)))
 
 (defn opposite-color [color] (case color
                                "white" "black"
