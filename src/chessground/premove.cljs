@@ -38,7 +38,7 @@
                (common/seq-contains? rook-files x2)))))
 
 (defn possible [ch key piece]
-  (let [orig (common/key->pos key)
+  (let [orig (js->clj (common/key->pos key))
         mobility (case (:role piece)
                    "pawn" (partial pawn (:color piece))
                    "knight" knight

@@ -2,8 +2,8 @@
   (:require [chessground.common :as common :refer [pp]]))
 
 (defn- key->vector [key size]
-  (let [[x y] (common/key->pos key)]
-    [(* x size -1) (* y size)]))
+  (let [pos (common/key->pos key)]
+    [(* (aget pos 0) size -1) (* (aget pos 1) size)]))
 
 (defn- square-vect [el orig dest]
   (let [size (.-clientWidth el)
