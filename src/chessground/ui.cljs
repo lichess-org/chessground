@@ -52,7 +52,7 @@
                                                            (.. this -props -ctrl)
                                                            (.. this -props -draggable)
                                                            )})
-                (animation/piece this)))
+                (animation/start this)))
      :componentWillUpdate
      (fn [next-props _]
        (this-as this
@@ -61,7 +61,7 @@
                   (when-let [instance (.. this -state -draggable-instance)]
                     (drag/piece-switch instance (.-draggable next-props))))))
      :componentDidUpdate
-     (fn [] (this-as this (animation/piece this)))
+     (fn [] (this-as this (animation/start this)))
      :componentWillUnmount
      (fn []
        (this-as this (when-let [instance (.. this -state -draggable-instance)]
@@ -137,7 +137,8 @@
      :componentWillReceiveProps
      (fn [next-props]
        (this-as this
-                (.setState this #js {:plans (animation/compute (.. this -props -chess)
+                (.setState this #js {:plans (animation/compute (.. this -props -animation)
+                                                               (.. this -props -chess)
                                                                (.-chess next-props))})))
      :render
      (fn []
@@ -171,6 +172,7 @@
                                   (when (data/premovable? app orig)
                                     (when-let [piece (get chess orig)]
                                       (premove/possible chess orig piece)))))
+        anim (get app :animation)
         make-square (fn [key]
                       #js {:key key
                            :ctrl ctrl
@@ -188,4 +190,6 @@
                            :move_dest (not (== -1 (.indexOf move-dests key)))
                            :premove_dest (not (== -1 (.indexOf premove-dests key)))
                            :current_premove (not (== -1 (.indexOf current-premove key)))})]
-    #js {:chess (.map all-keys make-square)}))
+    #js {:chess (.map all-keys make-square)
+         :animation #js {:enabled (get anim :enabled?)
+                         :duration (get anim :duration)}}))

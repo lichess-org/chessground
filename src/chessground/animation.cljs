@@ -24,7 +24,7 @@
             (.setState component #js {:anim delta2}
                        #(animate component start-at duration delta))))))))
 
-(defn piece [component]
+(defn start [component]
   (when-let [plan (.. component -state -plan)]
     (.setState component #js {:plan false})
     (let [piece-el (.getDOMNode component)
@@ -32,7 +32,7 @@
           vect (square-vect square-el (.-orig plan) (.-dest plan))]
       (animate component
                (.getTime (js/Date.))
-               500;(.-duration plan)
+               (.-duration plan)
                vect))))
 
 (defn- make-piece [key piece] #js {:key key
@@ -47,27 +47,30 @@
   (.sort ps #(- (distance p %1) (distance p %2)))
   (aget ps 0))
 
-(defn compute [prev current]
-  (let [anims #js {}
-        missings #js []
-        news #js []
-        pre-pieces #js {}]
-    (.forEach prev (fn [square]
-                     (when-let [piece (.-piece square)]
-                       (aset pre-pieces (.-key square) (make-piece (.-key square) piece)))))
-    (.forEach current (fn [square]
-                        (let [key (.-key square)
-                              pre-p (aget pre-pieces key)
-                              cur-p (.-piece square)]
-                          (if cur-p
-                            (if pre-p
-                              (when-not (same-piece cur-p pre-p)
-                                (.push missings pre-p)
+(defn compute [params prev current]
+  (if (.-enabled params)
+    (let [anims #js {}
+          missings #js []
+          news #js []
+          pre-pieces #js {}]
+      (.forEach prev (fn [square]
+                       (when-let [piece (.-piece square)]
+                         (aset pre-pieces (.-key square) (make-piece (.-key square) piece)))))
+      (.forEach current (fn [square]
+                          (let [key (.-key square)
+                                pre-p (aget pre-pieces key)
+                                cur-p (.-piece square)]
+                            (if cur-p
+                              (if pre-p
+                                (when-not (same-piece cur-p pre-p)
+                                  (.push missings pre-p)
+                                  (.push news (make-piece key cur-p)))
                                 (.push news (make-piece key cur-p)))
-                              (.push news (make-piece key cur-p)))
-                            (when pre-p (.push missings pre-p))))))
-    (.forEach news (fn [new-p]
-                     (when-let [pre-p (closer new-p (.filter missings #(same-piece new-p %)))]
-                       (aset anims (.-key new-p) #js {:orig (.-key pre-p)
-                                                      :dest (.-key new-p)}))))
-    anims))
+                              (when pre-p (.push missings pre-p))))))
+      (.forEach news (fn [new-p]
+                       (when-let [pre-p (closer new-p (.filter missings #(same-piece new-p %)))]
+                         (aset anims (.-key new-p) #js {:orig (.-key pre-p)
+                                                        :dest (.-key new-p)
+                                                        :duration (.-duration params)}))))
+      anims)
+    #js {}))
