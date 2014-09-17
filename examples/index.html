@@ -30,37 +30,39 @@
     </script>
 
     <!-- <section> -->
-    <!--   <div class="chessground wood small merida coordinates" id="ground1"></div> -->
-    <!--   <p>Default options, with CSS coordinates</p> -->
-    <!--   <script> -->
-    <!--     var ground = chessground.main(document.getElementById('ground1')); -->
-    <!--   </script> -->
-    <!-- </section> -->
-    <section>
-      <div class="chessground wood small merida coordinates" id="ground2"></div>
-      <p>Free as a birrd</p>
-      <script>
-        var ground = chessground.main(document.getElementById('ground2'), {
-          movable: {
-            free: true,
-            color: 'both',
-            dropOff: 'trash'
-          }
-        });
-        setInterval(function() {
-          ground.set({fen:'2r3k1/pp2Qpbp/4b1p1/3p4/3n1PP1/2N4P/Pq6/R2K1B1R w -'});
-          <!-- ground.set({fen:'rnbqkbnr/pNpppppp/8/8/8/8/PPPPPPPP/R1BQKBNR b KQkq'}); -->
-          setTimeout(function() {
-            ground.set({fen:'start'});
-          }, 1000);
-        }, 2000);
-      </script>
-    </section>
-    <!-- <section> -->
-      <!--   <div class="chessground blue small cburnett" id="ground5"></div> -->
-      <!--   <p>Valid moves: white plays, then premoves</p> -->
+      <!--   <div class="chessground wood small merida coordinates" id="ground1"></div> -->
+      <!--   <p>Default options, with CSS coordinates</p> -->
       <!--   <script> -->
-        <!--     (function() { -->
+        <!--     var ground = chessground.main(document.getElementById('ground1')); -->
+      <!--   </script> -->
+    <!-- </section> -->
+  <!-- <section> -->
+  <!--   <div class="chessground wood small merida coordinates" id="ground2"></div> -->
+  <!--   <p>Free as a birrd</p> -->
+  <!--   <script> -->
+  <!--     (function() { -->
+  <!--       var ground = chessground.main(document.getElementById('ground2'), { -->
+  <!--         movable: { -->
+  <!--           free: true, -->
+  <!--           color: 'both', -->
+  <!--           dropOff: 'trash' -->
+  <!--         } -->
+  <!--       }); -->
+  <!--       setInterval(function() { -->
+  <!--         ground.set({fen:'2r3k1/pp2Qpbp/4b1p1/3p4/3n1PP1/2N4P/Pq6/R2K1B1R w -'}); -->
+  <!--         //ground.set({fen:'rnbqkbnr/pNpppppp/8/8/8/8/PPPPPPPP/R1BQKBNR b KQkq'}); -->
+  <!--         setTimeout(function() { -->
+  <!--           ground.set({fen:'start'}); -->
+  <!--         }, 1000); -->
+  <!--       }, 2000); -->
+  <!--     })(); -->
+  <!--   </script> -->
+  <!-- </section> -->
+  <!-- <section> -->
+    <!--   <div class="chessground blue small cburnett" id="ground5"></div> -->
+    <!--   <p>Valid moves: white plays, then premoves</p> -->
+    <!--   <script> -->
+      <!--     (function() { -->
     <!--       var ground; -->
     <!--       var chess = new Chess(); -->
     <!--       var onMove = function(orig, dest) { -->
@@ -87,42 +89,42 @@
     <!--       }); -->
     <!--       window.ground = ground; -->
     <!--     })(); -->
-      <!--   </script> -->
-    <!-- </section> -->
-  <!-- <section> -->
-  <!--   <div class="chessground wood small merida" id="ground7"></div> -->
-  <!--   <p>Play a game on a single board</p> -->
-  <!--   <script> -->
-  <!--     (function() { -->
-  <!--       var ground; -->
-  <!--         var chess = new Chess(); -->
-  <!--         var onMove = function(orig, dest) { -->
-  <!--           chess.move({from: orig, to: dest}); -->
-  <!--           ground.set({ -->
-  <!--             turnColor: chessToColor(chess), -->
-  <!--             movable: { -->
-  <!--               color: chessToColor(chess), -->
-  <!--               dests: chessToDests(chess) -->
-  <!--             } -->
-  <!--           }); -->
-  <!--           ground.getFen(function(s) { console.log(s); }); -->
-  <!--         }; -->
-  <!--         ground = chessground.main(document.getElementById('ground7'), { -->
-  <!--           turnColor: 'white', -->
-  <!--           movable: { -->
-  <!--             free: false, -->
-  <!--             color: chessToColor(chess), -->
-  <!--             premove: true, -->
-  <!--             dests: chessToDests(chess), -->
-  <!--             events: { -->
-  <!--               after: onMove -->
-  <!--             } -->
-  <!--           } -->
-  <!--         }); -->
-  <!--         window.ground = ground; -->
-  <!--     })(); -->
-  <!--   </script> -->
+    <!--   </script> -->
   <!-- </section> -->
+<section>
+  <div class="chessground wood small merida" id="ground7"></div>
+  <p>Play a game on a single board</p>
+  <script>
+    (function() {
+      var ground;
+          var chess = new Chess();
+          var onMove = function(orig, dest) {
+            chess.move({from: orig, to: dest});
+            ground.set({
+              turnColor: chessToColor(chess),
+              movable: {
+                color: chessToColor(chess),
+                dests: chessToDests(chess)
+              }
+            });
+            ground.getFen(function(s) { console.log(s); });
+          };
+          ground = chessground.main(document.getElementById('ground7'), {
+            turnColor: 'white',
+            movable: {
+              free: false,
+              color: chessToColor(chess),
+              premove: true,
+              dests: chessToDests(chess),
+              events: {
+                after: onMove
+              }
+            }
+          });
+          window.ground = ground;
+    })();
+  </script>
+</section>
 </body>
 </html>
 

@@ -25,14 +25,14 @@
                        #(animate component start-at duration delta))))))))
 
 (defn piece [component]
-  (when-let [anim (.. component -state -anim -scheduled)]
-    (.setState component #js {:anim #js {:scheduled false}})
+  (when-let [plan (.. component -state -plan)]
+    (.setState component #js {:plan false})
     (let [piece-el (.getDOMNode component)
           square-el (.-parentNode piece-el)
-          vect (square-vect square-el (.-orig anim) (.-dest anim))]
+          vect (square-vect square-el (.-orig plan) (.-dest plan))]
       (animate component
                (.getTime (js/Date.))
-               500;(.-duration anim)
+               500;(.-duration plan)
                vect))))
 
 (defn- make-piece [key piece] #js {:key key

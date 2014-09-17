@@ -33,8 +33,8 @@
     #js
     {:displayName "Piece"
      :getInitialState
-     (fn [] (this-as this #js {:anim #js {:current false
-                                          :scheduled (.. this -props -anim)}}))
+     (fn [] (this-as this #js {:anim false
+                               :plan (.. this -props -plan)}))
      ; :shouldComponentUpdate
      ; (fn [next-props next-state]
      ;   (this-as this
@@ -43,23 +43,23 @@
      :componentWillReceiveProps
      (fn [props]
        (this-as this
-                (.setState this #js {:anim #js {:scheduled (.. props -anim)}})))
+                (.setState this #js {:plan (.. props -plan)})))
      :componentDidMount
      (fn []
        (this-as this
-                (.setState this #js {:draggable-instance (drag/piece
+                (.setState this #js {:draggable_instance (drag/piece
                                                            (.getDOMNode this)
                                                            (.. this -props -ctrl)
                                                            (.. this -props -draggable)
                                                            )})
-                (this-as this (animation/piece this))))
+                (animation/piece this)))
      :componentWillUpdate
      (fn [next-props _]
        (this-as this
                 (when (not= (.-draggable next-props)
                             (.. this -props -draggable))
-                  (drag/piece-switch (.. this -state -draggable-instance)
-                                     (.-draggable next-props)))))
+                  (when-let [instance (.. this -state -draggable-instance)]
+                    (drag/piece-switch instance (.-draggable next-props))))))
      :componentDidUpdate
      (fn [] (this-as this (animation/piece this)))
      :componentWillUnmount
@@ -133,20 +133,20 @@
     #js
     {:displayName "Board"
      :getInitialState
-     (fn [] #js {:anim #{}})
+     (fn [] #js {:plans #{}})
      :componentWillReceiveProps
      (fn [next-props]
        (this-as this
-                (.setState this #js {:anim (animation/compute (.. this -props -chess)
-                                                              (.-chess next-props))})))
+                (.setState this #js {:plans (animation/compute (.. this -props -chess)
+                                                               (.-chess next-props))})))
      :render
      (fn []
        (this-as this
                 (div #js {:className "cg-board"}
                      (.map (.. this -props -chess)
                            (fn [square]
-                             (when-let [anim (aget (.. this -state -anim) (.-key square))]
-                               (aset (.-piece square) "anim" anim))
+                             (when-let [plan (aget (.. this -state -plans) (.-key square))]
+                               (aset (.-piece square) "plan" plan))
                              (square-component square))))))}))
 
 (defn- array-of [coll]
@@ -184,8 +184,8 @@
                                                           (= draggable-color color))}))
                            :selected (== selected key)
                            :check (== check key)
-                           :last-move (or (== last-move-orig key) (== last-move-dest key))
-                           :move-dest (not (== -1 (.indexOf move-dests key)))
-                           :premove-dest (not (== -1 (.indexOf premove-dests key)))
-                           :current-premove (not (== -1 (.indexOf current-premove key)))})]
+                           :last_move (or (== last-move-orig key) (== last-move-dest key))
+                           :move_dest (not (== -1 (.indexOf move-dests key)))
+                           :premove_dest (not (== -1 (.indexOf premove-dests key)))
+                           :current_premove (not (== -1 (.indexOf current-premove key)))})]
     #js {:chess (.map all-keys make-square)}))
