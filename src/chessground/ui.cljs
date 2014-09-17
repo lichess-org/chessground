@@ -137,9 +137,7 @@
      :componentWillReceiveProps
      (fn [next-props]
        (this-as this
-                (.setState this #js {:plans (animation/compute (.. this -props -animation)
-                                                               (.. this -props -chess)
-                                                               (.-chess next-props))})))
+                (.setState this #js {:plans (animation/compute (.-props this) next-props)})))
      :render
      (fn []
        (this-as this
@@ -191,6 +189,6 @@
                            :premove_dest (not (== -1 (.indexOf premove-dests key)))
                            :current_premove (not (== -1 (.indexOf current-premove key)))})]
     #js {:chess (.map all-keys make-square)
+         :orientation orientation
          :animation #js {:enabled (get anim :enabled?)
-                         :orientation orientation
                          :duration (get anim :duration)}}))

@@ -7,6 +7,7 @@
 
 (def ^private files "abcdefgh")
 (def ^private file-numbers #js {"a" 1 "b" 2 "c" 3 "d" 4 "e" 5 "f" 6 "g" 7 "h" 8})
+(def ^private file-inverts #js {"a" "h" "b" "g" "c" "f" "d" "e" "e" "d" "f" "c" "g" "b" "h" "a"})
 
 (defn key->pos [key]
   #js [(aget file-numbers (aget key 0)) (js/parseInt (aget key 1))])
@@ -18,6 +19,10 @@
                                "white" "black"
                                "black" "white"
                                nil))
+
+(defn invert-key [k]
+  (str (aget file-inverts (aget k 0))
+       (- 9 (js/parseInt (aget k 1)))))
 
 (defn deep-merge [a b]
   (letfn [(smart-merge [x y]
