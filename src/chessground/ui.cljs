@@ -192,4 +192,5 @@
                            :current_premove (not (== -1 (.indexOf current-premove key)))})]
     #js {:chess (.map all-keys make-square)
          :animation #js {:enabled (get anim :enabled?)
+                         :orientation orientation
                          :duration (get anim :duration)}}))

@@ -5,10 +5,11 @@
   (let [pos (common/key->pos key)]
     [(* (aget pos 0) size -1) (* (aget pos 1) size)]))
 
-(defn- square-vect [el orig dest]
+(defn- square-vect [el plan]
   (let [size (.-clientWidth el)
-        orig-vec (key->vector orig size)
-        dest-vec (key->vector dest size)]
+        white (= (.-orientation plan) "white")
+        orig-vec (key->vector (if white (.-orig plan) (.-dest plan)) size)
+        dest-vec (key->vector (if white (.-dest plan) (.-orig plan)) size)]
     #js {:x (- (first dest-vec) (first orig-vec))
          :y (- (second dest-vec) (second orig-vec))}))
 
@@ -29,7 +30,7 @@
     (.setState component #js {:plan false})
     (let [piece-el (.getDOMNode component)
           square-el (.-parentNode piece-el)
-          vect (square-vect square-el (.-orig plan) (.-dest plan))]
+          vect (square-vect square-el plan)]
       (animate component
                (.getTime (js/Date.))
                (.-duration plan)
@@ -71,6 +72,7 @@
                        (when-let [pre-p (closer new-p (.filter missings #(same-piece new-p %)))]
                          (aset anims (.-key new-p) #js {:orig (.-key pre-p)
                                                         :dest (.-key new-p)
+                                                        :orientation (.-orientation params)
                                                         :duration (.-duration params)}))))
       anims)
     #js {}))
