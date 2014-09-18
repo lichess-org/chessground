@@ -191,4 +191,5 @@
     #js {:chess (.map all-keys make-square)
          :orientation orientation
          :animation #js {:enabled (get anim :enabled?)
-                         :duration (get anim :duration)}}))
+                         :duration (get anim :duration)
+                         :exclude (get-in app [:movable :dropped])}}))

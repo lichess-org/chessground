@@ -18,6 +18,7 @@
              :color "both" ; color that can move. white | black | both | nil
              :dests nil ; valid moves. {"a2" ["a3" "a4"] "b1" ["a3" "c3"]} | nil
              :drop-off "revert" ; when a piece is dropped outside the board. "revert" | "trash"
+             :dropped nil ; last dropped dest, not to be animated
              ; :drag-center? true ; whether to center the piece under the cursor on drag start
              :events {:after (fn [orig dest] nil) ; called after the move has been played
                       }}
@@ -32,7 +33,12 @@
   (when function
     (js/setTimeout #(apply function (map clj->js args)) 50)))
 
-(defn with-fen [state fen] (assoc state :chess (chess/make (or fen "start"))))
+(defn set-movable-dropped [state key] (assoc-in state [:movable :dropped] key))
+
+(defn with-fen [state fen]
+  (-> state
+      (set-movable-dropped nil)
+      (assoc :chess (chess/make (or fen "start")))))
 
 (defn movable? [state orig]
   (when-let [piece (chess/get-piece (:chess state) orig)]
@@ -99,6 +105,7 @@
 
 (defn set-orientation [state color]
   (cond-> state
+    true (set-movable-dropped nil)
     (common/seq-contains? chess/colors color) (assoc :orientation color)))
 
 (defn toggle-orientation [state]
@@ -121,28 +128,26 @@
 (defn set-pieces [state pieces]
   (let [next-state (update-in state [:chess] #(chess/set-pieces % pieces))]
     (callback (-> state :events :change))
-    next-state))
+    (set-movable-dropped next-state nil)))
+
+(defn- base-move-piece [state orig dest]
+  (when-let [next-chess (chess/move-piece (:chess state) [orig dest])]
+    (let [next-state (-> state
+                         (assoc :chess next-chess)
+                         (set-check nil)
+                         (set-movable-dropped nil)
+                         (set-last-move [orig dest]))]
+      (callback (-> next-state :events :change))
+      next-state)))
 
 (defn api-move-piece [state [orig dest]]
-  (if-let [next-chess (chess/move-piece (:chess state) [orig dest])]
-    (let [next-state (-> state
-                         (assoc :chess next-chess)
-                         (set-check nil)
-                         (set-last-move [orig dest]))]
-      (callback (-> next-state :events :change))
-      next-state)
-    state))
+  (or (base-move-piece state orig dest)
+      state))
 
 (defn move-piece [state orig dest]
-  (if-let [next-chess (chess/move-piece (:chess state) [orig dest])]
-    (let [next-state (-> state
-                         (assoc :chess next-chess)
-                         (assoc-in [:movable :dests] nil)
-                         (set-check nil)
-                         (set-last-move [orig dest]))]
-      (callback (-> next-state :movable :events :after) orig dest)
-      (callback (-> next-state :events :change))
-      next-state)
+  (if-let [next-state (base-move-piece state orig dest)]
+    (do (callback (-> next-state :movable :events :after) orig dest)
+        (assoc-in next-state [:movable :dests] nil))
     state))
 
 (defn play-premove [state]

@@ -54,11 +54,10 @@
 (defn- on-move [event]
   (let [piece (.-target event)
         x (+ (or (.-x piece) 0) (.-dx event))
-        y (+ (or (.-y piece) 0) (.-dy event))
-        transform (common/translate x y)]
+        y (+ (or (.-y piece) 0) (.-dy event))]
     (set! (.-x piece) x)
     (set! (.-y piece) y)
-    (aset (.-style piece) common/transform-prop transform)))
+    (aset (.-style piece) common/transform-prop (common/translate x y))))
 
 (defn- unfuck [piece]
   (set! (.-x piece) 0)

@@ -65,13 +65,14 @@
                                     (let [key (.-key square)
                                           pre-p (aget pre-pieces key)
                                           cur-p (.-piece square)]
-                                      (if cur-p
-                                        (if pre-p
-                                          (when-not (same-piece cur-p pre-p)
-                                            (.push missings pre-p)
+                                      (when-not (== key (.. current -animation -exclude))
+                                        (if cur-p
+                                          (if pre-p
+                                            (when-not (same-piece cur-p pre-p)
+                                              (.push missings pre-p)
+                                              (.push news (make-piece key cur-p false)))
                                             (.push news (make-piece key cur-p false)))
-                                          (.push news (make-piece key cur-p false)))
-                                        (when pre-p (.push missings pre-p))))))
+                                          (when pre-p (.push missings pre-p)))))))
       (.forEach news (fn [new-p]
                        (when-let [pre-p (closer new-p (.filter missings #(same-piece new-p %)))]
                          (aset anims (.-key new-p) #js {:orig (.-key pre-p)

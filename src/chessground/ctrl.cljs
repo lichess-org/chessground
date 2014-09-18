@@ -36,5 +36,7 @@
 
 (defn drop-on [app dest]
   (if-let [orig (:selected app)]
-    (move-piece app [orig dest])
+    (-> app
+        (move-piece [orig dest])
+        (data/set-movable-dropped dest))
     (drop-off app)))
