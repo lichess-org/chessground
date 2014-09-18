@@ -28,8 +28,7 @@
 (defn start [component]
   (when-let [plan (.. component -state -plan)]
     (.setState component #js {:plan false})
-    (let [piece-el (.getDOMNode component)
-          square-el (.-parentNode piece-el)
+    (let [square-el (.. component getDOMNode -parentNode)
           vect (square-vect square-el plan)]
       (animate component
                (.getTime (js/Date.))

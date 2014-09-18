@@ -23,19 +23,14 @@
 (defn- piece-hash [piece]
   (when piece (.join #js [(.-color piece) (.-role piece) (.-draggable piece)] "")))
 
-(defn- transform-style [x y]
-  (let [st #js {}]
-    (aset st common/transform-prop (common/translate x y))
-    st))
-
-(defn- event-stop [e] (.stopPropagation e) (.preventDefault e))
+(defn- transform-style [x y] #js {:left x :top y})
 
 (def ^private piece-component
   (js/React.createClass
     #js
     {:displayName "Piece"
      :getInitialState
-     (fn [] (this-as this #js {:draggable true
+     (fn [] (this-as this #js {:draggable (.. this -props -draggable)
                                :drag_rel nil
                                :drag_pos nil
                                :anim false
@@ -48,50 +43,20 @@
      :componentWillReceiveProps
      (fn [props]
        (this-as this
-                (.setState this #js {:plan (.. props -plan)})))
+                (drag/will-receive-props this props)
+                (.setState this #js {:plan (.-plan props)
+                                     :draggable (.-draggable props)})))
      :componentDidMount
-     (fn []
-       (this-as this
-                ; (.setState this #js {:draggable_instance (drag/piece
-                ;                                            (.getDOMNode this)
-                ;                                            (.. this -props -ctrl)
-                ;                                            (.. this -props -draggable)
-                ;                                            )})
-                (animation/start this)))
-     ; :componentWillUpdate
-     ; (fn [next-props _]
-     ;   (this-as this
-     ;            (when (not= (.-draggable next-props)
-     ;                        (.. this -props -draggable))
-     ;              (when-let [instance (.. this -state -draggable-instance)]
-     ;                (drag/piece-switch instance (.-draggable next-props))))))
-     :componentDidUpdate
      (fn [] (this-as this (animation/start this)))
-     :componentWillUnmount
-     (fn []
-       (this-as this (when-let [instance (.. this -state -draggable-instance)]
-                       (.unset instance))))
-     :onMouseDown
-     (fn [e]
+     :componentDidUpdate
+     (fn [_ state]
        (this-as this
-                (event-stop e)
-                (when (and (== (.-button e) 0) ; only left button
-                           (.. this -state -draggable))
-                  (.setState this #js {:drag_rel #js {:x (.-pageX e)
-                                                      :y (.-pageY e)}}))))
+                (animation/start this)
+                (drag/did-update this state)))
      :onMouseMove
-     (fn [e]
-       (this-as this
-                (event-stop e)
-                (when-let [rel (.. this -state -drag-rel)]
-                  (.setState this #js {:drag_pos #js {:x (- (.-pageX e) (.-x rel))
-                                                      :y (- (.-pageY e) (.-y rel))}}))))
+     (fn [e] (this-as this (drag/mousemove this e)))
      :onMouseUp
-     (fn [e]
-       (this-as this
-                (event-stop e)
-                (.setState this #js {:drag_rel nil
-                                     :drag_pos nil})))
+     (fn [e] (this-as this (drag/mouseup this e)))
      :render
      (fn []
        (this-as this
@@ -103,9 +68,7 @@
                                                    (.. this -props -color)
                                                    (.. this -props -role)
                                                    (if (.. this -state -drag-pos) "dragging" "")] " ")
-                            :onMouseDown (.-onMouseDown this)
-                            :onMouseMove (.-onMouseMove this)
-                            :onMouseUp (.-onMouseUp this)
+                            :onMouseDown (drag/mousedown this)
                             :style style}))))}))
 
 (def ^private square-component
@@ -122,6 +85,7 @@
                     (not (== (.. this -props -last-move) (.-last-move next-props)))
                     (not (== (.. this -props -current-premove) (.-current-premove next-props)))
                     (not (== (.. this -props -orientation) (.-orientation next-props)))
+                    (not (== (.. this -props -hover) (.-hover next-props)))
                     (not (== (piece-hash (.. this -props -piece))
                              (piece-hash (.-piece next-props)))))))
      :componentDidMount
@@ -153,30 +117,38 @@
                                                    "last-move" (.. this -props -last-move)
                                                    "move-dest" (.. this -props -move-dest)
                                                    "premove-dest" (.. this -props -premove-dest)
-                                                   "current-premove" (.. this -props -current-premove)})
+                                                   "current-premove" (.. this -props -current-premove)
+                                                   "drag-over" (.. this -props -hover)})
                         :data-key key
                         :data-coord-x (when (== y (if white? 1 8)) (get key 0))
                         :data-coord-y (when (== x (if white? 8 1)) y)}
-                       (when-let [piece (.. this -props -piece)] (piece-component piece))))))}))
+                       (when-let [piece (.. this -props -piece)]
+                         (piece-component piece))))))}))
 
 (def board-component
   (js/React.createClass
     #js
     {:displayName "Board"
      :getInitialState
-     (fn [] #js {:plans #{}})
+     (fn [] #js {:plans #{}
+                 :hover nil})
      :componentWillReceiveProps
      (fn [next-props]
        (this-as this
                 (.setState this #js {:plans (animation/compute (.-props this) next-props)})))
+     :setHover
+     (fn [key]
+       (this-as this (.setState this #js {:hover key})))
      :render
      (fn []
        (this-as this
                 (div #js {:className "cg-board"}
                      (.map (.. this -props -chess)
                            (fn [square]
-                             (when-let [plan (aget (.. this -state -plans) (.-key square))]
-                               (aset (.-piece square) "plan" plan))
+                             (when (.-piece square)
+                               (set! (.. square -piece -set-hover) (.-setHover this))
+                               (set! (.. square -piece -plan) (aget (.. this -state -plans) (.-key square))))
+                             (set! (.-hover square) (== (.. this -state -hover) (.-key square)))
                              (square-component square))))))}))
 
 (defn- array-of [coll]

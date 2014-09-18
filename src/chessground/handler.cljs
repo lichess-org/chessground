@@ -21,7 +21,8 @@
     :get-current-premove  #(a/put! msg (-> % :premovable :current))
     :api-move             #(data/api-move-piece % msg)
     :set-pieces           #(data/set-pieces % msg)
-    :play-premove         data/play-premove))
+    :play-premove         data/play-premove
+    pp))
 
 (defn process
   "Return a function that transforms an app data"

@@ -1,5 +1,4 @@
 .cg-square {
-  -webkit-transform: translate3d(0,0,0);
   cursor: pointer;
 }
 .cg-square:hover {

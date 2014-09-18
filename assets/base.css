@@ -69,7 +69,7 @@
   height: 100%;
   background-size: cover;
   z-index: 2;
-  -webkit-transform: translate3d(0,0,0);
+  /* -webkit-transform: translate3d(0,0,0); */
 }
 .cg-piece.dragging {
   z-index: 9;
