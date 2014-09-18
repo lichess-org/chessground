@@ -28,12 +28,17 @@
     (aset st common/transform-prop (common/translate x y))
     st))
 
+(defn- event-stop [e] (.stopPropagation e) (.preventDefault e))
+
 (def ^private piece-component
   (js/React.createClass
     #js
     {:displayName "Piece"
      :getInitialState
-     (fn [] (this-as this #js {:anim false
+     (fn [] (this-as this #js {:draggable true
+                               :drag_rel nil
+                               :drag_pos nil
+                               :anim false
                                :plan (.. this -props -plan)}))
      ; :shouldComponentUpdate
      ; (fn [next-props next-state]
@@ -47,33 +52,60 @@
      :componentDidMount
      (fn []
        (this-as this
-                (.setState this #js {:draggable_instance (drag/piece
-                                                           (.getDOMNode this)
-                                                           (.. this -props -ctrl)
-                                                           (.. this -props -draggable)
-                                                           )})
+                ; (.setState this #js {:draggable_instance (drag/piece
+                ;                                            (.getDOMNode this)
+                ;                                            (.. this -props -ctrl)
+                ;                                            (.. this -props -draggable)
+                ;                                            )})
                 (animation/start this)))
-     :componentWillUpdate
-     (fn [next-props _]
-       (this-as this
-                (when (not= (.-draggable next-props)
-                            (.. this -props -draggable))
-                  (when-let [instance (.. this -state -draggable-instance)]
-                    (drag/piece-switch instance (.-draggable next-props))))))
+     ; :componentWillUpdate
+     ; (fn [next-props _]
+     ;   (this-as this
+     ;            (when (not= (.-draggable next-props)
+     ;                        (.. this -props -draggable))
+     ;              (when-let [instance (.. this -state -draggable-instance)]
+     ;                (drag/piece-switch instance (.-draggable next-props))))))
      :componentDidUpdate
      (fn [] (this-as this (animation/start this)))
      :componentWillUnmount
      (fn []
        (this-as this (when-let [instance (.. this -state -draggable-instance)]
                        (.unset instance))))
+     :onMouseDown
+     (fn [e]
+       (this-as this
+                (event-stop e)
+                (when (and (== (.-button e) 0) ; only left button
+                           (.. this -state -draggable))
+                  (.setState this #js {:drag_rel #js {:x (.-pageX e)
+                                                      :y (.-pageY e)}}))))
+     :onMouseMove
+     (fn [e]
+       (this-as this
+                (event-stop e)
+                (when-let [rel (.. this -state -drag-rel)]
+                  (.setState this #js {:drag_pos #js {:x (- (.-pageX e) (.-x rel))
+                                                      :y (- (.-pageY e) (.-y rel))}}))))
+     :onMouseUp
+     (fn [e]
+       (this-as this
+                (event-stop e)
+                (.setState this #js {:drag_rel nil
+                                     :drag_pos nil})))
      :render
      (fn []
        (this-as this
-                (let [style (when-let [anim (.. this -state -anim)]
-                              (transform-style (.-x anim) (.-y anim)))]
+                (let [style (if-let [drag (.. this -state -drag-pos)]
+                              (transform-style (.-x drag) (.-y drag))
+                              (when-let [anim (.. this -state -anim)]
+                                (transform-style (.-x anim) (.-y anim))))]
                   (div #js {:className (.join #js ["cg-piece"
                                                    (.. this -props -color)
-                                                   (.. this -props -role)] " ")
+                                                   (.. this -props -role)
+                                                   (if (.. this -state -drag-pos) "dragging" "")] " ")
+                            :onMouseDown (.-onMouseDown this)
+                            :onMouseMove (.-onMouseMove this)
+                            :onMouseUp (.-onMouseUp this)
                             :style style}))))}))
 
 (def ^private square-component
@@ -101,8 +133,7 @@
                   (let [ev (if common/touch-device? "touchstart" "mousedown")]
                     (.addEventListener el ev (fn [e]
                                                (.preventDefault e)
-                                               (ctrl :select-square key))))
-                  (drag/square el))))
+                                               (ctrl :select-square key)))))))
      :render
      (fn []
        (this-as this
