@@ -23,7 +23,10 @@
 (defn- piece-hash [piece]
   (when piece (.join #js [(.-color piece) (.-role piece) (.-draggable piece)] "")))
 
-(defn- transform-style [x y] #js {:left x :top y})
+(defn- transform-style [x y]
+  (let [st #js {}]
+    (aset st common/transform-prop (common/translate x y))
+    st))
 
 (def ^private piece-component
   (js/React.createClass
