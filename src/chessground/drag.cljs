@@ -11,11 +11,14 @@
 
 (defn- over-key [this e]
   (let [bounds (-> this .-state (aget "drag-bounds"))
+        orientation (-> this .-props (aget "orientation"))
         board-x (aget bounds 0)
         board-y (aget bounds 1)
         board-size (aget bounds 2)
         file (js/Math.ceil (* 8 (/ (- (.-pageX e) board-x) board-size)))
-        rank (js/Math.ceil (- 8 (* 8 (/ (- (.-pageY e) board-y) board-size))))]
+        file (if (= "white" orientation) file (- 9 file))
+        rank (js/Math.ceil (- 8 (* 8 (/ (- (.-pageY e) board-y) board-size))))
+        rank (if (= "white" orientation) rank (- 9 rank))]
     (when (and (> file 0) (< file 9) (> rank 0) (< rank 9)) (common/pos->key #js [file rank]))))
 
 (defn start [this]

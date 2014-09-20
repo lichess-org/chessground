@@ -189,6 +189,7 @@
                                       #js {:ctrl ctrl
                                            :color color
                                            :role (get piece :role)
+                                           :orientation orientation
                                            :draggable (or (= draggable-color "both")
                                                           (= draggable-color color))}))
                            :selected (== selected key)
