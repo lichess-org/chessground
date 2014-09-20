@@ -56,12 +56,14 @@
 
 (defn did-update [this prev-state]
   (if (and (-> this .-state (aget "drag-rel")) (not (aget prev-state "drag-rel")))
-    (do (.addEventListener js/document "mousemove" (aget this "onMouseMove"))
-        (.addEventListener js/document "touchmove" (aget this "onTouchMove"))
-        (.addEventListener js/document "mouseup" (aget this "onMouseUp"))
-        (.addEventListener js/document "touchend" (aget this "onTouchEnd")))
+    (if touch-device?
+      (do (.addEventListener js/document "touchmove" (aget this "onTouchMove"))
+          (.addEventListener js/document "touchend" (aget this "onTouchEnd")))
+      (do (.addEventListener js/document "mousemove" (aget this "onMouseMove"))
+          (.addEventListener js/document "mouseup" (aget this "onMouseUp"))))
     (when (and (not (-> this .-state (aget "drag-rel"))) (aget prev-state "drag-rel"))
-      (.removeEventListener js/document "mousemove" (aget this "onMouseMove"))
-      (.removeEventListener js/document "touchmove" (aget this "onTouchMove"))
-      (.removeEventListener js/document "mouseup" (aget this "onMouseUp"))
-      (.removeEventListener js/document "touchend" (aget this "onTouchEnd")))))
+      (if touch-device?
+        (do (.removeEventListener js/document "touchmove" (aget this "onTouchMove"))
+            (.removeEventListener js/document "touchend" (aget this "onTouchEnd")))
+        (do (.removeEventListener js/document "mousemove" (aget this "onMouseMove"))
+            (.removeEventListener js/document "mouseup" (aget this "onMouseUp")))))))
