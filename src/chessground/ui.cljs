@@ -56,13 +56,9 @@
        (this-as this
                 (animation/start this)
                 (drag/did-update this state)))
-     :onMouseMove
+     :dragMove
      (fn [e] (this-as this (drag/move this e)))
-     :onTouchMove
-     (fn [e] (this-as this (drag/move this e)))
-     :onMouseUp
-     (fn [e] (this-as this (drag/end this e)))
-     :onTouchEnd
+     :dragEnd
      (fn [e] (this-as this (drag/end this e)))
      :render
      (fn []
