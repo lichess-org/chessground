@@ -27,11 +27,10 @@
     (when (and (or touch-device?
                    (== (.-button e) 0)) ; only left button
                (-> this .-state (aget "draggable")))
-      (let [board (.. this getDOMNode -parentNode -parentNode)
-            x (.-offsetLeft board)
-            y (.-offsetTop board)
-            size (.-offsetWidth board)]
-        (.setState this #js {:drag-bounds #js [x y size]
+      (let [client (.. this getDOMNode -parentNode -parentNode getBoundingClientRect)]
+        (.setState this #js {:drag-bounds #js [(.-left client)
+                                               (.-top client)
+                                               (.-width client)]
                              :drag-rel #js {:x (.-pageX e)
                                             :y (.-pageY e)}})))))
 
