@@ -57,9 +57,13 @@
                 (animation/start this)
                 (drag/did-update this state)))
      :onMouseMove
-     (fn [e] (this-as this (drag/mousemove this e)))
+     (fn [e] (this-as this (drag/move this e)))
+     :onTouchMove
+     (fn [e] (this-as this (drag/move this e)))
      :onMouseUp
-     (fn [e] (this-as this (drag/mouseup this e)))
+     (fn [e] (this-as this (drag/end this e)))
+     :onTouchEnd
+     (fn [e] (this-as this (drag/end this e)))
      :render
      (fn []
        (this-as this
@@ -71,7 +75,8 @@
                                                    (-> this .-props (aget "color"))
                                                    (-> this .-props (aget "role"))
                                                    (if (-> this .-state (aget "drag-pos")) "dragging" "")] " ")
-                            :onMouseDown (drag/mousedown this)
+                            :onMouseDown (drag/start this)
+                            :onTouchStart (drag/start this)
                             :style style}))))}))
 
 (def ^private square-component

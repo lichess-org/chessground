@@ -18,7 +18,7 @@
         rank (js/Math.ceil (- 8 (* 8 (/ (- (.-pageY e) board-y) board-size))))]
     (when (and (> file 0) (< file 9) (> rank 0) (< rank 9)) (common/pos->key #js [file rank]))))
 
-(defn mousedown [this]
+(defn start [this]
   (fn [e]
     (event-stop e)
     (when (and (== (.-button e) 0) ; only left button
@@ -31,7 +31,7 @@
                              :drag-rel #js {:x (.-pageX e)
                                             :y (.-pageY e)}})))))
 
-(defn mousemove [this e]
+(defn move [this e]
   ; (pp "onmove")
   (event-stop e)
   (when-let [rel (-> this .-state (aget "drag-rel"))]
@@ -40,7 +40,7 @@
       ((-> this .-props (aget "set-hover")) (over-key this e))
       (.setState this #js {:drag-pos pos}))))
 
-(defn mouseup [this e]
+(defn end [this e]
   (event-stop e)
   ((-> this .-props (aget "set-hover")) nil)
   (.setState this #js {:drag-rel nil
@@ -56,7 +56,11 @@
 (defn did-update [this prev-state]
   (if (and (-> this .-state (aget "drag-rel")) (not (aget prev-state "drag-rel")))
     (do (.addEventListener js/document "mousemove" (aget this "onMouseMove"))
-        (.addEventListener js/document "mouseup" (aget this "onMouseUp")))
+        (.addEventListener js/document "touchmove" (aget this "onTouchMove"))
+        (.addEventListener js/document "mouseup" (aget this "onMouseUp"))
+        (.addEventListener js/document "touchend" (aget this "onTouchEnd")))
     (when (and (not (-> this .-state (aget "drag-rel"))) (aget prev-state "drag-rel"))
       (.removeEventListener js/document "mousemove" (aget this "onMouseMove"))
-      (.removeEventListener js/document "mouseup" (aget this "onMouseUp")))))
+      (.removeEventListener js/document "touchmove" (aget this "onTouchMove"))
+      (.removeEventListener js/document "mouseup" (aget this "onMouseUp"))
+      (.removeEventListener js/document "touchend" (aget this "onTouchEnd")))))
