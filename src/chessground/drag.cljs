@@ -1,6 +1,6 @@
 (ns chessground.drag
   "Make pieces draggable, and squares droppable"
-  (:require [chessground.common :as common :refer [pp]]
+  (:require [chessground.common :as common :refer [pp touch-device?]]
             [chessground.chess :as chess]
             [cljs.core.async :as a]))
 
@@ -21,7 +21,8 @@
 (defn start [this]
   (fn [e]
     (event-stop e)
-    (when (and (== (.-button e) 0) ; only left button
+    (when (and (or touch-device? 
+                   (== (.-button e) 0)) ; only left button
                (-> this .-state (aget "draggable")))
       (let [board (.. this getDOMNode -parentNode -parentNode)
             x (.-offsetLeft board)
