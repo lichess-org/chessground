@@ -21,7 +21,7 @@
     arr))
 
 (defn- piece-hash [piece]
-  (when piece (.join #js [(.-color piece) (.-role piece) (.-draggable piece)] "")))
+  (when piece (.join #js [(aget piece "color") (aget piece "role") (aget piece "draggable")] "")))
 
 (defn- transform-style [x y]
   (let [st #js {}]
@@ -33,11 +33,11 @@
     #js
     {:displayName "Piece"
      :getInitialState
-     (fn [] (this-as this #js {:draggable (.. this -props -draggable)
-                               :drag_rel nil
-                               :drag_pos nil
+     (fn [] (this-as this #js {:draggable (-> this .-props (aget "draggable"))
+                               :drag-rel nil
+                               :drag-pos nil
                                :anim false
-                               :plan (.. this -props -plan)}))
+                               :plan (-> this .-props (aget "plan"))}))
      ; :shouldComponentUpdate
      ; (fn [next-props next-state]
      ;   (this-as this
@@ -47,8 +47,8 @@
      (fn [props]
        (this-as this
                 (drag/will-receive-props this props)
-                (.setState this #js {:plan (.-plan props)
-                                     :draggable (.-draggable props)})))
+                (.setState this #js {:plan (aget props "plan")
+                                     :draggable (aget props "draggable")})))
      :componentDidMount
      (fn [] (this-as this (animation/start this)))
      :componentDidUpdate
@@ -63,14 +63,14 @@
      :render
      (fn []
        (this-as this
-                (let [style (if-let [drag (.. this -state -drag-pos)]
-                              (transform-style (.-x drag) (.-y drag))
-                              (when-let [anim (.. this -state -anim)]
-                                (transform-style (.-x anim) (.-y anim))))]
+                (let [style (if-let [drag (-> this .-state (aget "drag-pos"))]
+                              (transform-style (aget drag "x") (aget drag "y"))
+                              (when-let [anim (-> this .-state (aget "anim"))]
+                                (transform-style (aget anim "x") (aget anim "y"))))]
                   (div #js {:className (.join #js ["cg-piece"
-                                                   (.. this -props -color)
-                                                   (.. this -props -role)
-                                                   (if (.. this -state -drag-pos) "dragging" "")] " ")
+                                                   (-> this .-props (aget "color"))
+                                                   (-> this .-props (aget "role"))
+                                                   (if (-> this .-state (aget "drag-pos")) "dragging" "")] " ")
                             :onMouseDown (drag/mousedown this)
                             :style style}))))}))
 
@@ -81,22 +81,22 @@
      :shouldComponentUpdate
      (fn [next-props _]
        (this-as this
-                (or (not (== (.. this -props -selected) (.-selected next-props)))
-                    (not (== (.. this -props -move-dest) (.-move-dest next-props)))
-                    (not (== (.. this -props -premove-dest) (.-premove-dest next-props)))
-                    (not (== (.. this -props -check) (.-check next-props)))
-                    (not (== (.. this -props -last-move) (.-last-move next-props)))
-                    (not (== (.. this -props -current-premove) (.-current-premove next-props)))
-                    (not (== (.. this -props -orientation) (.-orientation next-props)))
-                    (not (== (.. this -props -hover) (.-hover next-props)))
-                    (not (== (piece-hash (.. this -props -piece))
-                             (piece-hash (.-piece next-props)))))))
+                (or (not (== (-> this .-props (aget "selected")) (aget next-props "selected")))
+                    (not (== (-> this .-props (aget "move-dest")) (aget next-props "move-dest")))
+                    (not (== (-> this .-props (aget "premove-dest")) (aget next-props "premove-dest")))
+                    (not (== (-> this .-props (aget "check")) (aget next-props "check")))
+                    (not (== (-> this .-props (aget "last-move")) (aget next-props "last-move")))
+                    (not (== (-> this .-props (aget "current-premove")) (aget next-props "current-premove")))
+                    (not (== (-> this .-props (aget "orientation")) (aget next-props "orientation")))
+                    (not (== (-> this .-props (aget "hover")) (aget next-props "hover")))
+                    (not (== (piece-hash (-> this .-props (aget "piece")))
+                             (piece-hash (aget next-props "piece")))))))
      :componentDidMount
      (fn []
        (this-as this
                 (let [el (.getDOMNode this)
-                      key (.. this -props -key)
-                      ctrl (.. this -props -ctrl)]
+                      key (-> this .-props (aget "key"))
+                      ctrl (-> this .-props (aget "ctrl"))]
                   (let [ev (if common/touch-device? "touchstart" "mousedown")]
                     (.addEventListener el ev (fn [e]
                                                (.preventDefault e)
@@ -104,8 +104,8 @@
      :render
      (fn []
        (this-as this
-                (let [key (.. this -props -key)
-                      white? (= (.. this -props -orientation) "white")
+                (let [key (-> this .-props (aget "key"))
+                      white? (= (-> this .-props (aget "orientation")) "white")
                       x (inc (.indexOf "abcdefgh" (get key 0)))
                       y (js/parseInt (get key 1))
                       style-x (str (* (dec x) 12.5) "%")
@@ -115,17 +115,17 @@
                                  #js {"left" style-x "bottom" style-y}
                                  #js {"right" style-x "top" style-y})
                         :className (class-set #js {"cg-square" true
-                                                   "selected" (.. this -props -selected)
-                                                   "check" (.. this -props -check)
-                                                   "last-move" (.. this -props -last-move)
-                                                   "move-dest" (.. this -props -move-dest)
-                                                   "premove-dest" (.. this -props -premove-dest)
-                                                   "current-premove" (.. this -props -current-premove)
-                                                   "drag-over" (.. this -props -hover)})
+                                                   "selected" (-> this .-props (aget "selected"))
+                                                   "check" (-> this .-props (aget "check"))
+                                                   "last-move" (-> this .-props (aget "last-move"))
+                                                   "move-dest" (-> this .-props (aget "move-dest"))
+                                                   "premove-dest" (-> this .-props (aget "premove-dest"))
+                                                   "current-premove" (-> this .-props (aget "current-premove"))
+                                                   "drag-over" (-> this .-props (aget "hover"))})
                         :data-key key
                         :data-coord-x (when (== y (if white? 1 8)) (get key 0))
                         :data-coord-y (when (== x (if white? 8 1)) y)}
-                       (when-let [piece (.. this -props -piece)]
+                       (when-let [piece (-> this .-props (aget "piece"))]
                          (piece-component piece))))))}))
 
 (def board-component
@@ -146,12 +146,14 @@
      (fn []
        (this-as this
                 (div #js {:className "cg-board"}
-                     (.map (.. this -props -chess)
+                     (.map (-> this .-props (aget "chess"))
                            (fn [square]
-                             (when (.-piece square)
-                               (set! (.. square -piece -set-hover) (.-setHover this))
-                               (set! (.. square -piece -plan) (aget (.. this -state -plans) (.-key square))))
-                             (set! (.-hover square) (== (.. this -state -hover) (.-key square)))
+                             (when (aget square "piece")
+                               (aset (aget square "piece")
+                                     "set-hover" (aget this "setHover"))
+                               (aset (aget square "piece")
+                                     "plan" (-> this .-state (aget "plans") (aget (aget square "key")))))
+                             (aset square "hover" (== (-> this .-state (aget "hover")) (aget square "key")))
                              (square-component square))))))}))
 
 (defn- array-of [coll]
@@ -190,10 +192,10 @@
                                                           (= draggable-color color))}))
                            :selected (== selected key)
                            :check (== check key)
-                           :last_move (or (== last-move-orig key) (== last-move-dest key))
-                           :move_dest (not (== -1 (.indexOf move-dests key)))
-                           :premove_dest (not (== -1 (.indexOf premove-dests key)))
-                           :current_premove (not (== -1 (.indexOf current-premove key)))})]
+                           :last-move (or (== last-move-orig key) (== last-move-dest key))
+                           :move-dest (not (== -1 (.indexOf move-dests key)))
+                           :premove-dest (not (== -1 (.indexOf premove-dests key)))
+                           :current-premove (not (== -1 (.indexOf current-premove key)))})]
     #js {:chess (.map all-keys make-square)
          :orientation orientation
          :animation #js {:enabled (get anim :enabled?)
