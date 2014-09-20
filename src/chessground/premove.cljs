@@ -25,7 +25,7 @@
 (defn- queen [p1 p2] (or (bishop p1 p2) (rook p1 p2)))
 
 (defn- rook-files-of [ch color]
-  (map (comp common/file->pos first first)
+  (map #(->> % first first (aget common/file-numbers))
        (filter (fn [[k p]] (and (= (:role p) "rook")
                                 (= (:color p) color))) ch)))
 
