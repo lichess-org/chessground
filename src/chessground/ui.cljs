@@ -75,8 +75,8 @@
                                                    (-> this .-props (aget "color"))
                                                    (-> this .-props (aget "role"))
                                                    (if (-> this .-state (aget "drag-pos")) "dragging" "")] " ")
-                            :onMouseDown (drag/start this)
-                            :onTouchStart (drag/start this)
+                            :onMouseDown (when (not common/touch-device?) (drag/start this))
+                            :onTouchStart (when common/touch-device? (drag/start this))
                             :style style}))))}))
 
 (def ^private square-component

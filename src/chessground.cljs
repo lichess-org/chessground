@@ -8,7 +8,6 @@
 
 (extend-type js/NodeList ISeqable (-seq [array] (array-seq array 0)))
 
-
 (defn ^:export main
   "Application entry point; returns the public JavaScript API"
   [element config]
@@ -17,7 +16,6 @@
         app (api/main (or (js->clj config :keywordize-keys true) {}))
         app-atom (atom app)
         render #(js/React.renderComponent (ui/board-component (ui/clj->react % ctrl)) element)]
-    (.initializeTouchEvents js/React true)
     (render app)
     (am/go-loop []
                 (let [[k msg] (a/<! chan)]

@@ -21,7 +21,7 @@
 (defn start [this]
   (fn [e]
     (event-stop e)
-    (when (and (or touch-device? 
+    (when (and (or touch-device?
                    (== (.-button e) 0)) ; only left button
                (-> this .-state (aget "draggable")))
       (let [board (.. this getDOMNode -parentNode -parentNode)
