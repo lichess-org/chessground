@@ -86,16 +86,16 @@
      :shouldComponentUpdate
      (fn [next-props _]
        (this-as this
-                (or (not (== (-> this .-props (aget "selected")) (aget next-props "selected")))
-                    (not (== (-> this .-props (aget "move-dest")) (aget next-props "move-dest")))
-                    (not (== (-> this .-props (aget "premove-dest")) (aget next-props "premove-dest")))
-                    (not (== (-> this .-props (aget "check")) (aget next-props "check")))
-                    (not (== (-> this .-props (aget "last-move")) (aget next-props "last-move")))
-                    (not (== (-> this .-props (aget "current-premove")) (aget next-props "current-premove")))
-                    (not (== (-> this .-props (aget "orientation")) (aget next-props "orientation")))
-                    (not (== (-> this .-props (aget "hover")) (aget next-props "hover")))
-                    (not (== (piece-hash (-> this .-props (aget "piece")))
-                             (piece-hash (aget next-props "piece")))))))
+                (not (and (== (-> this .-props (aget "selected")) (aget next-props "selected"))
+                          (== (-> this .-props (aget "move-dest")) (aget next-props "move-dest"))
+                          (== (-> this .-props (aget "premove-dest")) (aget next-props "premove-dest"))
+                          (== (-> this .-props (aget "check")) (aget next-props "check"))
+                          (== (-> this .-props (aget "last-move")) (aget next-props "last-move"))
+                          (== (-> this .-props (aget "current-premove")) (aget next-props "current-premove"))
+                          (== (-> this .-props (aget "orientation")) (aget next-props "orientation"))
+                          (== (-> this .-props (aget "hover")) (aget next-props "hover"))
+                          (== (piece-hash (-> this .-props (aget "piece")))
+                              (piece-hash (aget next-props "piece")))))))
      :componentDidMount
      (fn []
        (this-as this
