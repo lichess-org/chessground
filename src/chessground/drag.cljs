@@ -48,8 +48,7 @@
   ((-> this .-props (aget "set-hover")) nil)
   (.setState this #js {:drag-rel nil
                        :drag-pos nil})
-  (when-let [drop-key (over-key this e)]
-    ((-> this .-props (aget "ctrl")) :drop-on drop-key)))
+  ((-> this .-props (aget "ctrl")) :drop-piece (over-key this e)))
 
 (defn will-receive-props [this props]
   (when (and (-> this .-state (aget "drag-rel")) (not (aget props "draggable")))

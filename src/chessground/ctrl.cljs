@@ -27,16 +27,13 @@
       (data/set-selected app key)
       (data/set-premovable-current app nil))))
 
-(defn drop-off [app]
+(defn drop-piece [app dest]
   (data/unselect
-    (or (when (= "trash" (-> app :movable :drop-off))
-          (when-let [key (:selected app)]
-            (update-in app [:chess] chess/set-pieces {key nil})))
-        app)))
-
-(defn drop-on [app dest]
-  (if-let [orig (:selected app)]
-    (-> app
-        (move-piece [orig dest])
-        (data/set-movable-dropped dest))
-    (drop-off app)))
+    (if-let [orig (:selected app)]
+      (cond
+        dest
+        (-> app (move-piece [orig dest]) (data/set-movable-dropped dest))
+        (= "trash" (-> app :movable :drop-off))
+        (update-in app [:chess] chess/set-pieces {orig nil})
+        :else app)
+      app)))

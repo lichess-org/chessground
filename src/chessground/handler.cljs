@@ -9,10 +9,9 @@
 
 (defn- do-process [k msg]
   (case k
-    :set                  #(api/set-config % msg)
     :select-square        #(ctrl/select-square % msg)
-    :drop-off             ctrl/drop-off
-    :drop-on              #(ctrl/drop-on % msg)
+    :drop-piece           #(ctrl/drop-piece % msg)
+    :set                  #(api/set-config % msg)
     :toggle-orientation   data/toggle-orientation
     :get-orientation      #(a/put! msg (:orientation %))
     :get-position         #(a/put! msg (chess/get-pieces (:chess %)))
