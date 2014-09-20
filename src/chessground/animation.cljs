@@ -22,8 +22,9 @@
           (let [x (* (.-x delta) (- 1 progress))
                 y (* (.-y delta) (- 1 progress))
                 delta2 #js {:x x :y y}]
-            (.setState component #js {:anim delta2}
-                       #(animate component start-at duration delta))))))))
+            (when (.isMounted component)
+              (.setState component #js {:anim delta2}
+                         #(animate component start-at duration delta)))))))))
 
 (defn start [component]
   (when-let [plan (.. component -state -plan)]
