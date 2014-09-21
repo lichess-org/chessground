@@ -72,21 +72,21 @@ function apiMove(orig, dest) {
 }
 
 function userMove(orig, dest) {
-  if (baseMove.call(this, orig, dest)) {
-    setSelected.call(this, null);
-    callUserFunction(this.movable.events.after.bind(null, orig, dest));
-  }
+  if (canMove.call(this, orig, dest)) {
+    if (baseMove.call(this, orig, dest)) {
+      setSelected.call(this, null);
+      callUserFunction(this.movable.events.after.bind(null, orig, dest));
+    }
+  } else if (canPremove.call(this, orig, dest)) {
+    this.premovable.current = [orig, dest];
+  } else if (isMovable.call(this, dest) || isPremovable.call(this, dest))
+    setSelected.call(this, dest);
+  else setSelected.call(this, null);
 }
 
 function selectSquare(key) {
   if (this.selected) {
-    if (this.selected !== key) {
-      if (canMove.call(this, this.selected, key))
-        userMove.call(this, this.selected, key);
-      else if (isMovable.call(this, key))
-        setSelected.call(this, key);
-      else setSelected.call(this, null);
-    }
+    if (this.selected !== key) userMove.call(this, this.selected, key)
   } else if (isMovable.call(this, key) || isPremovable.call(this, key))
     setSelected.call(this, key);
 }
@@ -95,12 +95,6 @@ function setSelected(key) {
   this.selected = key;
   if (key && isPremovable.call(this, key))
     this.premovable.dests = premove(this.pieces, key);
-}
-
-function canMove(orig, dest) {
-  return orig !== dest && isMovable.call(this, orig) && (
-    this.movable.free || _.contains(this.movable.dests[orig], dest)
-  );
 }
 
 function isMovable(orig) {
@@ -112,12 +106,24 @@ function isMovable(orig) {
     ));
 }
 
+function canMove(orig, dest) {
+  return orig !== dest && isMovable.call(this, orig) && (
+    this.movable.free || _.contains(this.movable.dests[orig], dest)
+  );
+}
+
 function isPremovable(orig) {
   var piece = this.pieces.get(orig);
   return piece && this.premovable.enabled && (
     this.movable.color === piece.color &&
     this.turnColor !== piece.color
   );
+}
+
+function canPremove(orig, dest) {
+  return orig !== dest &&
+    isPremovable.call(this, orig) &&
+    _.contains(premove(this.pieces, orig), dest);
 }
 
 function isDraggable(orig) {
