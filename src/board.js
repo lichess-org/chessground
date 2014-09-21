@@ -36,12 +36,8 @@ function callUserFunction(f) {
   setTimeout(f(), 20);
 }
 
-function setOrientation(color) {
-  this.orientation = color;
-}
-
 function toggleOrientation() {
-  setOrientation.call(this, this.orientation === 'white' ? 'black' : 'white');
+  this.orientation = this.orientation === 'white' ? 'black' : 'white';
 }
 
 function baseMove(orig, dest) {
@@ -90,7 +86,6 @@ function isMovable(orig) {
 
 module.exports = {
   defaults: defaults,
-  setOrientation: setOrientation,
   toggleOrientation: toggleOrientation,
   selectSquare: selectSquare,
   apiMove: apiMove

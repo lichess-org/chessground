@@ -4,9 +4,12 @@ var api = require('./api');
 
 window.chessground = function(element, config) {
 
-  // using master branch of mithril
-  var controller = m.module(element, {
-    controller: ctrl,
+  var controller = new ctrl(config);
+
+  m.module(element, {
+    controller: function() {
+      return controller;
+    },
     view: view
   });
 

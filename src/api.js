@@ -11,7 +11,7 @@ module.exports = function(element, controller, view) {
   };
 
   return {
-    setOrientation: action(controller.setOrientation),
+    set: action(controller.reconfigure),
     toggleOrientation: action(controller.toggleOrientation),
     getOrientation: function() {
       return controller.board.orientation;

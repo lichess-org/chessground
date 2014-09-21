@@ -1,13 +1,17 @@
 var board = require('./board');
 var pieces = require('./pieces');
+var configure = require('./configure');
 var fen = require('./fen');
 var util = require('./util');
 
-var controller = function() {
+module.exports = function(cfg) {
 
   this.board = board.defaults;
 
-  this.setOrientation = board.setOrientation.bind(this.board);
+  this.reconfigure = configure.bind(null, this.board);
+
+  if (cfg) this.reconfigure(cfg);
+
   this.toggleOrientation = board.toggleOrientation.bind(this.board);
 
   this.setPieces = this.board.pieces.set.bind(this.board.pieces);
@@ -16,5 +20,3 @@ var controller = function() {
 
   this.apiMove = board.apiMove.bind(this.board);
 };
-
-module.exports = controller;
