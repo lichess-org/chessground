@@ -15,7 +15,7 @@ function start(e) {
     move: move.bind(this),
     end: end.bind(this)
   };
-  board.selectSquare.call(this, orig);
+  board.setSelected.call(this, orig);
   document.addEventListener('mousemove', this.draggable.current.move);
   document.addEventListener('mouseup', this.draggable.current.end);
 }

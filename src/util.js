@@ -14,6 +14,9 @@ var allPos = (function() {
 function pos2key(pos) {
   return files[pos[0] - 1] + pos[1];
 }
+function key2pos(pos) {
+  return [(files.indexOf(pos[0]) + 1), parseInt(pos[1])];
+}
 
 function classSet(classNames) {
   return Object.keys(classNames).filter(function(className) {
@@ -39,6 +42,7 @@ module.exports = {
   ranks: ranks,
   allPos: allPos,
   pos2key: pos2key,
+  key2pos: key2pos,
   classSet: classSet,
   opposite: opposite,
   translate: translate,

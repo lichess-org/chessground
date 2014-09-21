@@ -73,6 +73,38 @@
         })();
       </script>
     </section>
+    <section>
+      <div class="chessground blue small cburnett" id="ground5"></div>
+      <p>Valid moves: white plays, then premoves</p>
+      <script>
+        (function() {
+          var ground;
+          var chess = new Chess();
+          var onMove = function(orig, dest) {
+            chess.move({from: orig, to: dest});
+            ground.set({
+              turnColor: chessToColor(chess),
+              movable: {
+                dests: []
+              }
+            });
+          };
+          ground = chessground(document.getElementById('ground5'), {
+            turnColor: 'white',
+            orientation: 'white',
+            movable: {
+              free: false,
+              premove: true,
+              color: 'white',
+              dests: chessToDests(chess),
+              events: {
+                after: onMove
+              }
+            }
+          });
+        })();
+      </script>
+    </section>
   </body>
 </html>
 

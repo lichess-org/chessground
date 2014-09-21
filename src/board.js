@@ -1,5 +1,7 @@
 var pieces = require('./pieces');
 var fen = require('./fen');
+var util = require('./util');
+var premove = require('./premove');
 
 function defaults() {
   return {
@@ -71,16 +73,28 @@ function apiMove(orig, dest) {
 
 function userMove(orig, dest) {
   if (baseMove.call(this, orig, dest)) {
-    this.selected = null;
+    setSelected.call(this, null);
     callUserFunction(this.movable.events.after.bind(null, orig, dest));
   }
 }
 
 function selectSquare(key) {
-  if (this.selected && canMove.call(this, this.selected, key))
-    userMove.call(this, this.selected, key);
-  else
-    this.selected = key;
+  if (this.selected) {
+    if (this.selected !== key) {
+      if (canMove.call(this, this.selected, key))
+        userMove.call(this, this.selected, key);
+      else if (isMovable.call(this, key))
+        setSelected.call(this, key);
+      else setSelected.call(this, null);
+    }
+  } else if (isMovable.call(this, key) || isPremovable.call(this, key))
+    setSelected.call(this, key);
+}
+
+function setSelected(key) {
+  this.selected = key;
+  if (key && isPremovable.call(this, key))
+    this.premovable.dests = premove(this.pieces, key);
 }
 
 function canMove(orig, dest) {
@@ -94,8 +108,16 @@ function isMovable(orig) {
   return piece && (
     this.movable.color === 'both' || (
       this.movable.color === piece.color &&
-      this.movable.color === this.turnColor
+      this.turnColor === piece.color
     ));
+}
+
+function isPremovable(orig) {
+  var piece = this.pieces.get(orig);
+  return piece && this.premovable.enabled && (
+    this.movable.color === piece.color &&
+    this.turnColor !== piece.color
+  );
 }
 
 function isDraggable(orig) {
@@ -113,6 +135,7 @@ module.exports = {
   defaults: defaults,
   toggleOrientation: toggleOrientation,
   selectSquare: selectSquare,
+  setSelected: setSelected,
   isDraggable: isDraggable,
   canMove: canMove,
   userMove: userMove,
