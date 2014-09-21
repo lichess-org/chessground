@@ -4,6 +4,7 @@ var gutil = require('gulp-util');
 var jshint = require('gulp-jshint');
 var watchify = require('watchify');
 var browserify = require('browserify');
+var uglify = require('gulp-uglify');
 
 gulp.task('lint', function() {
   return gulp.src(paths.scripts)
@@ -20,15 +21,15 @@ gulp.task('scripts', function() {
     .pipe(gulp.dest('./'));
 });
 
-// gulp.task('prod-scripts', function() {
-//   var bundleStream = browserify('./src/js/main.js').bundle();
+gulp.task('prod-scripts', function() {
+  var bundleStream = browserify('./src/main.js').bundle();
 
-//   return bundleStream
-//     .on('error', function(error) { gutil.log(gutil.colors.red(error.message)); })
-//     .pipe(source('app.js'))
-//     .pipe(uglify())
-//     .pipe(gulp.dest('./www'));
-// });
+  return bundleStream
+    .on('error', function(error) { gutil.log(gutil.colors.red(error.message)); })
+    .pipe(source('chessground.prod.js'))
+    .pipe(uglify())
+    .pipe(gulp.dest('./'));
+});
 
 gulp.task('watch-scripts', function() {
   var opts = watchify.args;
@@ -50,6 +51,7 @@ gulp.task('watch-scripts', function() {
 
 gulp.task('dev', ['scripts']);
 gulp.task('dev-watch', ['watch-scripts']);
+gulp.task('prod', ['prod-scripts']);
 
 // Default Task
 gulp.task('default', ['dev-watch']);
