@@ -56,6 +56,11 @@ function toggleOrientation() {
   this.orientation = this.orientation === 'white' ? 'black' : 'white';
 }
 
+function setPieces(pieces) {
+  this.pieces.set(pieces);
+  this.movable.dropped = null;
+}
+
 function baseMove(orig, dest) {
   var success = this.pieces.move(orig, dest);
   if (success) {
@@ -158,6 +163,7 @@ function playPremove() {
 module.exports = {
   defaults: defaults,
   toggleOrientation: toggleOrientation,
+  setPieces: setPieces,
   selectSquare: selectSquare,
   setSelected: setSelected,
   isDraggable: isDraggable,

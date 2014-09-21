@@ -1,6 +1,7 @@
 var util = require('./util');
 var board = require('./board');
 var drag = require('./drag');
+var anim = require('./anim');
 
 function renderPiece(ctrl, key, p) {
   var attrs = {
@@ -12,7 +13,10 @@ function renderPiece(ctrl, key, p) {
     }
     attrs.class = attrs.class + ' dragging';
   }
-  return {tag: 'div', attrs: attrs};
+  return {
+    tag: 'div',
+    attrs: attrs
+  };
 }
 
 function renderSquare(ctrl, pos) {
@@ -53,6 +57,9 @@ function renderSquare(ctrl, pos) {
 
 module.exports = function(ctrl) {
   return m('div.cg-board', {
+      config: function(el, isInit, context) {
+        anim(context, ctrl.board);
+      },
       onclick: function(e) {
         var key = e.target.getAttribute('data-key') || e.target.parentNode.getAttribute('data-key');
         ctrl.selectSquare(key);

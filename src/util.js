@@ -1,6 +1,17 @@
 var files = "abcdefgh".split('');
 var ranks = _.range(1, 9);
 
+function pos2key(pos) {
+  return files[pos[0] - 1] + pos[1];
+}
+function key2pos(pos) {
+  return [(files.indexOf(pos[0]) + 1), parseInt(pos[1])];
+}
+
+function invertKey(key) {
+  return files[7 - files.indexOf(key[0])] + (9 - parseInt(key[1]));
+}
+
 var allPos = (function() {
   var ps = [];
   ranks.forEach(function(y) {
@@ -10,13 +21,7 @@ var allPos = (function() {
   });
   return ps;
 })();
-
-function pos2key(pos) {
-  return files[pos[0] - 1] + pos[1];
-}
-function key2pos(pos) {
-  return [(files.indexOf(pos[0]) + 1), parseInt(pos[1])];
-}
+var allKeys = allPos.map(pos2key);
 
 function classSet(classNames) {
   return Object.keys(classNames).filter(function(className) {
@@ -41,6 +46,7 @@ module.exports = {
   files: files,
   ranks: ranks,
   allPos: allPos,
+  allKeys: allKeys,
   pos2key: pos2key,
   key2pos: key2pos,
   classSet: classSet,

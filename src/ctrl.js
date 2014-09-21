@@ -14,7 +14,7 @@ module.exports = function(cfg) {
 
   this.toggleOrientation = board.toggleOrientation.bind(this.board);
 
-  this.setPieces = this.board.pieces.set.bind(this.board.pieces);
+  this.setPieces = board.setPieces.bind(this.board);
 
   this.selectSquare = board.selectSquare.bind(this.board);
 

@@ -42,6 +42,7 @@ function end(e) {
   document.removeEventListener('mousemove', this.draggable.current.move);
   document.removeEventListener('mouseup', this.draggable.current.end);
   board.userMove.call(this, this.draggable.current.orig, this.draggable.current.over);
+  this.movable.dropped = this.draggable.current.over;
   this.draggable.current = {};
   m.redraw();
 }
