@@ -11,10 +11,35 @@ cg.util = {};
 
 cg.util.files = "abcdefgh".split('');
 cg.util.ranks = _.range(1, 9);
+cg.util.pos2key = function(pos) { return cg.util.files[pos[0] - 1] + pos[1]; }
 cg.util.classSet = function(classNames) {
   return Object.keys(classNames).filter(function(className) {
     return classNames[className];
   }).join(' ');
+}
+cg.fen.read = function(fen) {
+  fen = fen.replace(/ .+$/, '');
+  var rows = fen.split('/');
+  var pieces = {};
+  var y = 8;
+  for (var i = 0; i < 8; i++) {
+    var row = rows[i].split('');
+    var colIndex = 0;
+    for (var j = 0; j < row.length; j++) {
+      var nb = parseInt(row[j]);
+      if (nb) colIndex += nb;
+      else {
+        pieces[cg.util.pos2key([
+        var square = COLUMNS[colIndex] + currentRow;
+        position[square] = fenToPieceCode(row[j]);
+        colIndex++;
+      }
+    }
+
+    currentRow--;
+  }
+
+  return position;
 }
 
 // model
@@ -52,6 +77,9 @@ cg.controller = function() {
     }
   });
   this.orientation = m.prop('white');
+  this.toggleOrientation = function() {
+    this.orientation(this.orientation() == 'white' ? 'black' : 'white');
+  }.bind(this);
 };
 
 // view
@@ -101,7 +129,9 @@ cg.tpl.square = function(ctrl, x, y, asWhite) {
 
 cg.view = function(ctrl) {
   var asWhite = ctrl.orientation() === 'white';
-  return m('div.cg-board',
+  return m('div.cg-board', {
+      onclick: ctrl.toggleOrientation
+    },
     _.flatten(
       _.map(cg.util.ranks, function(y) {
         return _.map(cg.util.ranks, function(x) {
