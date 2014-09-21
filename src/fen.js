@@ -13,12 +13,10 @@ var roles = {
 };
 
 function read(fen) {
-  fen = fen.replace(/ .+$/, '');
-  var rows = fen.split('/');
   var pieces = {};
   _.forEach(fen.replace(/ .+$/, '').split('/'), function(row, y) {
     var x = 0;
-    _.forEach(row, function(v, x) {
+    _.forEach(row, function(v) {
       var nb = parseInt(v);
       if (nb) x += nb;
       else {

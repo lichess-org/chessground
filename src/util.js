@@ -2,7 +2,7 @@ var files = "abcdefgh".split('');
 var ranks = _.range(1, 9);
 
 function pos2key(pos) {
-  return cg.util.files[pos[0] - 1] + pos[1];
+  return files[pos[0] - 1] + pos[1];
 }
 
 function classSet(classNames) {

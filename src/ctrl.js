@@ -1,13 +1,15 @@
-var model = require('./model');
+var board = require('./board');
+var pieces = require('./pieces');
 var fen = require('./fen');
 var util = require('./util');
 
 var controller = function() {
-  this.pieces = new model.Pieces(fen.read(fen.initial));
-  this.orientation = m.prop('white');
-  this.toggleOrientation = function() {
-    this.orientation(this.orientation() == 'white' ? 'black' : 'white');
-  }.bind(this);
+
+  this.board = board.defaults;
+
+  this.toggleOrientation = board.toggleOrientation.bind(this.board);
+
+  this.selectSquare = board.selectSquare.bind(this.board);
 };
 
 module.exports = controller;
