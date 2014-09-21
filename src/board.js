@@ -85,7 +85,7 @@ function selectSquare(key) {
 
 function canMove(orig, dest) {
   return orig !== dest && isMovable.call(this, orig) && (
-    this.movable.free || _.contains(this.movable.dests, dest)
+    this.movable.free || _.contains(this.movable.dests[orig], dest)
   );
 }
 
