@@ -1,16 +1,25 @@
 var util = require('./util');
+var board = require('./board');
+var drag = require('./drag');
 
-function renderPiece(p) {
-  return m('div', {
+function renderPiece(ctrl, key, p) {
+  var attrs = {
     class: ['cg-piece', p.role, p.color].join(' ')
-  });
+  };
+  if (ctrl.board.draggable.current.orig === key) {
+    attrs.style = {
+      webkitTransform: util.translate(ctrl.board.draggable.current.pos)
+    }
+    attrs.class = attrs.class + ' dragging';
+  }
+  return {tag: 'div', attrs: attrs};
 }
 
-function renderSquare(ctrl, x, y) {
-  var styleX = (x - 1) * 12.5 + '%';
-  var styleY = (y - 1) * 12.5 + '%';
-  var file = util.files[x - 1];
-  var rank = y;
+function renderSquare(ctrl, pos) {
+  var styleX = (pos[0] - 1) * 12.5 + '%';
+  var styleY = (pos[1] - 1) * 12.5 + '%';
+  var file = util.files[pos[0] - 1];
+  var rank = pos[1];
   var key = file + rank;
   var piece = ctrl.board.pieces.get(key);
   var attrs = {
@@ -22,7 +31,7 @@ function renderSquare(ctrl, x, y) {
       'move-dest': _.contains(ctrl.board.movable.dests, key),
       'premove-dest': _.contains(ctrl.board.premovable.dests, key),
       'current-premove': _.contains(ctrl.board.premovable.current, key),
-      'drag-over': false
+      'drag-over': ctrl.board.draggable.current.over === key
     }),
     style: ctrl.board.orientation === 'white' ? {
       left: styleX,
@@ -33,27 +42,25 @@ function renderSquare(ctrl, x, y) {
     },
     'data-key': key
   };
-  if (y === (ctrl.board.orientation === 'white' ? 1 : 8)) attrs['data-coord-x'] = file;
-  if (x === (ctrl.board.orientation === 'white' ? 8 : 1)) attrs['data-coord-y'] = rank;
+  if (pos[1] === (ctrl.board.orientation === 'white' ? 1 : 8)) attrs['data-coord-x'] = file;
+  if (pos[0] === (ctrl.board.orientation === 'white' ? 8 : 1)) attrs['data-coord-y'] = rank;
   return {
     tag: 'div',
     attrs: attrs,
-    children: piece ? renderPiece(piece) : null
+    children: piece ? renderPiece(ctrl, key, piece) : null
   };
 }
 
 module.exports = function(ctrl) {
   return m('div.cg-board', {
       onclick: function(e) {
-        var key = e.toElement.getAttribute('data-key') || e.toElement.parentNode.getAttribute('data-key');
+        var key = e.target.getAttribute('data-key') || e.target.parentNode.getAttribute('data-key');
         ctrl.selectSquare(key);
-      }
+      },
+      onmousedown: drag.start.bind(ctrl.board)
     },
-    _.flatten(
-      util.ranks.map(function(y) {
-        return util.ranks.map(function(x) {
-          return renderSquare(ctrl, x, y);
-        });
-      })
-    ));
+    util.allPos.map(function(pos) {
+      return renderSquare(ctrl, pos);
+    })
+  );
 }

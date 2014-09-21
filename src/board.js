@@ -28,6 +28,17 @@ var defaults = {
     dests: [], // premove destinations for the current selection
     current: null // keys of the current saved premove ["e2" "e4"] | nil
   },
+  draggable: {
+    enabled: true, // allow moves & premoves to use drag'n drop
+    /*{
+     *  orig: "a2", // orig key of dragging piece
+     *  bounds: [100, 150, 300], // x, y, and size of the board for quick over calculations
+     *  rel: [100, 170] // x, y of the piece at original position
+     *  pos: [20, -12] // relative current position
+     *  over: "b3" // square being moused over
+     *}*/
+    current: {}
+  },
   events: {
     change: function() {} // called after the situation changes on the board
   }
@@ -85,9 +96,21 @@ function isMovable(orig) {
     ));
 }
 
+function isDraggable(orig) {
+  var piece = this.pieces.get(orig);
+  return piece && this.draggable.enabled && (
+    this.movable.color === 'both' || (
+      this.movable.color === piece.color && (
+        this.turnColor === piece.color || this.premovable.enabled
+      )
+    )
+  );
+}
+
 module.exports = {
   defaults: defaults,
   toggleOrientation: toggleOrientation,
   selectSquare: selectSquare,
+  isDraggable: isDraggable,
   apiMove: apiMove
 };
