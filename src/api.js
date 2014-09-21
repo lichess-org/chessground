@@ -22,7 +22,11 @@ module.exports = function(element, controller, view) {
     getFen: function() {
       return fen.write(controller.board.pieces.all);
     },
+    dump: function() {
+      return controller.board;
+    },
     move: action(controller.apiMove),
-    setPieces: action(controller.setPieces)
+    setPieces: action(controller.setPieces),
+    playPremove: action(controller.playPremove)
   }
 };

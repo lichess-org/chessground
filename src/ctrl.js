@@ -19,4 +19,6 @@ module.exports = function(cfg) {
   this.selectSquare = board.selectSquare.bind(this.board);
 
   this.apiMove = board.apiMove.bind(this.board);
+
+  this.playPremove = board.playPremove.bind(this.board);
 };

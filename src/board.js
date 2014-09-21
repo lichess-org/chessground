@@ -79,6 +79,7 @@ function userMove(orig, dest) {
     }
   } else if (canPremove.call(this, orig, dest)) {
     this.premovable.current = [orig, dest];
+    setSelected.call(this, null);
   } else if (isMovable.call(this, dest) || isPremovable.call(this, dest))
     setSelected.call(this, dest);
   else setSelected.call(this, null);
@@ -95,6 +96,8 @@ function setSelected(key) {
   this.selected = key;
   if (key && isPremovable.call(this, key))
     this.premovable.dests = premove(this.pieces, key);
+  else
+    this.premovable.dests = null;
 }
 
 function isMovable(orig) {
@@ -137,6 +140,21 @@ function isDraggable(orig) {
   );
 }
 
+function playPremove() {
+  var move = this.premovable.current;
+  if (move) {
+    var orig = move[0],
+      dest = move[1];
+    util.pp([orig, dest]);
+    if (canMove.call(this, orig, dest)) {
+      if (baseMove.call(this, orig, dest)) {
+        callUserFunction(this.movable.events.after.bind(null, orig, dest));
+      }
+    }
+    this.premovable.current = null;
+  }
+}
+
 module.exports = {
   defaults: defaults,
   toggleOrientation: toggleOrientation,
@@ -145,5 +163,6 @@ module.exports = {
   isDraggable: isDraggable,
   canMove: canMove,
   userMove: userMove,
-  apiMove: apiMove
+  apiMove: apiMove,
+  playPremove: playPremove
 };
