@@ -37,7 +37,6 @@ function callUserFunction(f) {
 }
 
 function setOrientation(color) {
-  console.log(color);
   this.orientation = color;
 }
 
@@ -45,11 +44,26 @@ function toggleOrientation() {
   setOrientation.call(this, this.orientation === 'white' ? 'black' : 'white');
 }
 
+function baseMove(orig, dest) {
+  var success = this.pieces.move(orig, dest);
+  if (success) {
+    this.lastMove = [orig, dest];
+    this.movable.dropped = null;
+    this.check = null;
+    callUserFunction(this.events.change);
+  }
+  return success;
+}
+
+function apiMove(orig, dest) {
+  return baseMove.call(this, orig, dest);
+}
+
 function userMove(orig, dest) {
-  this.pieces.move(orig, dest);
-  this.selected = null;
-  this.lastMove = [orig, dest];
-  callUserFunction(this.movable.events.after.bind(this, orig, dest));
+  if (baseMove.call(this, orig, dest)) {
+    this.selected = null;
+    callUserFunction(this.movable.events.after.bind(null, orig, dest));
+  }
 }
 
 function selectSquare(key) {
@@ -78,5 +92,6 @@ module.exports = {
   defaults: defaults,
   setOrientation: setOrientation,
   toggleOrientation: toggleOrientation,
-  selectSquare: selectSquare
+  selectSquare: selectSquare,
+  apiMove: apiMove
 };

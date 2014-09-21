@@ -11,8 +11,16 @@ Pieces = function(data) {
     data[key] = piece;
   }
   this.move = function(orig, dest) {
+    if (orig === dest || !this.get(orig)) return false;
     this.put(dest, this.get(orig));
     this.remove(orig);
+    return true;
+  };
+  this.set = function(pieces) {
+    _.forIn(pieces, function(piece, key) {
+      if (piece) this.put(key, piece);
+      else this.remove(key);
+    }.bind(this));
   };
 };
 
