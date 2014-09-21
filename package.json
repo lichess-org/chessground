@@ -7,9 +7,6 @@
     "example": "examples"
   },
   "dependencies": {
-    "interact": "~1.0.25",
-    "react": "~0.11.1",
-    "uglify-js": "~2.4.14",
     "browserify": "~5.11.2",
     "mithril": "~0.1.21"
   },
