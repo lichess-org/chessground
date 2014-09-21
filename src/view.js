@@ -17,11 +17,11 @@ function renderSquare(ctrl, x, y) {
     class: util.classSet({
       'cg-square': true,
       'selected': ctrl.board.selected === key,
-      'check': false,
+      'check': ctrl.board.check === key,
       'last-move': _.contains(ctrl.board.lastMove, key),
-      'move-dest': false,
-      'premove-dest': false,
-      'current-premove': false,
+      'move-dest': _.contains(ctrl.board.movable.dests, key),
+      'premove-dest': _.contains(ctrl.board.premovable.dests, key),
+      'current-premove': _.contains(ctrl.board.premovable.current, key),
       'drag-over': false
     }),
     style: ctrl.board.orientation === 'white' ? {

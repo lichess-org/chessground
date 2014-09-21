@@ -25,6 +25,7 @@ var defaults = {
   },
   premovable: {
     enabled: true, // allow premoves for color that can not move
+    dests: [], // premove destinations for the current selection
     current: null // keys of the current saved premove ["e2" "e4"] | nil
   },
   events: {
