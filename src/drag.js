@@ -15,6 +15,7 @@ function start(e) {
     move: move.bind(this),
     end: end.bind(this)
   };
+  board.selectSquare.call(this, orig);
   document.addEventListener('mousemove', this.draggable.current.move);
   document.addEventListener('mouseup', this.draggable.current.end);
 }
@@ -41,8 +42,7 @@ function end(e) {
   document.removeEventListener('mousemove', this.draggable.current.move);
   document.removeEventListener('mouseup', this.draggable.current.end);
   var orig = this.draggable.current.orig, dest = this.draggable.current.over;
-  if (orig === dest) board.selectSquare.call(this, orig);
-  else if (board.canMove.call(this, orig, dest)) board.userMove.call(this, orig, dest);
+  if (board.canMove.call(this, orig, dest)) board.userMove.call(this, orig, dest);
   this.draggable.current = {};
   m.redraw();
 }

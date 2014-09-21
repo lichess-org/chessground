@@ -28,7 +28,7 @@ function renderSquare(ctrl, pos) {
       'selected': ctrl.board.selected === key,
       'check': ctrl.board.check === key,
       'last-move': _.contains(ctrl.board.lastMove, key),
-      'move-dest': _.contains(ctrl.board.movable.dests, key),
+      'move-dest': _.contains(ctrl.board.movable.dests[ctrl.board.selected], key),
       'premove-dest': _.contains(ctrl.board.premovable.dests, key),
       'current-premove': _.contains(ctrl.board.premovable.current, key),
       'drag-over': ctrl.board.draggable.current.over === key

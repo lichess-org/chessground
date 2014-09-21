@@ -36,8 +36,41 @@
           // lastMove: ['a2', 'a3']
         });
         //setTimeout(function() {
-        //  ground.orientation('black');
-        //}, 1000);
+          //  ground.orientation('black');
+          //}, 1000);
+      </script>
+    </section>
+    <section>
+      <div class="chessground wood small merida" id="ground7"></div>
+      <p>Play a game on a single board</p>
+      <script>
+        (function() {
+          var ground;
+          var chess = new Chess();
+          var onMove = function(orig, dest) {
+            chess.move({from: orig, to: dest});
+            ground.set({
+              turnColor: chessToColor(chess),
+              movable: {
+                color: chessToColor(chess),
+                dests: chessToDests(chess)
+              }
+            });
+            ground.getFen(function(s) { console.log(s); });
+          };
+          ground = chessground(document.getElementById('ground7'), {
+            turnColor: 'white',
+            movable: {
+              free: false,
+              color: chessToColor(chess),
+              premove: true,
+              dests: chessToDests(chess),
+              events: {
+                after: onMove
+              }
+            }
+          });
+        })();
       </script>
     </section>
   </body>
