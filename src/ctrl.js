@@ -6,7 +6,7 @@ var util = require('./util');
 
 module.exports = function(cfg) {
 
-  this.board = board.defaults;
+  this.board = board.defaults();
 
   this.reconfigure = configure.bind(null, this.board);
 
