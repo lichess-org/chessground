@@ -1,11 +1,16 @@
+var util = require('./util');
+var fen = require('./fen');
 var model = require('./model');
-var view = require('./view');
 var ctrl = require('./ctrl');
+var view = require('./view');
+
+console.log(ctrl);
 
 // how to expose that?
 window.chessground = {
-  mithrilModule: {
-    controller: ctrl,
-    view: view
-  }
+  util: util,
+  fen: fen,
+  model: model,
+  ctrl: ctrl,
+  view: view
 };

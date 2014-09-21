@@ -1,17 +1,22 @@
 (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({"./src/main.js":[function(require,module,exports){
+var util = require('./util');
+var fen = require('./fen');
 var model = require('./model');
-var view = require('./view');
 var ctrl = require('./ctrl');
+var view = require('./view');
+
+console.log(ctrl);
 
 // how to expose that?
 window.chessground = {
-  mithrilModule: {
-    controller: ctrl,
-    view: view
-  }
+  util: util,
+  fen: fen,
+  model: model,
+  ctrl: ctrl,
+  view: view
 };
 
-},{"./ctrl":"/home/thib/chessground/src/ctrl.js","./model":"/home/thib/chessground/src/model.js","./view":"/home/thib/chessground/src/view.js"}],"/home/thib/chessground/node_modules/lodash/dist/lodash.js":[function(require,module,exports){
+},{"./ctrl":"/home/thib/chessground/src/ctrl.js","./fen":"/home/thib/chessground/src/fen.js","./model":"/home/thib/chessground/src/model.js","./util":"/home/thib/chessground/src/util.js","./view":"/home/thib/chessground/src/view.js"}],"/home/thib/chessground/node_modules/lodash/dist/lodash.js":[function(require,module,exports){
 (function (global){
 /**
  * @license
@@ -6802,6 +6807,7 @@ window.chessground = {
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
 },{}],"/home/thib/chessground/src/ctrl.js":[function(require,module,exports){
 var model = require('./model');
+var util = require('./util');
 
 var controller = function() {
   this.pieces = new model.Pieces({
@@ -6826,31 +6832,61 @@ var controller = function() {
 
 module.exports = controller;
 
-},{"./model":"/home/thib/chessground/src/model.js"}],"/home/thib/chessground/src/model.js":[function(require,module,exports){
+},{"./model":"/home/thib/chessground/src/model.js","./util":"/home/thib/chessground/src/util.js"}],"/home/thib/chessground/src/fen.js":[function(require,module,exports){
+function read(fen) {
+  fen = fen.replace(/ .+$/, '');
+  var rows = fen.split('/');
+  var pieces = {};
+  var y = 8;
+  // for (var i = 0; i < 8; i++) {
+  //   var row = rows[i].split('');
+  //   var colIndex = 0;
+  //   for (var j = 0; j < row.length; j++) {
+  //     var nb = parseInt(row[j]);
+  //     if (nb) colIndex += nb;
+  //     else {
+  //       pieces[cg.util.pos2key([
+  //       var square = COLUMNS[colIndex] + currentRow;
+  //       position[square] = fenToPieceCode(row[j]);
+  //       colIndex++;
+  //     }
+  //   }
 
-var model = {};
+  //   currentRow--;
+  // }
 
-model.Piece = function(data) {
+  return pieces;
+}
+
+module.exports = {
+  read: read
+};
+
+},{}],"/home/thib/chessground/src/model.js":[function(require,module,exports){
+Piece = function(data) {
   this.role = m.prop(data.role);
   this.color = m.prop(data.color);
 };
 
 // {a1: {role: 'rook', color: 'white'}, ...}
-model.Pieces = Object;
+Pieces = Object;
 
 // cg.model.Board = function(data) {
 //   this.pieces = m.prop(data.pieces);
 //   this.orientation = m.prop(data.orientation);
 // };
 
-module.exports = model;
+module.exports = {
+  Piece: Piece,
+  Pieces: Pieces
+};
 
-},{}],"/home/thib/chessground/src/utils.js":[function(require,module,exports){
+},{}],"/home/thib/chessground/src/util.js":[function(require,module,exports){
 var files = "abcdefgh".split('');
 var ranks = _.range(1, 9);
 
-function pos2key(pos) { 
-  return cg.util.files[pos[0] - 1] + pos[1]; 
+function pos2key(pos) {
+  return cg.util.files[pos[0] - 1] + pos[1];
 }
 
 function classSet(classNames) {
@@ -6868,23 +6904,21 @@ module.exports = {
   files: files,
   ranks: ranks,
   pos2key: pos2key,
-    classSet: classSet,
-    pp: pp
+  classSet: classSet,
+  pp: pp
 };
 
 },{}],"/home/thib/chessground/src/view.js":[function(require,module,exports){
-var util = require('./utils');
+var util = require('./util');
 var _ = require('lodash');
 
-var tpl = {};
-
-tpl.piece = function(p) {
+function renderPiece(p) {
   return m('div', {
     class: ['cg-piece', p.role, p.color].join(' ')
   });
-};
+}
 
-tpl.square = function(ctrl, x, y, asWhite) {
+function renderSquare(ctrl, x, y, asWhite) {
   var styleX = (x - 1) * 12.5 + '%';
   var styleY = (y - 1) * 12.5 + '%';
   var file = util.files[x - 1];
@@ -6915,20 +6949,20 @@ tpl.square = function(ctrl, x, y, asWhite) {
   return {
     tag: 'div',
     attrs: attrs,
-    children: ctrl.pieces[key] ? tpl.piece(ctrl.pieces[key]) : null
+    children: ctrl.pieces[key] ? renderPiece(ctrl.pieces[key]) : null
   };
-};
+}
 
-var view = module.exports = function(ctrl) {
+module.exports = function(ctrl) {
   var asWhite = ctrl.orientation() === 'white';
   return m('div.cg-board',
     _.flatten(
       _.map(util.ranks, function(y) {
         return _.map(util.ranks, function(x) {
-          return tpl.square(ctrl, x, y, asWhite);
+          return renderSquare(ctrl, x, y, asWhite);
         });
       })
     ));
-};
+}
 
-},{"./utils":"/home/thib/chessground/src/utils.js","lodash":"/home/thib/chessground/node_modules/lodash/dist/lodash.js"}]},{},["./src/main.js"]);
+},{"./util":"/home/thib/chessground/src/util.js","lodash":"/home/thib/chessground/node_modules/lodash/dist/lodash.js"}]},{},["./src/main.js"]);

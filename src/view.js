@@ -1,13 +1,13 @@
-var util = require('./utils');
+var util = require('./util');
 var _ = require('lodash');
 
-function piece(p) {
+function renderPiece(p) {
   return m('div', {
     class: ['cg-piece', p.role, p.color].join(' ')
   });
 }
 
-function square(ctrl, x, y, asWhite) {
+function renderSquare(ctrl, x, y, asWhite) {
   var styleX = (x - 1) * 12.5 + '%';
   var styleY = (y - 1) * 12.5 + '%';
   var file = util.files[x - 1];
@@ -38,7 +38,7 @@ function square(ctrl, x, y, asWhite) {
   return {
     tag: 'div',
     attrs: attrs,
-    children: ctrl.pieces[key] ? tpl.piece(ctrl.pieces[key]) : null
+    children: ctrl.pieces[key] ? renderPiece(ctrl.pieces[key]) : null
   };
 }
 
@@ -48,7 +48,7 @@ module.exports = function(ctrl) {
     _.flatten(
       _.map(util.ranks, function(y) {
         return _.map(util.ranks, function(x) {
-          return tpl.square(ctrl, x, y, asWhite);
+          return renderSquare(ctrl, x, y, asWhite);
         });
       })
     ));
