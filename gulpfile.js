@@ -31,7 +31,9 @@ gulp.task('scripts', function() {
 // });
 
 gulp.task('watch-scripts', function() {
-  var bundleStream = watchify(browserify('./src/main.js', watchify.args));
+  var opts = watchify.args;
+  opts.debug = true;
+  var bundleStream = watchify(browserify('./src/main.js', opts));
 
   function rebundle() {
     return bundleStream.bundle()
