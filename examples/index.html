@@ -28,13 +28,17 @@
       }
     </script>
 
-    <!-- <section> -->
-      <!--   <div class="chessground wood small merida coordinates" id="ground1"></div> -->
-      <!--   <p>Default options, with CSS coordinates</p> -->
-      <!--   <script> -->
-        <!--     var ground = chessground.main(document.getElementById('ground1')); -->
-      <!--   </script> -->
-    <!-- </section> -->
+    <section>
+        <div class="chessground wood small merida coordinates" id="ground1"></div>
+        <p>Board editor</p>
+        <script>
+          var ground = chessground.main(document.getElementById('ground1'), {
+            movable: {
+              dropOff: 'trash'
+            }
+          });
+        </script>
+    </section>
   <!-- <section> -->
   <!--   <div class="chessground wood small merida coordinates" id="ground2"></div> -->
   <!--   <p>Free as a birrd</p> -->
@@ -120,6 +124,7 @@
           };
           ground = chessground.main(document.getElementById('ground7'), {
             turnColor: 'white',
+            orientation: 'black',
             movable: {
               free: false,
               color: chessToColor(chess),

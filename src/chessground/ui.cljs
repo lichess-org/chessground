@@ -56,6 +56,8 @@
        (this-as this
                 (animation/start this)
                 (drag/did-update this state)))
+     :componentWillUnmount
+     (fn [] (this-as this (drag/will-unmount this)))
      :dragMove
      (fn [e] (this-as this (drag/move this e)))
      :dragEnd

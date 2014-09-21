@@ -21,6 +21,20 @@
         rank (if (= "white" orientation) rank (- 9 rank))]
     (when (and (> file 0) (< file 9) (> rank 0) (< rank 9)) (common/pos->key #js [file rank]))))
 
+(defn- add-listeners [this]
+  (if touch-device?
+    (do (.addEventListener js/document "touchmove" (aget this "dragMove"))
+        (.addEventListener js/document "touchend" (aget this "dragEnd")))
+    (do (.addEventListener js/document "mousemove" (aget this "dragMove"))
+        (.addEventListener js/document "mouseup" (aget this "dragEnd")))))
+
+(defn- remove-listeners [this]
+  (if touch-device?
+    (do (.removeEventListener js/document "touchmove" (aget this "dragMove"))
+        (.removeEventListener js/document "touchend" (aget this "dragEnd")))
+    (do (.removeEventListener js/document "mousemove" (aget this "dragMove"))
+        (.removeEventListener js/document "mouseup" (aget this "dragEnd")))))
+
 (defn start [this]
   (fn [e]
     (event-stop e)
@@ -46,8 +60,7 @@
 (defn end [this e]
   (event-stop e)
   ((-> this .-props (aget "set-hover")) nil)
-  (.setState this #js {:drag-rel nil
-                       :drag-pos nil})
+  (remove-listeners this)
   ((-> this .-props (aget "ctrl")) :drop-piece (over-key this e)))
 
 (defn will-receive-props [this props]
@@ -57,14 +70,10 @@
 
 (defn did-update [this prev-state]
   (if (and (-> this .-state (aget "drag-rel")) (not (aget prev-state "drag-rel")))
-    (if touch-device?
-      (do (.addEventListener js/document "touchmove" (aget this "dragMove"))
-          (.addEventListener js/document "touchend" (aget this "dragEnd")))
-      (do (.addEventListener js/document "mousemove" (aget this "dragMove"))
-          (.addEventListener js/document "mouseup" (aget this "dragEnd"))))
+    (add-listeners this)
     (when (and (not (-> this .-state (aget "drag-rel"))) (aget prev-state "drag-rel"))
-      (if touch-device?
-        (do (.removeEventListener js/document "touchmove" (aget this "dragMove"))
-            (.removeEventListener js/document "touchend" (aget this "dragEnd")))
-        (do (.removeEventListener js/document "mousemove" (aget this "dragMove"))
-            (.removeEventListener js/document "mouseup" (aget this "dragEnd")))))))
+      (remove-listeners this))))
+
+(defn will-unmount [this]
+  (pp "will unmount")
+  (when (-> this .-state (aget "drag-rel")) (remove-listeners this)))
