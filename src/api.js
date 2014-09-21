@@ -1,3 +1,5 @@
+var fen = require('./fen');
+
 module.exports = function(element, controller, view) {
 
   var action = function(computation) {
@@ -16,6 +18,9 @@ module.exports = function(element, controller, view) {
     },
     getPieces: function() {
       return controller.board.pieces.all;
+    },
+    getFen: function() {
+      return fen.write(controller.board.pieces.all);
     },
     move: action(controller.apiMove),
     setPieces: action(controller.setPieces)
