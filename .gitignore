@@ -1,14 +1,4 @@
-.lein-repl-history
-out/
-target/
-out-dev/
-out-prod/
-checkouts/
-.repl/
-.nrepl-port
-generated*
-debug
+chessground.js
 chessground.dev.js
 chessground.prod.js
 node_modules
-pom.xml
