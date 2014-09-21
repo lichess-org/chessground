@@ -112,5 +112,7 @@ module.exports = {
   toggleOrientation: toggleOrientation,
   selectSquare: selectSquare,
   isDraggable: isDraggable,
+  canMove: canMove,
+  userMove: userMove,
   apiMove: apiMove
 };

@@ -40,6 +40,8 @@ function overKey(e) {
 function end(e) {
   document.removeEventListener('mousemove', this.draggable.current.move);
   document.removeEventListener('mouseup', this.draggable.current.end);
+  var orig = this.draggable.current.orig, dest = this.draggable.current.over;
+  if (board.canMove.call(this, orig, dest)) board.userMove.call(this, orig, dest);
   this.draggable.current = {};
   m.redraw();
 }
