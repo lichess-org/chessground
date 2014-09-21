@@ -4,10 +4,7 @@ var model = require('./model');
 var ctrl = require('./ctrl');
 var view = require('./view');
 
-console.log(ctrl);
-
-// how to expose that?
-window.chessground = {
+window.cg = {
   util: util,
   fen: fen,
   model: model,
