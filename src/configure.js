@@ -1,4 +1,3 @@
-var _ = require('lodash');
 var fen = require('./fen');
 var pieces = require('./pieces');
 

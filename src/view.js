@@ -1,5 +1,4 @@
 var util = require('./util');
-var _ = require('lodash');
 
 function renderPiece(p) {
   return m('div', {
@@ -51,8 +50,8 @@ module.exports = function(ctrl) {
       }
     },
     _.flatten(
-      _.map(util.ranks, function(y) {
-        return _.map(util.ranks, function(x) {
+      util.ranks.map(function(y) {
+        return util.ranks.map(function(x) {
           return renderSquare(ctrl, x, y);
         });
       })

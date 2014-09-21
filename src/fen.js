@@ -1,4 +1,3 @@
-var _ = require('lodash');
 var util = require('./util');
 
 var initial = 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR'
@@ -23,9 +22,9 @@ var letters = {
 
 function read(fen) {
   var pieces = {};
-  _.forEach(fen.replace(/ .+$/, '').split('/'), function(row, y) {
+  fen.replace(/ .+$/, '').split('/').forEach(function(row, y) {
     var x = 0;
-    _.forEach(row, function(v) {
+    row.split('').forEach(function(v) {
       var nb = parseInt(v);
       if (nb) x += nb;
       else {
@@ -47,8 +46,8 @@ function write(pieces) {
       function(str, nb) {
         return str.replace(new RegExp(Array(nb + 1).join('1'), 'g'), nb);
       },
-      _.map(_.range(8, 0, -1), function(y) {
-        return _.map(_.range(1, 9), function(x) {
+      _.range(8, 0, -1).map(function(y) {
+        return _.range(1, 9).map(function(x) {
           var piece = pieces[util.pos2key([x, y])];
           if (piece) {
             var letter = letters[piece.role];
