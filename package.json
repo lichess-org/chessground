@@ -1,0 +1,39 @@
+{
+  "name": "chessground",
+  "version": "0.0.0",
+  "description": "Multipurpose chess UI.",
+  "main": "index.js",
+  "directories": {
+    "example": "examples"
+  },
+  "dependencies": {
+    "browserify": "~5.11.2",
+    "mithril": "~0.1.21",
+    "lodash": "~2.4.1"
+  },
+  "devDependencies": {
+    "gulp": "~3.8.8",
+    "watchify": "~1.0.2",
+    "vinyl-source-stream": "~1.0.0",
+    "gulp-util": "~3.0.1",
+    "gulp-jshint": "~1.8.4",
+    "browserify": "~5.11.2"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/ornicar/chessground.git"
+  },
+  "keywords": [
+    "chess",
+    "chessboard"
+  ],
+  "author": "Thibault Duplessis (https://github.com/ornicar)",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/ornicar/chessground/issues"
+  },
+  "homepage": "https://github.com/ornicar/chessground"
+}
