@@ -25,7 +25,7 @@ function closer(piece, pieces) {
 }
 
 function compute(prev, current) {
-  var size = current.size / 8,
+  var size = current.bounds.width / 8,
     anims = {},
     missings = [],
     news = [],
@@ -105,7 +105,7 @@ function animate(current, transformation) {
 // and mutates the board.
 module.exports = function(board, transformation) {
   return function() {
-    if (board.animation.enabled && !board.animation.current.start && board.size)
+    if (board.animation.enabled && !board.animation.current.start && board.bounds)
       return animate(board, transformation.apply.bind(transformation, board, arguments));
     else
       return transformation.apply(board, arguments);

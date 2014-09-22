@@ -88,12 +88,11 @@ module.exports = function(ctrl) {
       config: function(el, isInit, context) {
         // stay async to prevent a layout force redraw
         if (isInit) requestAnimationFrame(function() {
-          ctrl.board.size = el.clientWidth;
+          ctrl.board.bounds = el.getBoundingClientRect();
         });
       },
       onclick: function(e) {
-        var key = e.target.getAttribute('data-key') || e.target.parentNode.getAttribute('data-key');
-        ctrl.selectSquare(key);
+        ctrl.selectSquare(board.getKeyAtDomPos.call(ctrl.board, e.pageX, e.pageY));
       },
       onmousedown: drag.bind(ctrl.board)
     },

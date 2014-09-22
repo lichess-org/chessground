@@ -10,7 +10,7 @@ module.exports = function(cfg) {
     check: null, // square currently in check "a2" | nil
     lastMove: null, // squares part of the last move ["c3" "c4"] | nil
     selected: null, // square selected by the user "a1" | nil
-    size: null, // DOM element width, set by the render function for animations
+    bounds: null, // result of getBoundingClientRect on the board DOM element
     animation: {
       enabled: true,
       duration: 200,
@@ -43,7 +43,6 @@ module.exports = function(cfg) {
       enabled: true, // allow moves & premoves to use drag'n drop
       /*{ // current
        *  orig: "a2", // orig key of dragging piece
-       *  bounds: [100, 150, 300], // x, y, and size of the board for quick over calculations
        *  rel: [100, 170] // x, y of the piece at original position
        *  pos: [20, -12] // relative current position
        *  over: "b3" // square being moused over
