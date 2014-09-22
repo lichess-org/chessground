@@ -3,9 +3,13 @@ var board = require('./board');
 var drag = require('./drag');
 var anim = require('./anim');
 
+function pieceClass(p) {
+  return ['cg-piece', p.role, p.color].join(' ');
+}
+
 function renderPiece(ctrl, key, p) {
   var attrs = {
-    class: ['cg-piece', p.role, p.color].join(' ')
+    class: pieceClass(p)
   };
   if (ctrl.board.draggable.current.orig === key) {
     attrs.style = {
@@ -23,6 +27,15 @@ function renderPiece(ctrl, key, p) {
   return {
     tag: 'div',
     attrs: attrs
+  };
+}
+
+function renderGhost(p) {
+  return {
+    tag: 'div',
+    attrs: {
+      class: pieceClass(p) + ' ghost'
+    }
   };
 }
 
@@ -53,10 +66,17 @@ function renderSquare(ctrl, pos) {
   };
   if (pos[1] === (ctrl.board.orientation === 'white' ? 1 : 8)) attrs['data-coord-x'] = file;
   if (pos[0] === (ctrl.board.orientation === 'white' ? 8 : 1)) attrs['data-coord-y'] = rank;
+  var children = [];
+  if (piece) {
+    children.push(renderPiece(ctrl, key, piece));
+    if (ctrl.board.draggable.current.orig === key) {
+      children.push(renderGhost(piece));
+    }
+  }
   return {
     tag: 'div',
     attrs: attrs,
-    children: piece ? renderPiece(ctrl, key, piece) : null
+    children: children
   };
 }
 

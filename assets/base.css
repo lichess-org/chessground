@@ -73,3 +73,6 @@
 .cg-piece.dragging {
   z-index: 9;
 }
+.cg-piece.ghost {
+  opacity: 0.3;
+}
