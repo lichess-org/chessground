@@ -16,16 +16,17 @@ function setPieces(pieces) {
 }
 
 function baseMove(orig, dest) {
-  return anim(this, function() {
+  var success = anim(this, function() {
     var success = this.pieces.move(orig, dest);
     if (success) {
       this.lastMove = [orig, dest];
-      this.movable.dropped = null;
       this.check = null;
       callUserFunction(this.events.change);
     }
     return success;
   })();
+  if (success) this.movable.dropped = null;
+  return success;
 }
 
 function apiMove(orig, dest) {

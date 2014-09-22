@@ -27,7 +27,7 @@ module.exports = function(cfg) {
       free: true, // all moves are valid - board editor
       color: 'both', // color that can move. white | black | both | nil
       dests: {}, // valid moves. {"a2" ["a3" "a4"] "b1" ["a3" "c3"]} | nil
-      dropOff: 'trash', // when a piece is dropped outside the board. "revert" | "trash"
+      dropOff: 'revert', // when a piece is dropped outside the board. "revert" | "trash"
       dropped: null, // last dropped dest, not to be animated
       // dragCenter: true, // whether to center the piece under the cursor on drag start
       events: {
