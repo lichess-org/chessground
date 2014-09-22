@@ -65,7 +65,7 @@ function renderSquare(ctrl, pos) {
 module.exports = function(ctrl) {
   return m('div.cg-board', {
       config: function(el, isInit, context) {
-        anim(el, context, ctrl.board);
+        if (isInit) ctrl.board.size = el.clientWidth;
       },
       onclick: function(e) {
         var key = e.target.getAttribute('data-key') || e.target.parentNode.getAttribute('data-key');

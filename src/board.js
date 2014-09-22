@@ -11,6 +11,7 @@ function defaults() {
     check: null, // square currently in check "a2" | nil
     lastMove: null, // squares part of the last move ["c3" "c4"] | nil
     selected: null, // square selected by the user "a1" | nil
+    size: null, // DOM element width, set by the render function for animations
     animation: {
       enabled: true,
       duration: 200,
