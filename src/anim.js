@@ -100,11 +100,11 @@ function animate(current, transformation) {
 
 // transformation is a function
 // that assumes board data as this,
-// plus any number of arguments,
+// accepts any number of arguments,
 // and mutates the board.
 module.exports = function(board, transformation) {
   return function() {
-    if (board.animation.enabled && board.size) {
+    if (board.animation.enabled && !board.animation.current.start && board.size) {
       // here be dragons.
       return animate(board, transformation.apply.bind(transformation, board, arguments));
     } else transformation.apply(board, arguments);

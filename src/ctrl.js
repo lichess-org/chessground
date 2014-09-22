@@ -6,7 +6,7 @@ module.exports = function(cfg) {
 
   this.board = board.defaults();
 
-  this.reconfigure = configure.bind(null, this.board);
+  this.reconfigure = anim(this.board, configure.bind(null, this.board));
 
   if (cfg) this.reconfigure(cfg);
 
