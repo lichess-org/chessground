@@ -5,6 +5,7 @@ var jshint = require('gulp-jshint');
 var watchify = require('watchify');
 var browserify = require('browserify');
 var uglify = require('gulp-uglify');
+var streamify = require('gulp-streamify');
 
 gulp.task('lint', function() {
   return gulp.src(paths.scripts)
@@ -27,7 +28,7 @@ gulp.task('prod-scripts', function() {
   return bundleStream
     .on('error', function(error) { gutil.log(gutil.colors.red(error.message)); })
     .pipe(source('chessground.prod.js'))
-    .pipe(uglify())
+    .pipe(streamify(uglify()))
     .pipe(gulp.dest('./'));
 });
 
