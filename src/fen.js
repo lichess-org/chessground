@@ -41,21 +41,20 @@ function read(fen) {
 }
 
 function write(pieces) {
-    return _.reduce(
-      _.range(8, 1, -1),
-      function(str, nb) {
-        return str.replace(new RegExp(Array(nb + 1).join('1'), 'g'), nb);
-      },
-      _.range(8, 0, -1).map(function(y) {
-        return _.range(1, 9).map(function(x) {
-          var piece = pieces[util.pos2key([x, y])];
-          if (piece) {
-            var letter = letters[piece.role];
-            return piece.color === 'white' ? letter.toUpperCase() : letter;
-          } else return '1';
-        }).join('')
-      }).join('/'));
-  }
+  return _.range(8, 1, -1).reduce(
+    function(str, nb) {
+      return str.replace(new RegExp(Array(nb + 1).join('1'), 'g'), nb);
+    },
+    _.range(8, 0, -1).map(function(y) {
+      return _.range(1, 9).map(function(x) {
+        var piece = pieces[util.pos2key([x, y])];
+        if (piece) {
+          var letter = letters[piece.role];
+          return piece.color === 'white' ? letter.toUpperCase() : letter;
+        } else return '1';
+      }).join('')
+    }).join('/'));
+}
 
 module.exports = {
   initial: initial,
