@@ -17,4 +17,12 @@ function standalone(element, config) {
   return api(element, controller, view);
 }
 
-window.chessground = module.exports = standalone;
+window.chessground = standalone;
+
+module.exports = {
+  standalone: standalone,
+  mithril: {
+    controller: ctrl,
+    view: view
+  }
+};
