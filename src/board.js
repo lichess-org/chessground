@@ -34,7 +34,13 @@ function apiMove(orig, dest) {
 }
 
 function userMove(orig, dest) {
-  if (canMove.call(this, orig, dest)) {
+  if (!dest) {
+    setSelected.call(this, null);
+    if (this.movable.dropOff === 'trash') {
+      this.pieces.remove(orig);
+      callUserFunction(this.events.change);
+    }
+  } else if (canMove.call(this, orig, dest)) {
     if (baseMove.call(this, orig, dest)) {
       setSelected.call(this, null);
       callUserFunction(this.movable.events.after.bind(null, orig, dest));

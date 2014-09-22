@@ -18,7 +18,7 @@ module.exports = function(cfg) {
        *  start: timestamp,
        *  duration: ms,
        *  anims: {
-       *    a2: [-30, 50], ...
+       *    a2: [[-30, 50], [-20, 37]], ...
        *  }
        *}*/
       current: {}
