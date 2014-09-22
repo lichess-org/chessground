@@ -66,7 +66,10 @@ module.exports = function(ctrl) {
     attrs: {
       class: 'cg-board',
       config: function(el, isInit, context) {
-        if (isInit) ctrl.board.size = el.clientWidth;
+        // stay async to prevent a layout force redraw
+        if (isInit) requestAnimationFrame(function() {
+          ctrl.board.size = el.clientWidth;
+        });
       },
       onclick: function(e) {
         var key = e.target.getAttribute('data-key') || e.target.parentNode.getAttribute('data-key');
