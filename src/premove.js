@@ -37,7 +37,7 @@ function king(color, rookFiles, x1, y1, x2, y2) {
     diff(x1, x2) < 2 && diff(y1, y2) < 2
   ) || (
     y1 === y2 && y1 === (color === 'white' ? 1 : 8) && (
-      (x1 === 5 && (x2 === 3 || x2 === 7)) || _.contains(rookFiles, x2)
+      (x1 === 5 && (x2 === 3 || x2 === 7)) || util.containsX(rookFiles, x2)
     )
   );
 }

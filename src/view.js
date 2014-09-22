@@ -10,8 +10,16 @@ function renderPiece(ctrl, key, p) {
   if (ctrl.board.draggable.current.orig === key) {
     attrs.style = {
       webkitTransform: util.translate(ctrl.board.draggable.current.pos)
-    }
+    };
     attrs.class = attrs.class + ' dragging';
+  }
+  else if (ctrl.board.animation.current.anims) {
+    var animation = ctrl.board.animation.current.anims[key];
+    if (animation) {
+      attrs.style = {
+        webkitTransform: util.translate(animation[1])
+      };
+    }
   }
   return {
     tag: 'div',
@@ -27,14 +35,13 @@ function renderSquare(ctrl, pos) {
   var key = file + rank;
   var piece = ctrl.board.pieces.get(key);
   var attrs = {
-    class: util.classSet({
-      'cg-square': true,
+    class: key + ' cg-square ' + util.classSet({
       'selected': ctrl.board.selected === key,
       'check': ctrl.board.check === key,
-      'last-move': _.contains(ctrl.board.lastMove, key),
-      'move-dest': _.contains(ctrl.board.movable.dests[ctrl.board.selected], key),
-      'premove-dest': _.contains(ctrl.board.premovable.dests, key),
-      'current-premove': _.contains(ctrl.board.premovable.current, key),
+      'last-move': util.contains2(ctrl.board.lastMove, key),
+      'move-dest': util.containsX(ctrl.board.movable.dests[ctrl.board.selected], key),
+      'premove-dest': util.containsX(ctrl.board.premovable.dests, key),
+      'current-premove': util.contains2(ctrl.board.premovable.current, key),
       'drag-over': ctrl.board.draggable.current.over === key
     }),
     style: ctrl.board.orientation === 'white' ? {
@@ -58,7 +65,7 @@ function renderSquare(ctrl, pos) {
 module.exports = function(ctrl) {
   return m('div.cg-board', {
       config: function(el, isInit, context) {
-        anim(context, ctrl.board);
+        anim(el, context, ctrl.board);
       },
       onclick: function(e) {
         var key = e.target.getAttribute('data-key') || e.target.parentNode.getAttribute('data-key');

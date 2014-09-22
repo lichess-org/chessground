@@ -4,6 +4,7 @@ var ranks = _.range(1, 9);
 function pos2key(pos) {
   return files[pos[0] - 1] + pos[1];
 }
+
 function key2pos(pos) {
   return [(files.indexOf(pos[0]) + 1), parseInt(pos[1])];
 }
@@ -37,6 +38,14 @@ function translate(pos) {
   return 'translate3d(' + pos[0] + 'px,' + pos[1] + 'px,0)';
 }
 
+function contains2(xs, x) {
+  return xs && (xs[0] === x || xs[1] === x);
+}
+
+function containsX(xs, x) {
+  return xs && xs.indexOf(x) !== -1
+}
+
 function pp(x) {
   console.log(x);
   return x;
@@ -49,8 +58,11 @@ module.exports = {
   allKeys: allKeys,
   pos2key: pos2key,
   key2pos: key2pos,
+  invertKey: invertKey,
   classSet: classSet,
   opposite: opposite,
   translate: translate,
+  contains2: contains2,
+  containsX: containsX,
   pp: pp
 };

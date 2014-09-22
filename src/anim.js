@@ -24,7 +24,7 @@ function closer(piece, pieces) {
   })[0];
 }
 
-function compute(prev, current) {
+function compute(prev, current, size) {
   var anims = {};
   if (prev.pieces) {
     var missings = [],
@@ -56,20 +56,44 @@ function compute(prev, current) {
     news.forEach(function(newP) {
       var preP = closer(newP, missings.filter(samePiece.bind(null, newP)));
       if (preP) {
-        anims[newP.key] = {
-          orig: current.orientation === 'white' ? preP.pos : newP.pos,
-          dest: current.orientation === 'white' ? newP.pos : preP.pos,
-          duration: current.animation.duration
-        };
+        var orig = current.orientation === 'white' ? preP.pos : newP.pos;
+        var dest = current.orientation === 'white' ? newP.pos : preP.pos;
+        var vector = [(orig[0] - dest[0]) * size, (dest[1] - orig[1]) * size];
+        anims[newP.key] = [vector, vector];
       }
     });
   }
   return anims;
 }
 
-module.exports = function(prev, current) {
+function go() {
+    var self = this;
+    requestAnimationFrame(function() {
+      var rest = 1 - (new Date().getTime() - self.start) / self.duration;
+      if (rest <= 0) {
+        animation = {};
+        m.redraw();
+      } else {
+        _.forIn(self.anims, function(cfg, key) {
+          self.anims[key][1] = [cfg[0][0] * rest, cfg[0][1] * rest];
+        });
+        m.redraw();
+        go.call(self);
+      }
+    });
+  }
+
+module.exports = function(el, prev, current) {
   if (current.animation.enabled && prev.pieces) {
-    var anims = compute(prev, current);
+    var anims = compute(prev, current, el.clientWidth / 8);
+    if (Object.getOwnPropertyNames(anims).length > 0) {
+      current.animation.current = {
+        start: new Date().getTime(),
+        duration: current.animation.duration,
+        anims: anims
+      };
+      go.call(current.animation.current);
+    }
   }
   prev.orientation = current.orientation;
   prev.pieces = _.clone(current.pieces.all, true);

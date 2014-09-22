@@ -21,6 +21,7 @@ var letters = {
 };
 
 function read(fen) {
+  if (fen === 'start') fen = initial;
   var pieces = {};
   fen.replace(/ .+$/, '').split('/').forEach(function(row, y) {
     var x = 0;

@@ -13,7 +13,15 @@ function defaults() {
     selected: null, // square selected by the user "a1" | nil
     animation: {
       enabled: true,
-      duration: 200
+      duration: 200,
+      /*{
+       *  start: timestamp,
+       *  duration: ms,
+       *  anims: {
+       *    a2: [-30, 50], ...
+       *  }
+       *}*/
+      current: {}
     },
     movable: {
       free: true, // all moves are valid - board editor
@@ -116,7 +124,7 @@ function isMovable(orig) {
 
 function canMove(orig, dest) {
   return orig !== dest && isMovable.call(this, orig) && (
-    this.movable.free || _.contains(this.movable.dests[orig], dest)
+    this.movable.free || util.containX(this.movable.dests[orig], dest)
   );
 }
 
@@ -131,7 +139,7 @@ function isPremovable(orig) {
 function canPremove(orig, dest) {
   return orig !== dest &&
     isPremovable.call(this, orig) &&
-    _.contains(premove(this.pieces, orig), dest);
+    _util.containX(premove(this.pieces, orig), dest);
 }
 
 function isDraggable(orig) {
