@@ -11,7 +11,7 @@ module.exports = function(cfg) {
 
   this.toggleOrientation = anim(this.board, board.toggleOrientation);
 
-  this.setPieces = anim(board.setPieces);
+  this.setPieces = anim(this.board, board.setPieces);
 
   this.selectSquare = board.selectSquare.bind(this.board);
 

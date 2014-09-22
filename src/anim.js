@@ -86,7 +86,7 @@ function animate(current, transformation) {
     orientation: current.orientation,
     pieces: _.clone(current.pieces.all, true)
   };
-  transformation();
+  var result = transformation();
   var anims = compute(prev, current);
   if (Object.getOwnPropertyNames(anims).length > 0) {
     current.animation.current = {
@@ -96,6 +96,7 @@ function animate(current, transformation) {
     };
     go.call(current.animation);
   }
+  return result;
 }
 
 // transformation is a function
@@ -104,9 +105,9 @@ function animate(current, transformation) {
 // and mutates the board.
 module.exports = function(board, transformation) {
   return function() {
-    if (board.animation.enabled && !board.animation.current.start && board.size) {
-      // here be dragons.
+    if (board.animation.enabled && !board.animation.current.start && board.size)
       return animate(board, transformation.apply.bind(transformation, board, arguments));
-    } else transformation.apply(board, arguments);
+    else
+      return transformation.apply(board, arguments);
   };
 };

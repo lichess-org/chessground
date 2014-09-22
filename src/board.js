@@ -1,5 +1,6 @@
 var util = require('./util');
 var premove = require('./premove');
+var anim = require('./anim');
 
 function callUserFunction(f) {
   setTimeout(f(), 20);
@@ -15,14 +16,16 @@ function setPieces(pieces) {
 }
 
 function baseMove(orig, dest) {
-  var success = this.pieces.move(orig, dest);
-  if (success) {
-    this.lastMove = [orig, dest];
-    this.movable.dropped = null;
-    this.check = null;
-    callUserFunction(this.events.change);
-  }
-  return success;
+  return anim(this, function() {
+    var success = this.pieces.move(orig, dest);
+    if (success) {
+      this.lastMove = [orig, dest];
+      this.movable.dropped = null;
+      this.check = null;
+      callUserFunction(this.events.change);
+    }
+    return success;
+  })();
 }
 
 function apiMove(orig, dest) {
