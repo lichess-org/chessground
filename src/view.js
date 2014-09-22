@@ -50,7 +50,8 @@ function renderSquare(ctrl, pos) {
     } : {
       right: styleX,
       top: styleY
-    }
+    },
+    'data-key': key
   };
   if (pos[1] === (ctrl.board.orientation === 'white' ? 1 : 8)) attrs['data-coord-x'] = file;
   if (pos[0] === (ctrl.board.orientation === 'white' ? 8 : 1)) attrs['data-coord-y'] = rank;
