@@ -12,8 +12,7 @@ function renderPiece(ctrl, key, p) {
       webkitTransform: util.translate(ctrl.board.draggable.current.pos)
     };
     attrs.class = attrs.class + ' dragging';
-  }
-  else if (ctrl.board.animation.current.anims) {
+  } else if (ctrl.board.animation.current.anims) {
     var animation = ctrl.board.animation.current.anims[key];
     if (animation) {
       attrs.style = {
@@ -35,7 +34,7 @@ function renderSquare(ctrl, pos) {
   var key = file + rank;
   var piece = ctrl.board.pieces.get(key);
   var attrs = {
-    class: key + ' cg-square ' + util.classSet({
+    class: util.classSet({
       'selected': ctrl.board.selected === key,
       'check': ctrl.board.check === key,
       'last-move': util.contains2(ctrl.board.lastMove, key),
@@ -62,7 +61,10 @@ function renderSquare(ctrl, pos) {
 }
 
 module.exports = function(ctrl) {
-  return m('div.cg-board', {
+  return {
+    tag: 'div',
+    attrs: {
+      class: 'cg-board',
       config: function(el, isInit, context) {
         if (isInit) ctrl.board.size = el.clientWidth;
       },
@@ -72,8 +74,8 @@ module.exports = function(ctrl) {
       },
       onmousedown: drag.bind(ctrl.board)
     },
-    util.allPos.map(function(pos) {
+    children: util.allPos.map(function(pos) {
       return renderSquare(ctrl, pos);
     })
-  );
+  };
 }

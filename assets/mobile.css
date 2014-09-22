@@ -1,4 +1,4 @@
-.cg-square.selected {
+.cg-board > div.selected {
   background: rgba(216, 85, 0, 0.3);
 }
 .cg-piece.dragging {

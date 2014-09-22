@@ -18,12 +18,12 @@
   width: 100%;
   height: 100%;
 }
-.cg-square {
+.cg-board > div {
   position: absolute;
   width: 12.5%;
   height: 12.5%;
 }
-.cg-square[data-coord-x]::after {
+.cg-board > div[data-coord-x]::after {
   position: absolute;
   left: 1px;
   bottom: 1px;
