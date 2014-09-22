@@ -31,6 +31,9 @@ function end(e) {
 }
 
 module.exports = function(e) {
+  e.stopPropagation();
+  e.preventDefault();
+  if (e.button !== 0) return; // only left click
   var square = e.target.parentNode;
   var orig = square.getAttribute('data-key');
   var piece = this.pieces.get(orig);
