@@ -1,20 +1,19 @@
 var board = require('./board');
+var data = require('./data');
 var configure = require('./configure');
 var anim = require('./anim');
 
 module.exports = function(cfg) {
 
-  this.board = board.defaults();
+  this.board = data(cfg);
 
-  this.reconfigure = anim(this.board, configure.bind(null, this.board));
+  this.reconfigure = anim(this.board, configure);
 
-  if (cfg) this.reconfigure(cfg);
+  this.toggleOrientation = anim(this.board, board.toggleOrientation);
 
-  this.toggleOrientation = board.toggleOrientation.bind(this.board);
+  this.setPieces = anim(board.setPieces);
 
-  this.setPieces = board.setPieces.bind(this.board);
-
-  this.selectSquare = anim(this.board, board.selectSquare);
+  this.selectSquare = board.selectSquare.bind(this.board);
 
   this.apiMove = board.apiMove.bind(this.board);
 

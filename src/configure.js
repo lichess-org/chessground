@@ -1,14 +1,14 @@
 var fen = require('./fen');
 var pieces = require('./pieces');
 
-module.exports = function(board, config) {
+module.exports = function(config) {
 
-  _.merge(board, config);
+  _.merge(this, config);
 
-  if (board.fen) {
-    board.pieces = new pieces.Pieces(fen.read(board.fen));
-    delete board.fen;
+  if (this.fen) {
+    this.pieces = new pieces.Pieces(fen.read(this.fen));
+    delete this.fen;
   }
 
-  board.movable.dropped = null;
+  this.movable.dropped = null;
 };
