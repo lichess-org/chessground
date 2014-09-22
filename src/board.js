@@ -3,11 +3,11 @@ var premove = require('./premove');
 var anim = require('./anim');
 
 function callUserFunction(f) {
-  setTimeout(f(), 20);
+  setTimeout(f, 20);
 }
 
 function toggleOrientation() {
-  this.orientation = this.orientation === 'white' ? 'black' : 'white';
+  this.orientation = util.opposite(this.orientation);
 }
 
 function setPieces(pieces) {
