@@ -71,7 +71,7 @@ module.exports = function(ctrl) {
         var key = e.target.getAttribute('data-key') || e.target.parentNode.getAttribute('data-key');
         ctrl.selectSquare(key);
       },
-      onmousedown: drag.start.bind(ctrl.board)
+      onmousedown: drag.bind(ctrl.board)
     },
     util.allPos.map(function(pos) {
       return renderSquare(ctrl, pos);

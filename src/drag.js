@@ -1,25 +1,6 @@
 var board = require('./board');
 var util = require('./util');
 
-function start(e) {
-  var square = e.target.parentNode;
-  var orig = square.getAttribute('data-key');
-  var piece = this.pieces.get(orig);
-  if (!piece || !board.isDraggable.call(this, orig)) return;
-  this.draggable.current = {
-    orig: orig,
-    bounds: square.parentNode.getBoundingClientRect(),
-    rel: [e.pageX, e.pageY],
-    pos: [0, 0],
-    over: orig,
-    move: move.bind(this),
-    end: end.bind(this)
-  };
-  board.setSelected.call(this, orig);
-  document.addEventListener('mousemove', this.draggable.current.move);
-  document.addEventListener('mouseup', this.draggable.current.end);
-}
-
 function move(e) {
   this.draggable.current.pos = [
     e.pageX - this.draggable.current.rel[0],
@@ -47,6 +28,21 @@ function end(e) {
   m.redraw();
 }
 
-module.exports = {
-  start: start
-};
+module.exports = function(e) {
+  var square = e.target.parentNode;
+  var orig = square.getAttribute('data-key');
+  var piece = this.pieces.get(orig);
+  if (!piece || !board.isDraggable.call(this, orig)) return;
+  this.draggable.current = {
+    orig: orig,
+    bounds: square.parentNode.getBoundingClientRect(),
+    rel: [e.pageX, e.pageY],
+    pos: [0, 0],
+    over: orig,
+    move: move.bind(this),
+    end: end.bind(this)
+  };
+  board.setSelected.call(this, orig);
+  document.addEventListener('mousemove', this.draggable.current.move);
+  document.addEventListener('mouseup', this.draggable.current.end);
+}
