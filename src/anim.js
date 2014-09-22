@@ -67,21 +67,19 @@ function compute(prev, current, size) {
 }
 
 function go() {
-    var self = this;
-    requestAnimationFrame(function() {
-      var rest = 1 - (new Date().getTime() - self.start) / self.duration;
-      if (rest <= 0) {
-        animation = {};
-        m.redraw();
-      } else {
-        _.forIn(self.anims, function(cfg, key) {
-          self.anims[key][1] = [cfg[0][0] * rest, cfg[0][1] * rest];
-        });
-        m.redraw();
-        go.call(self);
-      }
+  var self = this;
+  var rest = 1 - (new Date().getTime() - self.current.start) / self.current.duration;
+  if (rest <= 0) {
+    self.current = {};
+    m.redraw();
+  } else {
+    _.forIn(self.current.anims, function(cfg, key) {
+      self.current.anims[key][1] = [cfg[0][0] * rest, cfg[0][1] * rest];
     });
+    m.redraw();
+    requestAnimationFrame(go.bind(self));
   }
+}
 
 module.exports = function(el, prev, current) {
   if (current.animation.enabled && prev.pieces) {
@@ -92,7 +90,7 @@ module.exports = function(el, prev, current) {
         duration: current.animation.duration,
         anims: anims
       };
-      go.call(current.animation.current);
+      go.call(current.animation);
     }
   }
   prev.orientation = current.orientation;
