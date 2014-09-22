@@ -2,7 +2,8 @@ var ctrl = require('./ctrl');
 var view = require('./view');
 var api = require('./api');
 
-window.chessground = function(element, config) {
+// for usage outside of mithril
+function standalone(element, config) {
 
   var controller = new ctrl(config);
 
@@ -14,4 +15,6 @@ window.chessground = function(element, config) {
   });
 
   return api(element, controller, view);
-};
+}
+
+window.chessground = module.exports = standalone;

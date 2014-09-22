@@ -27,7 +27,7 @@ gulp.task('prod-scripts', function() {
 
   return bundleStream
     .on('error', function(error) { gutil.log(gutil.colors.red(error.message)); })
-    .pipe(source('chessground.prod.js'))
+    .pipe(source('chessground.min.js'))
     .pipe(streamify(uglify()))
     .pipe(gulp.dest('./'));
 });
