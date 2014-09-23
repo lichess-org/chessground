@@ -1,4 +1,5 @@
 var fen = require('./fen');
+var m = require('mithril');
 
 module.exports = function(element, controller, view) {
 

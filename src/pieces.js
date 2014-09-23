@@ -1,3 +1,5 @@
+var forIn = require('lodash-node/modern/objects/forIn')
+
 // {a1: {role: 'rook', color: 'white'}, ...}
 Pieces = function(data) {
   this.all = data;
@@ -17,7 +19,7 @@ Pieces = function(data) {
     return true;
   };
   this.set = function(pieces) {
-    _.forIn(pieces, function(piece, key) {
+    forIn(pieces, function(piece, key) {
       if (piece) this.put(key, piece);
       else this.remove(key);
     }.bind(this));

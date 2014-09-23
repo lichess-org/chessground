@@ -94,7 +94,7 @@ function isPremovable(orig) {
 function canPremove(orig, dest) {
   return orig !== dest &&
     isPremovable.call(this, orig) &&
-    _util.containX(premove(this.pieces, orig), dest);
+    util.containX(premove(this.pieces, orig), dest);
 }
 
 function isDraggable(orig) {

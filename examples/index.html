@@ -7,8 +7,6 @@
     <link rel="stylesheet" href="../assets/desktop.css">
   </head>
   <body>
-    <script src="../libs/mithril.js"></script>
-    <script src="../libs/lodash.custom.min.js"></script>
     <script src="../chessground.js"></script>
     <!-- chess.js is NOT required by chessground. We include it for the examples. -->
     <script src="../libs/chess.min.js"></script>
@@ -33,7 +31,7 @@
         //var controller = new cg.controller();
         //m.render(document.getElementById('ground1'), cg.view.board(controller));
         (function() {
-          window.ground1 = chessground(document.getElementById('ground1'), {
+          window.ground1 = Chessground(document.getElementById('ground1'), {
             orientation: 'black',
               fen:'2r3k1/pp2Qpbp/4b1p1/3p4/3n1PP1/2N4P/Pq6/R2K1B1R w -'
           });

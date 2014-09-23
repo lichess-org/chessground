@@ -19,7 +19,7 @@ gulp.task('lint', function() {
     .pipe(jshint.reporter('default'));
 });
 
-gulp.task('prod-scripts', function() {
+gulp.task('prod', function() {
   return browserify('./src/main.js')
     .bundle()
     .on('error', onError)
@@ -28,9 +28,10 @@ gulp.task('prod-scripts', function() {
     .pipe(destination);
 });
 
-gulp.task('dev-scripts', function() {
+gulp.task('dev', function() {
   var opts = watchify.args;
   opts.debug = true;
+  opts.standalone = 'Chessground';
 
   var bundleStream = watchify(browserify(sources, opts))
     .on('update', rebundle)
@@ -46,6 +47,4 @@ gulp.task('dev-scripts', function() {
   return rebundle();
 });
 
-gulp.task('dev', ['dev-scripts']);
-gulp.task('prod', ['prod-scripts']);
 gulp.task('default', ['dev']);

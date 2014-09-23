@@ -1,5 +1,6 @@
 var board = require('./board');
 var util = require('./util');
+var m = require('mithril');
 
 function move(e) {
   this.draggable.current.pos = [

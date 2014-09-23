@@ -1,3 +1,6 @@
+var forIn = require('lodash-node/modern/objects/forIn')
+var clone = require('lodash-node/modern/objects/clone')
+var m = require('mithril');
 var util = require('./util');
 
 function makePiece(k, piece, invert) {
@@ -73,7 +76,7 @@ function go() {
     m.redraw();
   } else {
     m.startComputation();
-    _.forIn(self.current.anims, function(cfg, key) {
+    forIn(self.current.anims, function(cfg, key) {
       self.current.anims[key][1] = [cfg[0][0] * rest, cfg[0][1] * rest];
     });
     m.endComputation();
@@ -84,7 +87,7 @@ function go() {
 function animate(current, transformation) {
   var prev = {
     orientation: current.orientation,
-    pieces: _.clone(current.pieces.all, true)
+    pieces: clone(current.pieces.all, true)
   };
   var result = transformation();
   var anims = compute(prev, current);

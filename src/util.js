@@ -1,5 +1,7 @@
+var range = require('lodash-node/modern/arrays/range');
+
 var files = "abcdefgh".split('');
-var ranks = _.range(1, 9);
+var ranks = range(1, 9);
 
 function pos2key(pos) {
   return files[pos[0] - 1] + pos[1];

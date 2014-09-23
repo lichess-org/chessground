@@ -1,13 +1,14 @@
 {
   "name": "chessground",
-  "version": "0.0.0",
+  "version": "1.0.0",
   "description": "Multipurpose chess UI.",
-  "main": "index.js",
+  "main": "src/main.js",
   "directories": {
     "example": "examples"
   },
   "dependencies": {
-    "browserify": "~5.11.2"
+    "lodash-node": "^2.4.1",
+    "mithril": "^0.1.21"
   },
   "devDependencies": {
     "browserify": "~5.11.2",
@@ -28,6 +29,7 @@
   },
   "keywords": [
     "chess",
+    "lichess.org",
     "chessboard"
   ],
   "author": "Thibault Duplessis (https://github.com/ornicar)",
