@@ -12,6 +12,7 @@ var destination = gulp.dest('./');
 var onError = function(error) {
   gutil.log(gutil.colors.red(error.message));
 };
+var standalone = 'Chessground';
 
 gulp.task('lint', function() {
   return gulp.src(paths.scripts)
@@ -20,8 +21,9 @@ gulp.task('lint', function() {
 });
 
 gulp.task('prod', function() {
-  return browserify('./src/main.js')
-    .bundle()
+  return browserify('./src/main.js', {
+    standalone: standalone
+  }).bundle()
     .on('error', onError)
     .pipe(source('chessground.min.js'))
     .pipe(streamify(uglify()))
@@ -31,7 +33,7 @@ gulp.task('prod', function() {
 gulp.task('dev', function() {
   var opts = watchify.args;
   opts.debug = true;
-  opts.standalone = 'Chessground';
+  opts.standalone = standalone;
 
   var bundleStream = watchify(browserify(sources, opts))
     .on('update', rebundle)
