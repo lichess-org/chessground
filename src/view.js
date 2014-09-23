@@ -80,7 +80,7 @@ function renderSquare(ctrl, pos) {
   };
 }
 
-module.exports = function(ctrl) {
+function renderBoard(ctrl) {
   return {
     tag: 'div',
     attrs: {
@@ -88,6 +88,9 @@ module.exports = function(ctrl) {
       config: function(el, isUpdate, context) {
         // stay async to prevent a layout force redraw
         if (!isUpdate) requestAnimationFrame(function() {
+          ctrl.board.render = function() {
+            m.render(el.parentNode, renderBoard(ctrl));
+          }
           ctrl.board.bounds = el.getBoundingClientRect();
         });
       },
@@ -101,3 +104,5 @@ module.exports = function(ctrl) {
     })
   };
 }
+
+module.exports = renderBoard;

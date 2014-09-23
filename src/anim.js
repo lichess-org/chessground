@@ -68,19 +68,18 @@ function compute(prev, current) {
   return anims;
 }
 
-function go() {
+function go(render) {
   var self = this;
   var rest = 1 - (new Date().getTime() - self.current.start) / self.current.duration;
   if (rest <= 0) {
     self.current = {};
-    m.redraw();
+    render();
   } else {
-    m.startComputation();
     forIn(self.current.anims, function(cfg, key) {
       self.current.anims[key][1] = [cfg[0][0] * rest, cfg[0][1] * rest];
     });
-    m.endComputation();
-    requestAnimationFrame(go.bind(self));
+    render();
+    requestAnimationFrame(go.bind(self, render));
   }
 }
 
@@ -97,7 +96,7 @@ function animate(current, transformation) {
       duration: current.animation.duration,
       anims: anims
     };
-    go.call(current.animation);
+    go.call(current.animation, current.render);
   }
   return result;
 }
@@ -108,7 +107,7 @@ function animate(current, transformation) {
 // and mutates the board.
 module.exports = function(board, transformation) {
   return function() {
-    if (board.animation.enabled && !board.animation.current.start && board.bounds)
+    if (board.animation.enabled && !board.animation.current.start && board.render)
       return animate(board, transformation.apply.bind(transformation, board, arguments));
     else
       return transformation.apply(board, arguments);

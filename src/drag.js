@@ -8,7 +8,7 @@ function move(e) {
     e.clientY - this.draggable.current.rel[1]
   ];
   this.draggable.current.over = board.getKeyAtDomPos.call(this, e.clientX, e.clientY);
-  m.redraw();
+  this.render();
 }
 
 function end(e) {
@@ -25,6 +25,7 @@ function end(e) {
 module.exports = function(e) {
   e.stopPropagation();
   e.preventDefault();
+  if (!this.render) return; // needs the DOM element
   if (e.button !== 0) return; // only left click
   var square = e.target.parentNode;
   var orig = board.getKeyAtDomPos.call(this, e.clientX, e.clientY);
