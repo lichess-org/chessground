@@ -85,14 +85,14 @@ module.exports = function(ctrl) {
     tag: 'div',
     attrs: {
       class: 'cg-board',
-      config: function(el, isInit, context) {
+      config: function(el, isUpdate, context) {
         // stay async to prevent a layout force redraw
-        if (isInit) requestAnimationFrame(function() {
+        if (!isUpdate) requestAnimationFrame(function() {
           ctrl.board.bounds = el.getBoundingClientRect();
         });
       },
       onclick: function(e) {
-        ctrl.selectSquare(board.getKeyAtDomPos.call(ctrl.board, e.pageX, e.pageY));
+        ctrl.selectSquare(board.getKeyAtDomPos.call(ctrl.board, e.clientX, e.clientY));
       },
       onmousedown: drag.bind(ctrl.board)
     },
