@@ -7,52 +7,45 @@ var browserify = require('browserify');
 var uglify = require('gulp-uglify');
 var streamify = require('gulp-streamify');
 
+var sources = ['./src/main.js'];
+var destination = gulp.dest('./');
+var onError = function(error) {
+  gutil.log(gutil.colors.red(error.message));
+};
+
 gulp.task('lint', function() {
   return gulp.src(paths.scripts)
     .pipe(jshint())
     .pipe(jshint.reporter('default'));
 });
 
-gulp.task('scripts', function() {
-  var bundleStream = browserify('./src/main.js',{debug: true}).bundle();
-
-  return bundleStream
-    .on('error', function(error) { gutil.log(gutil.colors.red(error.message)); })
-    .pipe(source('chessground.js'))
-    .pipe(gulp.dest('./'));
-});
-
 gulp.task('prod-scripts', function() {
-  var bundleStream = browserify('./src/main.js').bundle();
-
-  return bundleStream
-    .on('error', function(error) { gutil.log(gutil.colors.red(error.message)); })
+  return browserify('./src/main.js')
+    .bundle()
+    .on('error', onError)
     .pipe(source('chessground.min.js'))
     .pipe(streamify(uglify()))
-    .pipe(gulp.dest('./'));
+    .pipe(destination);
 });
 
-gulp.task('watch-scripts', function() {
+gulp.task('dev-scripts', function() {
   var opts = watchify.args;
   opts.debug = true;
-  var bundleStream = watchify(browserify('./src/main.js', opts));
+
+  var bundleStream = watchify(browserify(sources, opts))
+    .on('update', rebundle)
+    .on('log', gutil.log);
 
   function rebundle() {
     return bundleStream.bundle()
-      .on('error', function(error) { gutil.log.bind(gutil, gutil.colors.red(error.message)); })
+      .on('error', onError)
       .pipe(source('chessground.js'))
-      .pipe(gulp.dest('./'));
+      .pipe(destination);
   }
-
-  bundleStream.on('update', rebundle);
-  bundleStream.on('log', gutil.log);
 
   return rebundle();
 });
 
-gulp.task('dev', ['scripts']);
-gulp.task('dev-watch', ['watch-scripts']);
+gulp.task('dev', ['dev-scripts']);
 gulp.task('prod', ['prod-scripts']);
-
-// Default Task
-gulp.task('default', ['dev-watch']);
+gulp.task('default', ['dev']);
