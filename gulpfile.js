@@ -8,7 +8,7 @@ var uglify = require('gulp-uglify');
 var streamify = require('gulp-streamify');
 
 var sources = ['./src/main.js'];
-var destination = gulp.dest('./');
+var destination = './';
 var onError = function(error) {
   gutil.log(gutil.colors.red(error.message));
 };
@@ -27,7 +27,7 @@ gulp.task('prod', function() {
     .on('error', onError)
     .pipe(source('chessground.min.js'))
     .pipe(streamify(uglify()))
-    .pipe(destination);
+    .pipe(gulp.dest(destination));
 });
 
 gulp.task('dev', function() {
@@ -43,7 +43,7 @@ gulp.task('dev', function() {
     return bundleStream.bundle()
       .on('error', onError)
       .pipe(source('chessground.js'))
-      .pipe(destination);
+      .pipe(gulp.dest(destination));
   }
 
   return rebundle();
