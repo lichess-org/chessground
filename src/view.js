@@ -105,9 +105,8 @@ function renderBoard(ctrl) {
           m.render(el.parentNode, renderBoard(ctrl));
         }
         if (isTouch) el.addEventListener('touchstart', autoredraw(function(e) {
-          var touch = e.touches[0];
-          drag.call(ctrl.board, e);
-          ctrl.selectSquare(board.getKeyAtDomPos.call(ctrl.board, touch.clientX, touch.clientY));
+          // drag.call(ctrl.board, e);
+          ctrl.selectSquare(board.getKeyAtDomPos.call(ctrl.board, util.eventPosition(e)));
         }, el));
       }
     }
