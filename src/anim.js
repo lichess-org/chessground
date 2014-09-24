@@ -28,7 +28,7 @@ function closer(piece, pieces) {
 }
 
 function compute(prev, current) {
-  var size = current.bounds.width / 8,
+  var size = current.bounds().width / 8,
     anims = {},
     missings = [],
     news = [],

@@ -82,46 +82,45 @@ function renderSquare(ctrl, pos) {
 }
 
 // from mithril source, more or less
-function autoredraw(callback, object) {
+function autoredraw(callback, node) {
   return function(e) {
     m.redraw.strategy("diff");
     m.startComputation();
     try {
-      return callback.call(object, e);
+      return callback.call(node, e);
     } finally {
       m.endComputation();
     }
   }
 }
 
-function boardEventListeners(ctrl, el) {
-  // ontouchstart in attrs doesn't work so we do it like that
-  if (util.isTouchDevice()) {
-    el.addEventListener('touchstart', autoredraw(function(e) {
-      var touch = e.touches[0];
-      drag.call(ctrl.board, e);
-      ctrl.selectSquare(board.getKeyAtDomPos.call(ctrl.board, touch.clientX, touch.clientY));
-    }, el));
-  } else {
-    el.addEventListener('click', autoredraw(function(e) {
-      ctrl.selectSquare(board.getKeyAtDomPos.call(ctrl.board, e.clientX, e.clientY));
-    }, el));
-    el.addEventListener('mousedown', autoredraw(drag.bind(ctrl.board), el));
-  }
-}
-
 function renderBoard(ctrl) {
+  var isTouch = util.isTouchDevice();
+  var attrs = {
+    class: 'cg-board',
+    config: function(el, isUpdate, context) {
+      if (!isUpdate) {
+        ctrl.board.bounds = el.getBoundingClientRect.bind(el);
+        ctrl.board.render = function() {
+          m.render(el.parentNode, renderBoard(ctrl));
+        }
+        if (isTouch) el.addEventListener('touchstart', autoredraw(function(e) {
+          var touch = e.touches[0];
+          drag.call(ctrl.board, e);
+          ctrl.selectSquare(board.getKeyAtDomPos.call(ctrl.board, touch.clientX, touch.clientY));
+        }, el));
+      }
+    }
+  }
+  if (!isTouch) {
+    attrs.onclick = function(e) {
+      ctrl.selectSquare(board.getKeyAtDomPos.call(ctrl.board, e.clientX, e.clientY))
+    };
+    attrs.onmousedown = drag.bind(ctrl.board);
+  }
   return {
     tag: 'div',
-    attrs: {
-      class: 'cg-board',
-      config: function(el, isUpdate, context) {
-        if (!isUpdate) {
-          ctrl.board.element = el;
-          boardEventListeners(ctrl, el);
-        }
-      }
-    },
+    attrs: attrs,
     children: util.allPos.map(function(pos) {
       return renderSquare(ctrl, pos);
     })

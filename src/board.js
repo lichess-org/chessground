@@ -123,8 +123,8 @@ function playPremove() {
 }
 
 function getKeyAtDomPos(x, y) {
-  if (!this.element) return;
-  var bounds = this.element.getBoundingClientRect();
+  if (!this.bounds) return;
+  var bounds = this.bounds();
   var file = Math.ceil(8 * ((x - bounds.left) / bounds.width));
   file = this.orientation === 'white' ? file : 9 - file;
   var rank = Math.ceil(8 - (8 * ((y - bounds.top) / bounds.height)));
