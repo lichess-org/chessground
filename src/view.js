@@ -114,9 +114,11 @@ function renderBoard(ctrl) {
   }
   if (!isTouch) {
     attrs.onclick = function(e) {
-      ctrl.selectSquare(board.getKeyAtDomPos.call(ctrl.board, e.clientX, e.clientY))
+      ctrl.selectSquare(board.getKeyAtDomPos.call(ctrl.board, util.eventPosition(e)))
     };
-    attrs.onmousedown = drag.bind(ctrl.board);
+    attrs.onmousedown = function(e) {
+      if (e.button === 0) drag.call(ctrl.board, e);
+    };
   }
   return {
     tag: 'div',

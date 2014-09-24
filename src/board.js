@@ -122,12 +122,12 @@ function playPremove() {
   }
 }
 
-function getKeyAtDomPos(x, y) {
+function getKeyAtDomPos(pos) {
   if (!this.bounds) return;
   var bounds = this.bounds();
-  var file = Math.ceil(8 * ((x - bounds.left) / bounds.width));
+  var file = Math.ceil(8 * ((pos[0] - bounds.left) / bounds.width));
   file = this.orientation === 'white' ? file : 9 - file;
-  var rank = Math.ceil(8 - (8 * ((y - bounds.top) / bounds.height)));
+  var rank = Math.ceil(8 - (8 * ((pos[1] - bounds.top) / bounds.height)));
   rank = this.orientation === 'white' ? rank : 9 - rank;
   if (file > 0 && file < 9 && rank > 0 && rank < 9) return util.pos2key([file, rank]);
 }

@@ -58,6 +58,10 @@ function isTouchDevice() {
     'onmsgesturechange' in window; // works on ie10
 }
 
+function eventPosition(e) {
+  return e.touches ? [e.touches[0].clientX, e.touches[0].clientY] : [e.clientX, e.clientY];
+}
+
 module.exports = {
   files: files,
   ranks: ranks,
@@ -72,5 +76,6 @@ module.exports = {
   contains2: contains2,
   containsX: containsX,
   isTouchDevice: isTouchDevice,
+  eventPosition: eventPosition,
   pp: pp
 };

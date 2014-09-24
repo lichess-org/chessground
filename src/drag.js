@@ -3,11 +3,12 @@ var util = require('./util');
 var m = require('mithril');
 
 function move(e) {
+  var position = util.eventPosition(e);
   this.draggable.current.pos = [
-    e.clientX - this.draggable.current.rel[0],
-    e.clientY - this.draggable.current.rel[1]
+    position[0] - this.draggable.current.rel[0],
+    position[1] - this.draggable.current.rel[1]
   ];
-  this.draggable.current.over = board.getKeyAtDomPos.call(this, e.clientX, e.clientY);
+  this.draggable.current.over = board.getKeyAtDomPos.call(this, position);
   this.render();
 }
 
@@ -26,14 +27,14 @@ module.exports = function(e) {
   e.stopPropagation();
   e.preventDefault();
   if (!this.render) return; // needs the DOM element
-  if (e.button !== 0) return; // only left click
+  var position = util.eventPosition(e);
   var square = e.target.parentNode;
-  var orig = board.getKeyAtDomPos.call(this, e.clientX, e.clientY);
+  var orig = board.getKeyAtDomPos.call(this, position);
   var piece = this.pieces.get(orig);
   if (!piece || !board.isDraggable.call(this, orig)) return;
   this.draggable.current = {
     orig: orig,
-    rel: [e.clientX, e.clientY],
+    rel: position,
     pos: [0, 0],
     over: orig,
     move: move.bind(this),
