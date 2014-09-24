@@ -86,18 +86,20 @@ function renderBoard(ctrl) {
     class: 'cg-board',
     config: function(el, isUpdate, context) {
 
-      // ontouchstart in attrs doesn't work so we do it like that
-      if (util.isTouchDevice()) {
-        el.addEventListener('touchstart', function(e) {
-          var touch = e.touches[0];
-          drag.call(ctrl.board, e);
-          ctrl.selectSquare(board.getKeyAtDomPos.call(ctrl.board, touch.clientX, touch.clientY));
-        });
-      } else {
-        el.addEventListener('click', function(e) {
-          ctrl.selectSquare(board.getKeyAtDomPos.call(ctrl.board, e.clientX, e.clientY));
-        });
-        el.addEventListener('mousedown', drag.bind(ctrl.board));
+      if (!isUpdate) {
+        // ontouchstart in attrs doesn't work so we do it like that
+        if (util.isTouchDevice()) {
+          el.addEventListener('touchstart', function(e) {
+            var touch = e.touches[0];
+            drag.call(ctrl.board, e);
+            ctrl.selectSquare(board.getKeyAtDomPos.call(ctrl.board, touch.clientX, touch.clientY));
+          });
+        } else {
+          el.addEventListener('click', function(e) {
+            ctrl.selectSquare(board.getKeyAtDomPos.call(ctrl.board, e.clientX, e.clientY));
+          });
+          el.addEventListener('mousedown', drag.bind(ctrl.board));
+        }
       }
 
       // stay async to prevent a layout force redraw
