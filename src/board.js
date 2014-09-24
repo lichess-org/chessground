@@ -123,10 +123,11 @@ function playPremove() {
 }
 
 function getKeyAtDomPos(x, y) {
-  if (!this.bounds) return;
-  var file = Math.ceil(8 * ((x - this.bounds.left) / this.bounds.width));
+  if (!this.element) return;
+  var bounds = this.element.getBoundingClientRect();
+  var file = Math.ceil(8 * ((x - bounds.left) / bounds.width));
   file = this.orientation === 'white' ? file : 9 - file;
-  var rank = Math.ceil(8 - (8 * ((y - this.bounds.top) / this.bounds.height)));
+  var rank = Math.ceil(8 - (8 * ((y - bounds.top) / bounds.height)));
   rank = this.orientation === 'white' ? rank : 9 - rank;
   if (file > 0 && file < 9 && rank > 0 && rank < 9) return util.pos2key([file, rank]);
 }

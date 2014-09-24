@@ -10,10 +10,7 @@ module.exports = function(cfg) {
     check: null, // square currently in check "a2" | nil
     lastMove: null, // squares part of the last move ["c3" "c4"] | nil
     selected: null, // square selected by the user "a1" | nil
-    render: function() {
-      throw 'board render is not initialized';
-    },
-    bounds: null, // result of getBoundingClientRect on the board DOM element
+    element: null, // DOM element on which the board is rendered, used for selective redraw
     animation: {
       enabled: true,
       duration: 200,
