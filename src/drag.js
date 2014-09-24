@@ -12,8 +12,8 @@ function move(e) {
 }
 
 function end(e) {
-  document.removeEventListener('mousemove', this.draggable.current.move);
-  document.removeEventListener('mouseup', this.draggable.current.end);
+  document.removeEventListener(util.isTouchDevice() ? 'touchmove' : 'mousemove', this.draggable.current.move);
+  document.removeEventListener(util.isTouchDevice() ? 'touchend' : 'mouseup', this.draggable.current.end);
   var orig = this.draggable.current.orig,
   dest = this.draggable.current.over;
   if (orig !== dest) this.movable.dropped = dest;
@@ -40,6 +40,6 @@ module.exports = function(e) {
     end: end.bind(this)
   };
   board.setSelected.call(this, orig);
-  document.addEventListener('mousemove', this.draggable.current.move);
-  document.addEventListener('mouseup', this.draggable.current.end);
-}
+  document.addEventListener(util.isTouchDevice() ? 'touchmove' : 'mousemove', this.draggable.current.move);
+  document.addEventListener(util.isTouchDevice() ? 'touchend' : 'mouseup', this.draggable.current.end);
+};

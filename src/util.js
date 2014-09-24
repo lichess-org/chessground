@@ -45,12 +45,17 @@ function contains2(xs, x) {
 }
 
 function containsX(xs, x) {
-  return xs && xs.indexOf(x) !== -1
+  return xs && xs.indexOf(x) !== -1;
 }
 
 function pp(x) {
   console.log(x);
   return x;
+}
+
+function isTouchDevice() {
+  return 'ontouchstart' in window || // works on most browsers
+    'onmsgesturechange' in window; // works on ie10
 }
 
 module.exports = {
@@ -66,5 +71,6 @@ module.exports = {
   translate: translate,
   contains2: contains2,
   containsX: containsX,
+  isTouchDevice: isTouchDevice,
   pp: pp
 };

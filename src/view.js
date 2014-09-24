@@ -82,24 +82,37 @@ function renderSquare(ctrl, pos) {
 }
 
 function renderBoard(ctrl) {
+  var attrs = {
+    class: 'cg-board',
+    config: function(el, isUpdate, context) {
+
+      // ontouchstart in attrs doesn't work so we do it like that
+      if (util.isTouchDevice()) {
+        el.addEventListener('touchstart', function(e) {
+          var touch = e.touches[0];
+          drag.call(ctrl.board, e);
+          ctrl.selectSquare(board.getKeyAtDomPos.call(ctrl.board, touch.clientX, touch.clientY));
+        });
+      } else {
+        el.addEventListener('click', function(e) {
+          ctrl.selectSquare(board.getKeyAtDomPos.call(ctrl.board, e.clientX, e.clientY));
+        });
+        el.addEventListener('mousedown', drag.bind(ctrl.board));
+      }
+
+      // stay async to prevent a layout force redraw
+      if (!isUpdate) requestAnimationFrame(function() {
+        ctrl.board.render = function() {
+          m.render(el.parentNode, renderBoard(ctrl));
+        };
+        ctrl.board.bounds = el.getBoundingClientRect();
+      });
+    }
+  };
+
   return {
     tag: 'div',
-    attrs: {
-      class: 'cg-board',
-      config: function(el, isUpdate, context) {
-        // stay async to prevent a layout force redraw
-        if (!isUpdate) requestAnimationFrame(function() {
-          ctrl.board.render = function() {
-            m.render(el.parentNode, renderBoard(ctrl));
-          }
-          ctrl.board.bounds = el.getBoundingClientRect();
-        });
-      },
-      onclick: function(e) {
-        ctrl.selectSquare(board.getKeyAtDomPos.call(ctrl.board, e.clientX, e.clientY));
-      },
-      onmousedown: drag.bind(ctrl.board)
-    },
+    attrs: attrs,
     children: util.allPos.map(function(pos) {
       return renderSquare(ctrl, pos);
     })

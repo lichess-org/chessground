@@ -46,16 +46,6 @@
           console.log(ground.getFen());
         };
         ground = Chessground(document.getElementById('ground'), {
-          turnColor: 'white',
-          movable: {
-            free: false,
-            color: chessToColor(chess),
-            premove: true,
-            dests: chessToDests(chess),
-            events: {
-              after: onMove
-            }
-          }
         });
       })();
     </script>
