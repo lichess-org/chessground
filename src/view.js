@@ -48,6 +48,7 @@ function renderSquare(ctrl, pos) {
   var piece = ctrl.board.pieces.get(key);
   var attrs = {
     class: util.classSet({
+      'cg-square': true,
       'selected': ctrl.board.selected === key,
       'check': ctrl.board.check === key,
       'last-move': util.contains2(ctrl.board.lastMove, key),

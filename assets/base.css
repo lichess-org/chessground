@@ -18,12 +18,12 @@
   width: 100%;
   height: 100%;
 }
-.cg-board > div {
+.cg-square {
   position: absolute;
   width: 12.5%;
   height: 12.5%;
 }
-.cg-board > div[data-coord-x]::after {
+.cg-square[data-coord-x]::after {
   position: absolute;
   left: 1px;
   bottom: 1px;
@@ -33,7 +33,7 @@
   color: #fff;
   opacity: 0.5;
 }
-.cg-board > div[data-coord-y]::before {
+.cg-square[data-coord-y]::before {
   position: absolute;
   right: 1px;
   top: 1px;
@@ -43,22 +43,22 @@
   color: #fff;
   opacity: 0.5;
 }
-.cg-board > div.move-dest {
+.cg-square.move-dest {
   background: radial-gradient(rgba(20, 85, 30, 0.5) 22%, #208530 0, rgba(0, 0, 0, 0.3) 0, rgba(0, 0, 0, 0) 0);
 }
-.cg-board > div.premove-dest {
+.cg-square.premove-dest {
   background: radial-gradient(rgba(20, 30, 85, 0.5) 22%, #203085 0, rgba(0, 0, 0, 0.3) 0, rgba(0, 0, 0, 0) 0);
 }
-.cg-board > div.selected {
+.cg-square.selected {
   background-color: rgba(20, 85, 30, 0.5);
 }
-.cg-board > div.last-move {
+.cg-square.last-move {
   background-color: rgba(155, 199, 0, 0.41);
 }
-.cg-board > div.check {
+.cg-square.check {
   background: radial-gradient(ellipse at center, rgba(255, 0, 0, 1) 0%, rgba(231, 0, 0, 1) 25%, rgba(169, 0, 0, 0) 89%, rgba(158, 0, 0, 0) 100%);
 }
-.cg-board > div.current-premove {
+.cg-square.current-premove {
   background-color: rgba(20, 30, 85, 0.5);
 }
 .cg-piece {
