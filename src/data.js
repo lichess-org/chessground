@@ -10,7 +10,8 @@ module.exports = function(cfg) {
     check: null, // square currently in check "a2" | nil
     lastMove: null, // squares part of the last move ["c3" "c4"] | nil
     selected: null, // square selected by the user "a1" | nil
-    element: null, // DOM element on which the board is rendered, used for selective redraw
+    render: null, // function that rerenders the board
+    bounds: null, // function that calculates the board bounds
     animation: {
       enabled: true,
       duration: 200,
