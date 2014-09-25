@@ -1,4 +1,3 @@
-var isEmpty = require('lodash-node/modern/objects/isEmpty');
 var board = require('./board');
 var util = require('./util');
 var m = require('mithril');
@@ -22,7 +21,8 @@ function start(e) {
 }
 
 function move(e) {
-  if (isEmpty(this.draggable.current)) return;
+  if (this.draggable.current.orig === undefined) return;
+
   var position = util.eventPosition(e);
   console.log('move', position);
   this.draggable.current.pos = [
@@ -35,6 +35,8 @@ function move(e) {
 }
 
 function end(e) {
+  if (this.draggable.current.orig === undefined) return;
+
   console.log('end');
   var orig = this.draggable.current.orig,
   dest = this.draggable.current.over;
