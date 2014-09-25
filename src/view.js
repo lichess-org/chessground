@@ -11,11 +11,13 @@ function renderPiece(ctrl, key, p) {
   var attrs = {
     class: pieceClass(p)
   };
-  if (ctrl.board.draggable.current.orig === key) {
+  var draggable = ctrl.board.draggable.current;
+  if (draggable.orig === key) {
     attrs.style = {
-      webkitTransform: util.translate(ctrl.board.draggable.current.pos)
+      webkitTransform: util.translate(draggable.pos)
     };
-    attrs.class = attrs.class + ' dragging';
+    if (draggable.isDragging)
+      attrs.class = attrs.class + ' dragging';
   } else if (ctrl.board.animation.current.anims) {
     var animation = ctrl.board.animation.current.anims[key];
     if (animation) {
@@ -91,7 +93,7 @@ function autoredraw(callback, node) {
     } finally {
       m.endComputation();
     }
-  }
+  };
 }
 
 function renderBoard(ctrl) {
@@ -103,20 +105,18 @@ function renderBoard(ctrl) {
         ctrl.board.bounds = el.getBoundingClientRect.bind(el);
         ctrl.board.render = function() {
           m.render(el.parentNode, renderBoard(ctrl));
-        }
+        };
         if (isTouch) el.addEventListener('touchstart', autoredraw(function(e) {
-          // drag.call(ctrl.board, e);
+          drag.call(ctrl.board, e);
           ctrl.selectSquare(board.getKeyAtDomPos.call(ctrl.board, util.eventPosition(e)));
         }, el));
       }
     }
-  }
+  };
   if (!isTouch) {
-    attrs.onclick = function(e) {
-      ctrl.selectSquare(board.getKeyAtDomPos.call(ctrl.board, util.eventPosition(e)))
-    };
     attrs.onmousedown = function(e) {
       if (e.button === 0) drag.call(ctrl.board, e);
+      ctrl.selectSquare(board.getKeyAtDomPos.call(ctrl.board, util.eventPosition(e)));
     };
   }
   return {

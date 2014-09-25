@@ -8,6 +8,7 @@ function move(e) {
     position[0] - this.draggable.current.rel[0],
     position[1] - this.draggable.current.rel[1]
   ];
+  this.draggable.current.isDragging = true;
   this.draggable.current.over = board.getKeyAtDomPos.call(this, position);
   this.render();
 }
@@ -33,6 +34,7 @@ module.exports = function(e) {
   var piece = this.pieces.get(orig);
   if (!piece || !board.isDraggable.call(this, orig)) return;
   this.draggable.current = {
+    isDragging: false,
     orig: orig,
     rel: position,
     pos: [0, 0],
@@ -40,7 +42,6 @@ module.exports = function(e) {
     move: move.bind(this),
     end: end.bind(this)
   };
-  board.setSelected.call(this, orig);
   document.addEventListener(util.isTouchDevice() ? 'touchmove' : 'mousemove', this.draggable.current.move);
   document.addEventListener(util.isTouchDevice() ? 'touchend' : 'mouseup', this.draggable.current.end);
 };
