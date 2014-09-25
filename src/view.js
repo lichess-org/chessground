@@ -107,15 +107,17 @@ function renderBoard(ctrl) {
           m.render(el.parentNode, renderBoard(ctrl));
         };
         if (isTouch) el.addEventListener('touchstart', autoredraw(function(e) {
-          drag.call(ctrl.board, e);
+          drag.start.call(ctrl.board, e);
           ctrl.selectSquare(board.getKeyAtDomPos.call(ctrl.board, util.eventPosition(e)));
         }, el));
+        document.addEventListener(isTouch ? 'touchmove' : 'mousemove', drag.move.bind(ctrl.board));
+        document.addEventListener(isTouch ? 'touchend' : 'mouseup', drag.end.bind(ctrl.board));
       }
     }
   };
   if (!isTouch) {
     attrs.onmousedown = function(e) {
-      if (e.button === 0) drag.call(ctrl.board, e);
+      if (e.button === 0) drag.start.call(ctrl.board, e);
       ctrl.selectSquare(board.getKeyAtDomPos.call(ctrl.board, util.eventPosition(e)));
     };
   }

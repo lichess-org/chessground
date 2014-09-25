@@ -1,9 +1,12 @@
+var isEmpty = require('lodash-node/modern/objects/isEmpty')
 var board = require('./board');
 var util = require('./util');
 var m = require('mithril');
 
 function move(e) {
+  if (isEmpty(this.draggable.current)) return;
   var position = util.eventPosition(e);
+  console.log('move', position);
   this.draggable.current.pos = [
     position[0] - this.draggable.current.rel[0],
     position[1] - this.draggable.current.rel[1]
@@ -14,8 +17,7 @@ function move(e) {
 }
 
 function end(e) {
-  document.removeEventListener(util.isTouchDevice() ? 'touchmove' : 'mousemove', this.draggable.current.move);
-  document.removeEventListener(util.isTouchDevice() ? 'touchend' : 'mouseup', this.draggable.current.end);
+  console.log('end');
   var orig = this.draggable.current.orig,
   dest = this.draggable.current.over;
   if (orig !== dest) this.movable.dropped = dest;
@@ -24,7 +26,7 @@ function end(e) {
   m.redraw();
 }
 
-module.exports = function(e) {
+function start(e) {
   e.stopPropagation();
   e.preventDefault();
   if (!this.render) return; // needs the DOM element
@@ -38,10 +40,14 @@ module.exports = function(e) {
     orig: orig,
     rel: position,
     pos: [0, 0],
-    over: orig,
-    move: move.bind(this),
-    end: end.bind(this)
+    over: orig
   };
-  document.addEventListener(util.isTouchDevice() ? 'touchmove' : 'mousemove', this.draggable.current.move);
-  document.addEventListener(util.isTouchDevice() ? 'touchend' : 'mouseup', this.draggable.current.end);
+}
+
+module.exports = {
+  start: start,
+  move: move,
+  end: end
 };
+
+
