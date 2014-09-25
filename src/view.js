@@ -17,7 +17,7 @@ function renderPiece(ctrl, key, p) {
       webkitTransform: util.translate(draggable.pos)
     };
     if (draggable.isDragging)
-      attrs.class = attrs.class + ' dragging';
+      attrs.class += ' dragging';
   } else if (ctrl.board.animation.current.anims) {
     var animation = ctrl.board.animation.current.anims[key];
     if (animation) {
@@ -117,8 +117,10 @@ function renderBoard(ctrl) {
   };
   if (!isTouch) {
     attrs.onmousedown = function(e) {
-      if (e.button === 0) drag.start.call(ctrl.board, e);
-      ctrl.selectSquare(board.getKeyAtDomPos.call(ctrl.board, util.eventPosition(e)));
+      if (e.button === 0) {
+        drag.start.call(ctrl.board, e);
+        ctrl.selectSquare(board.getKeyAtDomPos.call(ctrl.board, util.eventPosition(e)));
+      }
     };
   }
   return {

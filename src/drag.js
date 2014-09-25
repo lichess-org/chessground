@@ -27,8 +27,6 @@ function move(e) {
 
   if (cur.orig === undefined) return;
 
-  console.log('move', position);
-
   cur.pos = [
     position[0] - cur.rel[0],
     position[1] - cur.rel[1]
@@ -39,8 +37,6 @@ function move(e) {
 
 function end(e) {
   if (this.draggable.current.orig === undefined) return;
-
-  console.log('end');
   var orig = this.draggable.current.orig,
   dest = this.draggable.current.over;
   if (orig !== dest) this.movable.dropped = dest;
