@@ -1,7 +1,25 @@
-var isEmpty = require('lodash-node/modern/objects/isEmpty')
+var isEmpty = require('lodash-node/modern/objects/isEmpty');
 var board = require('./board');
 var util = require('./util');
 var m = require('mithril');
+
+function start(e) {
+  e.stopPropagation();
+  e.preventDefault();
+  if (!this.render) return; // needs the DOM element
+  var position = util.eventPosition(e);
+  var square = e.target.parentNode;
+  var orig = board.getKeyAtDomPos.call(this, position);
+  var piece = this.pieces.get(orig);
+  if (!piece || !board.isDraggable.call(this, orig)) return;
+  this.draggable.current = {
+    isDragging: false,
+    orig: orig,
+    rel: position,
+    pos: [0, 0],
+    over: orig
+  };
+}
 
 function move(e) {
   if (isEmpty(this.draggable.current)) return;
@@ -26,28 +44,8 @@ function end(e) {
   m.redraw();
 }
 
-function start(e) {
-  e.stopPropagation();
-  e.preventDefault();
-  if (!this.render) return; // needs the DOM element
-  var position = util.eventPosition(e);
-  var square = e.target.parentNode;
-  var orig = board.getKeyAtDomPos.call(this, position);
-  var piece = this.pieces.get(orig);
-  if (!piece || !board.isDraggable.call(this, orig)) return;
-  this.draggable.current = {
-    isDragging: false,
-    orig: orig,
-    rel: position,
-    pos: [0, 0],
-    over: orig
-  };
-}
-
 module.exports = {
   start: start,
   move: move,
   end: end
 };
-
-
