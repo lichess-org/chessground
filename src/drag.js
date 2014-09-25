@@ -7,8 +7,8 @@ function start(e) {
   e.preventDefault();
   if (!this.render) return; // needs the DOM element
   var position = util.eventPosition(e);
-  var square = e.target.parentNode;
-  var orig = board.getKeyAtDomPos.call(this, position);
+  var bounds = this.bounds();
+  var orig = board.getKeyAtDomPos.call(this, position, bounds);
   var piece = this.pieces.get(orig);
   if (!piece || !board.isDraggable.call(this, orig)) return;
   this.draggable.current = {
@@ -16,21 +16,24 @@ function start(e) {
     orig: orig,
     rel: position,
     pos: [0, 0],
+    bounds: bounds,
     over: orig
   };
 }
 
 function move(e) {
-  if (this.draggable.current.orig === undefined) return;
-
+  var cur = this.draggable.current;
   var position = util.eventPosition(e);
+
+  if (cur.orig === undefined) return;
+
   console.log('move', position);
-  this.draggable.current.pos = [
-    position[0] - this.draggable.current.rel[0],
-    position[1] - this.draggable.current.rel[1]
+
+  cur.pos = [
+    position[0] - cur.rel[0],
+    position[1] - cur.rel[1]
   ];
-  this.draggable.current.isDragging = true;
-  this.draggable.current.over = board.getKeyAtDomPos.call(this, position);
+  cur.over = board.getKeyAtDomPos.call(this, position, cur.bounds);
   this.render();
 }
 

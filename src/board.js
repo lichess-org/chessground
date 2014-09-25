@@ -122,9 +122,9 @@ function playPremove() {
   }
 }
 
-function getKeyAtDomPos(pos) {
-  if (!this.bounds) return;
-  var bounds = this.bounds();
+function getKeyAtDomPos(pos, bounds) {
+  if (!bounds && !this.bounds) return;
+  bounds = bounds || this.bounds(); // use provided value, or compute it
   var file = Math.ceil(8 * ((pos[0] - bounds.left) / bounds.width));
   file = this.orientation === 'white' ? file : 9 - file;
   var rank = Math.ceil(8 - (8 * ((pos[1] - bounds.top) / bounds.height)));
