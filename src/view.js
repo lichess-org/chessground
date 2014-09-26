@@ -16,7 +16,7 @@ function renderPiece(ctrl, key, p) {
     attrs.style = {
       webkitTransform: util.translate(draggable.pos)
     };
-    if (draggable.isDragging)
+    if (draggable && draggable.pos[0] !== 0 || draggable.pos[1] !== 1)
       attrs.class += ' dragging';
   } else if (ctrl.board.animation.current.anims) {
     var animation = ctrl.board.animation.current.anims[key];
