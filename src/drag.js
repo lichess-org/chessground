@@ -32,7 +32,7 @@ function move(ctrl, e) {
   ];
   if (ctrl.data.animation.squareOverEnabled)
     cur.over = board.getKeyAtDomPos(ctrl.data, position, cur.bounds);
-  ctrl.data.render();
+  m.redraw();
 }
 
 function end(ctrl, e) {
