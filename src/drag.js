@@ -32,6 +32,7 @@ function move(e) {
     position[1] - cur.rel[1]
   ];
   cur.over = board.getKeyAtDomPos.call(this, position, cur.bounds);
+  cur.isDragging = true;
   this.render();
 }
 
