@@ -56,7 +56,7 @@ module.exports = function(cfg) {
     }
   };
 
-  configure.call(defaults, cfg || {});
+  configure(defaults, cfg || {});
 
   return defaults;
 };

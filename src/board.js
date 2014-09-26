@@ -1,3 +1,4 @@
+var partial = require('lodash-node/modern/functions/partial');
 var util = require('./util');
 var premove = require('./premove');
 var anim = require('./anim');
@@ -6,129 +7,129 @@ function callUserFunction(f) {
   setTimeout(f, 20);
 }
 
-function toggleOrientation() {
-  this.orientation = util.opposite(this.orientation);
+function toggleOrientation(board) {
+  board.orientation = util.opposite(board.orientation);
 }
 
-function setPieces(pieces) {
-  this.pieces.set(pieces);
-  this.movable.dropped = null;
+function setPieces(board, pieces) {
+  board.pieces.set(pieces);
+  board.movable.dropped = null;
 }
 
-function baseMove(orig, dest) {
-  var success = anim(this, function() {
-    var success = this.pieces.move(orig, dest);
+function baseMove(board, orig, dest) {
+  var success = anim(board, function() {
+    var success = board.pieces.move(orig, dest);
     if (success) {
-      this.lastMove = [orig, dest];
-      this.check = null;
-      callUserFunction(this.events.change);
+      board.lastMove = [orig, dest];
+      board.check = null;
+      callUserFunction(board.events.change);
     }
     return success;
   })();
-  if (success) this.movable.dropped = null;
+  if (success) board.movable.dropped = null;
   return success;
 }
 
-function apiMove(orig, dest) {
-  return baseMove.call(this, orig, dest);
+function apiMove(board, orig, dest) {
+  return baseMove(board, orig, dest);
 }
 
-function userMove(orig, dest) {
+function userMove(board, orig, dest) {
   if (!dest) {
-    setSelected.call(this, null);
-    if (this.movable.dropOff === 'trash') {
-      this.pieces.remove(orig);
-      callUserFunction(this.events.change);
+    setSelected(board, null);
+    if (board.movable.dropOff === 'trash') {
+      board.pieces.remove(orig);
+      callUserFunction(board.events.change);
     }
-  } else if (canMove.call(this, orig, dest)) {
-    if (baseMove.call(this, orig, dest)) {
-      setSelected.call(this, null);
-      callUserFunction(this.movable.events.after.bind(null, orig, dest));
+  } else if (canMove(board, orig, dest)) {
+    if (baseMove(board, orig, dest)) {
+      setSelected(board, null);
+      callUserFunction(partial(board.movable.events.after, orig, dest));
     }
-  } else if (canPremove.call(this, orig, dest)) {
-    this.premovable.current = [orig, dest];
-    setSelected.call(this, null);
-  } else if (isMovable.call(this, dest) || isPremovable.call(this, dest))
-    setSelected.call(this, dest);
-  else setSelected.call(this, null);
+  } else if (canPremove(board, orig, dest)) {
+    board.premovable.current = [orig, dest];
+    setSelected(board, null);
+  } else if (isMovable(board, dest) || isPremovable(board, dest))
+    setSelected(board, dest);
+  else setSelected(board, null);
 }
 
-function selectSquare(key) {
-  if (this.selected) {
-    if (this.selected !== key) userMove.call(this, this.selected, key)
-  } else if (isMovable.call(this, key) || isPremovable.call(this, key))
-    setSelected.call(this, key);
+function selectSquare(board, key) {
+  if (board.selected) {
+    if (board.selected !== key) userMove(board, board.selected, key)
+  } else if (isMovable(board, key) || isPremovable(board, key))
+    setSelected(board, key);
 }
 
-function setSelected(key) {
-  this.selected = key;
-  if (key && isPremovable.call(this, key))
-    this.premovable.dests = premove(this.pieces, key);
+function setSelected(board, key) {
+  board.selected = key;
+  if (key && isPremovable(board, key))
+    board.premovable.dests = premove(board.pieces, key);
   else
-    this.premovable.dests = null;
+    board.premovable.dests = null;
 }
 
-function isMovable(orig) {
-  var piece = this.pieces.get(orig);
+function isMovable(board, orig) {
+  var piece = board.pieces.get(orig);
   return piece && (
-    this.movable.color === 'both' || (
-      this.movable.color === piece.color &&
-      this.turnColor === piece.color
+    board.movable.color === 'both' || (
+      board.movable.color === piece.color &&
+      board.turnColor === piece.color
     ));
 }
 
-function canMove(orig, dest) {
-  return orig !== dest && isMovable.call(this, orig) && (
-    this.movable.free || util.containsX(this.movable.dests[orig], dest)
+function canMove(board, orig, dest) {
+  return orig !== dest && isMovable(board, orig) && (
+    board.movable.free || util.containsX(board.movable.dests[orig], dest)
   );
 }
 
-function isPremovable(orig) {
-  var piece = this.pieces.get(orig);
-  return piece && this.premovable.enabled && (
-    this.movable.color === piece.color &&
-    this.turnColor !== piece.color
+function isPremovable(board, orig) {
+  var piece = board.pieces.get(orig);
+  return piece && board.premovable.enabled && (
+    board.movable.color === piece.color &&
+    board.turnColor !== piece.color
   );
 }
 
-function canPremove(orig, dest) {
+function canPremove(board, orig, dest) {
   return orig !== dest &&
-    isPremovable.call(this, orig) &&
-    util.containsX(premove(this.pieces, orig), dest);
+    isPremovable(board, orig) &&
+    util.containsX(premove(board.pieces, orig), dest);
 }
 
-function isDraggable(orig) {
-  var piece = this.pieces.get(orig);
-  return piece && this.draggable.enabled && (
-    this.movable.color === 'both' || (
-      this.movable.color === piece.color && (
-        this.turnColor === piece.color || this.premovable.enabled
+function isDraggable(board, orig) {
+  var piece = board.pieces.get(orig);
+  return piece && board.draggable.enabled && (
+    board.movable.color === 'both' || (
+      board.movable.color === piece.color && (
+        board.turnColor === piece.color || board.premovable.enabled
       )
     )
   );
 }
 
-function playPremove() {
-  var move = this.premovable.current;
+function playPremove(board) {
+  var move = board.premovable.current;
   if (move) {
     var orig = move[0],
       dest = move[1];
-    if (canMove.call(this, orig, dest)) {
-      if (baseMove.call(this, orig, dest)) {
-        callUserFunction(this.movable.events.after.bind(null, orig, dest));
+    if (canMove(board, orig, dest)) {
+      if (baseMove(board, orig, dest)) {
+        callUserFunction(partial(board.movable.events.after, orig, dest));
       }
     }
-    this.premovable.current = null;
+    board.premovable.current = null;
   }
 }
 
-function getKeyAtDomPos(pos, bounds) {
-  if (!bounds && !this.bounds) return;
-  bounds = bounds || this.bounds(); // use provided value, or compute it
+function getKeyAtDomPos(board, pos, bounds) {
+  if (!bounds && !board.bounds) return;
+  bounds = bounds || board.bounds(); // use provided value, or compute it
   var file = Math.ceil(8 * ((pos[0] - bounds.left) / bounds.width));
-  file = this.orientation === 'white' ? file : 9 - file;
+  file = board.orientation === 'white' ? file : 9 - file;
   var rank = Math.ceil(8 - (8 * ((pos[1] - bounds.top) / bounds.height)));
-  rank = this.orientation === 'white' ? rank : 9 - rank;
+  rank = board.orientation === 'white' ? rank : 9 - rank;
   if (file > 0 && file < 9 && rank > 0 && rank < 9) return util.pos2key([file, rank]);
 }
 

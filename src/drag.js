@@ -5,23 +5,23 @@ var m = require('mithril');
 function start(ctrl, e) {
   e.stopPropagation();
   e.preventDefault();
-  if (!ctrl.board.render) return; // needs the DOM element
+  if (!ctrl.data.render) return; // needs the DOM element
   var position = util.eventPosition(e);
-  var bounds = ctrl.board.bounds();
-  var orig = board.getKeyAtDomPos.call(ctrl.board, position, bounds);
-  var piece = ctrl.board.pieces.get(orig);
-  if (!piece || !board.isDraggable.call(ctrl.board, orig)) return;
-  ctrl.board.draggable.current = {
+  var bounds = ctrl.data.bounds();
+  var orig = board.getKeyAtDomPos(ctrl.data, position, bounds);
+  var piece = ctrl.data.pieces.get(orig);
+  if (!piece || !board.isDraggable(ctrl.data, orig)) return;
+  ctrl.data.draggable.current = {
     orig: orig,
     rel: position,
     pos: [0, 0],
     bounds: bounds,
-    over: ctrl.board.animation.squareOverEnabled ? orig : null
+    over: ctrl.data.animation.squareOverEnabled ? orig : null
   };
 }
 
 function move(ctrl, e) {
-  var cur = ctrl.board.draggable.current;
+  var cur = ctrl.data.draggable.current;
   var position = util.eventPosition(e);
 
   if (cur.orig === undefined) return;
@@ -30,18 +30,18 @@ function move(ctrl, e) {
     position[0] - cur.rel[0],
     position[1] - cur.rel[1]
   ];
-  if (ctrl.board.animation.squareOverEnabled)
-    cur.over = board.getKeyAtDomPos.call(ctrl.board, position, cur.bounds);
-  ctrl.board.render();
+  if (ctrl.data.animation.squareOverEnabled)
+    cur.over = board.getKeyAtDomPos(ctrl.data, position, cur.bounds);
+  ctrl.data.render();
 }
 
 function end(ctrl, e) {
-  if (ctrl.board.draggable.current.orig === undefined) return;
-  var orig = ctrl.board.draggable.current.orig,
-  dest = ctrl.board.draggable.current.over;
-  if (orig !== dest) ctrl.board.movable.dropped = dest;
-  board.userMove.call(ctrl.board, orig, dest);
-  ctrl.board.draggable.current = {};
+  var orig = ctrl.data.draggable.current.orig;
+  if (!orig) return;
+  dest = ctrl.data.draggable.current.over || board.getKeyAtDomPos(ctrl.data, util.eventPosition(e), ctrl.data.draggable.current.bounds);
+  if (orig !== dest) ctrl.data.movable.dropped = dest;
+  board.userMove(ctrl.data, orig, dest);
+  ctrl.data.draggable.current = {};
   m.redraw();
 }
 

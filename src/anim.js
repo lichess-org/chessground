@@ -1,5 +1,7 @@
 var forIn = require('lodash-node/modern/objects/forIn')
 var clone = require('lodash-node/modern/objects/clone')
+var partial = require('lodash-node/modern/functions/partial');
+var wrap = require('lodash-node/modern/functions/wrap');
 var m = require('mithril');
 var util = require('./util');
 
@@ -57,7 +59,7 @@ function compute(prev, current) {
     }
   });
   news.forEach(function(newP) {
-    var preP = closer(newP, missings.filter(samePiece.bind(null, newP)));
+    var preP = closer(newP, missings.filter(partial(samePiece, newP)));
     if (preP) {
       var orig = current.orientation === 'white' ? preP.pos : newP.pos;
       var dest = current.orientation === 'white' ? newP.pos : preP.pos;
@@ -68,52 +70,50 @@ function compute(prev, current) {
   return anims;
 }
 
-function go(render) {
-  var self = this;
-  var rest = 1 - (new Date().getTime() - self.current.start) / self.current.duration;
+function go(animation, render) {
+  var rest = 1 - (new Date().getTime() - animation.current.start) / animation.current.duration;
   try {
     if (rest <= 0) {
-      self.current = {};
+      animation.current = {};
       render();
     } else {
-      forIn(self.current.anims, function(cfg, key) {
-        self.current.anims[key][1] = [cfg[0][0] * rest, cfg[0][1] * rest];
+      forIn(animation.current.anims, function(cfg, key) {
+        animation.current.anims[key][1] = [cfg[0][0] * rest, cfg[0][1] * rest];
       });
       render();
-      requestAnimationFrame(go.bind(self, render));
+      requestAnimationFrame(partial(go, animation, render));
     }
   } catch (e) {
     // breaks if the DOM node was removed. Who cares.
   }
 }
 
-function animate(current, transformation) {
+function animate(data, transformation) {
   var prev = {
-    orientation: current.orientation,
-    pieces: clone(current.pieces.all, true)
+    orientation: data.orientation,
+    pieces: clone(data.pieces.all, true)
   };
   var result = transformation();
-  var anims = compute(prev, current);
+  var anims = compute(prev, data);
   if (Object.getOwnPropertyNames(anims).length > 0) {
-    current.animation.current = {
+    data.animation.current = {
       start: new Date().getTime(),
-      duration: current.animation.duration,
+      duration: data.animation.duration,
       anims: anims
     };
-    go.call(current.animation, current.render);
+    go(data.animation, data.render);
   }
   return result;
 }
 
 // transformation is a function
-// that assumes board data as this,
-// accepts any number of arguments,
+// accepts board data and any number of arguments,
 // and mutates the board.
-module.exports = function(board, transformation) {
+module.exports = function(data, transformation) {
   return function() {
-    if (board.animation.enabled && !board.animation.current.start && board.render)
-      return animate(board, transformation.apply.bind(transformation, board, arguments));
+    if (data.animation.enabled && !data.animation.current.start && data.render)
+      animate(data, transformation.apply.bind(transformation, data, arguments));
     else
-      return transformation.apply(board, arguments);
+      return partial(data, transformation);
   };
 };
