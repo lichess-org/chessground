@@ -108,7 +108,7 @@ function renderBoard(ctrl) {
       if (!isUpdate) {
         ctrl.board.bounds = el.getBoundingClientRect.bind(el);
         ctrl.board.render = function() {
-          m.render(el.parentNode, renderBoard(ctrl));
+          m.redraw();
         };
         if (isTouch) el.addEventListener('touchstart', autoredraw(function(e) {
           drag.start(ctrl, e);
