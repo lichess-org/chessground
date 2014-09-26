@@ -10,7 +10,6 @@ function pieceClass(p) {
 function renderPiece(ctrl, key, p) {
   var attrs = {
     style: {},
-    key: 'piece',
     class: pieceClass(p)
   };
   var draggable = ctrl.board.draggable.current;
