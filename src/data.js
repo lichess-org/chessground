@@ -15,6 +15,7 @@ module.exports = function(cfg) {
     animation: {
       enabled: true,
       duration: 200,
+      squareOverEnabled: true,
       /*{ // current
        *  start: timestamp,
        *  duration: ms,

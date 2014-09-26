@@ -2,6 +2,7 @@ var util = require('./util');
 var board = require('./board');
 var drag = require('./drag');
 var anim = require('./anim');
+var partial = require('lodash-node/modern/functions/partial');
 
 function pieceClass(p) {
   return ['cg-piece', p.role, p.color].join(' ');
@@ -110,18 +111,18 @@ function renderBoard(ctrl) {
           m.render(el.parentNode, renderBoard(ctrl));
         };
         if (isTouch) el.addEventListener('touchstart', autoredraw(function(e) {
-          drag.start.call(ctrl.board, e);
+          drag.start(ctrl, e);
           ctrl.selectSquare(board.getKeyAtDomPos.call(ctrl.board, util.eventPosition(e)));
         }, el));
-        document.addEventListener(isTouch ? 'touchmove' : 'mousemove', drag.move.bind(ctrl.board));
-        document.addEventListener(isTouch ? 'touchend' : 'mouseup', drag.end.bind(ctrl.board));
+        document.addEventListener(isTouch ? 'touchmove' : 'mousemove', partial(drag.move, ctrl));
+        document.addEventListener(isTouch ? 'touchend' : 'mouseup', partial(drag.end, ctrl));
       }
     }
   };
   if (!isTouch) {
     attrs.onmousedown = function(e) {
       if (e.button === 0) {
-        drag.start.call(ctrl.board, e);
+        drag.start(ctrl, e);
         ctrl.selectSquare(board.getKeyAtDomPos.call(ctrl.board, util.eventPosition(e)));
       }
     };
