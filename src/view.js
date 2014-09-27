@@ -88,43 +88,28 @@ function renderSquare(ctrl, pos) {
 }
 
 function renderBoard(ctrl) {
-  var isTouch = util.isTouchDevice();
-  var attrs = {
-    class: 'cg-board',
-    config: function(el, isUpdate, context) {
-      if (!isUpdate) {
+  return {
+    tag: 'div',
+    attrs: {
+      class: 'cg-board',
+      config: function(el, isUpdate, context) {
+        if (isUpdate) return;
         ctrl.data.bounds = el.getBoundingClientRect.bind(el);
-        ctrl.data.render = function() {
-          m.redraw();
-        };
-        if (isTouch) el.addEventListener('touchstart', function(e) {
-          m.startComputation();
-          drag.start(ctrl, e);
-          ctrl.selectSquare(board.getKeyAtDomPos(ctrl.data, util.eventPosition(e)));
-          m.endComputation();
-        });
+        ctrl.data.render = m.redraw
+        var isTouch = util.isTouchDevice();
+        var onstart = partial(drag.start, ctrl);
         var onmove = partial(drag.move, ctrl);
         var onend = partial(drag.end, ctrl);
+        document.addEventListener(isTouch ? 'touchstart' : 'mousedown', onstart);
         document.addEventListener(isTouch ? 'touchmove' : 'mousemove', onmove);
         document.addEventListener(isTouch ? 'touchend' : 'mouseup', onend);
         context.onunload = function() {
+          document.removeEventListener(isTouch ? 'touchstart' : 'mousedown', onstart);
           document.removeEventListener(isTouch ? 'touchmove' : 'mousemove', onmove);
           document.removeEventListener(isTouch ? 'touchend' : 'mouseup', onend);
         };
       }
-    }
-  };
-  if (!isTouch) {
-    attrs.onmousedown = function(e) {
-      if (e.button === 0) {
-        drag.start(ctrl, e);
-        ctrl.selectSquare(board.getKeyAtDomPos(ctrl.data, util.eventPosition(e)));
-      }
-    };
-  }
-  return {
-    tag: 'div',
-    attrs: attrs,
+    },
     children: util.allPos.map(partial(renderSquare, ctrl))
   };
 }

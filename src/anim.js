@@ -18,13 +18,9 @@ function samePiece(p1, p2) {
   return p1.role === p2.role && p1.color === p2.color;
 }
 
-function distance(p1, p2) {
-  return Math.sqrt(Math.pow(p1.pos[0] - p2.pos[0], 2) + Math.pow(p1.pos[1] - p2.pos[1], 2));
-}
-
 function closer(piece, pieces) {
   return pieces.sort(function(p1, p2) {
-    return distance(piece, p1) - distance(piece, p2);
+    return util.distance(piece.pos, p1.pos) - util.distance(piece.pos, p2.pos);
   })[0];
 }
 

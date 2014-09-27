@@ -41,6 +41,7 @@ module.exports = function(cfg) {
     },
     draggable: {
       enabled: true, // allow moves & premoves to use drag'n drop
+      distance: 3, // minimum distance to initiate a drag, in pixels
       /*{ // current
        *  orig: "a2", // orig key of dragging piece
        *  rel: [100, 170] // x, y of the piece at original position

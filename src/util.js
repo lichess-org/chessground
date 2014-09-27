@@ -49,6 +49,10 @@ function containsX(xs, x) {
   return xs && xs.indexOf(x) !== -1;
 }
 
+function distance(pos1, pos2) {
+  return Math.sqrt(Math.pow(pos1[0] - pos2[0], 2) + Math.pow(pos1[1] - pos2[1], 2));
+}
+
 function pp(x) {
   console.log(x);
   return x;
@@ -80,6 +84,7 @@ module.exports = {
   translate: translate,
   contains2: contains2,
   containsX: containsX,
+  distance: distance,
   isTouchDevice: isTouchDevice,
   eventPosition: eventPosition,
   partialApply: partialApply,
