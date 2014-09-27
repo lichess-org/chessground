@@ -124,11 +124,11 @@ function renderBoard(ctrl) {
         var onstart = partial(drag.start, ctrl);
         var onmove = partial(drag.move, ctrl);
         var onend = partial(drag.end, ctrl);
-        document.addEventListener(isTouch ? 'touchstart' : 'mousedown', onstart);
+        el.addEventListener(isTouch ? 'touchstart' : 'mousedown', onstart);
         document.addEventListener(isTouch ? 'touchmove' : 'mousemove', onmove);
         document.addEventListener(isTouch ? 'touchend' : 'mouseup', onend);
         context.onunload = function() {
-          document.removeEventListener(isTouch ? 'touchstart' : 'mousedown', onstart);
+          el.removeEventListener(isTouch ? 'touchstart' : 'mousedown', onstart);
           document.removeEventListener(isTouch ? 'touchmove' : 'mousemove', onmove);
           document.removeEventListener(isTouch ? 'touchend' : 'mouseup', onend);
         };
