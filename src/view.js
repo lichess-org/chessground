@@ -92,13 +92,11 @@ function autoredraw(callback, node) {
   return function(e) {
     m.redraw.strategy("diff");
     m.startComputation();
-    var res;
     try {
-      res = callback(node, e);
+      callback(node, e);
     } finally {
       m.endComputation();
     }
-    return res;
   };
 }
 
@@ -116,8 +114,14 @@ function renderBoard(ctrl) {
           drag.start(ctrl, e);
           ctrl.selectSquare(board.getKeyAtDomPos(ctrl.data, util.eventPosition(e)));
         }, el));
-        document.addEventListener(isTouch ? 'touchmove' : 'mousemove', partial(drag.move, ctrl));
-        document.addEventListener(isTouch ? 'touchend' : 'mouseup', partial(drag.end, ctrl));
+        var onmove = partial(drag.move, ctrl);
+        var onend = partial(drag.end, ctrl);
+        document.addEventListener(isTouch ? 'touchmove' : 'mousemove', onmove);
+        document.addEventListener(isTouch ? 'touchend' : 'mouseup', onend);
+        context.onunload = function() {
+          document.removeEventListener(isTouch ? 'touchmove' : 'mousemove', onmove);
+          document.removeEventListener(isTouch ? 'touchend' : 'mouseup', onend);
+        };
       }
     }
   };
