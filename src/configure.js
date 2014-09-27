@@ -1,14 +1,14 @@
 var merge = require('lodash-node/modern/objects/merge')
 var fen = require('./fen');
 
-module.exports = function(board, config) {
+module.exports = function(data, config) {
 
-  merge(board, config);
+  merge(data, config);
 
-  if (board.fen) {
-    board.pieces = fen.read(board.fen);
-    delete board.fen;
+  if (data.fen) {
+    data.pieces = fen.read(data.fen);
+    delete data.fen;
   }
 
-  board.movable.dropped = null;
+  data.movable.dropped = null;
 };
