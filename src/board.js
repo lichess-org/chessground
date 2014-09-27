@@ -67,7 +67,7 @@ function userMove(data, orig, dest) {
 
 function selectSquare(data, key) {
   if (data.selected) {
-    if (data.selected !== key) userMove(data, data.selected, key)
+    if (data.selected !== key) userMove(data, data.selected, key);
   } else if (isMovable(data, key) || isPremovable(data, key))
     setSelected(data, key);
 }
