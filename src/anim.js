@@ -107,7 +107,7 @@ function animate(transformation, data) {
 module.exports = function(transformation, data) {
   return function() {
     if (data.animation.enabled && !data.animation.current.start && data.render)
-      animate(util.partialApply(transformation, [data].concat(arguments)), data);
+      animate(util.partialApply(transformation, [data].concat(Array.prototype.slice.call(arguments, 0))), data);
     else
       return partial(transformation, data);
   };
