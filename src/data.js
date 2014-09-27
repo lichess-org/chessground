@@ -18,7 +18,10 @@ module.exports = function(cfg) {
        *  start: timestamp,
        *  duration: ms,
        *  anims: {
-       *    a2: [[-30, 50], [-20, 37]], ...
+       *    a2: [
+       *      [-30, 50], // animation goal
+       *      [-20, 37]  // animation current status
+       *    ], ...
        *  }
        *}*/
       current: {}
@@ -47,7 +50,10 @@ module.exports = function(cfg) {
        *  orig: "a2", // orig key of dragging piece
        *  rel: [100, 170] // x, y of the piece at original position
        *  pos: [20, -12] // relative current position
+       *  dec: [4, -8] // piece center decay
        *  over: "b3" // square being moused over
+       *  bounds: current cached board bounds
+       *  started: whether the drag has started, as per the distance setting
        *}*/
       current: {}
     },
