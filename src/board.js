@@ -7,129 +7,129 @@ function callUserFunction(f) {
   setTimeout(f, 20);
 }
 
-function toggleOrientation(board) {
-  board.orientation = util.opposite(board.orientation);
+function toggleOrientation(data) {
+  data.orientation = util.opposite(data.orientation);
 }
 
-function setPieces(board, pieces) {
-  board.pieces.set(pieces);
-  board.movable.dropped = null;
+function setPieces(data, pieces) {
+  data.pieces.set(pieces);
+  data.movable.dropped = null;
 }
 
-function baseMove(board, orig, dest) {
-  var success = anim(board, function() {
-    var success = board.pieces.move(orig, dest);
+function baseMove(data, orig, dest) {
+  var success = anim(function() {
+    var success = data.pieces.move(orig, dest);
     if (success) {
-      board.lastMove = [orig, dest];
-      board.check = null;
-      callUserFunction(board.events.change);
+      data.lastMove = [orig, dest];
+      data.check = null;
+      callUserFunction(data.events.change);
     }
     return success;
-  })();
-  if (success) board.movable.dropped = null;
+  }, data)();
+  if (success) data.movable.dropped = null;
   return success;
 }
 
-function apiMove(board, orig, dest) {
-  return baseMove(board, orig, dest);
+function apiMove(data, orig, dest) {
+  return baseMove(data, orig, dest);
 }
 
-function userMove(board, orig, dest) {
+function userMove(data, orig, dest) {
   if (!dest) {
-    setSelected(board, null);
-    if (board.movable.dropOff === 'trash') {
-      board.pieces.remove(orig);
-      callUserFunction(board.events.change);
+    setSelected(data, null);
+    if (data.movable.dropOff === 'trash') {
+      data.pieces.remove(orig);
+      callUserFunction(data.events.change);
     }
-  } else if (canMove(board, orig, dest)) {
-    if (baseMove(board, orig, dest)) {
-      setSelected(board, null);
-      callUserFunction(partial(board.movable.events.after, orig, dest));
+  } else if (canMove(data, orig, dest)) {
+    if (baseMove(data, orig, dest)) {
+      setSelected(data, null);
+      callUserFunction(partial(data.movable.events.after, orig, dest));
     }
-  } else if (canPremove(board, orig, dest)) {
-    board.premovable.current = [orig, dest];
-    setSelected(board, null);
-  } else if (isMovable(board, dest) || isPremovable(board, dest))
-    setSelected(board, dest);
-  else setSelected(board, null);
+  } else if (canPremove(data, orig, dest)) {
+    data.premovable.current = [orig, dest];
+    setSelected(data, null);
+  } else if (isMovable(data, dest) || isPremovable(data, dest))
+    setSelected(data, dest);
+  else setSelected(data, null);
 }
 
-function selectSquare(board, key) {
-  if (board.selected) {
-    if (board.selected !== key) userMove(board, board.selected, key)
-  } else if (isMovable(board, key) || isPremovable(board, key))
-    setSelected(board, key);
+function selectSquare(data, key) {
+  if (data.selected) {
+    if (data.selected !== key) userMove(data, data.selected, key)
+  } else if (isMovable(data, key) || isPremovable(data, key))
+    setSelected(data, key);
 }
 
-function setSelected(board, key) {
-  board.selected = key;
-  if (key && isPremovable(board, key))
-    board.premovable.dests = premove(board.pieces, key);
+function setSelected(data, key) {
+  data.selected = key;
+  if (key && isPremovable(data, key))
+    data.premovable.dests = premove(data.pieces, key);
   else
-    board.premovable.dests = null;
+    data.premovable.dests = null;
 }
 
-function isMovable(board, orig) {
-  var piece = board.pieces.get(orig);
+function isMovable(data, orig) {
+  var piece = data.pieces.get(orig);
   return piece && (
-    board.movable.color === 'both' || (
-      board.movable.color === piece.color &&
-      board.turnColor === piece.color
+    data.movable.color === 'both' || (
+      data.movable.color === piece.color &&
+      data.turnColor === piece.color
     ));
 }
 
-function canMove(board, orig, dest) {
-  return orig !== dest && isMovable(board, orig) && (
-    board.movable.free || util.containsX(board.movable.dests[orig], dest)
+function canMove(data, orig, dest) {
+  return orig !== dest && isMovable(data, orig) && (
+    data.movable.free || util.containsX(data.movable.dests[orig], dest)
   );
 }
 
-function isPremovable(board, orig) {
-  var piece = board.pieces.get(orig);
-  return piece && board.premovable.enabled && (
-    board.movable.color === piece.color &&
-    board.turnColor !== piece.color
+function isPremovable(data, orig) {
+  var piece = data.pieces.get(orig);
+  return piece && data.premovable.enabled && (
+    data.movable.color === piece.color &&
+    data.turnColor !== piece.color
   );
 }
 
-function canPremove(board, orig, dest) {
+function canPremove(data, orig, dest) {
   return orig !== dest &&
-    isPremovable(board, orig) &&
-    util.containsX(premove(board.pieces, orig), dest);
+    isPremovable(data, orig) &&
+    util.containsX(premove(data.pieces, orig), dest);
 }
 
-function isDraggable(board, orig) {
-  var piece = board.pieces.get(orig);
-  return piece && board.draggable.enabled && (
-    board.movable.color === 'both' || (
-      board.movable.color === piece.color && (
-        board.turnColor === piece.color || board.premovable.enabled
+function isDraggable(data, orig) {
+  var piece = data.pieces.get(orig);
+  return piece && data.draggable.enabled && (
+    data.movable.color === 'both' || (
+      data.movable.color === piece.color && (
+        data.turnColor === piece.color || data.premovable.enabled
       )
     )
   );
 }
 
-function playPremove(board) {
-  var move = board.premovable.current;
+function playPremove(data) {
+  var move = data.premovable.current;
   if (move) {
     var orig = move[0],
       dest = move[1];
-    if (canMove(board, orig, dest)) {
-      if (baseMove(board, orig, dest)) {
-        callUserFunction(partial(board.movable.events.after, orig, dest));
+    if (canMove(data, orig, dest)) {
+      if (baseMove(data, orig, dest)) {
+        callUserFunction(partial(data.movable.events.after, orig, dest));
       }
     }
-    board.premovable.current = null;
+    data.premovable.current = null;
   }
 }
 
-function getKeyAtDomPos(board, pos, bounds) {
-  if (!bounds && !board.bounds) return;
-  bounds = bounds || board.bounds(); // use provided value, or compute it
+function getKeyAtDomPos(data, pos, bounds) {
+  if (!bounds && !data.bounds) return;
+  bounds = bounds || data.bounds(); // use provided value, or compute it
   var file = Math.ceil(8 * ((pos[0] - bounds.left) / bounds.width));
-  file = board.orientation === 'white' ? file : 9 - file;
+  file = data.orientation === 'white' ? file : 9 - file;
   var rank = Math.ceil(8 - (8 * ((pos[1] - bounds.top) / bounds.height)));
-  rank = board.orientation === 'white' ? rank : 9 - rank;
+  rank = data.orientation === 'white' ? rank : 9 - rank;
   if (file > 0 && file < 9 && rank > 0 && rank < 9) return util.pos2key([file, rank]);
 }
 

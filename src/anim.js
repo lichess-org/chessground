@@ -1,7 +1,6 @@
 var forIn = require('lodash-node/modern/objects/forIn')
 var clone = require('lodash-node/modern/objects/clone')
 var partial = require('lodash-node/modern/functions/partial');
-var wrap = require('lodash-node/modern/functions/wrap');
 var m = require('mithril');
 var util = require('./util');
 
@@ -88,7 +87,7 @@ function go(animation, render) {
   }
 }
 
-function animate(data, transformation) {
+function animate(transformation, data) {
   var prev = {
     orientation: data.orientation,
     pieces: clone(data.pieces.all, true)
@@ -109,11 +108,11 @@ function animate(data, transformation) {
 // transformation is a function
 // accepts board data and any number of arguments,
 // and mutates the board.
-module.exports = function(data, transformation) {
+module.exports = function(transformation, data) {
   return function() {
     if (data.animation.enabled && !data.animation.current.start && data.render)
-      animate(data, transformation.apply.bind(transformation, data, arguments));
+      animate(util.partialApply(transformation, [data].concat(arguments)), data);
     else
-      return partial(data, transformation);
+      return partial(transformation, data);
   };
 };

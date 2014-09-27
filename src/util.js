@@ -1,3 +1,4 @@
+var partial = require('lodash-node/modern/functions/partial');
 var range = require('lodash-node/modern/arrays/range');
 
 var files = "abcdefgh".split('');
@@ -62,6 +63,10 @@ function eventPosition(e) {
   return e.touches ? [e.touches[0].clientX, e.touches[0].clientY] : [e.clientX, e.clientY];
 }
 
+function partialApply(fn, args) {
+  return partial.apply(null, [fn].concat(args));
+}
+
 module.exports = {
   files: files,
   ranks: ranks,
@@ -77,5 +82,6 @@ module.exports = {
   containsX: containsX,
   isTouchDevice: isTouchDevice,
   eventPosition: eventPosition,
+  partialApply: partialApply,
   pp: pp
 };
