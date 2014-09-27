@@ -29,7 +29,6 @@ module.exports = function(cfg) {
       dests: {}, // valid moves. {"a2" ["a3" "a4"] "b1" ["a3" "c3"]} | nil
       dropOff: 'revert', // when a piece is dropped outside the board. "revert" | "trash"
       dropped: null, // last dropped dest, not to be animated
-      // dragCenter: true, // whether to center the piece under the cursor on drag start
       events: {
         after: function(orig, dest) {} // called after the move has been played
       }
@@ -42,6 +41,7 @@ module.exports = function(cfg) {
     draggable: {
       enabled: true, // allow moves & premoves to use drag'n drop
       distance: 3, // minimum distance to initiate a drag, in pixels
+      squareTarget: false, // display big square target intended for mobile
       /*{ // current
        *  orig: "a2", // orig key of dragging piece
        *  rel: [100, 170] // x, y of the piece at original position

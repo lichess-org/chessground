@@ -1,7 +1,7 @@
 .cg-board > div.selected {
   background: rgba(216, 85, 0, 0.3);
 }
-#cg-dragging-square {
+#cg-square-target {
   position: absolute;
   background-color: transparent;
   border: 1px solid rgba(255, 255, 255, 0.5);

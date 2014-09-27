@@ -94,7 +94,7 @@ function renderDraggingSquare(cur) {
   return {
     tag: 'div',
     attrs: {
-      id: 'cg-dragging-square',
+      id: 'cg-square-target',
       style: {
         width: size + 'px',
         height: size + 'px',
@@ -110,7 +110,7 @@ function renderBoard(ctrl) {
   var children = util.allPos.map(function(pos) {
     return renderSquare(ctrl, pos);
   });
-  if (ctrl.data.draggable.current.over)
+  if (ctrl.data.draggable.current.over && ctrl.data.draggable.squareTarget)
     children.push(renderDraggingSquare(ctrl.data.draggable.current));
   return {
     tag: 'div',
