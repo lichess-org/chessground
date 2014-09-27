@@ -11,19 +11,21 @@ function start(ctrl, e) {
   var orig = board.getKeyAtDomPos(ctrl.data, position, bounds);
   var piece = ctrl.data.pieces[orig];
   ctrl.selectSquare(orig);
-  if (!piece || !board.isDraggable(ctrl.data, orig)) return;
-  var pieceBounds = e.target.getBoundingClientRect();
-  ctrl.data.draggable.current = {
-    orig: orig,
-    rel: position,
-    pos: [0, 0],
-    dec: [
-      position[0] - (pieceBounds.left + pieceBounds.width / 2),
-      position[1] - (pieceBounds.top + pieceBounds.height / 2)
-    ],
-    bounds: bounds,
-    started: false
-  };
+  if (piece && board.isDraggable(ctrl.data, orig)) {
+    var pieceBounds = e.target.getBoundingClientRect();
+    ctrl.data.draggable.current = {
+      orig: orig,
+      rel: position,
+      pos: [0, 0],
+      dec: [
+        position[0] - (pieceBounds.left + pieceBounds.width / 2),
+        position[1] - (pieceBounds.top + pieceBounds.height / 2)
+      ],
+      bounds: bounds,
+      started: false
+    };
+  }
+  ctrl.data.render();
 }
 
 function move(ctrl, e) {
@@ -42,7 +44,7 @@ function move(ctrl, e) {
     ];
     cur.over = board.getKeyAtDomPos(ctrl.data, position, cur.bounds);
   }
-  m.redraw();
+  ctrl.data.render();
 }
 
 function end(ctrl, e) {
@@ -53,8 +55,8 @@ function end(ctrl, e) {
     if (orig !== dest) ctrl.data.movable.dropped = dest;
     board.userMove(ctrl.data, orig, dest);
   }
-  m.redraw();
   draggable.current = {};
+  ctrl.data.render();
 }
 
 module.exports = {

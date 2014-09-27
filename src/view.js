@@ -110,7 +110,10 @@ function renderBoard(ctrl) {
         };
       }
     },
-    children: util.allPos.map(partial(renderSquare, ctrl))
+    //not using lodash.partial for perf, here
+    children: util.allPos.map(function(pos) {
+      return renderSquare(ctrl, pos);
+    })
   };
 }
 
