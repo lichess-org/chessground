@@ -50,7 +50,8 @@ function move(ctrl, e) {
 function end(ctrl, e) {
   var draggable = ctrl.data.draggable;
   var orig = draggable.current.orig;
-  if (orig && draggable.current.started) {
+  if (!orig) return;
+  if (draggable.current.started) {
     dest = draggable.current.over;
     if (orig !== dest) ctrl.data.movable.dropped = dest;
     board.userMove(ctrl.data, orig, dest);
