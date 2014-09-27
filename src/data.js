@@ -14,7 +14,6 @@ module.exports = function(cfg) {
     animation: {
       enabled: true,
       duration: 200,
-      squareOverEnabled: true,
       /*{ // current
        *  start: timestamp,
        *  duration: ms,
@@ -42,6 +41,7 @@ module.exports = function(cfg) {
     },
     draggable: {
       enabled: true, // allow moves & premoves to use drag'n drop
+      squareOverEnabled: true,
       /*{ // current
        *  orig: "a2", // orig key of dragging piece
        *  rel: [100, 170] // x, y of the piece at original position

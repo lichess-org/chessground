@@ -5,43 +5,47 @@ var m = require('mithril');
 function start(ctrl, e) {
   e.stopPropagation();
   e.preventDefault();
-  if (!ctrl.data.render) return; // needs the DOM element
   var position = util.eventPosition(e);
   var bounds = ctrl.data.bounds();
   var orig = board.getKeyAtDomPos(ctrl.data, position, bounds);
   var piece = ctrl.data.pieces[orig];
   if (!piece || !board.isDraggable(ctrl.data, orig)) return;
+  var pieceBounds = e.target.getBoundingClientRect();
   ctrl.data.draggable.current = {
     orig: orig,
     rel: position,
     pos: [0, 0],
-    bounds: bounds,
-    over: ctrl.data.animation.squareOverEnabled ? orig : null
+    dec: [
+      position[0] - (pieceBounds.left + pieceBounds.width / 2),
+      position[1] - (pieceBounds.top + pieceBounds.height / 2)
+    ],
+    bounds: bounds
   };
 }
 
 function move(ctrl, e) {
   var cur = ctrl.data.draggable.current;
-  var position = util.eventPosition(e);
+  if (!cur.orig) return;
 
-  if (cur.orig === undefined) return;
+  var position = util.eventPosition(e);
 
   cur.pos = [
     position[0] - cur.rel[0],
     position[1] - cur.rel[1]
   ];
-  if (ctrl.data.animation.squareOverEnabled)
+  if (ctrl.data.draggable.squareOverEnabled)
     cur.over = board.getKeyAtDomPos(ctrl.data, position, cur.bounds);
   m.redraw();
 }
 
 function end(ctrl, e) {
-  var orig = ctrl.data.draggable.current.orig;
+  var draggable = ctrl.data.draggable;
+  var orig = draggable.current.orig;
   if (!orig) return;
-  dest = ctrl.data.draggable.current.over || board.getKeyAtDomPos(ctrl.data, util.eventPosition(e), ctrl.data.draggable.current.bounds);
+  dest = draggable.current.over || board.getKeyAtDomPos(ctrl.data, util.eventPosition(e), draggable.current.bounds);
   if (orig !== dest) ctrl.data.movable.dropped = dest;
   board.userMove(ctrl.data, orig, dest);
-  ctrl.data.draggable.current = {};
+  draggable.current = {};
   m.redraw();
 }
 

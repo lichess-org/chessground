@@ -14,12 +14,14 @@ function renderPiece(ctrl, key, p) {
     class: pieceClass(p)
   };
   var draggable = ctrl.data.draggable.current;
-  if (draggable.orig === key) {
+  if (draggable.orig === key && (draggable.pos[0] !== 0 || draggable.pos[1] !== 0)) {
     attrs.style = {
-      webkitTransform: util.translate(draggable.pos)
+      webkitTransform: util.translate([
+        draggable.pos[0] + draggable.dec[0],
+        draggable.pos[1] + draggable.dec[1]
+      ])
     };
-    if (draggable && draggable.pos[0] !== 0 || draggable.pos[1] !== 0)
-      attrs.class += ' dragging';
+    attrs.class += ' dragging';
   } else if (ctrl.data.animation.current.anims) {
     var animation = ctrl.data.animation.current.anims[key];
     if (animation) {
