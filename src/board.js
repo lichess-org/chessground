@@ -11,20 +11,30 @@ function toggleOrientation(data) {
   data.orientation = util.opposite(data.orientation);
 }
 
+this.set = function(pieces) {
+  forIn(pieces, function(piece, key) {
+    if (piece) this.put(key, piece);
+    else this.remove(key);
+  }.bind(this));
+};
+
 function setPieces(data, pieces) {
-  data.pieces.set(pieces);
+  forIn(pieces, function(piece, key) {
+    if (piece) data.pieces[key] = piece;
+    else delete data.pieces[key];
+  });
   data.movable.dropped = null;
 }
 
 function baseMove(data, orig, dest) {
   var success = anim(function() {
-    var success = data.pieces.move(orig, dest);
-    if (success) {
-      data.lastMove = [orig, dest];
-      data.check = null;
-      callUserFunction(data.events.change);
-    }
-    return success;
+    if (orig === dest || !data.pieces[orig]) return false;
+    data.pieces[dest] = data.pieces[orig];
+    delete data.pieces[orig];
+    data.lastMove = [orig, dest];
+    data.check = null;
+    callUserFunction(data.events.change);
+    return true;
   }, data)();
   if (success) data.movable.dropped = null;
   return success;
@@ -38,7 +48,7 @@ function userMove(data, orig, dest) {
   if (!dest) {
     setSelected(data, null);
     if (data.movable.dropOff === 'trash') {
-      data.pieces.remove(orig);
+      delete data.pieces[orig];
       callUserFunction(data.events.change);
     }
   } else if (canMove(data, orig, dest)) {
@@ -70,7 +80,7 @@ function setSelected(data, key) {
 }
 
 function isMovable(data, orig) {
-  var piece = data.pieces.get(orig);
+  var piece = data.pieces[orig];
   return piece && (
     data.movable.color === 'both' || (
       data.movable.color === piece.color &&
@@ -85,7 +95,7 @@ function canMove(data, orig, dest) {
 }
 
 function isPremovable(data, orig) {
-  var piece = data.pieces.get(orig);
+  var piece = data.pieces[orig];
   return piece && data.premovable.enabled && (
     data.movable.color === piece.color &&
     data.turnColor !== piece.color
@@ -99,7 +109,7 @@ function canPremove(data, orig, dest) {
 }
 
 function isDraggable(data, orig) {
-  var piece = data.pieces.get(orig);
+  var piece = data.pieces[orig];
   return piece && data.draggable.enabled && (
     data.movable.color === 'both' || (
       data.movable.color === piece.color && (

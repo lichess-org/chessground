@@ -49,7 +49,7 @@ function renderSquare(ctrl, pos) {
   var file = util.files[pos[0] - 1];
   var rank = pos[1];
   var key = file + rank;
-  var piece = ctrl.data.pieces.get(key);
+  var piece = ctrl.data.pieces[key];
   var attrs = {
     class: util.classSet({
       'cg-square': true,

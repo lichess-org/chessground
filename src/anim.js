@@ -43,7 +43,7 @@ function compute(prev, current) {
   });
   util.allKeys.forEach(function(k) {
     if (k !== current.movable.dropped) {
-      var curP = current.pieces.get(k);
+      var curP = current.pieces[k];
       var preP = prePieces[k];
       if (curP) {
         if (preP) {
@@ -90,7 +90,7 @@ function go(animation, render) {
 function animate(transformation, data) {
   var prev = {
     orientation: data.orientation,
-    pieces: clone(data.pieces.all, true)
+    pieces: clone(data.pieces, true)
   };
   var result = transformation();
   var anims = compute(prev, data);

@@ -9,7 +9,7 @@ function start(ctrl, e) {
   var position = util.eventPosition(e);
   var bounds = ctrl.data.bounds();
   var orig = board.getKeyAtDomPos(ctrl.data, position, bounds);
-  var piece = ctrl.data.pieces.get(orig);
+  var piece = ctrl.data.pieces[orig];
   if (!piece || !board.isDraggable(ctrl.data, orig)) return;
   ctrl.data.draggable.current = {
     orig: orig,

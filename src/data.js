@@ -1,10 +1,9 @@
-var pieces = require('./pieces');
 var fen = require('./fen');
 var configure = require('./configure');
 
 module.exports = function(cfg) {
   var defaults = {
-    pieces: new pieces.Pieces(fen.read(fen.initial)),
+    pieces: fen.read(fen.initial),
     orientation: 'white',
     turnColor: 'white', // turn to play. white | black
     check: null, // square currently in check "a2" | nil
