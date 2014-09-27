@@ -1,6 +1,6 @@
 {
   "name": "chessground",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "Multipurpose chess UI.",
   "main": "src/main.js",
   "directories": {
