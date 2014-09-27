@@ -1,4 +1,5 @@
 var partial = require('lodash-node/modern/functions/partial');
+var forIn = require('lodash-node/modern/objects/forIn');
 var util = require('./util');
 var premove = require('./premove');
 var anim = require('./anim');
