@@ -87,19 +87,6 @@ function renderSquare(ctrl, pos) {
   };
 }
 
-// from mithril source, more or less
-function autoredraw(callback, node) {
-  return function(e) {
-    m.redraw.strategy("diff");
-    m.startComputation();
-    try {
-      callback(node, e);
-    } finally {
-      m.endComputation();
-    }
-  };
-}
-
 function renderBoard(ctrl) {
   var isTouch = util.isTouchDevice();
   var attrs = {
@@ -110,10 +97,12 @@ function renderBoard(ctrl) {
         ctrl.data.render = function() {
           m.redraw();
         };
-        if (isTouch) el.addEventListener('touchstart', autoredraw(function(e) {
+        if (isTouch) el.addEventListener('touchstart', function(e) {
+          m.startComputation();
           drag.start(ctrl, e);
           ctrl.selectSquare(board.getKeyAtDomPos(ctrl.data, util.eventPosition(e)));
-        }, el));
+          m.endComputation();
+        });
         var onmove = partial(drag.move, ctrl);
         var onend = partial(drag.end, ctrl);
         document.addEventListener(isTouch ? 'touchmove' : 'mousemove', onmove);

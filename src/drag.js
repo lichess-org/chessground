@@ -33,8 +33,7 @@ function move(ctrl, e) {
     position[0] - cur.rel[0],
     position[1] - cur.rel[1]
   ];
-  if (ctrl.data.draggable.squareOverEnabled)
-    cur.over = board.getKeyAtDomPos(ctrl.data, position, cur.bounds);
+  cur.over = board.getKeyAtDomPos(ctrl.data, position, cur.bounds);
   m.redraw();
 }
 
@@ -42,7 +41,7 @@ function end(ctrl, e) {
   var draggable = ctrl.data.draggable;
   var orig = draggable.current.orig;
   if (!orig) return;
-  dest = draggable.current.over || board.getKeyAtDomPos(ctrl.data, util.eventPosition(e), draggable.current.bounds);
+  dest = draggable.current.over;
   if (orig !== dest) ctrl.data.movable.dropped = dest;
   board.userMove(ctrl.data, orig, dest);
   draggable.current = {};
