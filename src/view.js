@@ -115,7 +115,7 @@ function renderBoard(ctrl) {
       config: function(el, isUpdate, context) {
         if (isUpdate) return;
         ctrl.data.bounds = el.getBoundingClientRect.bind(el);
-        ctrl.data.render = m.redraw
+        ctrl.data.render = m.redraw;
         var isTouch = util.isTouchDevice();
         var onstart = partial(drag.start, ctrl);
         var onmove = partial(drag.move, ctrl);
