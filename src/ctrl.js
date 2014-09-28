@@ -10,6 +10,8 @@ module.exports = function(cfg) {
 
   this.reconfigure = anim(configure, this.data);
 
+  this.reset = partial(board.reset, this.data);
+
   this.toggleOrientation = anim(board.toggleOrientation, this.data);
 
   this.setPieces = anim(board.setPieces, this.data);

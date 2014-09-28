@@ -12,12 +12,10 @@ function toggleOrientation(data) {
   data.orientation = util.opposite(data.orientation);
 }
 
-this.set = function(pieces) {
-  forIn(pieces, function(piece, key) {
-    if (piece) this.put(key, piece);
-    else this.remove(key);
-  }.bind(this));
-};
+function reset(data) {
+  data.lastMove = null;
+  setSelected(data, null);
+}
 
 function setPieces(data, pieces) {
   forIn(pieces, function(piece, key) {
@@ -147,6 +145,7 @@ function getKeyAtDomPos(data, pos, bounds) {
 }
 
 module.exports = {
+  reset: reset,
   toggleOrientation: toggleOrientation,
   setPieces: setPieces,
   selectSquare: selectSquare,
