@@ -10,7 +10,7 @@ module.exports = function(element, controller, view) {
       m.endComputation();
       // m.render(element, view(controller));
       return result;
-    }
+    };
   };
 
   return {
@@ -23,7 +23,7 @@ module.exports = function(element, controller, view) {
       return controller.data.pieces;
     },
     getFen: function() {
-      return fen.write(controller.data.pieces.all);
+      return fen.write(controller.data.pieces);
     },
     dump: function() {
       return controller.data;
@@ -31,5 +31,5 @@ module.exports = function(element, controller, view) {
     move: action(controller.apiMove),
     setPieces: action(controller.setPieces),
     playPremove: action(controller.playPremove)
-  }
+  };
 };
