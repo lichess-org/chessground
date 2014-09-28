@@ -97,10 +97,9 @@ function canMove(data, orig, dest) {
 
 function isPremovable(data, orig) {
   var piece = data.pieces[orig];
-  return piece && data.premovable.enabled && (
+  return piece && data.premovable.enabled &&
     data.movable.color === piece.color &&
-    data.turnColor !== piece.color
-  );
+    data.turnColor !== piece.color;
 }
 
 function canPremove(data, orig, dest) {
