@@ -55,7 +55,8 @@ function renderSquare(ctrl, pos) {
       'move-dest': util.containsX(ctrl.data.movable.dests[ctrl.data.selected], key),
       'premove-dest': util.containsX(ctrl.data.premovable.dests, key),
       'current-premove': util.contains2(ctrl.data.premovable.current, key),
-      'drag-over': ctrl.data.draggable.current.over === key
+      'drag-over': ctrl.data.draggable.current.over === key,
+      'occupied': piece
     }),
     style: ctrl.data.orientation === 'white' ? {
       left: styleX,
