@@ -15,4 +15,6 @@ module.exports = function(data, config) {
 
   // fix move/premove dests
   if (data.selected) board.setSelected(data, data.selected);
+
+  if (data.animation.duration < 10) data.animation.enabled = false;
 };
