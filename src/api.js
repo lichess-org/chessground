@@ -1,4 +1,3 @@
-var fen = require('./fen');
 var m = require('mithril');
 
 module.exports = function(element, controller, view) {
@@ -16,15 +15,9 @@ module.exports = function(element, controller, view) {
   return {
     set: action(controller.reconfigure),
     toggleOrientation: action(controller.toggleOrientation),
-    getOrientation: function() {
-      return controller.data.orientation;
-    },
-    getPieces: function() {
-      return controller.data.pieces;
-    },
-    getFen: function() {
-      return fen.write(controller.data.pieces);
-    },
+    getOrientation: controller.getOrientation,
+    getPieces: controller.getPieces,
+    getFen: controller.getFen,
     dump: function() {
       return controller.data;
     },

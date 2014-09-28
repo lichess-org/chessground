@@ -13,7 +13,7 @@ module.exports = function(cfg) {
 
   this.getPieces = function() { return this.data.pieces; };
 
-  this.getFen = function() { return fen.write(this.data.pieces); };
+  this.getFen = function() { return fen.write(this.data.pieces); }.bind(this);
 
   this.reconfigure = anim(configure, this.data);
 
