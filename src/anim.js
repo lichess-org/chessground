@@ -58,7 +58,7 @@ function computePlan(prev, current) {
     }
   });
   util.allKeys.forEach(function(k) {
-    if (k !== current.movable.dropped) {
+    if (k !== current.movable.dropped[1]) {
       var curP = current.pieces[k];
       var preP = prePieces[k];
       if (curP) {
@@ -84,7 +84,7 @@ function computePlan(prev, current) {
     }
   });
   missings.forEach(function(p) {
-    if (!contains(animedOrigs, p.key)) {
+    if (p.key !== current.movable.dropped[0] && !contains(animedOrigs, p.key)) {
       fadings.push({
         role: p.role,
         color: p.color,

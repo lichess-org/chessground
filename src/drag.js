@@ -55,7 +55,7 @@ function end(ctrl, e) {
   if (!orig) return;
   if (draggable.current.started) {
     dest = draggable.current.over;
-    if (orig !== dest) ctrl.data.movable.dropped = dest;
+    if (orig !== dest) ctrl.data.movable.dropped = [orig, dest];
     board.userMove(ctrl.data, orig, dest);
   }
   draggable.current = {};

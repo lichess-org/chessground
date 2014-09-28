@@ -11,7 +11,7 @@ module.exports = function(data, config) {
     delete data.fen;
   }
 
-  data.movable.dropped = null;
+  data.movable.dropped = [];
 
   // fix move/premove dests
   if (data.selected) board.setSelected(data, data.selected);

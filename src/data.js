@@ -39,7 +39,7 @@ module.exports = function(cfg) {
       color: 'both', // color that can move. white | black | both | nil
       dests: {}, // valid moves. {"a2" ["a3" "a4"] "b1" ["a3" "c3"]} | nil
       dropOff: 'revert', // when a piece is dropped outside the board. "revert" | "trash"
-      dropped: null, // last dropped dest, not to be animated
+      dropped: [], // last dropped [orig, dest], not to be animated
       events: {
         after: function(orig, dest) {} // called after the move has been played
       }
