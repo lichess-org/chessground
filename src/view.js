@@ -10,21 +10,19 @@ function pieceClass(p) {
 
 function renderPiece(ctrl, key, p) {
   var attrs = {
-    style: {
-      webkitTransform: null
-    },
+    style: {},
     class: pieceClass(p)
   };
   var draggable = ctrl.data.draggable.current;
   if (draggable.orig === key && (draggable.pos[0] !== 0 || draggable.pos[1] !== 0)) {
-    attrs.style.webkitTransform = util.translate([
+    attrs.style[util.transformProp()] = util.translate([
       draggable.pos[0] + draggable.dec[0],
       draggable.pos[1] + draggable.dec[1]
     ]);
     attrs.class += ' dragging';
   } else if (ctrl.data.animation.current.anims) {
     var animation = ctrl.data.animation.current.anims[key];
-    if (animation) attrs.style.webkitTransform = util.translate(animation[1]);
+    if (animation) attrs.style[util.transformProp()] = util.translate(animation[1]);
   }
   return {
     tag: 'div',
@@ -102,16 +100,17 @@ function renderDraggingSquare(cur) {
 }
 
 function renderFading(piece) {
+  var style = {
+        width: piece.size,
+        height: piece.size,
+        opacity: piece.opacity
+  };
+  style[util.transformProp()] = util.translate(piece.pos);
   return {
     tag: 'div',
     attrs: {
       class: 'cg-piece fading ' + piece.role + ' ' + piece.color,
-      style: {
-        width: piece.size,
-        height: piece.size,
-        webkitTransform: util.translate(piece.pos),
-        opacity: piece.opacity
-      }
+      style: style
     }
   };
 }
