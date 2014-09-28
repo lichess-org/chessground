@@ -38,7 +38,7 @@ function move(ctrl, e) {
     cur.started = true;
 
   if (cur.started) {
-    // cancel animatons while dragging
+    // cancel animations while dragging
     if (ctrl.data.animation.current.start) ctrl.data.animation.current = {};
     cur.pos = [
       position[0] - cur.rel[0],

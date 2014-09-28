@@ -4,6 +4,15 @@ var partial = require('lodash-node/modern/functions/partial');
 var m = require('mithril');
 var util = require('./util');
 
+var easing = {
+  easeInOutQuad: function(t) {
+    return t < 0.5 ? 2 * t * t : -1 + (4 - 2 * t) * t;
+  },
+  easeInOutCubic: function(t) {
+    return t < 0.5 ? 4 * t * t * t : (t - 1) * (2 * t - 2) * (2 * t - 2) + 1;
+  },
+};
+
 function makePiece(k, piece, invert) {
   var key = invert ? util.invertKey(k) : k;
   return {
@@ -73,8 +82,9 @@ function go(data) {
       data.animation.current = {};
       data.render();
     } else {
+      var ease = easing.easeInOutCubic(rest);
       forIn(data.animation.current.anims, function(cfg, key) {
-        data.animation.current.anims[key][1] = [cfg[0][0] * rest, cfg[0][1] * rest];
+        data.animation.current.anims[key][1] = [cfg[0][0] * ease, cfg[0][1] * ease];
       });
       data.render();
       requestAnimationFrame(partial(go, data));
