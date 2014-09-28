@@ -5,8 +5,10 @@ module.exports = function(element, controller, view) {
 
   var action = function(computation) {
     return function() {
+      m.startComputation();
       var result = computation.apply(null, arguments);
-      m.render(element, view(controller));
+      m.endComputation();
+      // m.render(element, view(controller));
       return result;
     }
   };

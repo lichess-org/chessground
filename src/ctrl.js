@@ -16,7 +16,7 @@ module.exports = function(cfg) {
 
   this.selectSquare = partial(board.selectSquare, this.data);
 
-  this.apiMove = partial(board.apiMove, this.data);
+  this.apiMove = anim(board.apiMove, this.data);
 
-  this.playPremove = partial(board.playPremove, this.data);
+  this.playPremove = anim(board.playPremove, this.data);
 };
