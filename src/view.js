@@ -101,6 +101,21 @@ function renderDraggingSquare(cur) {
   };
 }
 
+function renderFading(piece) {
+  return {
+    tag: 'div',
+    attrs: {
+      class: 'cg-piece fading ' + piece.role + ' ' + piece.color,
+      style: {
+        width: piece.size,
+        height: piece.size,
+        webkitTransform: util.translate(piece.pos),
+        opacity: piece.opacity
+      }
+    }
+  };
+}
+
 function renderBoard(ctrl) {
   //not using lodash.partial for raw perf, here
   var children = util.allPos.map(function(pos) {
@@ -108,6 +123,10 @@ function renderBoard(ctrl) {
   });
   if (ctrl.data.draggable.current.over && ctrl.data.draggable.squareTarget)
     children.push(renderDraggingSquare(ctrl.data.draggable.current));
+  if (ctrl.data.animation.current.fadings)
+    ctrl.data.animation.current.fadings.forEach(function(p) {
+      children.push(renderFading(p));
+    });
   return {
     tag: 'div',
     attrs: {

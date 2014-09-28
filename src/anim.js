@@ -1,9 +1,11 @@
 var forIn = require('lodash-node/modern/objects/forIn');
+var contains = require('lodash-node/modern/collections/contains');
 var clone = require('lodash-node/modern/objects/clone');
 var partial = require('lodash-node/modern/functions/partial');
 var m = require('mithril');
 var util = require('./util');
 
+// https://gist.github.com/gre/1650294
 var easing = {
   easeInOutQuad: function(t) {
     return t < 0.5 ? 2 * t * t : -1 + (4 - 2 * t) * t;
@@ -11,6 +13,12 @@ var easing = {
   easeInOutCubic: function(t) {
     return t < 0.5 ? 4 * t * t * t : (t - 1) * (2 * t - 2) * (2 * t - 2) + 1;
   },
+  easeOutQuad: function(t) {
+    return t * (2 - t);
+  },
+  easeOutCubic: function(t) {
+    return (--t) * t * t + 1;
+  }
 };
 
 function makePiece(k, piece, invert) {
@@ -33,13 +41,16 @@ function closer(piece, pieces) {
   })[0];
 }
 
-function compute(prev, current) {
+function computePlan(prev, current) {
   var size = current.bounds().width / 8,
     anims = {},
+    animedOrigs = [],
+    fadings = [],
     missings = [],
     news = [],
     invert = prev.orientation !== current.orientation,
-    prePieces = {};
+    prePieces = {},
+    white = current.orientation === 'white';
   util.allKeys.forEach(function(k) {
     if (prev.pieces[k]) {
       var piece = makePiece(k, prev.pieces[k], invert);
@@ -65,13 +76,31 @@ function compute(prev, current) {
   news.forEach(function(newP) {
     var preP = closer(newP, missings.filter(partial(samePiece, newP)));
     if (preP) {
-      var orig = current.orientation === 'white' ? preP.pos : newP.pos;
-      var dest = current.orientation === 'white' ? newP.pos : preP.pos;
+      var orig = white ? preP.pos : newP.pos;
+      var dest = white ? newP.pos : preP.pos;
       var vector = [(orig[0] - dest[0]) * size, (dest[1] - orig[1]) * size];
       anims[newP.key] = [vector, vector];
+      animedOrigs.push(preP.key);
     }
   });
-  return anims;
+  missings.forEach(function(p) {
+    if (!contains(animedOrigs, p.key)) {
+      fadings.push({
+        role: p.role,
+        color: p.color,
+        size: size + 'px',
+        pos: [
+          (white ? (p.pos[0] - 1) : (8 - p.pos[0])) * size, (white ? (1 - p.pos[1]) : (-8 + p.pos[1])) * size
+        ],
+        opacity: 1
+      });
+    }
+  });
+
+  return {
+    anims: anims,
+    fadings: fadings
+  };
 }
 
 function go(data) {
@@ -86,6 +115,9 @@ function go(data) {
       forIn(data.animation.current.anims, function(cfg, key) {
         data.animation.current.anims[key][1] = [cfg[0][0] * ease, cfg[0][1] * ease];
       });
+      for (var i in data.animation.current.fadings) {
+        data.animation.current.fadings[i].opacity = easing.easeOutQuad(rest);
+      }
       data.render();
       requestAnimationFrame(partial(go, data));
     }
@@ -103,13 +135,14 @@ function animate(transformation, data) {
     pieces: clone(data.pieces, true)
   };
   var result = transformation();
-  var anims = compute(prev, data);
-  if (Object.getOwnPropertyNames(anims).length > 0) {
+  var plan = computePlan(prev, data);
+  if (Object.getOwnPropertyNames(plan.anims).length > 0 || plan.fadings.length > 0) {
     var alreadyRunning = data.animation.current.start;
     data.animation.current = {
       start: new Date().getTime(),
       duration: data.animation.duration,
-      anims: anims
+      anims: plan.anims,
+      fadings: plan.fadings
     };
     if (!alreadyRunning) go(data);
   }
