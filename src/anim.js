@@ -112,7 +112,7 @@ function animate(transformation, data) {
 module.exports = function(transformation, data) {
   return function() {
     var transformationArgs = [data].concat(Array.prototype.slice.call(arguments, 0));
-    if (data.animation.enabled && data.render)
+    if (data.animation.enabled && data.animation.duration >= 10 && data.render)
       return animate(util.partialApply(transformation, transformationArgs), data);
     else
       return transformation.apply(null, transformationArgs);

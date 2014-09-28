@@ -1,4 +1,5 @@
 var merge = require('lodash-node/modern/objects/merge')
+var board = require('./board');
 var fen = require('./fen');
 
 module.exports = function(data, config) {
@@ -11,4 +12,7 @@ module.exports = function(data, config) {
   }
 
   data.movable.dropped = null;
+
+  // fix move/premove dests
+  if (data.selected) board.setSelected(data, data.selected);
 };
