@@ -9,11 +9,7 @@ module.exports = function(cfg) {
 
   this.data = data(cfg);
 
-  this.getOrientation = function() { return this.data.orientation; };
-
-  this.getPieces = function() { return this.data.pieces; };
-
-  this.getFen = function() { return fen.write(this.data.pieces); }.bind(this);
+  this.getFen = partial(fen.write, this.data.pieces);
 
   this.reconfigure = anim(configure, this.data);
 
