@@ -1,7 +1,7 @@
 {
   "name": "chessground",
-  "version": "1.1.0",
-  "description": "Multipurpose chess UI.",
+  "version": "1.0.0",
+  "description": "Multipurpose chess UI, for lichess.org web and mobile",
   "main": "src/main.js",
   "directories": {
     "example": "examples"
@@ -20,9 +20,6 @@
     "vinyl-source-stream": "~1.0.0",
     "watchify": "~1.0.2"
   },
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
   "repository": {
     "type": "git",
     "url": "git://github.com/ornicar/chessground.git"
@@ -30,7 +27,8 @@
   "keywords": [
     "chess",
     "lichess.org",
-    "chessboard"
+    "chessboard",
+    "UI"
   ],
   "author": "Thibault Duplessis (https://github.com/ornicar)",
   "license": "MIT",
