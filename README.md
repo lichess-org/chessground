@@ -19,10 +19,10 @@ You have to feed it with the correct moves using backend or frontend chess logic
 
 ## Features
 
-Chessground is designed to fulfill all lichess.org web and mobile apps, so it is pretty featureful.
+Chessground is designed to fulfill all lichess.org web and mobile apps needs, so it is pretty featureful.
 
 - Fast. Uses virtual DOM; runs smoothly on elder mobile phones
-- Small footprint: 15K gziped (42K unziped) including dependencies
+- Small footprint: 15K gzipped (42K unzipped) including dependencies
 - Standalone, or composable as a mithril.js module
 - Entirely configurable and reconfigurable at any time
 - Styling with CSS: board and pieces can be changed by simply switching a class
@@ -39,6 +39,7 @@ Chessground is designed to fulfill all lichess.org web and mobile apps, so it is
 - Premove by click or drag
 - Animation of pieces: moving and fading away
 - Display last move, check, move destinations, and premove destinations
+- Import and export positions in FEN notation
 - User callbacks
 - No chess logic inside: can be used for chess variations
 
