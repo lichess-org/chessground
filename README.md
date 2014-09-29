@@ -1,4 +1,4 @@
-## ChessGround - multipurpose chess UI.
+# ChessGround - multipurpose chess UI.
 
 Chessground targets all modern browsers, as well as mobile development using Cordova.
 
@@ -8,12 +8,41 @@ and [lichess.org puzzle solver](http://lichess.org/training).
 Note that Chessground is only the UI, and has no knowledge of the rules of chess.
 You have to feed it with the correct moves using backend or frontend chess logic.
 
-#### Dependencies
+### Demo
+
+[http://lichess.org/training](http://lichess.org/training)
+
+### Dependencies
 
 - [mithril.js](https://github.com/lhorie/mithril.js) - a minimalist virtual DOM library
 - [lodash-node](https://github.com/lodash/lodash-node) - just a handful of selected functions, not the whole thing
 
-### Installation
+## Features
+
+Chessground is designed to fulfill all lichess.org web and mobile apps, so it is pretty featureful.
+
+- Fast. Uses virtual DOM; runs smoothly on elder mobile phones
+- Small footprint: 15K gziped (42K unziped) including dependencies
+- Standalone, or composable as a mithril.js module
+- Entirely configurable and reconfigurable at any time
+- Styling with CSS: board and pieces can be changed by simply switching a class
+- Fluid layout: board can be resized at any time
+- Support for pieces larger than squares (for 3D)
+- Full mobile support (touchstart, touchmove, touchend)
+- Move pieces by click
+- Move pieces by drag'n drop
+  - minimum distance before drag
+  - centralisation of the piece under the cursor
+  - square target element for mobile
+  - piece ghost
+  - drop off revert or trash
+- Premove by click or drag
+- Animation of pieces: moving and fading away
+- Display last move, check, move destinations, and premove destinations
+- User callbacks
+- No chess logic inside: can be used for chess variations
+
+## Installation
 
 ```
 npm install --save git://github.com/ornicar/chessground.git
@@ -27,7 +56,7 @@ var Chessground = require("chessground");
 var ground = Chessground(document.body, options);
 ```
 
-### Options
+## Options
 
 All options are, well, optional.
 
@@ -69,11 +98,11 @@ All options are, well, optional.
 }
 ```
 
-### A.P.I.
+## A.P.I.
 
 There are a few functions you can call on a Chessground instance:
 
-#### Setters
+### Setters
 
 ```js
 var ground = Chessground(document.body, options);
@@ -95,7 +124,7 @@ ground.setPieces({a1: null, c5: {color: "black", role: "queen"}});
 ground.playPremove();
 ```
 
-#### Getters
+### Getters
 
 ```js
 // get the view angle
