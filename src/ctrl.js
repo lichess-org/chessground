@@ -11,7 +11,7 @@ module.exports = function(cfg) {
 
   this.getFen = function() {
     return fen.write(this.data.pieces);
-  }
+  }.bind(this);
 
   this.reconfigure = anim(configure, this.data);
 
