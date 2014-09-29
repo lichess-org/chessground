@@ -4,11 +4,11 @@ var configure = require('./configure');
 module.exports = function(cfg) {
   var defaults = {
     pieces: fen.read(fen.initial),
-    orientation: 'white',
+    orientation: 'white', // board orientation. white | black
     turnColor: 'white', // turn to play. white | black
-    check: null, // square currently in check "a2" | nil
-    lastMove: null, // squares part of the last move ["c3" "c4"] | nil
-    selected: null, // square selected by the user "a1" | nil
+    check: null, // square currently in check "a2" | null
+    lastMove: null, // squares part of the last move ["c3", "c4"] | null
+    selected: null, // square currently selected "a1" | null
     render: null, // function that rerenders the board
     bounds: null, // function that calculates the board bounds
     animation: {
@@ -36,8 +36,8 @@ module.exports = function(cfg) {
     },
     movable: {
       free: true, // all moves are valid - board editor
-      color: 'both', // color that can move. white | black | both | nil
-      dests: {}, // valid moves. {"a2" ["a3" "a4"] "b1" ["a3" "c3"]} | nil
+      color: 'both', // color that can move. white | black | both | null
+      dests: {}, // valid moves. {"a2" ["a3" "a4"] "b1" ["a3" "c3"]} | null
       dropOff: 'revert', // when a piece is dropped outside the board. "revert" | "trash"
       dropped: [], // last dropped [orig, dest], not to be animated
       events: {
@@ -47,7 +47,7 @@ module.exports = function(cfg) {
     premovable: {
       enabled: true, // allow premoves for color that can not move
       dests: [], // premove destinations for the current selection
-      current: null // keys of the current saved premove ["e2" "e4"] | nil
+      current: null // keys of the current saved premove ["e2" "e4"] | null
     },
     draggable: {
       enabled: true, // allow moves & premoves to use drag'n drop
