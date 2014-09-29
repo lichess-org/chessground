@@ -102,9 +102,9 @@ function renderDraggingSquare(cur) {
 
 function renderFading(piece) {
   var style = {
-        width: piece.size,
-        height: piece.size,
-        opacity: piece.opacity
+    width: piece.size,
+    height: piece.size,
+    opacity: piece.opacity
   };
   style[util.transformProp()] = util.translate(piece.pos);
   return {
@@ -116,7 +116,7 @@ function renderFading(piece) {
   };
 }
 
-function renderBoard(ctrl) {
+function renderContent(ctrl) {
   //not using lodash.partial for raw perf, here
   var children = util.allPos.map(function(pos) {
     return renderSquare(ctrl, pos);
@@ -127,6 +127,10 @@ function renderBoard(ctrl) {
     ctrl.data.animation.current.fadings.forEach(function(p) {
       children.push(renderFading(p));
     });
+  return children;
+}
+
+function renderBoard(ctrl) {
   return {
     tag: 'div',
     attrs: {
@@ -134,7 +138,6 @@ function renderBoard(ctrl) {
       config: function(el, isUpdate, context) {
         if (isUpdate) return;
         ctrl.data.bounds = el.getBoundingClientRect.bind(el);
-        ctrl.data.render = m.redraw;
         var isTouch = util.isTouchDevice();
         var onstart = partial(drag.start, ctrl);
         var onmove = partial(drag.move, ctrl);
@@ -147,9 +150,17 @@ function renderBoard(ctrl) {
           document.removeEventListener(isTouch ? 'touchmove' : 'mousemove', onmove);
           document.removeEventListener(isTouch ? 'touchend' : 'mouseup', onend);
         };
+        // this function only repaints the board itself.
+        // it's called when dragging or animating pieces,
+        // to prevent the full application embedding chessground
+        // rendering on every animation frame
+        ctrl.data.render = function() {
+          m.render(el, renderContent(ctrl));
+        };
+        ctrl.data.render();
       }
     },
-    children: children
+    children: null
   };
 }
 
