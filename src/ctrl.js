@@ -9,7 +9,9 @@ module.exports = function(cfg) {
 
   this.data = data(cfg);
 
-  this.getFen = partial(fen.write, this.data.pieces);
+  this.getFen = function() {
+    return fen.write(this.data.pieces);
+  }
 
   this.reconfigure = anim(configure, this.data);
 
@@ -24,5 +26,4 @@ module.exports = function(cfg) {
   this.apiMove = anim(board.apiMove, this.data);
 
   this.playPremove = anim(board.playPremove, this.data);
-
 };
