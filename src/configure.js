@@ -4,7 +4,16 @@ var fen = require('./fen');
 
 module.exports = function(data, config) {
 
+  var dests;
+  if (config.movable) {
+    dests = config.movable.dests;
+    delete config.movable.dests;
+  }
+
   merge(data, config);
+
+  if (dests !== undefined)
+    data.movable.dests = dests;
 
   if (data.fen) {
     data.pieces = fen.read(data.fen);
