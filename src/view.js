@@ -45,7 +45,7 @@ function renderSquare(ctrl, pos) {
   var rank = pos[1];
   var key = file + rank;
   var piece = ctrl.data.pieces[key];
-  var isDragOver = ctrl.data.draggable.current.over === key;
+  var isDragOver = ctrl.data.highlight.dragOver && ctrl.data.draggable.current.over === key;
   var attrs = {
     class: 'cg-square ' + util.classSet({
       'selected': ctrl.data.selected === key,

@@ -13,7 +13,8 @@ module.exports = function(cfg) {
     bounds: null, // function that calculates the board bounds
     highlight: {
       lastMove: true, // add last-move class to squares
-      check: true // add check class to squares
+      check: true, // add check class to squares
+      dragOver: true // add drag-over class to square when dragging over it
     },
     animation: {
       enabled: true,

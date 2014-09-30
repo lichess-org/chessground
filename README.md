@@ -70,7 +70,8 @@ All options are, well, optional.
   selected: null,         // square currently selected "a1" | null
   highlight: {
     lastMove: true,       // add last-move class to squares
-    check: true           // add check class to squares
+    check: true,          // add check class to squares
+    dragOver: true        // add drag-over class to square when dragging over it
   },
   animation: {
     enabled: true,        // enable piece animations, moving and fading
