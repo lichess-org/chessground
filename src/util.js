@@ -69,11 +69,11 @@ function transformProp() {
 }
 
 function computeTransformProp() {
-  var style = document.body.style;
-  ['webkitTransform', 'mozTransform', 'oTransform'].forEach(function(prop) {
-    if (prop in style) return prop;
-  });
-  return 'transform';
+  return 'transform' in document.body.style?
+    'transform': 'webkitTransform' in document.body.style?
+    'webkitTransform': 'mozTransform' in document.body.style?
+    'mozTransform': 'oTransform' in document.body.style?
+    'oTransform': 'msTransform';
 }
 
 function translate(pos) {
