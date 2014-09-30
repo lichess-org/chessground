@@ -1,5 +1,4 @@
 var forIn = require('lodash-node/modern/objects/forIn');
-var contains = require('lodash-node/modern/collections/contains');
 var m = require('mithril');
 var util = require('./util');
 
@@ -82,7 +81,7 @@ function computePlan(prev, current) {
     }
   });
   missings.forEach(function(p) {
-    if (p.key !== current.movable.dropped[0] && !contains(animedOrigs, p.key)) {
+    if (p.key !== current.movable.dropped[0] && !util.containsX(animedOrigs, p.key)) {
       fadings.push({
         role: p.role,
         color: p.color,
