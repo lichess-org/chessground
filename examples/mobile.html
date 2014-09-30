@@ -55,10 +55,13 @@
     <script>
       window.onload = function() {
         var size = (window.innerWidth) + 'px';
+        var ground = document.getElementById('ground');
         setTimeout(function() {
-          document.getElementById('ground').style.width = size;
-          document.getElementById('ground').style.height = size;
+          ground.style.width = size;
+          ground.style.height = size;
         }, 100);
+        ground.style.position = 'absolute';
+        ground.style.top = '100px';
       };
     </script>
   </body>

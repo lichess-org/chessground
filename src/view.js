@@ -92,8 +92,8 @@ function renderSquareTarget(cur) {
       style: {
         width: size + 'px',
         height: size + 'px',
-        left: (cur.bounds.left + (pos[0] - 1.5) * squareSize) + 'px',
-        top: (cur.bounds.top + (7.5 - pos[1]) * squareSize) + 'px'
+        left: (pos[0] - 1.5) * squareSize + 'px',
+        top: (7.5 - pos[1]) * squareSize + 'px'
       }
     }
   };
