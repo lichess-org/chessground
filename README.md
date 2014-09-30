@@ -22,7 +22,7 @@ You have to feed it with the correct moves using backend or frontend chess logic
 Chessground is designed to fulfill all lichess.org web and mobile apps needs, so it is pretty featureful.
 
 - Fast. Uses virtual DOM; runs smoothly on elder mobile phones
-- Small footprint: 14K gzipped (41K unzipped) including dependencies
+- Small footprint: 13K gzipped (38K unzipped) including dependencies
 - Standalone, or composable as a mithril.js module
 - Entirely configurable and reconfigurable at any time
 - Styling with CSS: board and pieces can be changed by simply switching a class
