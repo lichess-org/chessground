@@ -46,7 +46,7 @@ function start(ctrl, e) {
       if (cur.orig) processDrag();
     });
   };
-  renderDrag();
+  processDrag();
 }
 
 function move(ctrl, e) {
