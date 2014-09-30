@@ -1,7 +1,6 @@
 var forIn = require('lodash-node/modern/objects/forIn');
 var contains = require('lodash-node/modern/collections/contains');
 var clone = require('lodash-node/modern/objects/clone');
-var partial = require('lodash-node/modern/functions/partial');
 var m = require('mithril');
 var util = require('./util');
 
@@ -74,7 +73,7 @@ function computePlan(prev, current) {
     }
   });
   news.forEach(function(newP) {
-    var preP = closer(newP, missings.filter(partial(samePiece, newP)));
+    var preP = closer(newP, missings.filter(util.partial(samePiece, newP)));
     if (preP) {
       var orig = white ? preP.pos : newP.pos;
       var dest = white ? newP.pos : preP.pos;
@@ -119,7 +118,9 @@ function go(data) {
         data.animation.current.fadings[i].opacity = easing.easeOutQuad(rest);
       }
       data.render();
-      requestAnimationFrame(partial(go, data));
+      requestAnimationFrame(function() {
+        go(data);
+      });
     }
   } catch (e) {
     // breaks if the DOM node was removed. Who cares.

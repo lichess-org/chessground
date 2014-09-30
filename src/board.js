@@ -1,4 +1,3 @@
-var partial = require('lodash-node/modern/functions/partial');
 var forIn = require('lodash-node/modern/objects/forIn');
 var util = require('./util');
 var premove = require('./premove');
@@ -53,7 +52,7 @@ function userMove(data, orig, dest) {
   } else if (canMove(data, orig, dest)) {
     if (baseMove(data, orig, dest)) {
       setSelected(data, null);
-      callUserFunction(partial(data.movable.events.after, orig, dest));
+      callUserFunction(util.partial(data.movable.events.after, orig, dest));
     }
   } else if (canPremove(data, orig, dest)) {
     data.premovable.current = [orig, dest];
@@ -126,7 +125,7 @@ function playPremove(data) {
       dest = move[1];
     if (canMove(data, orig, dest)) {
       if (baseMove(data, orig, dest)) {
-        callUserFunction(partial(data.movable.events.after, orig, dest));
+        callUserFunction(util.partial(data.movable.events.after, orig, dest));
       }
     }
     data.premovable.current = null;

@@ -1,4 +1,3 @@
-var partial = require('lodash-node/modern/functions/partial');
 var range = require('lodash-node/modern/arrays/range');
 
 var files = "abcdefgh".split('');
@@ -84,7 +83,12 @@ function eventPosition(e) {
 }
 
 function partialApply(fn, args) {
-  return partial.apply(null, [fn].concat(args));
+  return fn.bind.apply(fn, [null].concat(args));
+}
+
+// because lodash partial function seems exceedingly complicated
+function partial() {
+  return partialApply(arguments[0], Array.prototype.slice.call(arguments, 1));
 }
 
 module.exports = {
@@ -104,6 +108,7 @@ module.exports = {
   isTouchDevice: isTouchDevice,
   eventPosition: eventPosition,
   partialApply: partialApply,
+  partial: partial,
   transformProp: transformProp,
   pp: pp
 };

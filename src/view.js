@@ -1,8 +1,7 @@
-var partial = require('lodash-node/modern/functions/partial');
 var util = require('./util');
 var board = require('./board');
 var drag = require('./drag');
-var anim = require('./anim');
+var util = require('./util');
 
 function pieceClass(p) {
   return ['cg-piece', p.role, p.color].join(' ');
@@ -117,10 +116,7 @@ function renderFading(piece) {
 }
 
 function renderContent(ctrl) {
-  //not using lodash.partial for raw perf, here
-  var children = util.allPos.map(function(pos) {
-    return renderSquare(ctrl, pos);
-  });
+  var children = util.allPos.map(util.partial(renderSquare, ctrl));
   if (ctrl.data.draggable.current.over && ctrl.data.draggable.squareTarget)
     children.push(renderSquareTarget(ctrl.data.draggable.current));
   if (ctrl.data.animation.current.fadings)
@@ -139,9 +135,9 @@ function renderBoard(ctrl) {
         if (isUpdate) return;
         ctrl.data.bounds = el.getBoundingClientRect.bind(el);
         var isTouch = util.isTouchDevice();
-        var onstart = partial(drag.start, ctrl);
-        var onmove = partial(drag.move, ctrl);
-        var onend = partial(drag.end, ctrl);
+        var onstart = util.partial(drag.start, ctrl);
+        var onmove = util.partial(drag.move, ctrl);
+        var onend = util.partial(drag.end, ctrl);
         el.addEventListener(isTouch ? 'touchstart' : 'mousedown', onstart);
         document.addEventListener(isTouch ? 'touchmove' : 'mousemove', onmove);
         document.addEventListener(isTouch ? 'touchend' : 'mouseup', onend);
