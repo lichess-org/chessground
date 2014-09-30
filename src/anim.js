@@ -152,6 +152,9 @@ function animate(transformation, data) {
       fadings: plan.fadings
     };
     if (!alreadyRunning) go(data);
+  } else {
+    // don't animate, just render right away
+    data.renderRAF();
   }
   return result;
 }
@@ -159,15 +162,14 @@ function animate(transformation, data) {
 // transformation is a function
 // accepts board data and any number of arguments,
 // and mutates the board.
-module.exports = function(transformation, data) {
+module.exports = function(transformation, data, skip) {
   return function() {
     var transformationArgs = [data].concat(Array.prototype.slice.call(arguments, 0));
-    if (data.animation.enabled && data.render)
+    if (data.animation.enabled && !skip && data.render)
       return animate(util.partialApply(transformation, transformationArgs), data);
     else {
-      m.startComputation();
       var result = transformation.apply(null, transformationArgs);
-      m.endComputation();
+      data.renderRAF();
       return result;
     }
   };

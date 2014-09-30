@@ -155,6 +155,11 @@ function renderBoard(ctrl) {
         ctrl.data.render = function() {
           m.render(el, renderContent(ctrl));
         };
+        ctrl.data.renderRAF = function() {
+          requestAnimationFrame(function() {
+            ctrl.data.render();
+          });
+        };
         ctrl.data.render();
       }
     },

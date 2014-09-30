@@ -24,6 +24,16 @@ function setPieces(data, pieces) {
   data.movable.dropped = [];
 }
 
+function setCheck(data, color) {
+  var checkColor = color || data.turnColor;
+  forIn(data.pieces, function(piece, key) {
+    if (piece.color === checkColor && piece.role === 'king') {
+      data.check = key;
+      return;
+    }
+  });
+}
+
 function baseMove(data, orig, dest) {
   var success = anim(function() {
     if (orig === dest || !data.pieces[orig]) return false;
@@ -146,6 +156,7 @@ module.exports = {
   reset: reset,
   toggleOrientation: toggleOrientation,
   setPieces: setPieces,
+  setCheck: setCheck,
   selectSquare: selectSquare,
   setSelected: setSelected,
   isDraggable: isDraggable,

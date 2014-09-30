@@ -118,6 +118,10 @@ var ground = Chessground(document.body, options);
 // board will be animated accordingly, if animations are enabled.
 ground.set(options);
 
+// sets the king of this color in check
+// if no color is provided, the current turn color is used
+ground.setCheck(color);
+
 // change the view angle
 ground.toggleOrientation();
 

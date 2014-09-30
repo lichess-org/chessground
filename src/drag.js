@@ -10,7 +10,7 @@ function start(ctrl, e) {
   var bounds = ctrl.data.bounds();
   var orig = board.getKeyAtDomPos(ctrl.data, position, bounds);
   var piece = ctrl.data.pieces[orig];
-  ctrl.selectSquare(orig);
+  board.selectSquare(ctrl.data, orig);
   if (piece && board.isDraggable(ctrl.data, orig)) {
     var pieceBounds = e.target.getBoundingClientRect();
     ctrl.data.draggable.current = {
