@@ -82,7 +82,7 @@ function renderSquare(ctrl, pos) {
   };
 }
 
-function renderDraggingSquare(cur) {
+function renderSquareTarget(cur) {
   var squareSize = cur.bounds.width / 8;
   var size = squareSize * 2;
   var pos = util.key2pos(cur.over);
@@ -122,7 +122,7 @@ function renderContent(ctrl) {
     return renderSquare(ctrl, pos);
   });
   if (ctrl.data.draggable.current.over && ctrl.data.draggable.squareTarget)
-    children.push(renderDraggingSquare(ctrl.data.draggable.current));
+    children.push(renderSquareTarget(ctrl.data.draggable.current));
   if (ctrl.data.animation.current.fadings)
     ctrl.data.animation.current.fadings.forEach(function(p) {
       children.push(renderFading(p));
