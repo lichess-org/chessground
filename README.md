@@ -68,6 +68,10 @@ All options are, well, optional.
   check: null,            // square currently in check "a2" | null
   lastMove: null,         // squares part of the last move ["c3", "c4"] | null
   selected: null,         // square currently selected "a1" | null
+  highlight: {
+    lastMove: true,       // add last-move class to squares
+    check: true           // add check class to squares
+  },
   animation: {
     enabled: true,        // enable piece animations, moving and fading
     duration: 200,        // animation duration in milliseconds
@@ -77,6 +81,7 @@ All options are, well, optional.
     color: "both",        // color that can move. "white" | "black" | "both" | null
     dests: {},            // valid moves. {a2: ["a3", "a4"], b1: ["a3", "c3"]} | null
     dropOff: "revert",    // when a piece is dropped outside the board. "revert" | "trash"
+    showDests: true,      // add the move-dest class to squares
     events: {
                           // called after the move has been played
       after: function(orig, dest) {}
@@ -84,6 +89,7 @@ All options are, well, optional.
   },
   premovable: {
     enabled: true,        // allow premoves for color that can not move
+    showDests: true,      // add the premove-dest class to squares
     current: null         // keys of the current saved premove ["e2", "e4"] | null
   },
   draggable: {

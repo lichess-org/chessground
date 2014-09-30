@@ -48,10 +48,10 @@ function renderSquare(ctrl, pos) {
   var attrs = {
     class: 'cg-square ' + util.classSet({
       'selected': ctrl.data.selected === key,
-      'check': ctrl.data.check === key,
-      'last-move': util.contains2(ctrl.data.lastMove, key),
-      'move-dest': util.containsX(ctrl.data.movable.dests[ctrl.data.selected], key),
-      'premove-dest': util.containsX(ctrl.data.premovable.dests, key),
+      'check': ctrl.data.highlight.check && ctrl.data.check === key,
+      'last-move': ctrl.data.highlight.lastMove && util.contains2(ctrl.data.lastMove, key),
+      'move-dest': ctrl.data.movable.showDests && util.containsX(ctrl.data.movable.dests[ctrl.data.selected], key),
+      'premove-dest': ctrl.data.premovable.showDests && util.containsX(ctrl.data.premovable.dests, key),
       'current-premove': util.contains2(ctrl.data.premovable.current, key),
       'drag-over': ctrl.data.draggable.current.over === key,
       'occupied': !!piece

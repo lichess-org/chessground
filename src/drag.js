@@ -32,7 +32,7 @@ function start(ctrl, e) {
       if (cur.orig) {
         // cancel animations while dragging
         if (ctrl.data.animation.current.start) ctrl.data.animation.current = {};
-        if (!cur.started && util.distance(cur.epos, cur.rel) > ctrl.data.draggable.distance)
+        if (!cur.started && util.distance(cur.epos, cur.rel) >= ctrl.data.draggable.distance)
           cur.started = true;
         if (cur.started) {
           cur.pos = [
