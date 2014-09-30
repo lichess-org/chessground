@@ -25,3 +25,4 @@ module.exports.util = require('./util');
 module.exports.configure = require('./configure');
 module.exports.anim = require('./anim');
 module.exports.board = require('./board');
+module.exports.drag = require('./drag');
