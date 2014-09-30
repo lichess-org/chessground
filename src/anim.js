@@ -103,28 +103,21 @@ function computePlan(prev, current) {
 function go(data) {
   if (!data.animation.current.start) return; // animation was canceled
   var rest = 1 - (new Date().getTime() - data.animation.current.start) / data.animation.current.duration;
-  try {
-    if (rest <= 0) {
-      data.animation.current = {};
-      data.render();
-    } else {
-      var ease = easing.easeInOutCubic(rest);
-      forIn(data.animation.current.anims, function(cfg, key) {
-        data.animation.current.anims[key][1] = [cfg[0][0] * ease, cfg[0][1] * ease];
-      });
-      for (var i in data.animation.current.fadings) {
-        data.animation.current.fadings[i].opacity = easing.easeOutQuad(rest);
-      }
-      data.render();
-      requestAnimationFrame(function() {
-        go(data);
-      });
-    }
-  } catch (e) {
-    // breaks if the DOM node was removed. Who cares.
+  if (rest <= 0) {
     data.animation.current = {};
     data.render();
-    console.log(e);
+  } else {
+    var ease = easing.easeInOutCubic(rest);
+    forIn(data.animation.current.anims, function(cfg, key) {
+      data.animation.current.anims[key][1] = [cfg[0][0] * ease, cfg[0][1] * ease];
+    });
+    for (var i in data.animation.current.fadings) {
+      data.animation.current.fadings[i].opacity = easing.easeOutQuad(rest);
+    }
+    data.render();
+    requestAnimationFrame(function() {
+      go(data);
+    });
   }
 }
 
