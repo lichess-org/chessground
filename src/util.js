@@ -70,7 +70,7 @@ function transformProp() {
 
 function computeTransformProp() {
   var style = document.body.style;
-  ['transform', 'webkitTransform', 'mozTransform', 'oTransform'].forEach(function(prop) {
+  ['webkitTransform', 'mozTransform', 'oTransform'].forEach(function(prop) {
     if (prop in style) return prop;
   });
   return 'transform';
