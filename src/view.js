@@ -45,15 +45,16 @@ function renderSquare(ctrl, pos) {
   var rank = pos[1];
   var key = file + rank;
   var piece = ctrl.data.pieces[key];
+  var isDragOver = ctrl.data.draggable.current.over === key;
   var attrs = {
     class: 'cg-square ' + util.classSet({
       'selected': ctrl.data.selected === key,
       'check': ctrl.data.highlight.check && ctrl.data.check === key,
       'last-move': ctrl.data.highlight.lastMove && util.contains2(ctrl.data.lastMove, key),
-      'move-dest': ctrl.data.movable.showDests && util.containsX(ctrl.data.movable.dests[ctrl.data.selected], key),
-      'premove-dest': ctrl.data.premovable.showDests && util.containsX(ctrl.data.premovable.dests, key),
+      'move-dest': (isDragOver || ctrl.data.movable.showDests) && util.containsX(ctrl.data.movable.dests[ctrl.data.selected], key),
+      'premove-dest': (isDragOver || ctrl.data.premovable.showDests) && util.containsX(ctrl.data.premovable.dests, key),
       'current-premove': util.contains2(ctrl.data.premovable.current, key),
-      'drag-over': ctrl.data.draggable.current.over === key,
+      'drag-over': isDragOver,
       'occupied': !!piece
     }),
     style: ctrl.data.orientation === 'white' ? {
