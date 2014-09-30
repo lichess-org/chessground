@@ -26,10 +26,12 @@ var allPos = (function() {
 })();
 var allKeys = allPos.map(pos2key);
 
-function classSet(classNames) {
-  return Object.keys(classNames).filter(function(className) {
-    return classNames[className];
-  }).join(' ');
+function classSet(classes) {
+  var arr = [];
+  for (var i in classes) {
+    if (classes[i]) arr.push(i);
+  }
+  return arr.join(' ');
 }
 
 function opposite(color) {

@@ -46,8 +46,7 @@ function renderSquare(ctrl, pos) {
   var key = file + rank;
   var piece = ctrl.data.pieces[key];
   var attrs = {
-    class: util.classSet({
-      'cg-square': true,
+    class: 'cg-square ' + util.classSet({
       'selected': ctrl.data.selected === key,
       'check': ctrl.data.check === key,
       'last-move': util.contains2(ctrl.data.lastMove, key),
@@ -55,7 +54,7 @@ function renderSquare(ctrl, pos) {
       'premove-dest': util.containsX(ctrl.data.premovable.dests, key),
       'current-premove': util.contains2(ctrl.data.premovable.current, key),
       'drag-over': ctrl.data.draggable.current.over === key,
-      'occupied': piece
+      'occupied': !!piece
     }),
     style: ctrl.data.orientation === 'white' ? {
       left: styleX,
@@ -116,7 +115,9 @@ function renderFading(piece) {
 }
 
 function renderContent(ctrl) {
-  var children = util.allPos.map(util.partial(renderSquare, ctrl));
+  var children = util.allPos.map(function(pos) {
+    return renderSquare(ctrl, pos);
+  });
   if (ctrl.data.draggable.current.over && ctrl.data.draggable.squareTarget)
     children.push(renderSquareTarget(ctrl.data.draggable.current));
   if (ctrl.data.animation.current.fadings)
