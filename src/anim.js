@@ -1,6 +1,5 @@
 var forIn = require('lodash-node/modern/objects/forIn');
 var contains = require('lodash-node/modern/collections/contains');
-var clone = require('lodash-node/modern/objects/clone');
 var m = require('mithril');
 var util = require('./util');
 
@@ -131,10 +130,18 @@ function go(data) {
 }
 
 function animate(transformation, data) {
+  // clone data
   var prev = {
     orientation: data.orientation,
-    pieces: clone(data.pieces, true)
+    pieces: {}
   };
+  // clone pieces
+  for (var key in data.pieces) {
+    prev.pieces[key] = {
+      role: data.pieces[key].role,
+      color: data.pieces[key].color
+    };
+  }
   var result = transformation();
   var plan = computePlan(prev, data);
   if (Object.getOwnPropertyNames(plan.anims).length > 0 || plan.fadings.length > 0) {
