@@ -1,4 +1,3 @@
-var forIn = require('lodash-node/modern/objects/forIn');
 var m = require('mithril');
 var util = require('./util');
 
@@ -48,12 +47,10 @@ function computePlan(prev, current) {
     invert = prev.orientation !== current.orientation,
     prePieces = {},
     white = current.orientation === 'white';
-  util.allKeys.forEach(function(k) {
-    if (prev.pieces[k]) {
-      var piece = makePiece(k, prev.pieces[k], invert);
-      prePieces[piece.key] = piece;
-    }
-  });
+  for (var k in prev.pieces) {
+    var piece = makePiece(k, prev.pieces[k], invert);
+    prePieces[piece.key] = piece;
+  }
   util.allKeys.forEach(function(k) {
     if (k !== current.movable.dropped[1]) {
       var curP = current.pieces[k];
@@ -108,9 +105,10 @@ function go(data) {
     data.render();
   } else {
     var ease = easing.easeInOutCubic(rest);
-    forIn(data.animation.current.anims, function(cfg, key) {
-      data.animation.current.anims[key][1] = [cfg[0][0] * ease, cfg[0][1] * ease];
-    });
+    for (var key in data.animation.current.anims) {
+      var cfg = data.animation.current.anims[key];
+      cfg[1] = [cfg[0][0] * ease, cfg[0][1] * ease];
+    }
     for (var i in data.animation.current.fadings) {
       data.animation.current.fadings[i].opacity = easing.easeOutQuad(rest);
     }
@@ -136,7 +134,7 @@ function animate(transformation, data) {
   }
   var result = transformation();
   var plan = computePlan(prev, data);
-  if (Object.getOwnPropertyNames(plan.anims).length > 0 || plan.fadings.length > 0) {
+  if (Object.keys(plan.anims).length > 0 || plan.fadings.length > 0) {
     var alreadyRunning = data.animation.current.start;
     data.animation.current = {
       start: new Date().getTime(),
