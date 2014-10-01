@@ -2,6 +2,7 @@ var range = require('lodash-node/modern/arrays/range');
 
 var files = "abcdefgh".split('');
 var ranks = range(1, 9);
+var invRanks = range(8, 0, -1);
 
 function pos2key(pos) {
   return files[pos[0] - 1] + pos[1];
@@ -17,7 +18,7 @@ function invertKey(key) {
 
 var allPos = (function() {
   var ps = [];
-  ranks.forEach(function(y) {
+  invRanks.forEach(function(y) {
     ranks.forEach(function(x) {
       ps.push([x, y]);
     });
