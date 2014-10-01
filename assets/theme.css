@@ -128,3 +128,10 @@
 .merida .cg-piece.king.black {
   background-image: url('images/pieces/merida/bK.svg');
 }
+.c3d .cg-piece {
+  background-image: url('images/pieces/c3d/bK.png');
+  height: 200%;
+  width: 150%;
+  left: -27%;
+  bottom: -30%;
+}
