@@ -2,11 +2,10 @@ var board = require('./board');
 var util = require('./util');
 var m = require('mithril');
 
-function start(ctrl, e) {
+function start(data, e) {
   if (e.button !== undefined && e.button !== 0) return; // only touch or left click
   e.stopPropagation();
   e.preventDefault();
-  var data = ctrl.data;
   var position = util.eventPosition(e);
   var bounds = data.bounds();
   var orig = board.getKeyAtDomPos(data, position, bounds);
@@ -51,19 +50,19 @@ function processDrag(data) {
   });
 }
 
-function move(ctrl, e) {
-  if (ctrl.data.draggable.current.orig)
-    ctrl.data.draggable.current.epos = util.eventPosition(e);
+function move(data, e) {
+  if (data.draggable.current.orig)
+    data.draggable.current.epos = util.eventPosition(e);
 }
 
-function end(ctrl, e) {
-  var draggable = ctrl.data.draggable;
-  var orig = draggable.current.orig;
+function end(data) {
+  var draggable = data.draggable;
+  var orig = draggable.current ? draggable.current.orig : null;
   if (!orig) return;
   if (draggable.current.started) {
     dest = draggable.current.over;
-    if (orig !== dest) ctrl.data.movable.dropped = [orig, dest];
-    board.userMove(ctrl.data, orig, dest);
+    if (orig !== dest) data.movable.dropped = [orig, dest];
+    board.userMove(data, orig, dest);
   }
   draggable.current = {};
 }

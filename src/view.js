@@ -137,9 +137,9 @@ function renderBoard(ctrl) {
         if (isUpdate) return;
         ctrl.data.bounds = el.getBoundingClientRect.bind(el);
         var isTouch = util.isTouchDevice();
-        var onstart = util.partial(drag.start, ctrl);
-        var onmove = util.partial(drag.move, ctrl);
-        var onend = util.partial(drag.end, ctrl);
+        var onstart = util.partial(drag.start, ctrl.data);
+        var onmove = util.partial(drag.move, ctrl.data);
+        var onend = util.partial(drag.end, ctrl.data);
         el.addEventListener(isTouch ? 'touchstart' : 'mousedown', onstart);
         document.addEventListener(isTouch ? 'touchmove' : 'mousemove', onmove);
         document.addEventListener(isTouch ? 'touchend' : 'mouseup', onend);

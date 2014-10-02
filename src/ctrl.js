@@ -3,6 +3,7 @@ var data = require('./data');
 var fen = require('./fen');
 var configure = require('./configure');
 var anim = require('./anim');
+var drag = require('./drag');
 
 module.exports = function(cfg) {
 
@@ -25,4 +26,9 @@ module.exports = function(cfg) {
   this.playPremove = anim(board.playPremove, this.data);
 
   this.setCheck = anim(board.setCheck, this.data, true);
+
+  this.stop = anim(function(data) {
+    board.stop(data);
+    drag.end(data);
+  }.bind(this), this.data, true);
 };

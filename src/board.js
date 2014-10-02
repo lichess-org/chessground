@@ -142,6 +142,12 @@ function playPremove(data) {
   }
 }
 
+function stop(data) {
+  data.movable.color = null;
+  data.movable.dests = {};
+  selectSquare(data, null);
+}
+
 function getKeyAtDomPos(data, pos, bounds) {
   if (!bounds && !data.bounds) return;
   bounds = bounds || data.bounds(); // use provided value, or compute it
@@ -164,5 +170,6 @@ module.exports = {
   userMove: userMove,
   apiMove: apiMove,
   playPremove: playPremove,
+  stop: stop,
   getKeyAtDomPos: getKeyAtDomPos
 };

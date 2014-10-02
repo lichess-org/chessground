@@ -14,6 +14,7 @@ module.exports = function(element, controller, view) {
     move: controller.apiMove,
     setPieces: controller.setPieces,
     setCheck: controller.setCheck,
-    playPremove: controller.playPremove
+    playPremove: controller.playPremove,
+    stop: controller.stop
   };
 };
