@@ -3,7 +3,7 @@ var m = require('mithril');
 module.exports = function(element, controller, view) {
 
   return {
-    set: controller.reconfigure,
+    set: controller.set,
     toggleOrientation: controller.toggleOrientation,
     getOrientation: controller.getOrientation,
     getPieces: controller.getPieces,

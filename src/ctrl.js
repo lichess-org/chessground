@@ -12,7 +12,7 @@ module.exports = function(cfg) {
     return fen.write(this.data.pieces);
   }.bind(this);
 
-  this.reconfigure = anim(configure, this.data);
+  this.set = anim(configure, this.data);
 
   this.toggleOrientation = anim(board.toggleOrientation, this.data);
 
