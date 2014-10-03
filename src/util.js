@@ -25,6 +25,7 @@ var allPos = (function() {
   });
   return ps;
 })();
+var invPos = allPos.slice().reverse();
 var allKeys = allPos.map(pos2key);
 
 function classSet(classes) {
@@ -98,6 +99,7 @@ module.exports = {
   files: files,
   ranks: ranks,
   allPos: allPos,
+  invPos: invPos,
   allKeys: allKeys,
   pos2key: pos2key,
   key2pos: key2pos,

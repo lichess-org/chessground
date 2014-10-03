@@ -38,9 +38,7 @@ function renderGhost(p) {
   };
 }
 
-function renderSquare(ctrl, pos) {
-  var styleX = (pos[0] - 1) * 12.5 + '%';
-  var styleY = (pos[1] - 1) * 12.5 + '%';
+function renderSquare(ctrl, pos, asWhite) {
   var file = util.files[pos[0] - 1];
   var rank = pos[1];
   var key = file + rank;
@@ -57,16 +55,13 @@ function renderSquare(ctrl, pos) {
       'drag-over': isDragOver,
       'occupied': !!piece
     }),
-    style: ctrl.data.orientation === 'white' ? {
-      left: styleX,
-      bottom: styleY
-    } : {
-      right: styleX,
-      top: styleY
+    style: {
+      left: (asWhite ? pos[0] - 1 : 8 - pos[0]) * 12.5 + '%',
+      bottom: (asWhite ? pos[1] - 1 : 8 - pos[1]) * 12.5 + '%'
     }
   };
-  if (pos[1] === (ctrl.data.orientation === 'white' ? 1 : 8)) attrs['data-coord-x'] = file;
-  if (pos[0] === (ctrl.data.orientation === 'white' ? 8 : 1)) attrs['data-coord-y'] = rank;
+  if (pos[1] === (asWhite ? 1 : 8)) attrs['data-coord-x'] = file;
+  if (pos[0] === (asWhite ? 8 : 1)) attrs['data-coord-y'] = rank;
   var children = [];
   if (piece) {
     children.push(renderPiece(ctrl, key, piece));
@@ -116,8 +111,9 @@ function renderFading(piece) {
 }
 
 function renderContent(ctrl) {
-  var children = util.allPos.map(function(pos) {
-    return renderSquare(ctrl, pos);
+  var asWhite = ctrl.data.orientation == 'white';
+  var children = (asWhite ? util.allPos : util.invPos).map(function(pos) {
+    return renderSquare(ctrl, pos, asWhite);
   });
   if (ctrl.data.draggable.current.over && ctrl.data.draggable.squareTarget)
     children.push(renderSquareTarget(ctrl.data.draggable.current));
