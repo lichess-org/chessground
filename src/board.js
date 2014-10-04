@@ -62,7 +62,7 @@ function userMove(data, orig, dest) {
   } else if (canMove(data, orig, dest)) {
     if (baseMove(data, orig, dest)) {
       setSelected(data, null);
-      callUserFunction(util.partial(data.movable.events.after, orig, dest));
+      callUserFunction(util.partial(data.movable.events.after, orig, dest, false));
     }
   } else if (canPremove(data, orig, dest)) {
     data.premovable.current = [orig, dest];
@@ -135,7 +135,7 @@ function playPremove(data) {
       dest = move[1];
     if (canMove(data, orig, dest)) {
       if (baseMove(data, orig, dest)) {
-        callUserFunction(util.partial(data.movable.events.after, orig, dest));
+        callUserFunction(util.partial(data.movable.events.after, orig, dest, true));
       }
     }
     data.premovable.current = null;
