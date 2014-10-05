@@ -34,7 +34,9 @@ function processDrag(data) {
     var cur = data.draggable.current;
     if (cur.orig) {
       // cancel animations while dragging
-      if (data.animation.current.start) data.animation.current = {};
+      if (data.animation.current.start &&
+        Object.keys(data.animation.current.anims).indexOf(cur.orig) !== -1)
+        data.animation.current = {};
       if (!cur.started && util.distance(cur.epos, cur.rel) >= data.draggable.distance)
         cur.started = true;
       if (cur.started) {
