@@ -113,8 +113,6 @@ There are a few functions you can call on a Chessground instance:
 ### Setters
 
 ```js
-var ground = Chessground(document.body, options);
-
 // reconfigure the instance. Accepts all options mentioned above.
 // board will be animated accordingly, if animations are enabled.
 ground.set(options);
@@ -148,6 +146,10 @@ var orientation = ground.getOrientation();
 // get pieces on the board
 // {a1: {color: "white", role: "rook"}, b1: {color: "white", role: "knight"}}
 var pieces = ground.getPieces();
+
+// get the material difference between white and black
+// {white: {pawn: 3 queen: 1}, black: {bishop: 2}}
+var diff = ground.getMaterialDiff();
 
 // get the current FEN position
 // rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR

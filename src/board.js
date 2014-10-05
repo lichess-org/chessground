@@ -158,6 +158,22 @@ function getKeyAtDomPos(data, pos, bounds) {
   if (file > 0 && file < 9 && rank > 0 && rank < 9) return util.pos2key([file, rank]);
 }
 
+// {white: {pawn: 3 queen: 1}, black: {bishop: 2}}
+function getMaterialDiff(data) {
+  var counts = {king: 0, queen: 0, rook: 0, bishop: 0, knight: 0, pawn: 0};
+  for (var k in data.pieces) {
+    var p = data.pieces[k];
+    counts[p.role] += ((p.color === 'white') ? 1 : -1);
+  }
+  var diff = {white: {}, black: {}}
+  for (var role in counts) {
+    var c = counts[role];
+    if (c > 0) diff.white[role] = c;
+    else if (c < 0) diff.black[role] = -c;
+  }
+  return diff;
+}
+
 module.exports = {
   reset: reset,
   toggleOrientation: toggleOrientation,
@@ -171,5 +187,6 @@ module.exports = {
   apiMove: apiMove,
   playPremove: playPremove,
   stop: stop,
-  getKeyAtDomPos: getKeyAtDomPos
+  getKeyAtDomPos: getKeyAtDomPos,
+  getMaterialDiff: getMaterialDiff
 };
