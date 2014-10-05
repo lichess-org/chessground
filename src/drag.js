@@ -9,9 +9,9 @@ function start(data, e) {
   var position = util.eventPosition(e);
   var bounds = data.bounds();
   var orig = board.getKeyAtDomPos(data, position, bounds);
-  var piece = data.pieces[orig];
   board.selectSquare(data, orig);
-  if (piece && board.isDraggable(data, orig)) {
+  var stillSelected = data.selected === orig;
+  if (data.pieces[orig] && stillSelected && board.isDraggable(data, orig)) {
     var pieceBounds = e.target.getBoundingClientRect();
     data.draggable.current = {
       orig: orig,
