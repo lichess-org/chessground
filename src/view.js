@@ -94,18 +94,22 @@ function renderSquareTarget(cur) {
   };
 }
 
-function renderFading(piece) {
-  var style = {
-    width: piece.size,
-    height: piece.size,
-    opacity: piece.opacity
-  };
-  style[util.transformProp()] = util.translate(piece.pos);
+function renderFading(cfg) {
   return {
     tag: 'div',
     attrs: {
-      class: 'cg-piece fading ' + piece.role + ' ' + piece.color,
-      style: style
+      class: 'cg-square fading',
+      style: {
+        left: cfg.left,
+        bottom: cfg.bottom,
+        opacity: cfg.opacity
+      }
+    },
+    children: {
+      tag: 'div',
+      attrs: {
+        class: pieceClass(cfg.piece)
+      }
     }
   };
 }

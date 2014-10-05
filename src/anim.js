@@ -80,12 +80,12 @@ function computePlan(prev, current) {
   missings.forEach(function(p) {
     if (p.key !== current.movable.dropped[0] && !util.containsX(animedOrigs, p.key)) {
       fadings.push({
-        role: p.role,
-        color: p.color,
-        size: size + 'px',
-        pos: [
-          (white ? (p.pos[0] - 1) : (8 - p.pos[0])) * size, (white ? (1 - p.pos[1]) : (-8 + p.pos[1])) * size
-        ],
+        piece: {
+          role: p.role,
+          color: p.color
+        },
+        left: 12.5 * (white ? (p.pos[0] - 1) : (8 - p.pos[0])) + '%',
+        bottom: 12.5 * (white ? (p.pos[1] - 1) : (8 - p.pos[1])) + '%',
         opacity: 1
       });
     }
