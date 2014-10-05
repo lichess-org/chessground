@@ -152,7 +152,7 @@ function playPremove(data) {
         callUserFunction(util.partial(data.movable.events.after, orig, dest, true));
       }
     }
-    data.premovable.current = null;
+    unsetPremove(data);
   }
 }
 
@@ -210,6 +210,7 @@ module.exports = {
   userMove: userMove,
   apiMove: apiMove,
   playPremove: playPremove,
+  unsetPremove: unsetPremove,
   stop: stop,
   getKeyAtDomPos: getKeyAtDomPos,
   getMaterialDiff: getMaterialDiff

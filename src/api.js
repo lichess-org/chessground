@@ -23,6 +23,7 @@ module.exports = function(element, controller, view) {
     setPieces: controller.setPieces,
     setCheck: controller.setCheck,
     playPremove: controller.playPremove,
+    cancelPremove: controller.cancelPremove,
     stop: controller.stop
   };
 };

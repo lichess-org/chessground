@@ -25,6 +25,8 @@ module.exports = function(cfg) {
 
   this.playPremove = anim(board.playPremove, this.data);
 
+  this.cancelPremove = anim(board.unsetPremove, this.data, true);
+
   this.setCheck = anim(board.setCheck, this.data, true);
 
   this.stop = anim(function(data) {

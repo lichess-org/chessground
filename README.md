@@ -139,6 +139,9 @@ ground.setPieces({a1: null, c5: {color: "black", role: "queen"}});
 // play the current premove, if any
 ground.playPremove();
 
+// cancel the current premove, if any
+ground.cancelPremove();
+
 // cancels current move and prevent further ones
 ground.stop();
 ```
