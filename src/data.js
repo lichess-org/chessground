@@ -56,7 +56,11 @@ module.exports = function(cfg) {
       enabled: true, // allow premoves for color that can not move
       showDests: true, // whether to add the premove-dest class on squares
       dests: [], // premove destinations for the current selection
-      current: null // keys of the current saved premove ["e2" "e4"] | null
+      current: null, // keys of the current saved premove ["e2" "e4"] | null
+      events: {
+        set: function(orig, dest) {}, // called after the premove has been set
+        unset: function() {} // called after the premove has been unset
+      }
     },
     draggable: {
       enabled: true, // allow moves & premoves to use drag'n drop

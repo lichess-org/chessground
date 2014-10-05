@@ -92,6 +92,12 @@ All options are, well, optional.
     enabled: true,        // allow premoves for color that can not move
     showDests: true,      // add the premove-dest class to squares
     current: null         // keys of the current saved premove ["e2", "e4"] | null
+      events: {
+                          // called after the premove has been set
+        set: function(orig, dest) {},
+                          // called after the premove has been unset
+        unset: function() {}
+      }
   },
   draggable: {
     enabled: true,        // allow moves & premoves to use drag'n drop

@@ -34,6 +34,18 @@ function setCheck(data, color) {
   });
 }
 
+function setPremove(data, orig, dest) {
+  data.premovable.current = [orig, dest];
+  callUserFunction(util.partial(data.premovable.events.set, orig, dest));
+}
+
+function unsetPremove(data) {
+  if (data.premovable.current) {
+    data.premovable.current = null;
+    callUserFunction(data.premovable.events.unset);
+  }
+}
+
 function baseMove(data, orig, dest) {
   var success = anim(function() {
     if (orig === dest || !data.pieces[orig]) return false;
@@ -65,7 +77,7 @@ function userMove(data, orig, dest) {
       callUserFunction(util.partial(data.movable.events.after, orig, dest, false));
     }
   } else if (canPremove(data, orig, dest)) {
-    data.premovable.current = [orig, dest];
+    setPremove(data, orig, dest);
     setSelected(data, null);
   } else if (isMovable(data, dest) || isPremovable(data, dest))
     setSelected(data, dest);
@@ -77,8 +89,10 @@ function selectSquare(data, key) {
     if (key) {
       if (data.selected !== key) userMove(data, data.selected, key);
     } else setSelected(data, null);
-  } else if (isMovable(data, key) || isPremovable(data, key))
-    setSelected(data, key);
+  } else {
+    if (isMovable(data, key) || isPremovable(data, key)) setSelected(data, key);
+    else unsetPremove(data);
+  }
 }
 
 function setSelected(data, key) {
@@ -160,12 +174,22 @@ function getKeyAtDomPos(data, pos, bounds) {
 
 // {white: {pawn: 3 queen: 1}, black: {bishop: 2}}
 function getMaterialDiff(data) {
-  var counts = {king: 0, queen: 0, rook: 0, bishop: 0, knight: 0, pawn: 0};
+  var counts = {
+    king: 0,
+    queen: 0,
+    rook: 0,
+    bishop: 0,
+    knight: 0,
+    pawn: 0
+  };
   for (var k in data.pieces) {
     var p = data.pieces[k];
     counts[p.role] += ((p.color === 'white') ? 1 : -1);
   }
-  var diff = {white: {}, black: {}}
+  var diff = {
+    white: {},
+    black: {}
+  }
   for (var role in counts) {
     var c = counts[role];
     if (c > 0) diff.white[role] = c;
