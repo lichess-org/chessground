@@ -10,6 +10,8 @@ module.exports = function(cfg) {
     lastMove: null, // squares part of the last move ["c3", "c4"] | null
     selected: null, // square currently selected "a1" | null
     render: null, // function that rerenders the board
+    renderRAF: null, // function that rerenders the board using requestAnimationFrame
+    element: null, // DOM element of the board, required for drag piece centering
     bounds: null, // function that calculates the board bounds
     highlight: {
       lastMove: true, // add last-move class to squares

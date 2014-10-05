@@ -45,7 +45,7 @@ function renderSquare(ctrl, pos, asWhite) {
   var piece = ctrl.data.pieces[key];
   var isDragOver = ctrl.data.highlight.dragOver && ctrl.data.draggable.current.over === key;
   var attrs = {
-    class: 'cg-square ' + util.classSet({
+    class: 'cg-square ' + key + ' ' + util.classSet({
       'selected': ctrl.data.selected === key,
       'check': ctrl.data.highlight.check && ctrl.data.check === key,
       'last-move': ctrl.data.highlight.lastMove && util.contains2(ctrl.data.lastMove, key),
@@ -131,7 +131,6 @@ function renderBoard(ctrl) {
       class: 'cg-board orientation-' + ctrl.data.orientation,
       config: function(el, isUpdate, context) {
         if (isUpdate) return;
-        ctrl.data.bounds = el.getBoundingClientRect.bind(el);
         var isTouch = util.isTouchDevice();
         var onstart = util.partial(drag.start, ctrl.data);
         var onmove = util.partial(drag.move, ctrl.data);
@@ -154,6 +153,8 @@ function renderBoard(ctrl) {
         ctrl.data.renderRAF = function() {
           requestAnimationFrame(ctrl.data.render);
         };
+        ctrl.data.bounds = el.getBoundingClientRect.bind(el);
+        ctrl.data.element = el;
         ctrl.data.render();
       }
     },

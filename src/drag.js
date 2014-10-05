@@ -12,7 +12,7 @@ function start(data, e) {
   board.selectSquare(data, orig);
   var stillSelected = data.selected === orig;
   if (data.pieces[orig] && stillSelected && board.isDraggable(data, orig)) {
-    var pieceBounds = e.target.getBoundingClientRect();
+    var pieceBounds = data.element.querySelector('.' + orig).getBoundingClientRect();
     data.draggable.current = {
       orig: orig,
       rel: position,
