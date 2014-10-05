@@ -1,6 +1,6 @@
 {
   "name": "chessground",
-  "version": "1.4.3",
+  "version": "1.4.4",
   "description": "Multipurpose chess UI, for lichess.org web and mobile",
   "main": "src/main.js",
   "directories": {

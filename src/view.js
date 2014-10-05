@@ -128,7 +128,7 @@ function renderBoard(ctrl) {
   return {
     tag: 'div',
     attrs: {
-      class: 'cg-board',
+      class: 'cg-board orientation-' + ctrl.data.orientation,
       config: function(el, isUpdate, context) {
         if (isUpdate) return;
         ctrl.data.bounds = el.getBoundingClientRect.bind(el);
