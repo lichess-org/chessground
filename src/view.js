@@ -142,7 +142,6 @@ function renderBoard(ctrl) {
         el.addEventListener(isTouch ? 'touchstart' : 'mousedown', onstart);
         document.addEventListener(isTouch ? 'touchmove' : 'mousemove', onmove);
         document.addEventListener(isTouch ? 'touchend' : 'mouseup', onend);
-        document.addEventListener('touchcancel', function(e) { console.log(e); });
         context.onunload = function() {
           el.removeEventListener(isTouch ? 'touchstart' : 'mousedown', onstart);
           document.removeEventListener(isTouch ? 'touchmove' : 'mousemove', onmove);
