@@ -83,7 +83,7 @@ function translate(pos) {
 }
 
 function eventPosition(e) {
-  return e.touches ? [e.touches[0].clientX, e.touches[0].clientY] : [e.clientX, e.clientY];
+  return e.touches ? [e.targetTouches[0].clientX, e.targetTouches[0].clientY] : [e.clientX, e.clientY];
 }
 
 function partialApply(fn, args) {

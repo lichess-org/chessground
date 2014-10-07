@@ -2,10 +2,14 @@ var board = require('./board');
 var util = require('./util');
 var m = require('mithril');
 
+var originTarget;
+
 function start(data, e) {
   if (e.button !== undefined && e.button !== 0) return; // only touch or left click
+  if (e.touches && e.touches.length > 1) return; // support one finger touch only
   e.stopPropagation();
   e.preventDefault();
+  originTarget = e.target;
   var position = util.eventPosition(e);
   var bounds = data.bounds();
   var orig = board.getKeyAtDomPos(data, position, bounds);
@@ -53,14 +57,19 @@ function processDrag(data) {
 }
 
 function move(data, e) {
+  if (e.touches && e.touches.length > 1) return; // support one finger touch only
+
   if (data.draggable.current.orig)
     data.draggable.current.epos = util.eventPosition(e);
 }
 
-function end(data) {
+function end(data, e) {
   var draggable = data.draggable;
   var orig = draggable.current ? draggable.current.orig : null;
   if (!orig) return;
+  // comparing with the origin target is an easy way to test that the end event
+  // has the same touch origin
+  if (originTarget && originTarget !== e.target) return;
   if (draggable.current.started) {
     dest = draggable.current.over;
     if (orig !== dest) data.movable.dropped = [orig, dest];
