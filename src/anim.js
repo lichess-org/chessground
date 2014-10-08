@@ -38,7 +38,9 @@ function closer(piece, pieces) {
 }
 
 function computePlan(prev, current) {
-  var size = current.bounds().width / 8,
+  var bounds = current.bounds(),
+    width = bounds.width / 8,
+    height = bounds.height / 8,
     anims = {},
     animedOrigs = [],
     fadings = [],
@@ -72,7 +74,7 @@ function computePlan(prev, current) {
     if (preP) {
       var orig = white ? preP.pos : newP.pos;
       var dest = white ? newP.pos : preP.pos;
-      var vector = [(orig[0] - dest[0]) * size, (dest[1] - orig[1]) * size];
+      var vector = [(orig[0] - dest[0]) * width, (dest[1] - orig[1]) * height];
       anims[newP.key] = [vector, vector];
       animedOrigs.push(preP.key);
     }

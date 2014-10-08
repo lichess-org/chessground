@@ -77,18 +77,16 @@ function renderSquare(ctrl, pos, asWhite) {
 }
 
 function renderSquareTarget(cur) {
-  var squareSize = cur.bounds.width / 8;
-  var size = squareSize * 2;
   var pos = util.key2pos(cur.over);
   return {
     tag: 'div',
     attrs: {
       id: 'cg-square-target',
       style: {
-        width: size + 'px',
-        height: size + 'px',
-        left: (pos[0] - 1.5) * squareSize + 'px',
-        top: (7.5 - pos[1]) * squareSize + 'px'
+        width: cur.bounds.width / 4 + 'px',
+        height: cur.bounds.height / 4 + 'px',
+        left: (pos[0] - 1.5) * cur.bounds.width / 8 + 'px',
+        top: (7.5 - pos[1]) * cur.bounds.height / 8 + 'px'
       }
     }
   };
