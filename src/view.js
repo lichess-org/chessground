@@ -164,4 +164,12 @@ function renderBoard(ctrl) {
   };
 }
 
-module.exports = renderBoard;
+module.exports = function(ctrl) {
+  return {
+    tag: 'div',
+    attrs: {
+      class: 'cg-board-wrap'
+    },
+    children: renderBoard(ctrl)
+  };
+};
