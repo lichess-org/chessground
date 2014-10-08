@@ -69,7 +69,7 @@ function end(data, e) {
   if (!orig) return;
   // comparing with the origin target is an easy way to test that the end event
   // has the same touch origin
-  if (originTarget && originTarget !== e.target) return;
+  if (e.type === "touchend" && originTarget !== e.target) return;
   if (draggable.current.started) {
     dest = draggable.current.over;
     if (orig !== dest) data.movable.dropped = [orig, dest];
