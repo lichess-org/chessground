@@ -83,7 +83,7 @@
     <!--   </script> -->
     <!-- </section> -->
     <section>
-        <div class="chessground wood small staunton" id="ground7"></div>
+        <div class="chessground light-wood-3d small staunton" id="ground7"></div>
         <p>Play a game on a single board</p>
         <script>
             (function() {
@@ -102,6 +102,9 @@
           };
           ground = Chessground(document.getElementById('ground7'), {
             turnColor: 'white',
+            animation: {
+              duration: 500
+            },
             movable: {
               free: false,
               color: chessToColor(chess),
@@ -112,39 +115,41 @@
               }
             }
           });
+              window.cg6 = ground;
         })();
         </script>
     </section>
-  <!-- <section> -->
-    <!--   <div class="chessground blue small cburnett" id="ground5"></div> -->
-    <!--   <p>Valid moves: white plays, then premoves</p> -->
-    <!--   <script> -->
-    <!--       (function() { -->
-    <!--       var ground; -->
-    <!--       var chess = new Chess(); -->
-    <!--       var onMove = function(orig, dest) { -->
-    <!--         chess.move({from: orig, to: dest}); -->
-    <!--         ground.set({ -->
-    <!--           turnColor: chessToColor(chess), -->
-    <!--         }); -->
-    <!--       }; -->
-    <!--       ground = Chessground(document.getElementById('ground5'), { -->
-    <!--         turnColor: 'white', -->
-    <!--         orientation: 'white', -->
-    <!--         movable: { -->
-    <!--           free: false, -->
-    <!--           premove: true, -->
-    <!--           color: 'white', -->
-    <!--           dests: chessToDests(chess), -->
-    <!--           events: { -->
-    <!--             after: onMove -->
-    <!--           } -->
-    <!--         } -->
-    <!--       }); -->
-    <!--       window.cg5 = ground; -->
-    <!--     })(); -->
-    <!--   </script> -->
-  <!-- </section> -->
+  <section>
+      <div class="chessground blue small cburnett" id="ground5"></div>
+      <p>Valid moves: white plays, then premoves</p>
+      <script>
+          (function() {
+          var ground;
+          var chess = new Chess();
+          var onMove = function(orig, dest) {
+            console.log(chessToColor(chess));
+            chess.move({from: orig, to: dest});
+            ground.set({
+              turnColor: chessToColor(chess),
+            });
+            console.log(chessToColor(chess));
+          };
+          ground = Chessground(document.getElementById('ground5'), {
+            turnColor: 'white',
+            orientation: 'white',
+            movable: {
+              free: false,
+              color: 'white',
+              dests: chessToDests(chess),
+              events: {
+                after: onMove
+              }
+            }
+          });
+          window.cg5 = ground;
+        })();
+      </script>
+  </section>
   </body>
 </html>
 

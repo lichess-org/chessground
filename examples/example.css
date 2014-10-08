@@ -3,7 +3,7 @@ body {
   text-align: center;
   color: #b0b0b0;
   font-size: 11px;
-  margin: 0;
+  margin: 30px 0 0 0;
 }
 section {
   display: inline-block;
@@ -23,8 +23,4 @@ section p {
 .chessground.small {
   width: 300px;
   height: 300px;
-}
-.chessground.large {
-  width: 400px;
-  height: 400px;
 }

@@ -10,6 +10,31 @@
 .marble > .cg-board {
   background-image: url('images/board/marble.jpg');
 }
+.chessground.light-wood-3d {
+  position: relative;
+  background-image: url('images/board/3d/Light-Wood.png');
+  background-size: cover;
+}
+.chessground.small.light-wood-3d {
+  width: calc(1400px / 4.6666);
+  height: calc(1310px / 4.6666);
+}
+.chessground.large.light-wood-3d {
+  width: calc(1400px / 1);
+  height: calc(1310px / 1);
+}
+.light-wood-3d > .cg-board {
+  position: absolute;
+  left: 0;
+  top: 0.6168702%;
+  width: 100%;
+  height: 97.0229%;
+}
+/*
+whole: 1400x1310
+useful: 1400x1271, 
+top: 8, bottom: 31
+
 
 /*
  * Pieces
@@ -178,8 +203,12 @@
   background-image: url(images/pieces/staunton/basic/Black-King.png);
 }
 .staunton div.cg-piece {
+  /* original size:
+     width: 140.625%;
+     height: 179.6875%; */
+  /* size on 3D board, with height/width = 90.78571% */
   width: 140.625%;
-  height: 179.6875%;
+  height: 197.92486231313927%;
   left: -18%;
-  top: -63%;
+  top: -77%;
 }
