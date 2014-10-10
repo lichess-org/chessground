@@ -133,18 +133,20 @@ function renderBoard(ctrl) {
       class: 'cg-board orientation-' + ctrl.data.orientation,
       config: function(el, isUpdate, context) {
         if (isUpdate) return;
-        var isTouch = util.isTouchDevice();
-        var onstart = util.partial(drag.start, ctrl.data);
-        var onmove = util.partial(drag.move, ctrl.data);
-        var onend = util.partial(drag.end, ctrl.data);
-        el.addEventListener(isTouch ? 'touchstart' : 'mousedown', onstart);
-        document.addEventListener(isTouch ? 'touchmove' : 'mousemove', onmove);
-        document.addEventListener(isTouch ? 'touchend' : 'mouseup', onend);
-        context.onunload = function() {
-          el.removeEventListener(isTouch ? 'touchstart' : 'mousedown', onstart);
-          document.removeEventListener(isTouch ? 'touchmove' : 'mousemove', onmove);
-          document.removeEventListener(isTouch ? 'touchend' : 'mouseup', onend);
-        };
+        if (!ctrl.data.viewOnly) {
+          var isTouch = util.isTouchDevice();
+          var onstart = util.partial(drag.start, ctrl.data);
+          var onmove = util.partial(drag.move, ctrl.data);
+          var onend = util.partial(drag.end, ctrl.data);
+          el.addEventListener(isTouch ? 'touchstart' : 'mousedown', onstart);
+          document.addEventListener(isTouch ? 'touchmove' : 'mousemove', onmove);
+          document.addEventListener(isTouch ? 'touchend' : 'mouseup', onend);
+          context.onunload = function() {
+            el.removeEventListener(isTouch ? 'touchstart' : 'mousedown', onstart);
+            document.removeEventListener(isTouch ? 'touchmove' : 'mousemove', onmove);
+            document.removeEventListener(isTouch ? 'touchend' : 'mouseup', onend);
+          };
+        }
         // this function only repaints the board itself.
         // it's called when dragging or animating pieces,
         // to prevent the full application embedding chessground

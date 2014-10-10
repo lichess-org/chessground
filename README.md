@@ -27,7 +27,7 @@ Chessground is designed to fulfill all lichess.org web and mobile apps needs, so
 - Entirely configurable and reconfigurable at any time
 - Styling with CSS: board and pieces can be changed by simply switching a class
 - Fluid layout: board can be resized at any time
-- Support for pieces larger than squares (for 3D)
+- Support for 3D pieces and boards
 - Full mobile support (touchstart, touchmove, touchend)
 - Move pieces by click
 - Move pieces by drag'n drop
@@ -68,6 +68,7 @@ All options are, well, optional.
   check: null,            // square currently in check "a2" | null
   lastMove: null,         // squares part of the last move ["c3", "c4"] | null
   selected: null,         // square currently selected "a1" | null
+  viewOnly: false,        // don't bind events: the user will never be able to move pieces around
   highlight: {
     lastMove: true,       // add last-move class to squares
     check: true,          // add check class to squares
@@ -119,7 +120,7 @@ There are a few functions you can call on a Chessground instance:
 ### Setters
 
 ```js
-// reconfigure the instance. Accepts all options mentioned above.
+// reconfigure the instance. Accepts all options mentioned above (bar "viewOnly").
 // board will be animated accordingly, if animations are enabled.
 ground.set(options);
 

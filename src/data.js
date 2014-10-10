@@ -13,6 +13,7 @@ module.exports = function(cfg) {
     renderRAF: null, // function that rerenders the board using requestAnimationFrame
     element: null, // DOM element of the board, required for drag piece centering
     bounds: null, // function that calculates the board bounds
+    viewOnly: false, // don't bind events: the user will never be able to move pieces around
     highlight: {
       lastMove: true, // add last-move class to squares
       check: true, // add check class to squares
