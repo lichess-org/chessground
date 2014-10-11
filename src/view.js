@@ -60,8 +60,10 @@ function renderSquare(ctrl, pos, asWhite) {
       bottom: (asWhite ? pos[1] - 1 : 8 - pos[1]) * 12.5 + '%'
     }
   };
-  if (pos[1] === (asWhite ? 1 : 8)) attrs['data-coord-x'] = file;
-  if (pos[0] === (asWhite ? 8 : 1)) attrs['data-coord-y'] = rank;
+  if (ctrl.data.coordinates) {
+    if (pos[1] === (asWhite ? 1 : 8)) attrs['data-coord-x'] = file;
+    if (pos[0] === (asWhite ? 8 : 1)) attrs['data-coord-y'] = rank;
+  }
   var children = [];
   if (piece) {
     children.push(renderPiece(ctrl, key, piece));

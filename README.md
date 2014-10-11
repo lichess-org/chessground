@@ -68,6 +68,7 @@ All options are, well, optional.
   check: null,            // square currently in check "a2" | null
   lastMove: null,         // squares part of the last move ["c3", "c4"] | null
   selected: null,         // square currently selected "a1" | null
+  coordinates: true,      // display board coordinates as square ::after elements
   viewOnly: false,        // don't bind events: the user will never be able to move pieces around
   highlight: {
     lastMove: true,       // add last-move class to squares
