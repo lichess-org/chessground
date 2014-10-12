@@ -57,11 +57,6 @@ function pp(x) {
   return x;
 }
 
-function isTouchDevice() {
-  return 'ontouchstart' in window || // works on most browsers
-    'onmsgesturechange' in window; // works on ie10
-}
-
 // this must be cached because of the access to document.body.style
 var cachedTransformProp;
 
@@ -110,7 +105,6 @@ module.exports = {
   contains2: contains2,
   containsX: containsX,
   distance: distance,
-  isTouchDevice: isTouchDevice,
   eventPosition: eventPosition,
   partialApply: partialApply,
   partial: partial,

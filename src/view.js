@@ -128,6 +128,35 @@ function renderContent(ctrl) {
   return children;
 }
 
+function bindEvents(ctrl, el, context) {
+  var onstart = util.partial(drag.start, ctrl.data);
+  var onmove = util.partial(drag.move, ctrl.data);
+  var onend = util.partial(drag.end, ctrl.data);
+  var startEvents = ['touchstart', 'mousedown'];
+  var moveEvents = ['touchmove', 'mousemove'];
+  var endEvents = ['touchend', 'mouseup'];
+  startEvents.forEach(function(ev) {
+    el.addEventListener(ev, onstart);
+  });
+  moveEvents.forEach(function(ev) {
+    document.addEventListener(ev, onmove);
+  });
+  endEvents.forEach(function(ev) {
+    document.addEventListener(ev, onend);
+  });
+  context.onunload = function() {
+    startEvents.forEach(function(ev) {
+      el.removeEventListener(ev, onstart);
+    });
+    moveEvents.forEach(function(ev) {
+      document.removeEventListener(ev, onmove);
+    });
+    endEvents.forEach(function(ev) {
+      document.removeEventListener(ev, onend);
+    });
+  };
+}
+
 function renderBoard(ctrl) {
   return {
     tag: 'div',
@@ -135,20 +164,7 @@ function renderBoard(ctrl) {
       class: 'cg-board orientation-' + ctrl.data.orientation,
       config: function(el, isUpdate, context) {
         if (isUpdate) return;
-        if (!ctrl.data.viewOnly) {
-          var isTouch = util.isTouchDevice();
-          var onstart = util.partial(drag.start, ctrl.data);
-          var onmove = util.partial(drag.move, ctrl.data);
-          var onend = util.partial(drag.end, ctrl.data);
-          el.addEventListener(isTouch ? 'touchstart' : 'mousedown', onstart);
-          document.addEventListener(isTouch ? 'touchmove' : 'mousemove', onmove);
-          document.addEventListener(isTouch ? 'touchend' : 'mouseup', onend);
-          context.onunload = function() {
-            el.removeEventListener(isTouch ? 'touchstart' : 'mousedown', onstart);
-            document.removeEventListener(isTouch ? 'touchmove' : 'mousemove', onmove);
-            document.removeEventListener(isTouch ? 'touchend' : 'mouseup', onend);
-          };
-        }
+        if (!ctrl.data.viewOnly) bindEvents(ctrl, el, context);
         // this function only repaints the board itself.
         // it's called when dragging or animating pieces,
         // to prevent the full application embedding chessground
