@@ -51,7 +51,7 @@ module.exports = function(cfg) {
       dropped: [], // last dropped [orig, dest], not to be animated
       showDests: true, // whether to add the move-dest class on squares
       events: {
-        after: function(orig, dest, isPremove) {} // called after the move has been played
+        after: function(orig, dest, metadata) {} // called after the move has been played
       }
     },
     premovable: {

@@ -1,5 +1,6 @@
 var board = require('./board');
 var util = require('./util');
+var hold = require('./hold');
 var m = require('mithril');
 
 var originTarget;
@@ -29,6 +30,7 @@ function start(data, e) {
       bounds: bounds,
       started: false
     };
+    hold.start();
   }
   processDrag(data);
 }

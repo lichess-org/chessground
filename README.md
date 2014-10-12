@@ -87,7 +87,7 @@ All options are, well, optional.
     showDests: true,      // add the move-dest class to squares
     events: {
                           // called after the move has been played
-      after: function(orig, dest, isPremove) {}
+      after: function(orig, dest, metadata) {}
     }
   },
   premovable: {

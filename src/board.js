@@ -2,6 +2,7 @@ var forIn = require('lodash-node/modern/objects/forIn');
 var util = require('./util');
 var premove = require('./premove');
 var anim = require('./anim');
+var hold = require('./hold');
 
 function callUserFunction(f) {
   setTimeout(f, 20);
@@ -74,7 +75,10 @@ function userMove(data, orig, dest) {
   } else if (canMove(data, orig, dest)) {
     if (baseMove(data, orig, dest)) {
       setSelected(data, null);
-      callUserFunction(util.partial(data.movable.events.after, orig, dest, false));
+      callUserFunction(util.partial(data.movable.events.after, orig, dest, {
+        premove: false,
+        holdTime: hold.stop()
+      }));
     }
   } else if (canPremove(data, orig, dest)) {
     setPremove(data, orig, dest);
@@ -149,7 +153,9 @@ function playPremove(data) {
       dest = move[1];
     if (canMove(data, orig, dest)) {
       if (baseMove(data, orig, dest)) {
-        callUserFunction(util.partial(data.movable.events.after, orig, dest, true));
+        callUserFunction(util.partial(data.movable.events.after, orig, dest, {
+          premove: true
+        }));
       }
     }
     unsetPremove(data);
