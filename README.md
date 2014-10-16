@@ -109,7 +109,8 @@ All options are, well, optional.
     showGhost: true,      // show ghost of piece being dragged
   },
   events: {
-    change: function() {} // called after the situation changes on the board
+    change: function() {},   // called after the situation changes on the board
+    select: function(key) {} // called when a square is selected
   }
 }
 ```

@@ -5,7 +5,7 @@ var anim = require('./anim');
 var hold = require('./hold');
 
 function callUserFunction(f) {
-  setTimeout(f, 20);
+  setTimeout(f, 1);
 }
 
 function toggleOrientation(data) {
@@ -105,6 +105,7 @@ function setSelected(data, key) {
     data.premovable.dests = premove(data.pieces, key);
   else
     data.premovable.dests = null;
+  callUserFunction(data.selected);
 }
 
 function isMovable(data, orig) {
