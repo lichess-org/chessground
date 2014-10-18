@@ -1,21 +1,16 @@
-# ChessGround - multipurpose chess UI.
+<img src="https://raw.githubusercontent.com/ornicar/chessground/master/screenshot/3d.png" width=512 height=512 alt="Chessground in 3D mode" />
 
-Chessground targets all modern browsers, as well as mobile development using Cordova.
+**Chessground** is the opensource chess UI developed for [lichess.org](http://lichess.org).
 
-See it in action on [lichess.org board editor](http://lichess.org/editor)
-and [lichess.org puzzle solver](http://lichess.org/training).
+It targets modern browsers, as well as mobile development using Cordova.
 
-Note that Chessground is only the UI, and has no knowledge of the rules of chess.
-You have to feed it with the correct moves using backend or frontend chess logic.
+### Demos
 
-### Demo
-
-[http://lichess.org/training](http://lichess.org/training)
-
-### Dependencies
-
-- [mithril.js](https://github.com/lhorie/mithril.js) - a minimalist virtual DOM library
-- [lodash-node](https://github.com/lodash/lodash-node) - just a handful of selected functions, not the whole thing
+- [Chess TV](http://lichess.org/tv)
+- [Board editor](http://lichess.org/editor)
+- [Puzzle solver](http://lichess.org/training)
+- [Game preview](http://lichess.org/games)
+- [Chess Captcha](http://lichess.org/signup)
 
 ## Features
 
@@ -42,6 +37,11 @@ Chessground is designed to fulfill all lichess.org web and mobile apps needs, so
 - Import and export positions in FEN notation
 - User callbacks
 - No chess logic inside: can be used for chess variations
+
+### Dependencies
+
+- [mithril.js](https://github.com/lhorie/mithril.js) - a minimalist virtual DOM library
+- [lodash-node](https://github.com/lodash/lodash-node) - just a handful of selected functions, not the whole thing
 
 ## Installation
 
