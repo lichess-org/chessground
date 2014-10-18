@@ -1,7 +1,7 @@
 var m = require('mithril');
 var board = require('./board');
 
-module.exports = function(element, controller, view) {
+module.exports = function(controller) {
 
   return {
     set: controller.set,

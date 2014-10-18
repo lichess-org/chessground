@@ -1,3 +1,4 @@
+var m = require('mithril');
 var ctrl = require('./ctrl');
 var view = require('./view');
 var api = require('./api');
@@ -7,14 +8,9 @@ function init(element, config) {
 
   var controller = new ctrl(config);
 
-  m.module(element, {
-    controller: function() {
-      return controller;
-    },
-    view: view
-  });
+  m.render(element, view(controller));
 
-  return api(element, controller, view);
+  return api(controller);
 }
 
 module.exports = init;
