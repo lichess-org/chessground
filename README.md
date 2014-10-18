@@ -167,3 +167,15 @@ var diff = ground.getMaterialDiff();
 // rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR
 var fen = ground.getFen();
 ```
+
+## Developers
+
+### Build
+
+```
+npm install
+gulp
+```
+
+Then open `examples/index.html` in your browser.
+The examples are non exhaustive, but feel free to try things out by editing `index.html`.
