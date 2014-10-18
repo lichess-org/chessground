@@ -188,7 +188,7 @@ module.exports = function(ctrl) {
   return {
     tag: 'div',
     attrs: {
-      class: 'cg-board-wrap' + (ctrl.data.viewOnly ? ' view-only' : '')
+      class: 'cg-board-wrap' + (ctrl.data.viewOnly ? ' view-only' : 'manipulable')
     },
     children: renderBoard(ctrl)
   };
