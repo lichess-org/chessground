@@ -50,6 +50,7 @@ function unsetPremove(data) {
 function baseMove(data, orig, dest) {
   var success = anim(function() {
     if (orig === dest || !data.pieces[orig]) return false;
+    if (data.pieces[dest]) callUserFunction(util.partial(data.events.capture, dest, data.pieces[dest]));
     data.pieces[dest] = data.pieces[orig];
     delete data.pieces[orig];
     data.lastMove = [orig, dest];

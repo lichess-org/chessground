@@ -110,6 +110,8 @@ All options are, well, optional.
   },
   events: {
     change: function() {},   // called after the situation changes on the board
+                             // called when a piece has been captured
+    capture: function(key, piece) {},
     select: function(key) {} // called when a square is selected
   }
 }

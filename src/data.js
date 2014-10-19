@@ -83,6 +83,7 @@ module.exports = function(cfg) {
     },
     events: {
       change: function() {}, // called after the situation changes on the board
+      capture: function(key, piece) {}, // called when a piece has been captured
       select: function(key) {} // called when a square is selected
     }
   };
