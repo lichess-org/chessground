@@ -20,6 +20,7 @@ module.exports = function(data, config) {
   // if a fen was provided, replace the pieces
   if (data.fen) {
     data.pieces = fen.read(data.fen);
+    data.check = config.check;
     delete data.fen;
   }
 
