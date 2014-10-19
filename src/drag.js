@@ -14,6 +14,7 @@ function start(data, e) {
   var position = util.eventPosition(e);
   var bounds = data.bounds();
   var orig = board.getKeyAtDomPos(data, position, bounds);
+  var hadPremove = !!data.premovable.current;
   board.selectSquare(data, orig);
   var stillSelected = data.selected === orig;
   if (data.pieces[orig] && stillSelected && board.isDraggable(data, orig)) {
@@ -31,7 +32,7 @@ function start(data, e) {
       started: false
     };
     hold.start();
-  }
+  } else if (hadPremove) board.unsetPremove(data);
   processDrag(data);
 }
 
@@ -72,6 +73,7 @@ function end(data, e) {
   // comparing with the origin target is an easy way to test that the end event
   // has the same touch origin
   if (e.type === "touchend" && originTarget !== e.target) return;
+  board.unsetPremove(data);
   if (draggable.current.started) {
     dest = draggable.current.over;
     if (orig !== dest) data.movable.dropped = [orig, dest];
