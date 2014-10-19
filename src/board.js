@@ -89,14 +89,12 @@ function userMove(data, orig, dest) {
 }
 
 function selectSquare(data, key) {
+  unsetPremove(data);
   if (data.selected) {
     if (key) {
       if (data.selected !== key) userMove(data, data.selected, key);
     } else setSelected(data, null);
-  } else {
-    if (isMovable(data, key) || isPremovable(data, key)) setSelected(data, key);
-    else unsetPremove(data);
-  }
+  } else if (isMovable(data, key) || isPremovable(data, key)) setSelected(data, key);
   if (key) callUserFunction(util.partial(data.events.select, key));
 }
 
