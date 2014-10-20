@@ -31,6 +31,6 @@ module.exports = function(cfg) {
 
   this.stop = anim(function(data) {
     board.stop(data);
-    drag.end(data);
+    drag.cancel(data);
   }.bind(this), this.data, true);
 };

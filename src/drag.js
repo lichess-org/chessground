@@ -5,6 +5,10 @@ var m = require('mithril');
 
 var originTarget;
 
+function hashPiece(piece) {
+  return piece ? piece.color + ' ' + piece.role : '';
+}
+
 function start(data, e) {
   if (e.button !== undefined && e.button !== 0) return; // only touch or left click
   if (e.touches && e.touches.length > 1) return; // support one finger touch only
@@ -21,6 +25,7 @@ function start(data, e) {
     var pieceBounds = data.element.querySelector('.' + orig).getBoundingClientRect();
     data.draggable.current = {
       orig: orig,
+      piece: hashPiece(data.pieces[orig]),
       rel: position,
       epos: position,
       pos: [0, 0],
@@ -44,14 +49,18 @@ function processDrag(data) {
       if (data.animation.current.start &&
         Object.keys(data.animation.current.anims).indexOf(cur.orig) !== -1)
         data.animation.current = {};
-      if (!cur.started && util.distance(cur.epos, cur.rel) >= data.draggable.distance)
-        cur.started = true;
-      if (cur.started) {
-        cur.pos = [
-          cur.epos[0] - cur.rel[0],
-          cur.epos[1] - cur.rel[1]
-        ];
-        cur.over = board.getKeyAtDomPos(data, cur.epos, cur.bounds);
+      // if moving piece is gone, cancel
+      if (hashPiece(data.pieces[cur.orig]) != cur.piece) cancel(data);
+      else {
+        if (!cur.started && util.distance(cur.epos, cur.rel) >= data.draggable.distance)
+          cur.started = true;
+        if (cur.started) {
+          cur.pos = [
+            cur.epos[0] - cur.rel[0],
+            cur.epos[1] - cur.rel[1]
+          ];
+          cur.over = board.getKeyAtDomPos(data, cur.epos, cur.bounds);
+        }
       }
     }
     data.render();
@@ -82,9 +91,17 @@ function end(data, e) {
   draggable.current = {};
 }
 
+function cancel(data) {
+  if (data.draggable.current.orig) {
+    data.draggable.current = {};
+    board.selectSquare(data, null);
+  }
+}
+
 module.exports = {
   start: start,
   move: move,
   end: end,
+  cancel: cancel,
   processDrag: processDrag
 };
