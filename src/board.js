@@ -63,10 +63,12 @@ function baseMove(data, orig, dest) {
 }
 
 function baseUserMove(data, orig, dest) {
-  if (baseMove(data, orig, dest)) {
+  var result = baseMove(data, orig, dest);
+  if (result) {
     data.movable.dests = {};
     data.turnColor = util.opposite(data.turnColor);
   }
+  return result;
 }
 
 function apiMove(data, orig, dest) {
