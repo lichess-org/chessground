@@ -47,7 +47,7 @@ function unsetPremove(data) {
   }
 }
 
-function baseMove(data, orig, dest, skipAnimation) {
+function baseMove(data, orig, dest) {
   var success = anim(function() {
     if (orig === dest || !data.pieces[orig]) return false;
     if (data.pieces[dest]) callUserFunction(util.partial(data.events.capture, dest, data.pieces[dest]));
@@ -57,7 +57,7 @@ function baseMove(data, orig, dest, skipAnimation) {
     data.check = null;
     callUserFunction(data.events.change);
     return true;
-  }, data, skipAnimation)();
+  }, data)();
   if (success) data.movable.dropped = [];
   return success;
 }
@@ -152,7 +152,7 @@ function playPremove(data) {
   var orig = move[0],
     dest = move[1];
   if (canMove(data, orig, dest)) {
-    if (baseMove(data, orig, dest, true)) {
+    if (baseMove(data, orig, dest)) {
       data.movable.dests = {};
       callUserFunction(util.partial(data.movable.events.after, orig, dest, {
         premove: true
