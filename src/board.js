@@ -15,6 +15,7 @@ function toggleOrientation(data) {
 function reset(data) {
   data.lastMove = null;
   setSelected(data, null);
+  unsetPremove(data);
 }
 
 function setPieces(data, pieces) {
