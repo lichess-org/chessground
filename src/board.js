@@ -62,6 +62,13 @@ function baseMove(data, orig, dest) {
   return success;
 }
 
+function baseUserMove(data, orig, dest) {
+  if (baseMove(data, orig, dest)) {
+    data.movable.dests = {};
+    data.turnColor = util.opposite(data.turnColor);
+  }
+}
+
 function apiMove(data, orig, dest) {
   return baseMove(data, orig, dest);
 }
@@ -74,8 +81,7 @@ function userMove(data, orig, dest) {
       callUserFunction(data.events.change);
     }
   } else if (canMove(data, orig, dest)) {
-    if (baseMove(data, orig, dest)) {
-      data.movable.dests = {};
+    if (baseUserMove(data, orig, dest)) {
       setSelected(data, null);
       callUserFunction(util.partial(data.movable.events.after, orig, dest, {
         premove: false,
@@ -152,8 +158,7 @@ function playPremove(data) {
   var orig = move[0],
     dest = move[1];
   if (canMove(data, orig, dest)) {
-    if (baseMove(data, orig, dest)) {
-      data.movable.dests = {};
+    if (baseUserMove(data, orig, dest)) {
       callUserFunction(util.partial(data.movable.events.after, orig, dest, {
         premove: true
       }));
