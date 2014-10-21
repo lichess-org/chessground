@@ -173,6 +173,7 @@ function playPremove(data) {
 function stop(data) {
   data.movable.color = null;
   data.movable.dests = {};
+  unsetPremove(data);
   selectSquare(data, null);
 }
 
