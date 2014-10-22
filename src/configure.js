@@ -4,6 +4,8 @@ var fen = require('./fen');
 
 module.exports = function(data, config) {
 
+  if (!config) return;
+
   // don't merge destinations...
   var dests;
   if (config.movable) {

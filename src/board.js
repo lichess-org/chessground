@@ -29,10 +29,7 @@ function setPieces(data, pieces) {
 function setCheck(data, color) {
   var checkColor = color || data.turnColor;
   forIn(data.pieces, function(piece, key) {
-    if (piece.color === checkColor && piece.role === 'king') {
-      data.check = key;
-      return;
-    }
+    if (piece.color === checkColor && piece.role === 'king') data.check = key;
   });
 }
 
