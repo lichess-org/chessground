@@ -24,6 +24,8 @@ module.exports = function(data, config) {
     delete data.fen;
   }
 
+  if (data.check === true) board.setCheck(data);
+
   // forget about the last dropped piece
   data.movable.dropped = [];
 
