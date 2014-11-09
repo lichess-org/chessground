@@ -1,4 +1,3 @@
-var forIn = require('lodash-node/modern/objects/forIn');
 var util = require('./util');
 var premove = require('./premove');
 var anim = require('./anim');
@@ -19,8 +18,8 @@ function reset(data) {
 }
 
 function setPieces(data, pieces) {
-  forIn(pieces, function(piece, key) {
-    if (piece) data.pieces[key] = piece;
+  Object.keys(pieces).forEach(function(key) {
+    if (pieces[key]) data.pieces[key] = pieces[key];
     else delete data.pieces[key];
   });
   data.movable.dropped = [];
@@ -28,8 +27,8 @@ function setPieces(data, pieces) {
 
 function setCheck(data, color) {
   var checkColor = color || data.turnColor;
-  forIn(data.pieces, function(piece, key) {
-    if (piece.color === checkColor && piece.role === 'king') data.check = key;
+  Object.keys(data.pieces).forEach(function(key) {
+    if (data.pieces[key].color === checkColor && data.pieces[key].role === 'king') data.check = key;
   });
 }
 
