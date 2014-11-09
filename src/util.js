@@ -85,6 +85,7 @@ function partial() {
 module.exports = {
   files: files,
   ranks: ranks,
+  invRanks: invRanks,
   allPos: allPos,
   invPos: invPos,
   allKeys: allKeys,
