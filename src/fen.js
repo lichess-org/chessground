@@ -1,4 +1,3 @@
-var range = require('lodash-node/modern/arrays/range')
 var util = require('./util');
 
 var initial = 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR'
@@ -43,12 +42,12 @@ function read(fen) {
 }
 
 function write(pieces) {
-  return range(8, 1, -1).reduce(
+  return [8, 7, 6, 5, 4, 3, 2].reduce(
     function(str, nb) {
       return str.replace(new RegExp(Array(nb + 1).join('1'), 'g'), nb);
     },
-    range(8, 0, -1).map(function(y) {
-      return range(1, 9).map(function(x) {
+    util.invRanks.map(function(y) {
+      return util.ranks.map(function(x) {
         var piece = pieces[util.pos2key([x, y])];
         if (piece) {
           var letter = letters[piece.role];
