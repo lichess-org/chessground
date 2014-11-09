@@ -1,4 +1,4 @@
-var merge = require('lodash-node/modern/objects/merge')
+var merge = require('merge')
 var board = require('./board');
 var fen = require('./fen');
 
@@ -13,7 +13,7 @@ module.exports = function(data, config) {
     delete config.movable.dests;
   }
 
-  merge(data, config);
+  merge.recursive(data, config);
 
   // ...but use the new ones instead
   if (dests !== undefined)

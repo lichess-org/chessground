@@ -50,11 +50,6 @@ function distance(pos1, pos2) {
   return Math.sqrt(Math.pow(pos1[0] - pos2[0], 2) + Math.pow(pos1[1] - pos2[1], 2));
 }
 
-function pp(x) {
-  console.log(x);
-  return x;
-}
-
 // this must be cached because of the access to document.body.style
 var cachedTransformProp;
 
@@ -83,7 +78,6 @@ function partialApply(fn, args) {
   return fn.bind.apply(fn, [null].concat(args));
 }
 
-// because lodash partial function seems exceedingly complicated
 function partial() {
   return partialApply(arguments[0], Array.prototype.slice.call(arguments, 1));
 }
@@ -106,6 +100,5 @@ module.exports = {
   eventPosition: eventPosition,
   partialApply: partialApply,
   partial: partial,
-  transformProp: transformProp,
-  pp: pp
+  transformProp: transformProp
 };
