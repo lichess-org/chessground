@@ -135,6 +135,7 @@ function animate(transformation, data) {
     };
   }
   var result = transformation();
+  if (!data.render) return result;
   var plan = computePlan(prev, data);
   if (Object.keys(plan.anims).length > 0 || plan.fadings.length > 0) {
     var alreadyRunning = data.animation.current.start;
