@@ -9,6 +9,7 @@ It targets modern browsers, as well as mobile development using Cordova.
 - [Chess TV](http://lichess.org/tv)
 - [Board editor](http://lichess.org/editor)
 - [Puzzle solver](http://lichess.org/training)
+- [Analysis board](http://lichess.org/ofWXRFGy)
 - [Game preview](http://lichess.org/games)
 - [Chess Captcha](http://lichess.org/signup)
 
