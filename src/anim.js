@@ -135,7 +135,6 @@ function animate(transformation, data) {
     };
   }
   var result = transformation();
-  if (!data.render) return result;
   var plan = computePlan(prev, data);
   if (Object.keys(plan.anims).length > 0 || plan.fadings.length > 0) {
     var alreadyRunning = data.animation.current.start;
@@ -159,7 +158,8 @@ function animate(transformation, data) {
 module.exports = function(transformation, data, skip) {
   return function() {
     var transformationArgs = [data].concat(Array.prototype.slice.call(arguments, 0));
-    if (data.animation.enabled && !skip && data.render)
+    if (!data.render) return transformation.apply(null, transformationArgs);
+    else if (data.animation.enabled && !skip)
       return animate(util.partialApply(transformation, transformationArgs), data);
     else {
       var result = transformation.apply(null, transformationArgs);
