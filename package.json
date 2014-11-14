@@ -8,7 +8,7 @@
   },
   "dependencies": {
     "merge": "^1.2.0",
-    "mithril": "^0.1.22"
+    "mithril": "0.1.22"
   },
   "devDependencies": {
     "browserify": "~5.11.2",
