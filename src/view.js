@@ -105,12 +105,12 @@ function renderFading(cfg) {
         opacity: cfg.opacity
       }
     },
-    children: {
+    children: [{
       tag: 'div',
       attrs: {
         class: pieceClass(cfg.piece)
       }
-    }
+    }]
   };
 }
 
@@ -180,7 +180,7 @@ function renderBoard(ctrl) {
         ctrl.data.render();
       }
     },
-    children: null
+    children: []
   };
 }
 
@@ -190,6 +190,6 @@ module.exports = function(ctrl) {
     attrs: {
       class: 'cg-board-wrap ' + (ctrl.data.viewOnly ? 'view-only' : 'manipulable')
     },
-    children: renderBoard(ctrl)
+    children: [renderBoard(ctrl)]
   };
 };
