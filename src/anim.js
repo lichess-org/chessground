@@ -3,18 +3,9 @@ var util = require('./util');
 
 // https://gist.github.com/gre/1650294
 var easing = {
-  easeInOutQuad: function(t) {
-    return t < 0.5 ? 2 * t * t : -1 + (4 - 2 * t) * t;
-  },
   easeInOutCubic: function(t) {
     return t < 0.5 ? 4 * t * t * t : (t - 1) * (2 * t - 2) * (2 * t - 2) + 1;
   },
-  easeOutQuad: function(t) {
-    return t * (2 - t);
-  },
-  easeOutCubic: function(t) {
-    return (--t) * t * t + 1;
-  }
 };
 
 function makePiece(k, piece, invert) {
@@ -99,6 +90,10 @@ function computePlan(prev, current) {
   };
 }
 
+function roundBy(n, by) {
+  return Math.round(n * by) / by;
+}
+
 function go(data) {
   if (!data.animation.current.start) return; // animation was canceled
   var rest = 1 - (new Date().getTime() - data.animation.current.start) / data.animation.current.duration;
@@ -109,10 +104,10 @@ function go(data) {
     var ease = easing.easeInOutCubic(rest);
     for (var key in data.animation.current.anims) {
       var cfg = data.animation.current.anims[key];
-      cfg[1] = [cfg[0][0] * ease, cfg[0][1] * ease];
+      cfg[1] = [roundBy(cfg[0][0] * ease, 10), roundBy(cfg[0][1] * ease, 10)];
     }
     for (var i in data.animation.current.fadings) {
-      data.animation.current.fadings[i].opacity = easing.easeOutQuad(rest);
+      data.animation.current.fadings[i].opacity = roundBy(ease, 100)
     }
     data.render();
     requestAnimationFrame(function() {
