@@ -6,18 +6,10 @@ module.exports = function(data, config) {
 
   if (!config) return;
 
-  // don't merge destinations...
-  var dests;
-  if (config.movable) {
-    dests = config.movable.dests;
-    delete config.movable.dests;
-  }
+  // don't merge destinations. Just override.
+  if (config.movable && config.movable.dests) delete data.movable.dests;
 
   merge.recursive(data, config);
-
-  // ...but use the new ones instead
-  if (dests !== undefined)
-    data.movable.dests = dests;
 
   // if a fen was provided, replace the pieces
   if (data.fen) {
