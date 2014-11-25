@@ -78,8 +78,10 @@ function renderSquare(ctrl, pos, asWhite) {
   };
 }
 
-function renderSquareTarget(cur) {
-  var pos = util.key2pos(cur.over);
+function renderSquareTarget(ctrl, cur) {
+  var pos = util.key2pos(cur.over),
+  x = ctrl.data.orientation === 'white' ? pos[0] : 9 - pos[0],
+  y = ctrl.data.orientation === 'white' ? pos[1] : 9 - pos[1];
   return {
     tag: 'div',
     attrs: {
@@ -87,8 +89,8 @@ function renderSquareTarget(cur) {
       style: {
         width: cur.bounds.width / 4 + 'px',
         height: cur.bounds.height / 4 + 'px',
-        left: (pos[0] - 1.5) * cur.bounds.width / 8 + 'px',
-        top: (7.5 - pos[1]) * cur.bounds.height / 8 + 'px'
+        left: (x - 1.5) * cur.bounds.width / 8 + 'px',
+        top: (7.5 - y) * cur.bounds.height / 8 + 'px'
       }
     }
   };
@@ -120,7 +122,7 @@ function renderContent(ctrl) {
     return renderSquare(ctrl, pos, asWhite);
   });
   if (ctrl.data.draggable.current.over && ctrl.data.draggable.squareTarget)
-    children.push(renderSquareTarget(ctrl.data.draggable.current));
+    children.push(renderSquareTarget(ctrl, ctrl.data.draggable.current));
   if (ctrl.data.animation.current.fadings)
     ctrl.data.animation.current.fadings.forEach(function(p) {
       children.push(renderFading(p));
