@@ -24,6 +24,7 @@ module.exports = function(controller) {
     setCheck: controller.setCheck,
     playPremove: controller.playPremove,
     cancelPremove: controller.cancelPremove,
+    cancelMove: controller.cancelMove,
     stop: controller.stop
   };
 };

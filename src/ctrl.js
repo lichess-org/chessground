@@ -29,6 +29,8 @@ module.exports = function(cfg) {
 
   this.setCheck = anim(board.setCheck, this.data, true);
 
+  this.cancelMove = anim(board.cancelMove, this.data, true);
+
   this.stop = anim(function(data) {
     board.stop(data);
     drag.cancel(data);

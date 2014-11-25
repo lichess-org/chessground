@@ -166,11 +166,15 @@ function playPremove(data) {
   unsetPremove(data);
 }
 
+function cancelMove(data) {
+  unsetPremove(data);
+  selectSquare(data, null);
+}
+
 function stop(data) {
   data.movable.color = null;
   data.movable.dests = {};
-  unsetPremove(data);
-  selectSquare(data, null);
+  cancelMove(data);
 }
 
 function getKeyAtDomPos(data, pos, bounds) {
@@ -222,6 +226,7 @@ module.exports = {
   apiMove: apiMove,
   playPremove: playPremove,
   unsetPremove: unsetPremove,
+  cancelMove: cancelMove,
   stop: stop,
   getKeyAtDomPos: getKeyAtDomPos,
   getMaterialDiff: getMaterialDiff

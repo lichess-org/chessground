@@ -148,6 +148,9 @@ ground.playPremove();
 // cancel the current premove, if any
 ground.cancelPremove();
 
+// cancel the current move being made
+ground.cancelMove();
+
 // cancels current move and prevent further ones
 ground.stop();
 ```
