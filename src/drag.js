@@ -15,6 +15,7 @@ function start(data, e) {
   e.stopPropagation();
   e.preventDefault();
   originTarget = e.target;
+  var previouslySelected = data.selected;
   var position = util.eventPosition(e);
   var bounds = data.bounds();
   var orig = board.getKeyAtDomPos(data, position, bounds);
@@ -24,6 +25,7 @@ function start(data, e) {
   if (data.pieces[orig] && stillSelected && board.isDraggable(data, orig)) {
     var pieceBounds = data.element.querySelector('.' + orig).getBoundingClientRect();
     data.draggable.current = {
+      previouslySelected: previouslySelected,
       orig: orig,
       piece: hashPiece(data.pieces[orig]),
       rel: position,
@@ -87,7 +89,7 @@ function end(data, e) {
     dest = draggable.current.over;
     if (orig !== dest) data.movable.dropped = [orig, dest];
     board.userMove(data, orig, dest);
-  }
+  } else if (draggable.current.previouslySelected === orig) board.setSelected(data, null);
   draggable.current = {};
 }
 
