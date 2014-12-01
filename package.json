@@ -1,13 +1,13 @@
 {
   "name": "chessground",
-  "version": "1.7.25",
+  "version": "1.7.26",
   "description": "lichess.org Chess UI",
   "main": "src/main.js",
   "directories": {
     "example": "examples"
   },
   "dependencies": {
-    "merge": "^1.2.0",
+    "merge": "1.2.0",
     "mithril": "0.1.25"
   },
   "devDependencies": {
