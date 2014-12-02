@@ -15,7 +15,7 @@ var onError = function(error) {
 var standalone = 'Chessground';
 
 gulp.task('lint', function() {
-  return gulp.src(paths.scripts)
+  return gulp.src('./src/main.js')
     .pipe(jshint())
     .pipe(jshint.reporter('default'));
 });
