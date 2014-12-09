@@ -70,6 +70,7 @@ All options are, well, optional.
   selected: null,         // square currently selected "a1" | null
   coordinates: true,      // display board coordinates as square ::after elements
   viewOnly: false,        // don't bind events: the user will never be able to move pieces around
+  minimalDom: false,      // don't use square elements. Optimization to use only with viewOnly
   highlight: {
     lastMove: true,       // add last-move class to squares
     check: true,          // add check class to squares
@@ -124,7 +125,7 @@ There are a few functions you can call on a Chessground instance:
 ### Setters
 
 ```js
-// reconfigure the instance. Accepts all options mentioned above (bar "viewOnly").
+// reconfigure the instance. Accepts all options mentioned above (bar "viewOnly" & "minimalDom").
 // board will be animated accordingly, if animations are enabled.
 ground.set(options);
 

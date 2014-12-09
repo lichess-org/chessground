@@ -80,8 +80,8 @@ function renderSquare(ctrl, pos, asWhite) {
 
 function renderSquareTarget(ctrl, cur) {
   var pos = util.key2pos(cur.over),
-  x = ctrl.data.orientation === 'white' ? pos[0] : 9 - pos[0],
-  y = ctrl.data.orientation === 'white' ? pos[1] : 9 - pos[1];
+    x = ctrl.data.orientation === 'white' ? pos[0] : 9 - pos[0],
+    y = ctrl.data.orientation === 'white' ? pos[1] : 9 - pos[1];
   return {
     tag: 'div',
     attrs: {
@@ -116,8 +116,46 @@ function renderFading(cfg) {
   };
 }
 
+function renderMinimalDom(ctrl, asWhite) {
+  var children = [];
+  if (ctrl.data.lastMove) ctrl.data.lastMove.forEach(function(key) {
+    var pos = util.key2pos(key);
+    children.push({
+      tag: 'div',
+      attrs: {
+        class: 'cg-square last-move',
+        style: {
+          left: (asWhite ? pos[0] - 1 : 8 - pos[0]) * 12.5 + '%',
+          bottom: (asWhite ? pos[1] - 1 : 8 - pos[1]) * 12.5 + '%'
+        }
+      }
+    });
+  });
+  Object.keys(ctrl.data.pieces).forEach(function(key) {
+    var pos = util.key2pos(key);
+    var attrs = {
+      style: {
+        left: (asWhite ? pos[0] - 1 : 8 - pos[0]) * 12.5 + '%',
+        bottom: (asWhite ? pos[1] - 1 : 8 - pos[1]) * 12.5 + '%'
+      },
+      class: pieceClass(ctrl.data.pieces[key])
+    };
+    if (ctrl.data.animation.current.anims) {
+      var animation = ctrl.data.animation.current.anims[key];
+      if (animation) attrs.style[util.transformProp()] = util.translate(animation[1]);
+    }
+    children.push({
+      tag: 'div',
+      attrs: attrs
+    });
+  });
+
+  return children;
+}
+
 function renderContent(ctrl) {
   var asWhite = ctrl.data.orientation == 'white';
+  if (ctrl.data.minimalDom) return renderMinimalDom(ctrl, asWhite);
   var children = (asWhite ? util.allPos : util.invPos).map(function(pos) {
     return renderSquare(ctrl, pos, asWhite);
   });
@@ -190,7 +228,11 @@ module.exports = function(ctrl) {
   return {
     tag: 'div',
     attrs: {
-      class: 'cg-board-wrap ' + (ctrl.data.viewOnly ? 'view-only' : 'manipulable')
+      class: [
+        'cg-board-wrap',
+        ctrl.data.viewOnly ? 'view-only' : 'manipulable',
+        ctrl.data.minimalDom ? 'minimal-dom' : 'full-dom'
+      ].join(' ')
     },
     children: [renderBoard(ctrl)]
   };

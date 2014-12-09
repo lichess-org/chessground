@@ -80,3 +80,8 @@
 .cg-piece.ghost {
   opacity: 0.3;
 }
+.minimal-dom .cg-piece {
+  position: absolute;
+  width: 12.5%;
+  height: 12.5%;
+}

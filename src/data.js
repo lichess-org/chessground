@@ -15,6 +15,7 @@ module.exports = function(cfg) {
     element: null, // DOM element of the board, required for drag piece centering
     bounds: null, // function that calculates the board bounds
     viewOnly: false, // don't bind events: the user will never be able to move pieces around
+    minimalDom: false, // don't use square elements. Optimization to use only with viewOnly
     highlight: {
       lastMove: true, // add last-move class to squares
       check: true, // add check class to squares
