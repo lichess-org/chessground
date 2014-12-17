@@ -2,6 +2,7 @@ var util = require('./util');
 var board = require('./board');
 var drag = require('./drag');
 var util = require('./util');
+var m = require('mithril');
 
 function pieceClass(p) {
   return ['cg-piece', p.role, p.color].join(' ');
