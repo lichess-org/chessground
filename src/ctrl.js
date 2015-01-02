@@ -44,18 +44,13 @@ module.exports = function(cfg) {
   }.bind(this), this.data, true);
 
   this.explode = function(keys) {
+    if (!this.data.render) return;
+    this.data.animation.current = {};
+    this.vm.exploding = keys;
+    this.data.renderRAF();
     setTimeout(function() {
-      if (!this.data.render) return;
-      this.data.animation.current = {};
-      this.vm.exploding = keys;
-      keys.forEach(function(k) {
-        delete this.data.pieces[k];
-      }.bind(this));
+      this.vm.exploding = false;
       this.data.renderRAF();
-      setTimeout(function() {
-        this.vm.exploding = false;
-        this.data.renderRAF();
-      }.bind(this), 200);
-    }.bind(this), this.data.animation.duration / 2);
+    }.bind(this), 200);
   }.bind(this);
 };
