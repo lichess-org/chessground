@@ -38,4 +38,20 @@ module.exports = function(cfg) {
     board.stop(data);
     drag.cancel(data);
   }.bind(this), this.data, true);
+
+  this.explode = function(keys) {
+    setTimeout(function() {
+      if (!this.data.render) return;
+      this.data.animation.current = {};
+      this.vm.exploding = keys;
+      keys.forEach(function(k) {
+        delete this.data.pieces[k];
+      }.bind(this));
+      this.data.renderRAF();
+      setTimeout(function() {
+        this.vm.exploding = false;
+        this.data.renderRAF();
+      }.bind(this), 200);
+    }.bind(this), this.data.animation.duration / 2);
+  }.bind(this);
 };

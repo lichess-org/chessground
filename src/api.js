@@ -25,6 +25,7 @@ module.exports = function(controller) {
     playPremove: controller.playPremove,
     cancelPremove: controller.cancelPremove,
     cancelMove: controller.cancelMove,
-    stop: controller.stop
+    stop: controller.stop,
+    explode: controller.explode
   };
 };

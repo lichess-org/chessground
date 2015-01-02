@@ -54,7 +54,8 @@ function renderSquare(ctrl, pos, asWhite) {
       'premove-dest': (isDragOver || ctrl.data.premovable.showDests) && util.containsX(ctrl.data.premovable.dests, key),
       'current-premove': util.contains2(ctrl.data.premovable.current, key),
       'drag-over': isDragOver,
-      'occupied': !!piece
+      'occupied': !!piece,
+      'exploding': ctrl.vm.exploding && ctrl.vm.exploding.indexOf(key) !== -1
     }),
     style: {
       left: (asWhite ? pos[0] - 1 : 8 - pos[0]) * 12.5 + '%',
