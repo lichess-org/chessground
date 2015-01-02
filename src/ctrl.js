@@ -9,6 +9,10 @@ module.exports = function(cfg) {
 
   this.data = data(cfg);
 
+  this.vm = {
+    exploding: false
+  };
+
   this.getFen = function() {
     return fen.write(this.data.pieces);
   }.bind(this);
