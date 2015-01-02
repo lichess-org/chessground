@@ -45,7 +45,6 @@ module.exports = function(cfg) {
 
   this.explode = function(keys) {
     if (!this.data.render) return;
-    this.data.animation.current = {};
     this.vm.exploding = keys;
     this.data.renderRAF();
     setTimeout(function() {
