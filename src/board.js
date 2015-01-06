@@ -52,10 +52,10 @@ function tryAutoCastle(data, orig, dest) {
   if (origPos[1] !== 1 && origPos[1] !== 8) return;
   var destPos = util.key2pos(dest);
   var oldRookPos, newRookPos;
-  if (destPos[0] === 7) {
+  if (destPos[0] === 7 || destPos[0] === 8) {
     oldRookPos = util.pos2key([8, origPos[1]]);
     newRookPos = util.pos2key([6, origPos[1]]);
-  } else if (destPos[0] === 3) {
+  } else if (destPos[0] === 3 || destPos[0] === 1) {
     oldRookPos = util.pos2key([1, origPos[1]]);
     newRookPos = util.pos2key([4, origPos[1]]);
   } else return;
