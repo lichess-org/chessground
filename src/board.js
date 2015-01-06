@@ -46,21 +46,33 @@ function unsetPremove(data) {
 
 function tryAutoCastle(data, orig, dest) {
   if (!data.autoCastle) return;
-  if (data.pieces[dest].role !== 'king') return;
+  var king = data.pieces[dest];
+  if (king.role !== 'king') return;
   var origPos = util.key2pos(orig);
   if (origPos[0] !== 5) return;
   if (origPos[1] !== 1 && origPos[1] !== 8) return;
-  var destPos = util.key2pos(dest);
-  var oldRookPos, newRookPos;
+  var destPos = util.key2pos(dest),
+    oldRookPos, newRookPos, newKingPos;
   if (destPos[0] === 7 || destPos[0] === 8) {
     oldRookPos = util.pos2key([8, origPos[1]]);
     newRookPos = util.pos2key([6, origPos[1]]);
+    newKingPos = util.pos2key([7, origPos[1]]);
   } else if (destPos[0] === 3 || destPos[0] === 1) {
     oldRookPos = util.pos2key([1, origPos[1]]);
     newRookPos = util.pos2key([4, origPos[1]]);
+    newKingPos = util.pos2key([3, origPos[1]]);
   } else return;
-  data.pieces[newRookPos] = data.pieces[oldRookPos];
+  delete data.pieces[orig];
+  delete data.pieces[dest];
   delete data.pieces[oldRookPos];
+  data.pieces[newKingPos] = {
+    role: 'king',
+    color: king.color
+  };
+  data.pieces[newRookPos] = {
+    role: 'rook',
+    color: king.color
+  };
 }
 
 function baseMove(data, orig, dest) {
