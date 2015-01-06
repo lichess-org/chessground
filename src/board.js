@@ -44,6 +44,25 @@ function unsetPremove(data) {
   }
 }
 
+function tryAutoCastle(data, orig, dest) {
+  if (!data.autoCastle) return;
+  if (data.pieces[dest].role !== 'king') return;
+  var origPos = util.key2pos(orig);
+  if (origPos[0] !== 5) return;
+  if (origPos[1] !== 1 && origPos[1] !== 8) return;
+  var destPos = util.key2pos(dest);
+  var oldRookPos, newRookPos;
+  if (destPos[0] === 7) {
+    oldRookPos = util.pos2key([8, origPos[1]]);
+    newRookPos = util.pos2key([6, origPos[1]]);
+  } else if (destPos[0] === 3) {
+    oldRookPos = util.pos2key([1, origPos[1]]);
+    newRookPos = util.pos2key([4, origPos[1]]);
+  } else return;
+  data.pieces[newRookPos] = data.pieces[oldRookPos];
+  delete data.pieces[oldRookPos];
+}
+
 function baseMove(data, orig, dest) {
   var success = anim(function() {
     if (orig === dest || !data.pieces[orig]) return false;
@@ -52,6 +71,7 @@ function baseMove(data, orig, dest) {
     delete data.pieces[orig];
     data.lastMove = [orig, dest];
     data.check = null;
+    tryAutoCastle(data, orig, dest);
     callUserFunction(data.events.change);
     return true;
   }, data)();

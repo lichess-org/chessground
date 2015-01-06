@@ -14,6 +14,7 @@ module.exports = function(cfg) {
     renderRAF: null, // function that rerenders the board using requestAnimationFrame
     element: null, // DOM element of the board, required for drag piece centering
     bounds: null, // function that calculates the board bounds
+    autoCastle: false, // immediately complete the castle by moving the rook after king move
     viewOnly: false, // don't bind events: the user will never be able to move pieces around
     minimalDom: false, // don't use square elements. Optimization to use only with viewOnly
     highlight: {
