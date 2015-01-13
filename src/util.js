@@ -101,5 +101,6 @@ module.exports = {
   eventPosition: eventPosition,
   partialApply: partialApply,
   partial: partial,
-  transformProp: transformProp
+  transformProp: transformProp,
+  requestAnimationFrame: window.requestAnimationFrame || window.setTimeout
 };

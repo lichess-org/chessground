@@ -107,10 +107,10 @@ function go(data) {
       cfg[1] = [roundBy(cfg[0][0] * ease, 10), roundBy(cfg[0][1] * ease, 10)];
     }
     for (var i in data.animation.current.fadings) {
-      data.animation.current.fadings[i].opacity = roundBy(ease, 100)
+      data.animation.current.fadings[i].opacity = roundBy(ease, 100);
     }
     data.render();
-    requestAnimationFrame(function() {
+    util.requestAnimationFrame(function() {
       go(data);
     });
   }
