@@ -102,5 +102,5 @@ module.exports = {
   partialApply: partialApply,
   partial: partial,
   transformProp: transformProp,
-  requestAnimationFrame: window.requestAnimationFrame || window.setTimeout
+  requestAnimationFrame: (window.requestAnimationFrame || window.setTimeout).bind(window)
 };
