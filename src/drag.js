@@ -44,7 +44,7 @@ function start(data, e) {
 }
 
 function processDrag(data) {
-  requestAnimationFrame(function() {
+  util.requestAnimationFrame(function() {
     var cur = data.draggable.current;
     if (cur.orig) {
       // cancel animations while dragging
