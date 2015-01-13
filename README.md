@@ -18,7 +18,7 @@ It targets modern browsers, as well as mobile development using Cordova.
 Chessground is designed to fulfill all lichess.org web and mobile apps needs, so it is pretty featureful.
 
 - Fast. Uses virtual DOM; runs smoothly even on elder mobile phones
-- Small footprint: 12K gzipped (33K unzipped) including dependencies
+- Small footprint: 12K gzipped (35K unzipped) including dependencies
 - Standalone, or composable as a mithril.js module
 - Entirely configurable and reconfigurable at any time
 - Styling with CSS: board and pieces can be changed by simply switching a class
