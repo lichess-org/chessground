@@ -78,7 +78,8 @@ function tryAutoCastle(data, orig, dest) {
 function baseMove(data, orig, dest) {
   var success = anim(function() {
     if (orig === dest || !data.pieces[orig]) return false;
-    if (data.pieces[dest]) callUserFunction(util.partial(data.events.capture, dest, data.pieces[dest]));
+    if (data.pieces[dest] && data.pieces[dest].color !== data.pieces[orig].color)
+      callUserFunction(util.partial(data.events.capture, dest, data.pieces[dest]));
     data.pieces[dest] = data.pieces[orig];
     delete data.pieces[orig];
     data.lastMove = [orig, dest];
