@@ -237,7 +237,7 @@ function getMaterialDiff(data) {
   var diff = {
     white: {},
     black: {}
-  }
+  };
   for (var role in counts) {
     var c = counts[role];
     if (c > 0) diff.white[role] = c;

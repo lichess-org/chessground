@@ -60,19 +60,19 @@ function compute(pieces, key) {
       mobility = pawn.bind(null, piece.color);
       break;
     case 'knight':
-      mobility = knight
+      mobility = knight;
       break;
     case 'bishop':
-      mobility = bishop
+      mobility = bishop;
       break;
     case 'rook':
-      mobility = rook
+      mobility = rook;
       break;
     case 'queen':
-      mobility = queen
+      mobility = queen;
       break;
     case 'king':
-      mobility = king.bind(null, piece.color, rookFilesOf(pieces, piece.color))
+      mobility = king.bind(null, piece.color, rookFilesOf(pieces, piece.color));
       break;
   }
   return util.allPos.filter(function(pos2) {

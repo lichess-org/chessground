@@ -1,6 +1,6 @@
 var util = require('./util');
 
-var initial = 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR'
+var initial = 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR';
 
 var roles = {
   p: "pawn",
@@ -53,7 +53,7 @@ function write(pieces) {
           var letter = letters[piece.role];
           return piece.color === 'white' ? letter.toUpperCase() : letter;
         } else return '1';
-      }).join('')
+      }).join('');
     }).join('/'));
 }
 
