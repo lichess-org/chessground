@@ -27,5 +27,6 @@ module.exports = function(data, config) {
   if (data.selected) board.setSelected(data, data.selected);
 
   // no need for such short animations
-  if (data.animation.duration < 10) data.animation.enabled = false;
+  if (!data.animation.duration || data.animation.duration < 10)
+    data.animation.enabled = false;
 };
