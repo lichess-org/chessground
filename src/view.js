@@ -1,5 +1,4 @@
 var util = require('./util');
-var board = require('./board');
 var drag = require('./drag');
 var util = require('./util');
 var m = require('mithril');
@@ -156,7 +155,7 @@ function renderMinimalDom(ctrl, asWhite) {
 }
 
 function renderContent(ctrl) {
-  var asWhite = ctrl.data.orientation == 'white';
+  var asWhite = ctrl.data.orientation === 'white';
   if (ctrl.data.minimalDom) return renderMinimalDom(ctrl, asWhite);
   var children = (asWhite ? util.allPos : util.invPos).map(function(pos) {
     return renderSquare(ctrl, pos, asWhite);

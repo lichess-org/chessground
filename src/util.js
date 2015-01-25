@@ -53,17 +53,17 @@ function distance(pos1, pos2) {
 // this must be cached because of the access to document.body.style
 var cachedTransformProp;
 
-function transformProp() {
-  if (!cachedTransformProp) cachedTransformProp = computeTransformProp();
-  return cachedTransformProp;
-}
-
 function computeTransformProp() {
   return 'transform' in document.body.style?
     'transform': 'webkitTransform' in document.body.style?
     'webkitTransform': 'mozTransform' in document.body.style?
     'mozTransform': 'oTransform' in document.body.style?
     'oTransform': 'msTransform';
+}
+
+function transformProp() {
+  if (!cachedTransformProp) cachedTransformProp = computeTransformProp();
+  return cachedTransformProp;
 }
 
 function translate(pos) {

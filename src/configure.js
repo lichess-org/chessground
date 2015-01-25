@@ -1,4 +1,4 @@
-var merge = require('merge')
+var merge = require('merge');
 var board = require('./board');
 var fen = require('./fen');
 

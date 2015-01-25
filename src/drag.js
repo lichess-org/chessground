@@ -1,7 +1,6 @@
 var board = require('./board');
 var util = require('./util');
 var hold = require('./hold');
-var m = require('mithril');
 
 var originTarget;
 
@@ -52,7 +51,7 @@ function processDrag(data) {
         Object.keys(data.animation.current.anims).indexOf(cur.orig) !== -1)
         data.animation.current = {};
       // if moving piece is gone, cancel
-      if (hashPiece(data.pieces[cur.orig]) != cur.piece) cancel(data);
+      if (hashPiece(data.pieces[cur.orig]) !== cur.piece) cancel(data);
       else {
         if (!cur.started && util.distance(cur.epos, cur.rel) >= data.draggable.distance)
           cur.started = true;
@@ -80,6 +79,7 @@ function move(data, e) {
 function end(data, e) {
   var draggable = data.draggable;
   var orig = draggable.current ? draggable.current.orig : null;
+  var dest;
   if (!orig) return;
   // comparing with the origin target is an easy way to test that the end event
   // has the same touch origin

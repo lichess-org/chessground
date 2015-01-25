@@ -1,4 +1,3 @@
-var m = require('mithril');
 var util = require('./util');
 
 // https://gist.github.com/gre/1650294

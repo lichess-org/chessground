@@ -1,4 +1,3 @@
-var m = require('mithril');
 var board = require('./board');
 
 module.exports = function(controller) {
