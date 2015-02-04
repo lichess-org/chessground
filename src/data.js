@@ -85,8 +85,10 @@ module.exports = function(cfg) {
     },
     events: {
       change: function() {}, // called after the situation changes on the board
-      move: function(orig, dest) {}, // called after a piece has been moved
-      capture: function(key, piece) {}, // called when a piece has been captured
+      // called after a piece has been moved.
+      // capturedPiece is null or like {color: 'white', 'role': 'queen'}
+      move: function(orig, dest, capturedPiece) {},
+      capture: function(key, piece) {}, // DEPRECATED called when a piece has been captured
       select: function(key) {} // called when a square is selected
     }
   };

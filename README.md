@@ -111,8 +111,9 @@ All options are, well, optional.
   },
   events: {
     change: function() {},   // called after the situation changes on the board
-    move: function() {}, // called after a piece has been moved
-    capture: function(key, piece) {}, // called when a piece has been captured
+    // called after a piece has been moved.
+    // capturedPiece is null or like {color: 'white', 'role': 'queen'}
+    move: function(orig, dest, capturedPiece) {},
     select: function(key) {} // called when a square is selected
   }
 }

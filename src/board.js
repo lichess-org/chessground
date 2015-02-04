@@ -78,10 +78,14 @@ function tryAutoCastle(data, orig, dest) {
 function baseMove(data, orig, dest) {
   var success = anim(function() {
     if (orig === dest || !data.pieces[orig]) return false;
-    if (!data.pieces[dest])
-      callUserFunction(util.partial(data.events.move, orig, dest));
-    else if (data.pieces[dest] && data.pieces[dest].color !== data.pieces[orig].color)
-      callUserFunction(util.partial(data.events.capture, dest, data.pieces[dest]));
+    var captured = (
+      data.pieces[dest] &&
+      data.pieces[dest].color !== data.pieces[orig].color
+    ) ? data.pieces[dest] : null;
+    // always call events.move
+    callUserFunction(util.partial(data.events.move, orig, dest, captured));
+    // call deprecated events.capture
+    if (captured) callUserFunction(util.partial(data.events.capture, dest, captured));
     data.pieces[dest] = data.pieces[orig];
     delete data.pieces[orig];
     data.lastMove = [orig, dest];
