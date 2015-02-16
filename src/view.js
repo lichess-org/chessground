@@ -157,9 +157,11 @@ function renderMinimalDom(ctrl, asWhite) {
 function renderContent(ctrl) {
   var asWhite = ctrl.data.orientation === 'white';
   if (ctrl.data.minimalDom) return renderMinimalDom(ctrl, asWhite);
-  var children = (asWhite ? util.allPos : util.invPos).map(function(pos) {
-    return renderSquare(ctrl, pos, asWhite);
-  });
+  var positions = asWhite ? util.allPos : util.invPos;
+  var children = [];
+  for (var i = 0; i < positions.length; i++) {
+    children.push(renderSquare(ctrl, positions[i], asWhite));
+  }
   if (ctrl.data.draggable.current.over && ctrl.data.draggable.squareTarget)
     children.push(renderSquareTarget(ctrl, ctrl.data.draggable.current));
   if (ctrl.data.animation.current.fadings)
