@@ -133,7 +133,7 @@ function renderMinimalDom(ctrl, asWhite) {
     });
   });
   var piecesKeys = Object.keys(ctrl.data.pieces);
-  for (var i = 0; i < piecesKeys.length; i++) {
+  for (var i = 0, len = piecesKeys.length; i < len; i++) {
     var key = piecesKeys[i];
     var pos = util.key2pos(key);
     var attrs = {
