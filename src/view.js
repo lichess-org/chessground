@@ -132,7 +132,9 @@ function renderMinimalDom(ctrl, asWhite) {
       }
     });
   });
-  Object.keys(ctrl.data.pieces).forEach(function(key) {
+  var piecesKeys = Object.keys(ctrl.data.pieces);
+  for (var i = 0; i < piecesKeys.length; i++) {
+    var key = piecesKeys[i];
     var pos = util.key2pos(key);
     var attrs = {
       style: {
@@ -149,7 +151,7 @@ function renderMinimalDom(ctrl, asWhite) {
       tag: 'div',
       attrs: attrs
     });
-  });
+  }
 
   return children;
 }
