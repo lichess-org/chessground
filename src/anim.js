@@ -39,26 +39,27 @@ function computePlan(prev, current) {
     invert = prev.orientation !== current.orientation,
     prePieces = {},
     white = current.orientation === 'white';
-  for (var k in prev.pieces) {
-    var piece = makePiece(k, prev.pieces[k], invert);
+  for (var pk in prev.pieces) {
+    var piece = makePiece(pk, prev.pieces[pk], invert);
     prePieces[piece.key] = piece;
   }
-  util.allKeys.forEach(function(k) {
-    if (k !== current.movable.dropped[1]) {
-      var curP = current.pieces[k];
-      var preP = prePieces[k];
+  for (var i = 0; i < util.allKeys.length; i++) {
+    var key = util.allKeys[i];
+    if (key !== current.movable.dropped[1]) {
+      var curP = current.pieces[key];
+      var preP = prePieces[key];
       if (curP) {
         if (preP) {
           if (!samePiece(curP, preP)) {
             missings.push(preP);
-            news.push(makePiece(k, curP, false));
+            news.push(makePiece(key, curP, false));
           }
         } else
-          news.push(makePiece(k, curP, false));
+          news.push(makePiece(key, curP, false));
       } else if (preP)
         missings.push(preP);
     }
-  });
+  }
   news.forEach(function(newP) {
     var preP = closer(newP, missings.filter(util.partial(samePiece, newP)));
     if (preP) {
