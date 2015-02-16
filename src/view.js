@@ -161,7 +161,7 @@ function renderContent(ctrl) {
   if (ctrl.data.minimalDom) return renderMinimalDom(ctrl, asWhite);
   var positions = asWhite ? util.allPos : util.invPos;
   var children = [];
-  for (var i = 0; i < positions.length; i++) {
+  for (var i = 0, len = positions.length; i < len; i++) {
     children.push(renderSquare(ctrl, positions[i], asWhite));
   }
   if (ctrl.data.draggable.current.over && ctrl.data.draggable.squareTarget)
