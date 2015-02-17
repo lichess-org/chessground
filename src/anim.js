@@ -7,6 +7,18 @@ var easing = {
   },
 };
 
+// currently animating pieces
+var animating = {};
+
+function fixAnimatingPiecesElAfter() {
+  var keys = Object.keys(animating);
+  for (var i = 0, len = keys.length; i < len; i++) {
+    var p = animating[keys[i]];
+    if (p) p.removeAttribute('style');
+  }
+  animating = {};
+}
+
 function makePiece(k, piece, invert) {
   var key = invert ? util.invertKey(k) : k;
   return {
@@ -95,21 +107,34 @@ function roundBy(n, by) {
 }
 
 function go(data) {
-  if (!data.animation.current.start) return; // animation was canceled
+  // animation was canceled
+  if (!data.animation.current.start) {
+    fixAnimatingPiecesElAfter();
+    return;
+  }
   var rest = 1 - (new Date().getTime() - data.animation.current.start) / data.animation.current.duration;
   if (rest <= 0) {
     data.animation.current = {};
+    fixAnimatingPiecesElAfter();
     data.render();
   } else {
+    // render once to have all pieces there
+    if (!data.animation.running) data.render();
+    data.animation.running = true;
     var ease = easing.easeInOutCubic(rest);
     for (var key in data.animation.current.anims) {
       var cfg = data.animation.current.anims[key];
       cfg[1] = [roundBy(cfg[0][0] * ease, 10), roundBy(cfg[0][1] * ease, 10)];
+      var newPieceEl;
+      if (animating[key]) newPieceEl = animating[key];
+      else {
+        newPieceEl = data.element.querySelector('.' + key + ' > .cg-piece');
+        animating[key] = newPieceEl;
+      }
+      if (newPieceEl) {
+        newPieceEl.style[util.transformProp()] = util.translate(cfg[1]);
+      }
     }
-    for (var i in data.animation.current.fadings) {
-      data.animation.current.fadings[i].opacity = roundBy(ease, 100);
-    }
-    data.render();
     util.requestAnimationFrame(function() {
       go(data);
     });
@@ -142,6 +167,7 @@ function animate(transformation, data) {
     if (!alreadyRunning) go(data);
   } else {
     // don't animate, just render right away
+    fixAnimatingPiecesElAfter();
     data.renderRAF();
   }
   return result;
