@@ -1,12 +1,6 @@
 .cg-square.selected {
   background: rgba(216, 85, 0, 0.3);
 }
-.cg-piece.dragging {
-  width: 200%;
-  height: 200%;
-  top: -22.5px;
-  left: -22.5px;
-}
 #cg-square-target {
   position: absolute;
   background-color: rgba(0, 0, 0, 0.2);
