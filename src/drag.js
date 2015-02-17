@@ -71,7 +71,6 @@ function processDrag(data, e) {
     else {
       if (!cur.started && util.distance(cur.epos, cur.rel) >= data.draggable.distance) {
         if (!cur.started) {
-          draggingPiece.className = draggingPiece.className += ' dragging';
           // intended for mobile only: big pieces and position in top center
           if (data.draggable.squareTarget) {
             draggingPiece.style.width = '200%';
