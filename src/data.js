@@ -17,7 +17,7 @@ module.exports = function(cfg) {
     autoCastle: false, // immediately complete the castle by moving the rook after king move
     viewOnly: false, // don't bind events: the user will never be able to move pieces around
     minimalDom: false, // don't use square elements. Optimization to use only with viewOnly
-    disableRightClick: true, // because who needs a context menu on a chessboard
+    disableRightClick: false, // because who needs a context menu on a chessboard
     highlight: {
       lastMove: true, // add last-move class to squares
       check: true, // add check class to squares
