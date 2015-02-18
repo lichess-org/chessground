@@ -235,7 +235,7 @@ module.exports = function(ctrl) {
     attrs: {
       config: function(el, isUpdate) {
         if (!isUpdate) el.addEventListener('contextmenu', function(e) {
-          if (ctrl.data.disableRightClick) {
+          if (ctrl.data.disableContextMenu) {
             e.preventDefault();
             return false;
           }

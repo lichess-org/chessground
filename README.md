@@ -71,6 +71,7 @@ All options are, well, optional.
   coordinates: true,      // display board coordinates as square ::after elements
   viewOnly: false,        // don't bind events: the user will never be able to move pieces around
   minimalDom: false,      // don't use square elements. Optimization to use only with viewOnly
+  disableContextMenu: false
   highlight: {
     lastMove: true,       // add last-move class to squares
     check: true,          // add check class to squares
