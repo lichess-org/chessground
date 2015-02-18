@@ -122,8 +122,11 @@ function go(data) {
     if (!data.animation.running) data.render();
     data.animation.running = true;
     var ease = easing.easeInOutCubic(rest);
-    for (var key in data.animation.current.anims) {
-      var cfg = data.animation.current.anims[key];
+    var anims = data.animation.current.anims;
+    var animsK = Object.keys(anims);
+    for (var i = 0, len = animsK.length; i < len; i++) {
+      var key = animsK[i];
+      var cfg = anims[key];
       cfg[1] = [roundBy(cfg[0][0] * ease, 10), roundBy(cfg[0][1] * ease, 10)];
       var newPieceEl;
       if (animating[key]) newPieceEl = animating[key];
