@@ -141,7 +141,7 @@ function renderMinimalDom(ctrl, asWhite) {
         left: (asWhite ? pos[0] - 1 : 8 - pos[0]) * 12.5 + '%',
         bottom: (asWhite ? pos[1] - 1 : 8 - pos[1]) * 12.5 + '%'
       },
-      class: pieceClass(ctrl.data.pieces[key])
+      class: pieceClass(ctrl.data.pieces[key]) + ' ' + key
     };
     if (ctrl.data.animation.current.anims) {
       var animation = ctrl.data.animation.current.anims[key];

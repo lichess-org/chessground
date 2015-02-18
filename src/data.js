@@ -25,7 +25,6 @@ module.exports = function(cfg) {
     animation: {
       enabled: true,
       duration: 200,
-      running: false, // is there a currently running animation?
       /*{ // current
        *  start: timestamp,
        *  duration: ms,
@@ -42,6 +41,10 @@ module.exports = function(cfg) {
        *      role: 'rook',
        *      color: 'black'
        *    }
+       *  },
+       *  animating: {
+       *    a2: pieceDomEl,
+       *    ...
        *  }
        *}*/
       current: {}
