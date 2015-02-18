@@ -144,9 +144,9 @@ function end(data, e) {
     board.userMove(data, orig, dest);
   } else if (draggable.current.previouslySelected === orig) {
     board.setSelected(data, null);
-    data.render();
   }
   draggable.current = {};
+  data.render();
 }
 
 function cancel(data) {
