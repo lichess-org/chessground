@@ -233,6 +233,14 @@ module.exports = function(ctrl) {
   return {
     tag: 'div',
     attrs: {
+      config: function(el, isUpdate) {
+        if (!isUpdate) el.addEventListener('contextmenu', function(e) {
+          if (ctrl.data.disableRightClick) {
+            e.preventDefault();
+            return false;
+          }
+        });
+      },
       class: [
         'cg-board-wrap',
         ctrl.data.viewOnly ? 'view-only' : 'manipulable',
