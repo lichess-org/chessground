@@ -9,7 +9,10 @@ function pieceClass(p) {
 
 function renderPiece(ctrl, key, p) {
   var attrs = {
-    style: {},
+    style: {
+      width: '100%',
+      height: '100%'
+    },
     class: pieceClass(p)
   };
   var draggable = ctrl.data.draggable.current;
