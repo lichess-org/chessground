@@ -15,9 +15,7 @@ function hashPiece(piece) {
 function fixDraggingPieceElementAfterDrag() {
   if (draggingPiece) {
     draggingPiece.classList.remove('dragging');
-    draggingPiece.style.width = '100%';
-    draggingPiece.style.height = '100%';
-    draggingPiece.style[util.transformProp()] = '';
+    draggingPiece.removeAttribute('style');
   }
   if (squareTarget && squareTarget.parentNode) {
     squareTarget.parentNode.removeChild(squareTarget);
