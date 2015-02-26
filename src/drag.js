@@ -150,9 +150,9 @@ function end(data, e) {
 }
 
 function cancel(data) {
+  fixDraggingPieceElementAfterDrag();
   if (data.draggable.current.orig) {
     data.draggable.current = {};
-    fixDraggingPieceElementAfterDrag();
     board.selectSquare(data, null);
   }
 }

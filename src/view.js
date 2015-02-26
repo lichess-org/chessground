@@ -177,6 +177,7 @@ function bindEvents(ctrl, el, context) {
   var onstart = util.partial(drag.start, ctrl.data);
   var onmove = util.partial(drag.move, ctrl.data);
   var onend = util.partial(drag.end, ctrl.data);
+  var oncancel = util.partial(drag.cancel, ctrl.data);
   var startEvents = ['touchstart', 'mousedown'];
   var moveEvents = ['touchmove', 'mousemove'];
   var endEvents = ['touchend', 'mouseup'];
@@ -189,6 +190,7 @@ function bindEvents(ctrl, el, context) {
   endEvents.forEach(function(ev) {
     document.addEventListener(ev, onend);
   });
+  document.addEventListener('touchcancel', oncancel);
   context.onunload = function() {
     startEvents.forEach(function(ev) {
       el.removeEventListener(ev, onstart);
@@ -199,6 +201,7 @@ function bindEvents(ctrl, el, context) {
     endEvents.forEach(function(ev) {
       document.removeEventListener(ev, onend);
     });
+    document.removeEventListener('touchcancel', oncancel);
   };
 }
 
