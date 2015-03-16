@@ -32,11 +32,11 @@ function queen(x1, y1, x2, y2) {
   return bishop(x1, y1, x2, y2) || rook(x1, y1, x2, y2);
 }
 
-function king(color, rookFiles, x1, y1, x2, y2) {
+function king(color, rookFiles, canCastle, x1, y1, x2, y2) {
   return (
     diff(x1, x2) < 2 && diff(y1, y2) < 2
   ) || (
-    y1 === y2 && y1 === (color === 'white' ? 1 : 8) && (
+    canCastle && y1 === y2 && y1 === (color === 'white' ? 1 : 8) && (
       (x1 === 5 && (x2 === 3 || x2 === 7)) || util.containsX(rookFiles, x2)
     )
   );
@@ -51,7 +51,7 @@ function rookFilesOf(pieces, color) {
   });
 }
 
-function compute(pieces, key) {
+function compute(pieces, key, canCastle) {
   var piece = pieces[key];
   var pos = util.key2pos(key);
   var mobility;
@@ -72,7 +72,7 @@ function compute(pieces, key) {
       mobility = queen;
       break;
     case 'king':
-      mobility = king.bind(null, piece.color, rookFilesOf(pieces, piece.color));
+      mobility = king.bind(null, piece.color, rookFilesOf(pieces, piece.color), canCastle);
       break;
   }
   return util.allPos.filter(function(pos2) {

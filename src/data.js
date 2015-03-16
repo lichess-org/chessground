@@ -60,6 +60,7 @@ module.exports = function(cfg) {
     premovable: {
       enabled: true, // allow premoves for color that can not move
       showDests: true, // whether to add the premove-dest class on squares
+      castle: true, // whether to allow king castle premoves
       dests: [], // premove destinations for the current selection
       current: null, // keys of the current saved premove ["e2" "e4"] | null
       events: {

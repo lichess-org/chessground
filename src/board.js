@@ -146,7 +146,7 @@ function selectSquare(data, key) {
 function setSelected(data, key) {
   data.selected = key;
   if (key && isPremovable(data, key))
-    data.premovable.dests = premove(data.pieces, key);
+    data.premovable.dests = premove(data.pieces, key, data.premovable.castle);
   else
     data.premovable.dests = null;
 }
@@ -176,7 +176,7 @@ function isPremovable(data, orig) {
 function canPremove(data, orig, dest) {
   return orig !== dest &&
     isPremovable(data, orig) &&
-    util.containsX(premove(data.pieces, orig), dest);
+    util.containsX(premove(data.pieces, orig, data.premovable.castle), dest);
 }
 
 function isDraggable(data, orig) {
