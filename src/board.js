@@ -4,7 +4,7 @@ var anim = require('./anim');
 var hold = require('./hold');
 
 function callUserFunction(f) {
-  f();
+  setTimeout(f, 1);
 }
 
 function toggleOrientation(data) {
