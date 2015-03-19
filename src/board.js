@@ -84,8 +84,6 @@ function baseMove(data, orig, dest) {
     ) ? data.pieces[dest] : null;
     // always call events.move
     callUserFunction(util.partial(data.events.move, orig, dest, captured));
-    // call deprecated events.capture
-    if (captured) callUserFunction(util.partial(data.events.capture, dest, captured));
     data.pieces[dest] = data.pieces[orig];
     delete data.pieces[orig];
     data.lastMove = [orig, dest];
