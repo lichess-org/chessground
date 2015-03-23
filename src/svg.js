@@ -118,7 +118,7 @@ module.exports = function(ctrl) {
   if (!ctrl.data.bounds) return;
   var shapes = ctrl.data.drawable.shapes.map(computeShape(ctrl.data.orientation));
   var current = ctrl.data.drawable.current;
-  if (!shapes.length && !current) return;
+  if (!shapes.length && !current.length) return;
   if (!bounds) bounds = ctrl.data.bounds();
   var origs = lineOrigs(shapes);
   return {
