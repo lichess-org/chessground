@@ -24,3 +24,20 @@ section p {
   width: 300px;
   height: 300px;
 }
+.chessground.normal {
+  width: 512px;
+  height: 512px;
+}
+.cg-board-wrap svg {
+  overflow: hidden;
+  position: relative;
+  top: 0px;
+  left: 0px;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 2;
+}
+.cg-board-wrap svg * {
+  transition: 0.3s;
+}

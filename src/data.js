@@ -92,6 +92,27 @@ module.exports = function(cfg) {
       move: function(orig, dest, capturedPiece) {},
       capture: function(key, piece) {}, // DEPRECATED called when a piece has been captured
       select: function(key) {} // called when a square is selected
+    },
+    drawable: {
+      enabled: false, // allows SVG drawings
+      shapes: [
+        // ['e8'],
+        // ['f7'],
+        // ['e2', 'e4'],
+        // ['g1', 'f3'],
+        // ['f3', 'g5'],
+        // ['g5', 'f7'],
+        // ['f1', 'c4'],
+        // ['c4', 'f7'],
+      ],
+      /*{ // current
+       *  orig: "a2", // orig key of drawing
+       *  rel: [100, 170] // x, y of the piece at original position
+       *  pos: [20, -12] // relative current position
+       *  over: "b3" // square being moused over
+       *  bounds: current cached board bounds
+       *}*/
+      current: {}
     }
   };
 

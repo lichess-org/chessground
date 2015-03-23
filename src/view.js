@@ -1,6 +1,7 @@
-var util = require('./util');
 var drag = require('./drag');
+var draw = require('./draw');
 var util = require('./util');
+var svg = require('./svg');
 var m = require('mithril');
 
 function pieceClass(p) {
@@ -170,13 +171,22 @@ function renderContent(ctrl) {
     ctrl.data.animation.current.fadings.forEach(function(p) {
       children.push(renderFading(p));
     });
+  if (ctrl.data.drawable.enabled) children.push(svg(ctrl));
   return children;
 }
 
+function dragOrDraw(d, drag, draw) {
+  return function(e) {
+    if (d.drawable.enabled && e.shiftKey) draw(d, e);
+    else drag(d, e);
+  };
+}
+
 function bindEvents(ctrl, el, context) {
-  var onstart = util.partial(drag.start, ctrl.data);
-  var onmove = util.partial(drag.move, ctrl.data);
-  var onend = util.partial(drag.end, ctrl.data);
+  var d = ctrl.data;
+  var onstart = dragOrDraw(d, drag.start, draw.start);
+  var onmove = dragOrDraw(d, drag.move, draw.move);
+  var onend = dragOrDraw(d, drag.end, draw.end);
   var startEvents = ['touchstart', 'mousedown'];
   var moveEvents = ['touchmove', 'mousemove'];
   var endEvents = ['touchend', 'mouseup'];
@@ -250,3 +260,4 @@ module.exports = function(ctrl) {
     children: [renderBoard(ctrl)]
   };
 };
+;
