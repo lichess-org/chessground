@@ -35,6 +35,7 @@ Chessground is designed to fulfill all lichess.org web and mobile apps needs, so
 - Premove by click or drag
 - Animation of pieces: moving and fading away
 - Display last move, check, move destinations, and premove destinations
+- SVG drawing of circles and arrows on the board
 - Import and export positions in FEN notation
 - User callbacks
 - No chess logic inside: can be used for chess variations
@@ -109,6 +110,9 @@ All options are, well, optional.
     squareTarget: false,  // display big square target; intended for mobile
     centerPiece: true,    // center the piece on cursor at drag start
     showGhost: true,      // show ghost of piece being dragged
+  },
+  drawable: {
+    enabled: true         // enable SVG circle and arrow drawing on the board
   },
   events: {
     change: function() {},   // called after the situation changes on the board
