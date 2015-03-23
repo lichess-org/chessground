@@ -107,7 +107,6 @@ module.exports = function(cfg) {
       ],
       /*{ // current
        *  orig: "a2", // orig key of drawing
-       *  rel: [100, 170] // x, y of the piece at original position
        *  pos: [20, -12] // relative current position
        *  over: "b3" // square being moused over
        *  bounds: current cached board bounds

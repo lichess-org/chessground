@@ -14,7 +14,11 @@ function lineWidth(light) {
 }
 
 function opacity(light) {
-  return light ? 0.2 : 0.5;
+  return light ? 0.2 : 0.6;
+}
+
+function arrowMargin() {
+  return 24 / 512 * bounds.width;
 }
 
 function pos2px(pos) {
@@ -40,21 +44,27 @@ function circle(pos, light) {
   };
 }
 
-function arrow(orig, dest, withHead, light) {
-  var o = pos2px(orig);
-  var d = pos2px(dest);
+function arrow(orig, dest, light) {
+  var m = arrowMargin();
+  var a = pos2px(orig);
+  var b = pos2px(dest);
+  var dx = b[0] - a[0],
+    dy = b[1] - a[1],
+    angle = Math.atan2(dy, dx);
+  var xo = Math.cos(angle) * m,
+    yo = Math.sin(angle) * m;
   return {
     tag: 'line',
     attrs: {
       stroke: color,
       'stroke-width': lineWidth(light),
-      'marker-end': withHead ? 'url(#arrowhead)' : null,
+      'stroke-linecap': 'round',
+      'marker-end': 'url(#arrowhead)',
       opacity: opacity(light),
-      x1: o[0],
-      y1: o[1],
-      x2: d[0],
-      y2: d[1],
-      'stroke-linecap': 'round'
+      x1: a[0],
+      y1: a[1],
+      x2: b[0] - xo,
+      y2: b[1] - yo
     }
   };
 }
@@ -84,14 +94,6 @@ function computeShape(orientation) {
   };
 }
 
-function lineOrigs(shapes) {
-  var origs = [];
-  shapes.forEach(function(s) {
-    if (s.length === 2) origs.push(s[0]);
-  });
-  return origs;
-}
-
 function samePos(p1, p2) {
   return p1[0] === p2[0] && p1[1] === p2[1];
 }
@@ -102,7 +104,7 @@ function renderCurrent(data) {
   var shape = computeShape(data.orientation)(c.orig === c.over ? [c.orig] : [c.orig, c.over]);
   return shape.length === 1 ?
     circle(shape[0], true) :
-    arrow(shape[0], shape[1], true, true);
+    arrow(shape[0], shape[1], true);
 }
 
 module.exports = function(ctrl) {
@@ -110,7 +112,6 @@ module.exports = function(ctrl) {
   var shapes = ctrl.data.drawable.shapes.map(computeShape(ctrl.data.orientation));
   if (!shapes.length && !ctrl.data.drawable.current.orig) return;
   if (!bounds) bounds = ctrl.data.bounds();
-  var origs = lineOrigs(shapes);
   return {
     tag: 'svg',
     children: [
@@ -120,9 +121,6 @@ module.exports = function(ctrl) {
         if (shape.length === 2) return arrow(
           shape[0],
           shape[1],
-          origs.filter(function(o) {
-            return samePos(o, shape[1]);
-          }).length === 0,
           false);
       }),
       renderCurrent(ctrl.data)
