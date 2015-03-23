@@ -107,7 +107,7 @@ function samePos(p1, p2) {
 
 function renderCurrent(data) {
   var c = data.drawable.current;
-  if (!c || !c.orig || !c.over) return;
+  if (!c.orig || !c.over) return;
   var shape = computeShape(data.orientation)(c.orig === c.over ? [c.orig] : [c.orig, c.over]);
   return shape.length === 1 ?
     circle(shape[0], true) :
@@ -117,8 +117,7 @@ function renderCurrent(data) {
 module.exports = function(ctrl) {
   if (!ctrl.data.bounds) return;
   var shapes = ctrl.data.drawable.shapes.map(computeShape(ctrl.data.orientation));
-  var current = ctrl.data.drawable.current;
-  if (!shapes.length && !current.length) return;
+  if (!shapes.length && !ctrl.data.drawable.current.orig) return;
   if (!bounds) bounds = ctrl.data.bounds();
   var origs = lineOrigs(shapes);
   return {

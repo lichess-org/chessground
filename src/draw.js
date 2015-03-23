@@ -38,8 +38,8 @@ function move(data, e) {
 
 function end(data, e) {
   var drawable = data.drawable;
-  var orig = drawable.current ? drawable.current.orig : null;
-  var dest = drawable.current ? drawable.current.over : null;
+  var orig = drawable.current.orig;
+  var dest = drawable.current.over;
   if (!orig || !dest) return;
   if (orig === dest) addCircle(drawable, orig);
   else addLine(drawable, orig, dest);
