@@ -59,27 +59,18 @@ function arrow(orig, dest, withHead, light) {
   };
 }
 
-var defs = {
-  tag: 'defs',
-  children: [{
-    tag: 'marker',
-    attrs: {
-      id: 'arrowhead',
-      orient: 'auto',
-      markerWidth: 4,
-      markerHeight: 8,
-      refX: 2.05,
-      refY: 2.01
-    },
-    children: [{
-      tag: 'path',
-      attrs: {
-        d: 'M0,0 V4 L3,2 Z',
-        fill: color
-      }
-    }]
-  }]
-};
+var defs = m('defs',
+  m('marker', {
+    id: 'arrowhead',
+    orient: 'auto',
+    markerWidth: 4,
+    markerHeight: 8,
+    refX: 2.05,
+    refY: 2.01
+  }, m('path', {
+    d: 'M0,0 V4 L3,2 Z',
+    fill: color
+  })));
 
 function orient(pos, color) {
   return color === 'white' ? pos : [9 - pos[0], 9 - pos[1]];
