@@ -14,7 +14,7 @@ function lineWidth(light) {
 }
 
 function opacity(light) {
-  return light ? 0.2 : 0.6;
+  return light ? 0.5 : 1;
 }
 
 function arrowMargin() {
