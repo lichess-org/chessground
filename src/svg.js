@@ -112,6 +112,7 @@ module.exports = function(ctrl) {
   var shapes = ctrl.data.drawable.shapes.map(computeShape(ctrl.data.orientation));
   if (!shapes.length && !ctrl.data.drawable.current.orig) return;
   if (!bounds) bounds = ctrl.data.bounds();
+  if (bounds.width !== bounds.height) return;
   return {
     tag: 'svg',
     children: [
