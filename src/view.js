@@ -178,7 +178,7 @@ function renderContent(ctrl) {
 function dragOrDraw(d, drag, draw) {
   return function(e) {
     if (d.drawable.enabled && e.shiftKey) draw(d, e);
-    else drag(d, e);
+    else if (!d.viewOnly) drag(d, e);
   };
 }
 
@@ -219,7 +219,8 @@ function renderBoard(ctrl) {
       class: 'cg-board orientation-' + ctrl.data.orientation,
       config: function(el, isUpdate, context) {
         if (isUpdate) return;
-        if (!ctrl.data.viewOnly) bindEvents(ctrl, el, context);
+        if (!ctrl.data.viewOnly || ctrl.data.drawable.enabled)
+          bindEvents(ctrl, el, context);
         // this function only repaints the board itself.
         // it's called when dragging or animating pieces,
         // to prevent the full application embedding chessground
