@@ -6,7 +6,7 @@ function hashPiece(piece) {
 }
 
 function start(data, e) {
-  if (e.button !== undefined && e.button !== 0) return; // only touch or left click
+  if (e.button !== undefined && e.button !== 0 && e.button !== 2) return; // only touch or left click
   if (e.touches && e.touches.length > 1) return; // support one finger touch only
   e.stopPropagation();
   e.preventDefault();

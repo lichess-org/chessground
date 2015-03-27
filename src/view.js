@@ -178,6 +178,7 @@ function renderContent(ctrl) {
 function dragOrDraw(d, drag, draw) {
   return function(e) {
     if (d.drawable.enabled && e.shiftKey) draw(d, e);
+    else if (d.drawable.enabled && e.button === 2) draw(d, e);
     else if (!d.viewOnly) drag(d, e);
   };
 }
@@ -246,7 +247,7 @@ module.exports = function(ctrl) {
     attrs: {
       config: function(el, isUpdate) {
         if (!isUpdate) el.addEventListener('contextmenu', function(e) {
-          if (ctrl.data.disableContextMenu) {
+          if (ctrl.data.disableContextMenu || ctrl.data.drawable.enabled) {
             e.preventDefault();
             return false;
           }
