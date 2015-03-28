@@ -13,7 +13,6 @@ function start(data, e) {
   if (e.touches && e.touches.length > 1) return; // support one finger touch only
   e.stopPropagation();
   e.preventDefault();
-  if (data.drawable.enabled) data.drawable.shapes = [];
   originTarget = e.target;
   var previouslySelected = data.selected;
   var position = util.eventPosition(e);

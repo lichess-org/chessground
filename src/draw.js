@@ -9,6 +9,7 @@ function start(data, e) {
   if (e.touches && e.touches.length > 1) return; // support one finger touch only
   e.stopPropagation();
   e.preventDefault();
+  board.cancelMove(data);
   var position = util.eventPosition(e);
   var bounds = data.bounds();
   var orig = board.getKeyAtDomPos(data, position, bounds);
@@ -50,6 +51,12 @@ function cancel(data) {
   if (data.drawable.current.orig) data.drawable.current = {};
 }
 
+function clear(data, e) {
+  if (e.button !== 0 || e.shiftKey) return; // only left click
+  data.drawable.shapes = [];
+  data.render();
+}
+
 function not(f) {
   return function(x) {
     return !f(x);
@@ -82,5 +89,6 @@ module.exports = {
   move: move,
   end: end,
   cancel: cancel,
+    clear: clear,
   processDraw: processDraw
 };
