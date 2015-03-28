@@ -54,11 +54,11 @@ function distance(pos1, pos2) {
 var cachedTransformProp;
 
 function computeTransformProp() {
-  return 'transform' in document.body.style?
-    'transform': 'webkitTransform' in document.body.style?
-    'webkitTransform': 'mozTransform' in document.body.style?
-    'mozTransform': 'oTransform' in document.body.style?
-    'oTransform': 'msTransform';
+  return 'transform' in document.body.style ?
+    'transform' : 'webkitTransform' in document.body.style ?
+    'webkitTransform' : 'mozTransform' in document.body.style ?
+    'mozTransform' : 'oTransform' in document.body.style ?
+    'oTransform' : 'msTransform';
 }
 
 function transformProp() {
@@ -82,6 +82,10 @@ function partial() {
   return partialApply(arguments[0], Array.prototype.slice.call(arguments, 1));
 }
 
+function isRightButton(e) {
+  return e.buttons === 2 || e.button === 2;
+}
+
 module.exports = {
   files: files,
   ranks: ranks,
@@ -102,5 +106,6 @@ module.exports = {
   partialApply: partialApply,
   partial: partial,
   transformProp: transformProp,
-  requestAnimationFrame: (window.requestAnimationFrame || window.setTimeout).bind(window)
+  requestAnimationFrame: (window.requestAnimationFrame || window.setTimeout).bind(window),
+  isRightButton: isRightButton
 };

@@ -178,7 +178,7 @@ function renderContent(ctrl) {
 function dragOrDraw(d, drag, draw) {
   return function(e) {
     if (d.drawable.enabled && e.shiftKey) draw(d, e);
-    else if (d.drawable.enabled && e.button === 2) draw(d, e);
+    else if (d.drawable.enabled && util.isRightButton(e)) draw(d, e);
     else if (!d.viewOnly) drag(d, e);
   };
 }
@@ -262,4 +262,3 @@ module.exports = function(ctrl) {
     children: [renderBoard(ctrl)]
   };
 };
-;
