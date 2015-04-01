@@ -64,7 +64,7 @@ function processDrag(data, e) {
     // cancel animations while dragging
     if (data.animation.current.start &&
       Object.keys(data.animation.current.anims).indexOf(cur.orig) !== -1)
-      data.animation.current = {};
+      data.animation.current.start = false;
 
     // if moving piece is gone, cancel
     if (hashPiece(data.pieces[cur.orig]) !== cur.piece) cancel(data);

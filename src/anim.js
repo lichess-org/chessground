@@ -16,6 +16,7 @@ function fixPieceElementsAfterAnimating(data) {
       else if (p) p.removeAttribute('style');
     }
   }
+  data.animation.current = {};
 }
 
 function makePiece(k, piece, invert) {
@@ -115,7 +116,6 @@ function go(data, running) {
   var rest = 1 - (new Date().getTime() - data.animation.current.start) / data.animation.current.duration;
   if (rest <= 0) {
     fixPieceElementsAfterAnimating(data);
-    data.animation.current = {};
     data.render();
   } else {
     // render once to have all pieces there
