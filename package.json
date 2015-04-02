@@ -30,6 +30,11 @@
     "chessboard",
     "UI"
   ],
+  
+  "scripts": {
+    "build": "npm install && gulp"
+  },
+  
   "author": "Thibault Duplessis (https://github.com/ornicar)",
   "license": "MIT",
   "bugs": {
