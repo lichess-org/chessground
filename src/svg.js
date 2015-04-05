@@ -1,7 +1,7 @@
 var m = require('mithril');
 var key2pos = require('./util').key2pos;
 
-var color = '#008800';
+var colors = ['#008800', '#880000'];
 
 var bounds;
 
@@ -26,25 +26,25 @@ function pos2px(pos) {
   return [(pos[0] - 0.5) * squareSize, (8.5 - pos[1]) * squareSize];
 }
 
-function circle(pos, light) {
+function circle(color, pos, light) {
   var o = pos2px(pos);
   var width = circleWidth(light);
   var radius = bounds.width / 16;
   return {
     tag: 'circle',
     attrs: {
-      stroke: color,
+      stroke: colors[color],
       'stroke-width': width,
       fill: 'none',
       opacity: opacity(light),
       cx: o[0],
       cy: o[1],
-      r: radius - width / 2
+      r: radius - width / 2 - color * width * 1.5
     }
   };
 }
 
-function arrow(orig, dest, light) {
+function arrow(color, orig, dest, light) {
   var m = arrowMargin();
   var a = pos2px(orig);
   var b = pos2px(dest);
@@ -56,10 +56,10 @@ function arrow(orig, dest, light) {
   return {
     tag: 'line',
     attrs: {
-      stroke: color,
+      stroke: colors[color],
       'stroke-width': lineWidth(light),
       'stroke-linecap': 'round',
-      'marker-end': 'url(#arrowhead)',
+      'marker-end': 'url(#arrowhead' + color + ')',
       opacity: opacity(light),
       x1: a[0],
       y1: a[1],
@@ -69,9 +69,10 @@ function arrow(orig, dest, light) {
   };
 }
 
+// TODO: LOOP all colors
 var defs = m('defs',
   m('marker', {
-    id: 'arrowhead',
+    id: 'arrowhead0',
     orient: 'auto',
     markerWidth: 4,
     markerHeight: 8,
@@ -79,8 +80,20 @@ var defs = m('defs',
     refY: 2.01
   }, m('path', {
     d: 'M0,0 V4 L3,2 Z',
-    fill: color
-  })));
+    fill: colors[0]
+  })),
+  m('marker', {
+    id: 'arrowhead1',
+    orient: 'auto',
+    markerWidth: 4,
+    markerHeight: 8,
+    refX: 2.05,
+    refY: 2.01
+  }, m('path', {
+    d: 'M0,0 V4 L3,2 Z',
+    fill: colors[1]
+  }))
+  );
 
 function orient(pos, color) {
   return color === 'white' ? pos : [9 - pos[0], 9 - pos[1]];
@@ -88,9 +101,10 @@ function orient(pos, color) {
 
 function computeShape(orientation) {
   return function(s) {
-    return s.map(function(k) {
+    var s = s.slice(0);
+    return [s.shift()].concat(s.map(function(k) {
       return orient(key2pos(k), orientation);
-    });
+    }));
   };
 }
 
@@ -101,10 +115,10 @@ function samePos(p1, p2) {
 function renderCurrent(data) {
   var c = data.drawable.current;
   if (!c.orig || !c.over) return;
-  var shape = computeShape(data.orientation)(c.orig === c.over ? [c.orig] : [c.orig, c.over]);
-  return shape.length === 1 ?
-    circle(shape[0], true) :
-    arrow(shape[0], shape[1], true);
+  var shape = computeShape(data.orientation)(c.orig === c.over ? [c.color, c.orig] : [c.color, c.orig, c.over]);
+  return shape.length === 2 ?
+    circle(c.color, shape[1], true) :
+    arrow(c.color, shape[1], shape[2], true);
 }
 
 module.exports = function(ctrl) {
@@ -118,10 +132,11 @@ module.exports = function(ctrl) {
     children: [
       defs,
       shapes.map(function(shape) {
-        if (shape.length === 1) return circle(shape[0], false);
-        if (shape.length === 2) return arrow(
+        if (shape.length === 2) return circle(shape[0], shape[1], false);
+        if (shape.length === 3) return arrow(
           shape[0],
           shape[1],
+          shape[2],
           false);
       }),
       renderCurrent(ctrl.data)

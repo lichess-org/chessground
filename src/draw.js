@@ -16,7 +16,8 @@ function start(data, e) {
     orig: orig,
     over: orig,
     epos: position,
-    bounds: bounds
+    bounds: bounds,
+    color: e.shiftKey & util.isRightButton(e)
   };
   processDraw(data);
 }
@@ -57,24 +58,26 @@ function not(f) {
 }
 
 function addCircle(drawable, key) {
+  var color = drawable.current.color;
   var sameCircle = function(s) {
-    return s.length === 1 && s[0] === key;
+    return s.length === 2 && s[0] === color && s[1] === key;
   };
   var exists = drawable.shapes.filter(sameCircle).length > 0;
   if (exists) drawable.shapes = drawable.shapes.filter(not(sameCircle));
-  else drawable.shapes.push([key]);
+  else drawable.shapes.push([color, key]);
 }
 
 function addLine(drawable, orig, dest) {
+  var color = drawable.current.color;
   var sameLine = function(s) {
-    return s.length === 2 && (
-      (s[0] === orig && s[1] === dest) ||
-      (s[1] === orig && s[0] === dest)
+    return s.length === 3 && (
+      (s[1] === orig && s[2] === dest) ||
+      (s[2] === orig && s[1] === dest)
     );
   };
   var exists = drawable.shapes.filter(sameLine).length > 0;
   if (exists) drawable.shapes = drawable.shapes.filter(not(sameLine));
-  else drawable.shapes.push([orig, dest]);
+  else drawable.shapes.push([color, orig, dest]);
 }
 
 module.exports = {
