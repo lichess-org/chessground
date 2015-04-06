@@ -99,47 +99,31 @@ function orient(pos, color) {
   return color === 'white' ? pos : [9 - pos[0], 9 - pos[1]];
 }
 
-function computeShape(orientation) {
-  return function(s) {
-    var s = s.slice(0);
-    return [s.shift()].concat(s.map(function(k) {
-      return orient(key2pos(k), orientation);
-    }));
+function renderShape(orientation, light) {
+  return function(shape) {
+    if (shape.orig && shape.dest) return arrow(
+        shape.color,
+        orient(key2pos(shape.orig), orientation),
+        orient(key2pos(shape.dest), orientation),
+        light);
+    else if (shape.orig) return circle(
+        shape.color,
+        orient(key2pos(shape.orig), orientation),
+        light);
   };
-}
-
-function samePos(p1, p2) {
-  return p1[0] === p2[0] && p1[1] === p2[1];
-}
-
-function renderCurrent(data) {
-  var c = data.drawable.current;
-  if (!c.orig || !c.over) return;
-  var shape = computeShape(data.orientation)(c.orig === c.over ? [c.color, c.orig] : [c.color, c.orig, c.over]);
-  return shape.length === 2 ?
-    circle(c.color, shape[1], true) :
-    arrow(c.color, shape[1], shape[2], true);
 }
 
 module.exports = function(ctrl) {
   if (!ctrl.data.bounds) return;
-  var shapes = ctrl.data.drawable.shapes.map(computeShape(ctrl.data.orientation));
-  if (!shapes.length && !ctrl.data.drawable.current.orig) return;
+  if (!ctrl.data.drawable.shapes.length && !ctrl.data.drawable.current.orig) return;
   if (!bounds) bounds = ctrl.data.bounds();
   if (bounds.width !== bounds.height) return;
   return {
     tag: 'svg',
     children: [
       defs,
-      shapes.map(function(shape) {
-        if (shape.length === 2) return circle(shape[0], shape[1], false);
-        if (shape.length === 3) return arrow(
-          shape[0],
-          shape[1],
-          shape[2],
-          false);
-      }),
-      renderCurrent(ctrl.data)
+      ctrl.data.drawable.shapes.map(renderShape(ctrl.data.orientation)),
+      renderShape(ctrl.data.orientation, true)(ctrl.data.drawable.current)
     ]
   };
 }

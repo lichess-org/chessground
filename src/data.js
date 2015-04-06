@@ -96,20 +96,19 @@ module.exports = function(cfg) {
     drawable: {
       enabled: false, // allows SVG drawings
       shapes: [
-        // color, squares
-        // [0, 'e8'],
-        // [1, 'f7'],
-        // [0, 'e2', 'e4'],
-        // [0, 'g1', 'f3'],
-        // [0, 'f3', 'g5'],
-        // [1, 'g5', 'f7'],
-        // [1, 'f1', 'c4'],
-        // [1, 'c4', 'f7'],
+        // {color: 0, orig: 'e8'},
+        // {color: 1, orig: 'f7'],
+        // {color: 0, orig: 'e2', dest: 'e4'},
+        // {color: 0, orig: 'g1', dest: 'f3'},
+        // {color: 0, orig: 'f3', dest: 'g5'},
+        // {color: 1, orig: 'g5', dest: 'f7'},
+        // {color: 1, orig: 'f1', dest: 'c4'},
+        // {color: 1, orig: 'c4', dest: 'f7'},
       ],
       /*{ // current
        *  orig: "a2", // orig key of drawing
        *  pos: [20, -12] // relative current position
-       *  over: "b3" // square being moused over
+       *  dest: "b3" // square being moused over
        *  bounds: // current cached board bounds
        *  color: 0 // color number for shape
        *}*/
