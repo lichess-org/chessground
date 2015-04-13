@@ -1,6 +1,6 @@
-var util = require('./util');
 var drag = require('./drag');
 var util = require('./util');
+var svg = require('./svg');
 var m = require('mithril');
 
 function pieceClass(p) {
@@ -170,6 +170,7 @@ function renderContent(ctrl) {
     ctrl.data.animation.current.fadings.forEach(function(p) {
       children.push(renderFading(p));
     });
+  if (ctrl.data.drawable.enabled) children.push(svg(ctrl));
   return children;
 }
 
@@ -212,7 +213,8 @@ function renderBoard(ctrl) {
       class: 'cg-board orientation-' + ctrl.data.orientation,
       config: function(el, isUpdate, context) {
         if (isUpdate) return;
-        if (!ctrl.data.viewOnly) bindEvents(ctrl, el, context);
+        if (!ctrl.data.viewOnly || ctrl.data.drawable.enabled)
+          bindEvents(ctrl, el, context);
         // this function only repaints the board itself.
         // it's called when dragging or animating pieces,
         // to prevent the full application embedding chessground
@@ -236,6 +238,14 @@ module.exports = function(ctrl) {
   return {
     tag: 'div',
     attrs: {
+      config: function(el, isUpdate) {
+        if (!isUpdate) el.addEventListener('contextmenu', function(e) {
+          if (ctrl.data.disableContextMenu || ctrl.data.drawable.enabled) {
+            e.preventDefault();
+            return false;
+          }
+        });
+      },
       class: [
         'cg-board-wrap',
         ctrl.data.viewOnly ? 'view-only' : 'manipulable',

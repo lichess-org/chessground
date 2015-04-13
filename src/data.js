@@ -17,6 +17,7 @@ module.exports = function(cfg) {
     autoCastle: false, // immediately complete the castle by moving the rook after king move
     viewOnly: false, // don't bind events: the user will never be able to move pieces around
     minimalDom: false, // don't use square elements. Optimization to use only with viewOnly
+    disableContextMenu: false, // because who needs a context menu on a chessboard
     highlight: {
       lastMove: true, // add last-move class to squares
       check: true, // add check class to squares
@@ -63,6 +64,7 @@ module.exports = function(cfg) {
     premovable: {
       enabled: true, // allow premoves for color that can not move
       showDests: true, // whether to add the premove-dest class on squares
+      castle: true, // whether to allow king castle premoves
       dests: [], // premove destinations for the current selection
       current: null, // keys of the current saved premove ["e2" "e4"] | null
       events: {
@@ -94,6 +96,26 @@ module.exports = function(cfg) {
       move: function(orig, dest, capturedPiece) {},
       capture: function(key, piece) {}, // DEPRECATED called when a piece has been captured
       select: function(key) {} // called when a square is selected
+    },
+    drawable: {
+      enabled: false, // allows SVG drawings
+      shapes: [
+        // ['e8'],
+        // ['f7'],
+        // ['e2', 'e4'],
+        // ['g1', 'f3'],
+        // ['f3', 'g5'],
+        // ['g5', 'f7'],
+        // ['f1', 'c4'],
+        // ['c4', 'f7'],
+      ],
+      /*{ // current
+       *  orig: "a2", // orig key of drawing
+       *  pos: [20, -12] // relative current position
+       *  over: "b3" // square being moused over
+       *  bounds: current cached board bounds
+       *}*/
+      current: {}
     }
   };
 

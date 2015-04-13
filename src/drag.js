@@ -162,5 +162,5 @@ module.exports = {
   move: move,
   end: end,
   cancel: cancel,
-  processDrag: processDrag
+  processDrag: processDrag // must be exposed for board editors
 };

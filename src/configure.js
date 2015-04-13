@@ -15,6 +15,7 @@ module.exports = function(data, config) {
   if (data.fen) {
     data.pieces = fen.read(data.fen);
     data.check = config.check;
+    data.drawable.shapes = [];
     delete data.fen;
   }
 
