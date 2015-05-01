@@ -1,6 +1,6 @@
 {
   "name": "chessground",
-  "version": "2.0.13",
+  "version": "2.1.0",
   "description": "lichess.org Chess UI",
   "main": "src/main.js",
   "directories": {
@@ -11,14 +11,13 @@
     "mithril": "0.1.30"
   },
   "devDependencies": {
-    "browserify": "~5.11.2",
-    "gulp": "~3.8.8",
-    "gulp-jshint": "~1.8.4",
-    "gulp-streamify": "0.0.5",
-    "gulp-uglify": "^1.1.0",
-    "gulp-util": "~3.0.1",
-    "vinyl-source-stream": "~1.0.0",
-    "watchify": "~1.0.2"
+    "browserify": "~9.0.8",
+    "gulp": "~3.8.11",
+    "gulp-streamify": "~0.0.5",
+    "gulp-uglify": "~1.2.0",
+    "gulp-util": "~3.0.4",
+    "vinyl-source-stream": "~1.1.0",
+    "watchify": "~3.1.1"
   },
   "repository": {
     "type": "git",
