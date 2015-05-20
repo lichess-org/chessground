@@ -66,6 +66,10 @@ module.exports = function(cfg) {
       events: {
         set: function(orig, dest) {}, // called after the premove has been set
         unset: function() {} // called after the premove has been unset
+      },
+      display: {
+        square: true, // show current premove as square highlight
+        arrow: false // show current premove as arrow
       }
     },
     draggable: {
@@ -109,7 +113,6 @@ module.exports = function(cfg) {
        *  orig: "a2", // orig key of drawing
        *  pos: [20, -12] // relative current position
        *  over: "b3" // square being moused over
-       *  bounds: current cached board bounds
        *}*/
       current: {}
     }

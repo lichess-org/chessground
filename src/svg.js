@@ -1,7 +1,8 @@
 var m = require('mithril');
 var key2pos = require('./util').key2pos;
 
-var color = '#008800';
+var green = '#008800';
+var blue = '#000088';
 
 var bounds;
 
@@ -26,7 +27,7 @@ function pos2px(pos) {
   return [(pos[0] - 0.5) * squareSize, (8.5 - pos[1]) * squareSize];
 }
 
-function circle(pos, light) {
+function circle(pos, light, color) {
   var o = pos2px(pos);
   var width = circleWidth(light);
   var radius = bounds.width / 16;
@@ -44,7 +45,7 @@ function circle(pos, light) {
   };
 }
 
-function arrow(orig, dest, light) {
+function arrow(orig, dest, light, color) {
   var m = arrowMargin();
   var a = pos2px(orig);
   var b = pos2px(dest);
@@ -69,8 +70,8 @@ function arrow(orig, dest, light) {
   };
 }
 
-var defs = m('defs',
-  m('marker', {
+var defs = m('defs', [green, blue].map(function(color) {
+  return m('marker', {
     id: 'arrowhead',
     orient: 'auto',
     markerWidth: 4,
@@ -80,7 +81,8 @@ var defs = m('defs',
   }, m('path', {
     d: 'M0,0 V4 L3,2 Z',
     fill: color
-  })));
+  }));
+}));
 
 function orient(pos, color) {
   return color === 'white' ? pos : [9 - pos[0], 9 - pos[1]];
@@ -103,28 +105,42 @@ function renderCurrent(data) {
   if (!c.orig || !c.over) return;
   var shape = computeShape(data.orientation)(c.orig === c.over ? [c.orig] : [c.orig, c.over]);
   return shape.length === 1 ?
-    circle(shape[0], true) :
-    arrow(shape[0], shape[1], true);
+    circle(shape[0], true, green) :
+    arrow(shape[0], shape[1], true, green);
+}
+
+function computeBounds(data) {
+  if (bounds) return true;
+  bounds = data.bounds();
+  return bounds.width === bounds.height;
+}
+
+function renderDrawing(data) {
+  if (!data.drawable.enabled || !computeBounds(data)) return;
+  var shapes = data.drawable.shapes.map(computeShape(data.orientation));
+  if (!shapes.length && !data.drawable.current.orig) return;
+  return [
+    shapes.map(function(shape) {
+      if (shape.length === 1) return circle(shape[0], false, green);
+      if (shape.length === 2) return arrow(shape[0], shape[1], false, green);
+    }),
+    renderCurrent(data)
+  ];
+}
+
+function renderPremove(data) {
+  if (!data.premovable.display.arrow || !data.premovable.current || !computeBounds(data)) return;
+  var shape = computeShape(data.orientation)(data.premovable.current)
+  return arrow(shape[0], shape[1], false, blue);
 }
 
 module.exports = function(ctrl) {
   if (!ctrl.data.bounds) return;
-  var shapes = ctrl.data.drawable.shapes.map(computeShape(ctrl.data.orientation));
-  if (!shapes.length && !ctrl.data.drawable.current.orig) return;
-  if (!bounds) bounds = ctrl.data.bounds();
-  if (bounds.width !== bounds.height) return;
+  var drawing = renderDrawing(ctrl.data);
+  var premove = renderPremove(ctrl.data);
+  if (!drawing && !premove) return;
   return {
     tag: 'svg',
-    children: [
-      defs,
-      shapes.map(function(shape) {
-        if (shape.length === 1) return circle(shape[0], false);
-        if (shape.length === 2) return arrow(
-          shape[0],
-          shape[1],
-          false);
-      }),
-      renderCurrent(ctrl.data)
-    ]
+    children: [defs, drawing, premove]
   };
 }

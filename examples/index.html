@@ -112,10 +112,15 @@
             movable: {
               free: false,
               color: chessToColor(chess),
-              premove: true,
               dests: chessToDests(chess),
               events: {
-                after: onMove
+///                after: onMove
+              }
+            },
+            premovable: {
+              display: {
+                square: true,
+                arrow: true
               }
             },
             drawable: {

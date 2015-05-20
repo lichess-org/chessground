@@ -52,7 +52,7 @@ function renderSquare(ctrl, pos, asWhite) {
       'last-move': ctrl.data.highlight.lastMove && util.contains2(ctrl.data.lastMove, key),
       'move-dest': (isDragOver || ctrl.data.movable.showDests) && util.containsX(ctrl.data.movable.dests[ctrl.data.selected], key),
       'premove-dest': (isDragOver || ctrl.data.premovable.showDests) && util.containsX(ctrl.data.premovable.dests, key),
-      'current-premove': util.contains2(ctrl.data.premovable.current, key),
+      'current-premove': ctrl.data.premovable.display.square && util.contains2(ctrl.data.premovable.current, key),
       'drag-over': isDragOver,
       'occupied': !!piece,
       'exploding': ctrl.vm.exploding && ctrl.vm.exploding.indexOf(key) !== -1
@@ -171,7 +171,7 @@ function renderContent(ctrl) {
     ctrl.data.animation.current.fadings.forEach(function(p) {
       children.push(renderFading(p));
     });
-  if (ctrl.data.drawable.enabled) children.push(svg(ctrl));
+  children.push(svg(ctrl));
   return children;
 }
 

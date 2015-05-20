@@ -89,6 +89,6 @@ module.exports = {
   move: move,
   end: end,
   cancel: cancel,
-    clear: clear,
+  clear: clear,
   processDraw: processDraw
 };
