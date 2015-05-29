@@ -1,6 +1,5 @@
 var board = require('./board');
 var util = require('./util');
-var hold = require('./hold');
 
 var originTarget;
 
@@ -37,7 +36,6 @@ function start(data, e) {
       bounds: bounds,
       started: false
     };
-    hold.start();
   } else if (hadPremove) board.unsetPremove(data);
   processDrag(data);
 }
