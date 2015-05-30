@@ -14,7 +14,7 @@ function renderPiece(ctrl, key, p) {
     class: pieceClass(p)
   };
   var draggable = ctrl.data.draggable.current;
-  if (draggable.orig === key && (draggable.pos[0] !== 0 || draggable.pos[1] !== 0)) {
+  if (draggable.orig === key && draggable.started) {
     attrs.style[util.transformProp()] = util.translate([
       draggable.pos[0] + draggable.dec[0],
       draggable.pos[1] + draggable.dec[1]

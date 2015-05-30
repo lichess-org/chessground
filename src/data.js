@@ -70,7 +70,7 @@ module.exports = function(cfg) {
     },
     draggable: {
       enabled: true, // allow moves & premoves to use drag'n drop
-      distance: 2, // minimum distance to initiate a drag, in pixels
+      distance: 3, // minimum distance to initiate a drag, in pixels
       squareTarget: false, // display big square target intended for mobile
       centerPiece: true, // center the piece on cursor at drag start
       showGhost: true, // show ghost of piece being dragged
@@ -84,6 +84,9 @@ module.exports = function(cfg) {
        *  started: whether the drag has started, as per the distance setting
        *}*/
       current: {}
+    },
+    stats: {
+      dragged: true // was last piece dragged or clicked?
     },
     events: {
       change: function() {}, // called after the situation changes on the board

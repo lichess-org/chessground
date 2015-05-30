@@ -82,7 +82,6 @@ function baseMove(data, orig, dest) {
       data.pieces[dest] &&
       data.pieces[dest].color !== data.pieces[orig].color
     ) ? data.pieces[dest] : null;
-    // always call events.move
     callUserFunction(util.partial(data.events.move, orig, dest, captured));
     data.pieces[dest] = data.pieces[orig];
     delete data.pieces[orig];
@@ -123,6 +122,7 @@ function userMove(data, orig, dest) {
         premove: false,
         holdTime: hold.stop()
       }));
+      return true;
     }
   } else if (canPremove(data, orig, dest)) {
     setPremove(data, orig, dest);
@@ -135,7 +135,9 @@ function userMove(data, orig, dest) {
 function selectSquare(data, key) {
   if (data.selected) {
     if (key) {
-      if (data.selected !== key) userMove(data, data.selected, key);
+      if (data.selected !== key) {
+        if (userMove(data, data.selected, key)) data.stats.dragged = false;
+      }
     } else setSelected(data, null);
   } else if (isMovable(data, key) || isPremovable(data, key)) setSelected(data, key);
   if (key) callUserFunction(util.partial(data.events.select, key));

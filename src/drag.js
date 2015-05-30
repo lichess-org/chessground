@@ -35,7 +35,7 @@ function start(data, e) {
         position[1] - (pieceBounds.top + pieceBounds.height / 2)
       ] : [0, 0],
       bounds: bounds,
-      started: false
+      started: data.stats.dragged
     };
     hold.start();
   } else if (hadPremove) board.unsetPremove(data);
@@ -87,7 +87,7 @@ function end(data, e) {
   if (draggable.current.started) {
     dest = draggable.current.over;
     if (orig !== dest) data.movable.dropped = [orig, dest];
-    board.userMove(data, orig, dest);
+    if (board.userMove(data, orig, dest)) data.stats.dragged = true;
   } else if (draggable.current.previouslySelected === orig) board.setSelected(data, null);
   draggable.current = {};
 }
