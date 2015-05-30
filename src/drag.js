@@ -5,7 +5,7 @@ var hold = require('./hold');
 var originTarget;
 
 function hashPiece(piece) {
-  return piece ? piece.color + ' ' + piece.role : '';
+  return piece ? piece.color + piece.role : '';
 }
 
 function start(data, e) {
@@ -47,8 +47,7 @@ function processDrag(data) {
     var cur = data.draggable.current;
     if (cur.orig) {
       // cancel animations while dragging
-      if (data.animation.current.start &&
-        Object.keys(data.animation.current.anims).indexOf(cur.orig) !== -1)
+      if (data.animation.current.start && data.animation.current.anims[cur.orig])
         data.animation.current = {};
       // if moving piece is gone, cancel
       if (hashPiece(data.pieces[cur.orig]) !== cur.piece) cancel(data);
