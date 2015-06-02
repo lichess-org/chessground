@@ -7,6 +7,20 @@ function hashPiece(piece) {
   return piece ? piece.color + piece.role : '';
 }
 
+function computeSquareBounds(data, bounds, key) {
+  var pos = util.key2pos(key);
+  if (data.orientation !== 'white') {
+    pos[0] = 9 - pos[0];
+    pos[1] = 9 - pos[1];
+  }
+  return {
+    left: bounds.left + bounds.width * (pos[0] - 1) / 8,
+    top: bounds.top + bounds.height * (8 - pos[1]) / 8,
+    width: bounds.width / 8,
+    height: bounds.height / 8
+  };
+}
+
 function start(data, e) {
   if (e.button !== undefined && e.button !== 0) return; // only touch or left click
   if (e.touches && e.touches.length > 1) return; // support one finger touch only
@@ -21,7 +35,7 @@ function start(data, e) {
   board.selectSquare(data, orig);
   var stillSelected = data.selected === orig;
   if (data.pieces[orig] && stillSelected && board.isDraggable(data, orig)) {
-    var pieceBounds = data.element.querySelector('.' + orig).getBoundingClientRect();
+    var squareBounds = computeSquareBounds(data, bounds, orig);
     data.draggable.current = {
       previouslySelected: previouslySelected,
       orig: orig,
@@ -30,8 +44,8 @@ function start(data, e) {
       epos: position,
       pos: [0, 0],
       dec: data.draggable.centerPiece ? [
-        position[0] - (pieceBounds.left + pieceBounds.width / 2),
-        position[1] - (pieceBounds.top + pieceBounds.height / 2)
+        position[0] - (squareBounds.left + squareBounds.width / 2),
+        position[1] - (squareBounds.top + squareBounds.height / 2)
       ] : [0, 0],
       bounds: bounds,
       started: data.stats.dragged
