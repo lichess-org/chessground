@@ -86,7 +86,9 @@ module.exports = function(cfg) {
       current: {}
     },
     stats: {
-      dragged: false // was last piece dragged or clicked? needs default to false for touch
+      // was last piece dragged or clicked?
+      // needs default to false for touch
+      dragged: !('ontouchstart' in window)
     },
     events: {
       change: function() {}, // called after the situation changes on the board
