@@ -7,17 +7,17 @@ function hashPiece(piece) {
   return piece ? piece.color + piece.role : '';
 }
 
-function computeSquareBounds(data, bounds, key) {
+function computeSquareBounds(data, key) {
   var pos = util.key2pos(key);
   if (data.orientation !== 'white') {
     pos[0] = 9 - pos[0];
     pos[1] = 9 - pos[1];
   }
   return {
-    left: bounds.left + bounds.width * (pos[0] - 1) / 8,
-    top: bounds.top + bounds.height * (8 - pos[1]) / 8,
-    width: bounds.width / 8,
-    height: bounds.height / 8
+    left: data.bounds.left + data.bounds.width * (pos[0] - 1) / 8,
+    top: data.bounds.top + data.bounds.height * (8 - pos[1]) / 8,
+    width: data.bounds.width / 8,
+    height: data.bounds.height / 8
   };
 }
 
@@ -29,13 +29,12 @@ function start(data, e) {
   originTarget = e.target;
   var previouslySelected = data.selected;
   var position = util.eventPosition(e);
-  var bounds = data.bounds();
-  var orig = board.getKeyAtDomPos(data, position, bounds);
+  var orig = board.getKeyAtDomPos(data, position);
   var hadPremove = !!data.premovable.current;
   board.selectSquare(data, orig);
   var stillSelected = data.selected === orig;
   if (data.pieces[orig] && stillSelected && board.isDraggable(data, orig)) {
-    var squareBounds = computeSquareBounds(data, bounds, orig);
+    var squareBounds = computeSquareBounds(data, orig);
     data.draggable.current = {
       previouslySelected: previouslySelected,
       orig: orig,
@@ -47,7 +46,7 @@ function start(data, e) {
         position[0] - (squareBounds.left + squareBounds.width / 2),
         position[1] - (squareBounds.top + squareBounds.height / 2)
       ] : [0, 0],
-      bounds: bounds,
+      bounds: data.bounds,
       started: data.stats.dragged
     };
   } else if (hadPremove) board.unsetPremove(data);

@@ -3,32 +3,30 @@ var key2pos = require('./util').key2pos;
 
 var color = '#008800';
 
-var bounds;
-
-function circleWidth(light) {
+function circleWidth(light, bounds) {
   return (light ? 2 : 4) / 512 * bounds.width;
 }
 
-function lineWidth(light) {
+function lineWidth(light, bounds) {
   return (light ? 7 : 10) / 512 * bounds.width;
 }
 
-function opacity(light) {
+function opacity(light, bounds) {
   return light ? 0.5 : 1;
 }
 
-function arrowMargin() {
+function arrowMargin(bounds) {
   return 24 / 512 * bounds.width;
 }
 
-function pos2px(pos) {
+function pos2px(pos, bounds) {
   var squareSize = bounds.width / 8;
   return [(pos[0] - 0.5) * squareSize, (8.5 - pos[1]) * squareSize];
 }
 
-function circle(pos, light) {
-  var o = pos2px(pos);
-  var width = circleWidth(light);
+function circle(pos, light, bounds) {
+  var o = pos2px(pos, bounds);
+  var width = circleWidth(light, bounds);
   var radius = bounds.width / 16;
   return {
     tag: 'circle',
@@ -36,7 +34,7 @@ function circle(pos, light) {
       stroke: color,
       'stroke-width': width,
       fill: 'none',
-      opacity: opacity(light),
+      opacity: opacity(light, bounds),
       cx: o[0],
       cy: o[1],
       r: radius - width / 2
@@ -44,10 +42,10 @@ function circle(pos, light) {
   };
 }
 
-function arrow(orig, dest, light) {
-  var m = arrowMargin();
-  var a = pos2px(orig);
-  var b = pos2px(dest);
+function arrow(orig, dest, light, bounds) {
+  var m = arrowMargin(bounds);
+  var a = pos2px(orig, bounds);
+  var b = pos2px(dest, bounds);
   var dx = b[0] - a[0],
     dy = b[1] - a[1],
     angle = Math.atan2(dy, dx);
@@ -57,10 +55,10 @@ function arrow(orig, dest, light) {
     tag: 'line',
     attrs: {
       stroke: color,
-      'stroke-width': lineWidth(light),
+      'stroke-width': lineWidth(light, bounds),
       'stroke-linecap': 'round',
       'marker-end': 'url(#arrowhead)',
-      opacity: opacity(light),
+      opacity: opacity(light, bounds),
       x1: a[0],
       y1: a[1],
       x2: b[0] - xo,
@@ -103,26 +101,27 @@ function renderCurrent(data) {
   if (!c.orig || !c.over) return;
   var shape = computeShape(data.orientation)(c.orig === c.over ? [c.orig] : [c.orig, c.over]);
   return shape.length === 1 ?
-    circle(shape[0], true) :
-    arrow(shape[0], shape[1], true);
+    circle(shape[0], true, data.bounds) :
+    arrow(shape[0], shape[1], true, data.bounds);
 }
 
 module.exports = function(ctrl) {
   if (!ctrl.data.bounds) return;
+  var bounds = ctrl.data.bounds;
   var shapes = ctrl.data.drawable.shapes.map(computeShape(ctrl.data.orientation));
   if (!shapes.length && !ctrl.data.drawable.current.orig) return;
-  if (!bounds) bounds = ctrl.data.bounds();
   if (bounds.width !== bounds.height) return;
   return {
     tag: 'svg',
     children: [
       defs,
       shapes.map(function(shape) {
-        if (shape.length === 1) return circle(shape[0], false);
+        if (shape.length === 1) return circle(shape[0], false, bounds);
         if (shape.length === 2) return arrow(
           shape[0],
           shape[1],
-          false);
+          false,
+          bounds);
       }),
       renderCurrent(ctrl.data)
     ]

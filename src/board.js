@@ -226,12 +226,11 @@ function stop(data) {
   cancelMove(data);
 }
 
-function getKeyAtDomPos(data, pos, bounds) {
-  if (!bounds && !data.bounds) return;
-  bounds = bounds || data.bounds(); // use provided value, or compute it
-  var file = Math.ceil(8 * ((pos[0] - bounds.left) / bounds.width));
+function getKeyAtDomPos(data, pos) {
+  if (!data.bounds) return;
+  var file = Math.ceil(8 * ((pos[0] - data.bounds.left) / data.bounds.width));
   file = data.orientation === 'white' ? file : 9 - file;
-  var rank = Math.ceil(8 - (8 * ((pos[1] - bounds.top) / bounds.height)));
+  var rank = Math.ceil(8 - (8 * ((pos[1] - data.bounds.top) / data.bounds.height)));
   rank = data.orientation === 'white' ? rank : 9 - rank;
   if (file > 0 && file < 9 && rank > 0 && rank < 9) return util.pos2key([file, rank]);
 }
