@@ -28,7 +28,7 @@ function closer(piece, pieces) {
 }
 
 function computePlan(prev, current) {
-  var bounds = current.bounds,
+  var bounds = current.bounds(),
     width = bounds.width / 8,
     height = bounds.height / 8,
     anims = {},

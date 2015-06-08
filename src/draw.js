@@ -11,12 +11,13 @@ function start(data, e) {
   e.preventDefault();
   board.cancelMove(data);
   var position = util.eventPosition(e);
-  var orig = board.getKeyAtDomPos(data, position);
+  var bounds = data.bounds();
+  var orig = board.getKeyAtDomPos(data, position, bounds);
   data.drawable.current = {
     orig: orig,
     over: orig,
     epos: position,
-    bounds: data.bounds
+    bounds: bounds
   };
   processDraw(data);
 }
@@ -24,7 +25,7 @@ function start(data, e) {
 function processDraw(data) {
   util.requestAnimationFrame(function() {
     var cur = data.drawable.current;
-    if (cur.orig) cur.over = board.getKeyAtDomPos(data, cur.epos);
+    if (cur.orig) cur.over = board.getKeyAtDomPos(data, cur.epos, cur.bounds);
     data.render();
     if (cur.orig) processDraw(data);
   });

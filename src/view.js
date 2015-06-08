@@ -235,7 +235,7 @@ function renderBoard(ctrl) {
         ctrl.data.renderRAF = function() {
           util.requestAnimationFrame(ctrl.data.render);
         };
-        ctrl.data.bounds = el.getBoundingClientRect();
+        ctrl.data.bounds = el.getBoundingClientRect.bind(el);
         ctrl.data.element = el;
         ctrl.data.render();
       }
