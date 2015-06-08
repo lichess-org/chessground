@@ -71,6 +71,7 @@ module.exports = function(cfg) {
     draggable: {
       enabled: true, // allow moves & premoves to use drag'n drop
       distance: 3, // minimum distance to initiate a drag, in pixels
+      autoDistance: true, // lets chessground set distance to zero when user drags pieces
       squareTarget: false, // display big square target intended for mobile
       centerPiece: true, // center the piece on cursor at drag start
       showGhost: true, // show ghost of piece being dragged

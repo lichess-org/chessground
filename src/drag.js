@@ -48,7 +48,7 @@ function start(data, e) {
         position[1] - (squareBounds.top + squareBounds.height / 2)
       ] : [0, 0],
       bounds: bounds,
-      started: data.stats.dragged
+      started: data.draggable.autoDistance && data.stats.dragged
     };
   } else if (hadPremove) board.unsetPremove(data);
   processDrag(data);
