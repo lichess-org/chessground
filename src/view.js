@@ -235,13 +235,7 @@ function renderBoard(ctrl) {
         ctrl.data.renderRAF = function() {
           util.requestAnimationFrame(ctrl.data.render);
         };
-        var computeBounds = function() {
-          if (!ctrl.data.draggable.current.orig && !ctrl.data.animation.current.anims) {
-            ctrl.data.bounds = el.getBoundingClientRect();
-          }
-          setTimeout(computeBounds, 1500);
-        };
-        computeBounds();
+        ctrl.data.bounds = el.getBoundingClientRect();
         ctrl.data.element = el;
         ctrl.data.render();
       }
