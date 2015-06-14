@@ -177,8 +177,7 @@ function renderContent(ctrl) {
 
 function dragOrDraw(d, withDrag, withDraw) {
   return function(e) {
-    if (d.drawable.enabled && e.shiftKey) withDraw(d, e);
-    else if (d.drawable.enabled && util.isRightButton(e)) withDraw(d, e);
+    if (d.drawable.enabled && (e.shiftKey || util.isRightButton(e))) withDraw(d, e);
     else if (!d.viewOnly) withDrag(d, e);
   };
 }
