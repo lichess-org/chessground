@@ -90,17 +90,18 @@ function move(data, e) {
 function end(data, e) {
   var draggable = data.draggable;
   var orig = draggable.current ? draggable.current.orig : null;
-  var dest;
   if (!orig) return;
   // comparing with the origin target is an easy way to test that the end event
   // has the same touch origin
   if (e && e.type === "touchend" && originTarget !== e.target) return;
   board.unsetPremove(data);
+  var dest = draggable.current.over;
   if (draggable.current.started) {
-    dest = draggable.current.over;
     if (orig !== dest) data.movable.dropped = [orig, dest];
     if (board.userMove(data, orig, dest)) data.stats.dragged = true;
-  } else if (draggable.current.previouslySelected === orig) board.setSelected(data, null);
+  }
+  if (orig === draggable.current.previouslySelected && (orig === dest || !dest))
+    board.setSelected(data, null);
   draggable.current = {};
 }
 
