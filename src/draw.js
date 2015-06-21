@@ -26,7 +26,7 @@ function processDraw(data) {
   util.requestAnimationFrame(function() {
     var cur = data.drawable.current;
     if (cur.orig) {
-      dest = board.getKeyAtDomPos(data, cur.epos, cur.bounds);
+      var dest = board.getKeyAtDomPos(data, cur.epos, cur.bounds);
       if (cur.orig === dest) cur.dest = undefined;
       else cur.dest = dest;
     }
