@@ -1,7 +1,7 @@
 var m = require('mithril');
 var key2pos = require('./util').key2pos;
 
-var color = '#008800';
+var colors = ['#15781B', '#882020', '#003088', '#E68F00'];
 
 var bounds;
 
@@ -26,25 +26,25 @@ function pos2px(pos) {
   return [(pos[0] - 0.5) * squareSize, (8.5 - pos[1]) * squareSize];
 }
 
-function circle(pos, light) {
+function circle(drawColor, pos, light) {
   var o = pos2px(pos);
   var width = circleWidth(light);
   var radius = bounds.width / 16;
   return {
     tag: 'circle',
     attrs: {
-      stroke: color,
+      stroke: colors[drawColor],
       'stroke-width': width,
       fill: 'none',
       opacity: opacity(light),
       cx: o[0],
       cy: o[1],
-      r: radius - width / 2
+      r: radius - width / 2 - drawColor * width * 1.5
     }
   };
 }
 
-function arrow(orig, dest, light) {
+function arrow(drawColor, orig, dest, light) {
   var m = arrowMargin();
   var a = pos2px(orig);
   var b = pos2px(dest);
@@ -56,10 +56,10 @@ function arrow(orig, dest, light) {
   return {
     tag: 'line',
     attrs: {
-      stroke: color,
+      stroke: colors[drawColor],
       'stroke-width': lineWidth(light),
       'stroke-linecap': 'round',
-      'marker-end': 'url(#arrowhead)',
+      'marker-end': 'url(#arrowhead' + drawColor + ')',
       opacity: opacity(light),
       x1: a[0],
       y1: a[1],
@@ -70,61 +70,50 @@ function arrow(orig, dest, light) {
 }
 
 var defs = m('defs',
-  m('marker', {
-    id: 'arrowhead',
-    orient: 'auto',
-    markerWidth: 4,
-    markerHeight: 8,
-    refX: 2.05,
-    refY: 2.01
-  }, m('path', {
-    d: 'M0,0 V4 L3,2 Z',
-    fill: color
-  })));
+  colors.map(function(color, i) {
+    return m('marker', {
+      id: 'arrowhead' + i,
+      orient: 'auto',
+      markerWidth: 4,
+      markerHeight: 8,
+      refX: 2.05,
+      refY: 2.01
+    }, m('path', {
+      d: 'M0,0 V4 L3,2 Z',
+      fill: color
+    }))
+  })
+);
 
 function orient(pos, color) {
   return color === 'white' ? pos : [9 - pos[0], 9 - pos[1]];
 }
 
-function computeShape(orientation) {
-  return function(s) {
-    return s.map(function(k) {
-      return orient(key2pos(k), orientation);
-    });
+function renderShape(orientation, light) {
+  return function(shape) {
+    if (shape.orig && shape.dest) return arrow(
+        shape.drawColor,
+        orient(key2pos(shape.orig), orientation),
+        orient(key2pos(shape.dest), orientation),
+        light);
+    else if (shape.orig) return circle(
+        shape.drawColor,
+        orient(key2pos(shape.orig), orientation),
+        light);
   };
-}
-
-function samePos(p1, p2) {
-  return p1[0] === p2[0] && p1[1] === p2[1];
-}
-
-function renderCurrent(data) {
-  var c = data.drawable.current;
-  if (!c.orig || !c.over) return;
-  var shape = computeShape(data.orientation)(c.orig === c.over ? [c.orig] : [c.orig, c.over]);
-  return shape.length === 1 ?
-    circle(shape[0], true) :
-    arrow(shape[0], shape[1], true);
 }
 
 module.exports = function(ctrl) {
   if (!ctrl.data.bounds) return;
-  var shapes = ctrl.data.drawable.shapes.map(computeShape(ctrl.data.orientation));
-  if (!shapes.length && !ctrl.data.drawable.current.orig) return;
+  if (!ctrl.data.drawable.shapes.length && !ctrl.data.drawable.current.orig) return;
   if (!bounds) bounds = ctrl.data.bounds();
   if (bounds.width !== bounds.height) return;
   return {
     tag: 'svg',
     children: [
       defs,
-      shapes.map(function(shape) {
-        if (shape.length === 1) return circle(shape[0], false);
-        if (shape.length === 2) return arrow(
-          shape[0],
-          shape[1],
-          false);
-      }),
-      renderCurrent(ctrl.data)
+      ctrl.data.drawable.shapes.map(renderShape(ctrl.data.orientation)),
+      renderShape(ctrl.data.orientation, true)(ctrl.data.drawable.current)
     ]
   };
 }
