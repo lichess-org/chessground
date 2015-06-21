@@ -1,7 +1,7 @@
 var m = require('mithril');
 var key2pos = require('./util').key2pos;
 
-var colors = ['#008800', '#880000'];
+var colors = ['#15781B', '#882020', '#003088', '#E68F00'];
 
 var bounds;
 
@@ -26,25 +26,25 @@ function pos2px(pos) {
   return [(pos[0] - 0.5) * squareSize, (8.5 - pos[1]) * squareSize];
 }
 
-function circle(color, pos, light) {
+function circle(drawColor, pos, light) {
   var o = pos2px(pos);
   var width = circleWidth(light);
   var radius = bounds.width / 16;
   return {
     tag: 'circle',
     attrs: {
-      stroke: colors[color],
+      stroke: colors[drawColor],
       'stroke-width': width,
       fill: 'none',
       opacity: opacity(light),
       cx: o[0],
       cy: o[1],
-      r: radius - width / 2 - color * width * 1.5
+      r: radius - width / 2 - drawColor * width * 1.5
     }
   };
 }
 
-function arrow(color, orig, dest, light) {
+function arrow(drawColor, orig, dest, light) {
   var m = arrowMargin();
   var a = pos2px(orig);
   var b = pos2px(dest);
@@ -56,10 +56,10 @@ function arrow(color, orig, dest, light) {
   return {
     tag: 'line',
     attrs: {
-      stroke: colors[color],
+      stroke: colors[drawColor],
       'stroke-width': lineWidth(light),
       'stroke-linecap': 'round',
-      'marker-end': 'url(#arrowhead' + color + ')',
+      'marker-end': 'url(#arrowhead' + drawColor + ')',
       opacity: opacity(light),
       x1: a[0],
       y1: a[1],
@@ -69,31 +69,21 @@ function arrow(color, orig, dest, light) {
   };
 }
 
-// TODO: LOOP all colors
 var defs = m('defs',
-  m('marker', {
-    id: 'arrowhead0',
-    orient: 'auto',
-    markerWidth: 4,
-    markerHeight: 8,
-    refX: 2.05,
-    refY: 2.01
-  }, m('path', {
-    d: 'M0,0 V4 L3,2 Z',
-    fill: colors[0]
-  })),
-  m('marker', {
-    id: 'arrowhead1',
-    orient: 'auto',
-    markerWidth: 4,
-    markerHeight: 8,
-    refX: 2.05,
-    refY: 2.01
-  }, m('path', {
-    d: 'M0,0 V4 L3,2 Z',
-    fill: colors[1]
-  }))
-  );
+  colors.map(function(color, i) {
+    return m('marker', {
+      id: 'arrowhead' + i,
+      orient: 'auto',
+      markerWidth: 4,
+      markerHeight: 8,
+      refX: 2.05,
+      refY: 2.01
+    }, m('path', {
+      d: 'M0,0 V4 L3,2 Z',
+      fill: color
+    }))
+  })
+);
 
 function orient(pos, color) {
   return color === 'white' ? pos : [9 - pos[0], 9 - pos[1]];
@@ -102,12 +92,12 @@ function orient(pos, color) {
 function renderShape(orientation, light) {
   return function(shape) {
     if (shape.orig && shape.dest) return arrow(
-        shape.color,
+        shape.drawColor,
         orient(key2pos(shape.orig), orientation),
         orient(key2pos(shape.dest), orientation),
         light);
     else if (shape.orig) return circle(
-        shape.color,
+        shape.drawColor,
         orient(key2pos(shape.orig), orientation),
         light);
   };
