@@ -7,9 +7,10 @@ function diff(a, b) {
 function pawn(color, x1, y1, x2, y2) {
   return diff(x1, x2) < 2 && (
     color === 'white' ? (
-      y2 === y1 + 1 || (y1 === 2 && y2 === 4 && x1 === x2)
+      // allow 2 squares from 1 and 8, for horde
+      y2 === y1 + 1 || (y1 <= 2 && y2 === (y1 + 2) && x1 === x2)
     ) : (
-      y2 === y1 - 1 || (y1 === 7 && y2 === 5 && x1 === x2)
+      y2 === y1 - 1 || (y1 >= 7 && y2 === (y1 - 2) && x1 === x2)
     )
   );
 }

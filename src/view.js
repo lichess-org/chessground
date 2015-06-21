@@ -14,7 +14,7 @@ function renderPiece(ctrl, key, p) {
     class: pieceClass(p)
   };
   var draggable = ctrl.data.draggable.current;
-  if (draggable.orig === key && (draggable.pos[0] !== 0 || draggable.pos[1] !== 0)) {
+  if (draggable.orig === key && draggable.started) {
     attrs.style[util.transformProp()] = util.translate([
       draggable.pos[0] + draggable.dec[0],
       draggable.pos[1] + draggable.dec[1]
@@ -175,11 +175,10 @@ function renderContent(ctrl) {
   return children;
 }
 
-function dragOrDraw(d, drag, draw) {
+function dragOrDraw(d, withDrag, withDraw) {
   return function(e) {
-    if (d.drawable.enabled && e.shiftKey) draw(d, e);
-    else if (d.drawable.enabled && util.isRightButton(e)) draw(d, e);
-    else if (!d.viewOnly) drag(d, e);
+    if (d.drawable.enabled && (e.shiftKey || util.isRightButton(e))) withDraw(d, e);
+    else if (!d.viewOnly) withDrag(d, e);
   };
 }
 
@@ -188,6 +187,7 @@ function bindEvents(ctrl, el, context) {
   var onstart = dragOrDraw(d, drag.start, draw.start);
   var onmove = dragOrDraw(d, drag.move, draw.move);
   var onend = dragOrDraw(d, drag.end, draw.end);
+  var drawClear = util.partial(draw.clear, d);
   var startEvents = ['touchstart', 'mousedown'];
   var moveEvents = ['touchmove', 'mousemove'];
   var endEvents = ['touchend', 'mouseup'];
@@ -200,6 +200,7 @@ function bindEvents(ctrl, el, context) {
   endEvents.forEach(function(ev) {
     document.addEventListener(ev, onend);
   });
+  el.addEventListener('mousedown', drawClear);
   context.onunload = function() {
     startEvents.forEach(function(ev) {
       el.removeEventListener(ev, onstart);
@@ -210,6 +211,7 @@ function bindEvents(ctrl, el, context) {
     endEvents.forEach(function(ev) {
       document.removeEventListener(ev, onend);
     });
+    el.removeEventListener('mousedown', drawClear);
   };
 }
 

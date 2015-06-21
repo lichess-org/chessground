@@ -82,7 +82,6 @@ function baseMove(data, orig, dest) {
       data.pieces[dest] &&
       data.pieces[dest].color !== data.pieces[orig].color
     ) ? data.pieces[dest] : null;
-    // always call events.move
     callUserFunction(util.partial(data.events.move, orig, dest, captured));
     data.pieces[dest] = data.pieces[orig];
     delete data.pieces[orig];
@@ -111,6 +110,7 @@ function apiMove(data, orig, dest) {
 
 function userMove(data, orig, dest) {
   if (!dest) {
+    hold.cancel();
     setSelected(data, null);
     if (data.movable.dropOff === 'trash') {
       delete data.pieces[orig];
@@ -118,26 +118,38 @@ function userMove(data, orig, dest) {
     }
   } else if (canMove(data, orig, dest)) {
     if (baseUserMove(data, orig, dest)) {
+      var holdTime = hold.stop();
       setSelected(data, null);
       callUserFunction(util.partial(data.movable.events.after, orig, dest, {
         premove: false,
-        holdTime: hold.stop()
+        holdTime: holdTime
       }));
+      return true;
     }
   } else if (canPremove(data, orig, dest)) {
     setPremove(data, orig, dest);
     setSelected(data, null);
-  } else if (isMovable(data, dest) || isPremovable(data, dest))
+  } else if (isMovable(data, dest) || isPremovable(data, dest)) {
     setSelected(data, dest);
-  else setSelected(data, null);
+    hold.start();
+  } else setSelected(data, null);
 }
 
 function selectSquare(data, key) {
   if (data.selected) {
     if (key) {
-      if (data.selected !== key) userMove(data, data.selected, key);
-    } else setSelected(data, null);
-  } else if (isMovable(data, key) || isPremovable(data, key)) setSelected(data, key);
+      if (data.selected !== key) {
+        if (userMove(data, data.selected, key)) data.stats.dragged = false;
+      }
+      else hold.start();
+    } else {
+      setSelected(data, null);
+      hold.cancel();
+    }
+  } else if (isMovable(data, key) || isPremovable(data, key)) {
+    setSelected(data, key);
+    hold.start();
+  }
   if (key) callUserFunction(util.partial(data.events.select, key));
 }
 
