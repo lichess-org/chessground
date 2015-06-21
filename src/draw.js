@@ -15,9 +15,9 @@ function start(data, e) {
   var orig = board.getKeyAtDomPos(data, position, bounds);
   data.drawable.current = {
     orig: orig,
-    over: orig,
     epos: position,
-    bounds: bounds
+    bounds: bounds,
+    drawColor: (e.shiftKey & util.isRightButton(e)) + (e.altKey ? 2 : 0)
   };
   processDraw(data);
 }
@@ -25,7 +25,11 @@ function start(data, e) {
 function processDraw(data) {
   util.requestAnimationFrame(function() {
     var cur = data.drawable.current;
-    if (cur.orig) cur.over = board.getKeyAtDomPos(data, cur.epos, cur.bounds);
+    if (cur.orig) {
+      dest = board.getKeyAtDomPos(data, cur.epos, cur.bounds);
+      if (cur.orig === dest) cur.dest = undefined;
+      else cur.dest = dest;
+    }
     data.render();
     if (cur.orig) processDraw(data);
   });
@@ -39,10 +43,9 @@ function move(data, e) {
 function end(data, e) {
   var drawable = data.drawable;
   var orig = drawable.current.orig;
-  var dest = drawable.current.over;
-  if (!orig || !dest) return;
-  if (orig === dest) addCircle(drawable, orig);
-  else addLine(drawable, orig, dest);
+  var dest = drawable.current.dest;
+  if (orig && dest) addLine(drawable, orig, dest);
+  else if (orig) addCircle(drawable, orig);
   drawable.current = {};
   data.render();
 }
@@ -64,24 +67,26 @@ function not(f) {
 }
 
 function addCircle(drawable, key) {
+  var drawColor = drawable.current.drawColor;
   var sameCircle = function(s) {
-    return s.length === 1 && s[0] === key;
+    return s.drawColor === drawColor && s.orig === key && !s.dest;
   };
   var exists = drawable.shapes.filter(sameCircle).length > 0;
   if (exists) drawable.shapes = drawable.shapes.filter(not(sameCircle));
-  else drawable.shapes.push([key]);
+  else drawable.shapes.push({drawColor: drawColor, orig: key});
 }
 
 function addLine(drawable, orig, dest) {
+  var drawColor = drawable.current.drawColor;
   var sameLine = function(s) {
-    return s.length === 2 && (
-      (s[0] === orig && s[1] === dest) ||
-      (s[1] === orig && s[0] === dest)
+    return s.orig && s.dest && (
+      (s.orig === orig && s.dest === dest) ||
+      (s.dest === orig && s.orig === dest)
     );
   };
   var exists = drawable.shapes.filter(sameLine).length > 0;
   if (exists) drawable.shapes = drawable.shapes.filter(not(sameLine));
-  else drawable.shapes.push([orig, dest]);
+  else drawable.shapes.push({drawColor: drawColor, orig: orig, dest: dest});
 }
 
 module.exports = {
