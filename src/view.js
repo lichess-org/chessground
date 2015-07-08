@@ -81,18 +81,26 @@ function renderSquare(ctrl, pos, asWhite) {
 
 function renderSquareTarget(ctrl, cur) {
   var pos = util.key2pos(cur.over),
-    x = ctrl.data.orientation === 'white' ? pos[0] : 9 - pos[0],
-    y = ctrl.data.orientation === 'white' ? pos[1] : 9 - pos[1];
+    width = cur.bounds.width,
+    targetWidth = width / 4,
+    squareWidth = width / 8,
+    asWhite = ctrl.data.orientation === 'white';
+  var style = {
+    width: targetWidth + 'px',
+    height: targetWidth + 'px',
+    left: (-0.5 * squareWidth) + 'px',
+    top: (-0.5 * squareWidth) + 'px'
+  };
+  var vector = [
+    (asWhite ? pos[0] - 1 : 8 - pos[0]) * squareWidth,
+    (asWhite ? 8 - pos[1] : pos[1] - 1) * squareWidth
+  ];
+  style[util.transformProp()] = util.translate(vector);
   return {
     tag: 'div',
     attrs: {
       id: 'cg-square-target',
-      style: {
-        width: cur.bounds.width / 4 + 'px',
-        height: cur.bounds.height / 4 + 'px',
-        left: (x - 1.5) * cur.bounds.width / 8 + 'px',
-        top: (7.5 - y) * cur.bounds.height / 8 + 'px'
-      }
+      style: style
     }
   };
 }

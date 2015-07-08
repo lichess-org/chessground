@@ -72,16 +72,14 @@ function processDrag(data, e) {
       if (!cur.started && util.distance(cur.epos, cur.rel) >= data.draggable.distance) {
         if (!cur.started) {
           // intended for mobile only: big pieces and position in top center
-          if (data.draggable.squareTarget) {
-            draggingPiece.style.width = '200%';
-            draggingPiece.style.height = '200%';
-            var pieceBounds = draggingPiece.getBoundingClientRect();
-            var position = util.eventPosition(e);
-            data.draggable.current.dec = data.draggable.centerPiece ? [
-              position[0] - (pieceBounds.left + pieceBounds.width / 2),
-              0
-            ] : [0, 0];
-          }
+          draggingPiece.style.width = '200%';
+          draggingPiece.style.height = '200%';
+          var pieceBounds = draggingPiece.getBoundingClientRect();
+          var position = util.eventPosition(e);
+          data.draggable.current.dec = data.draggable.centerPiece ? [
+            position[0] - (pieceBounds.left + pieceBounds.width / 2),
+            0
+          ] : [0, 0];
           cur.started = true;
           // render once for ghost and dragging style
           data.render();
@@ -95,8 +93,12 @@ function processDrag(data, e) {
         // render once for square target
         if (!cur.over) {
           cur.over = board.getKeyAtDomPos(data, cur.epos, cur.bounds);
-          data.render();
-          squareTarget = document.getElementById('cg-square-target');
+          // setup square target if dragging into bounds
+          if (cur.over) {
+            cur.prevTarget = cur.over;
+            data.render();
+            squareTarget = document.getElementById('cg-square-target');
+          } else squareTarget = null;
         }
         cur.over = board.getKeyAtDomPos(data, cur.epos, cur.bounds);
 
@@ -107,12 +109,16 @@ function processDrag(data, e) {
         ]);
         // only mobile board will render square target so this apply only to
         // mobile devices
-        if (cur.over && squareTarget) {
-          var stPos = util.key2pos(cur.over),
-            stX = data.orientation === 'white' ? stPos[0] : 9 - stPos[0],
-            stY = data.orientation === 'white' ? stPos[1] : 9 - stPos[1];
-          squareTarget.style.left = (stX - 1.5) * cur.bounds.width / 8 + 'px';
-          squareTarget.style.top = (7.5 - stY) * cur.bounds.height / 8 + 'px';
+        if (cur.over && squareTarget && cur.over !== cur.prevTarget) {
+          var squareWidth = cur.bounds.width / 8,
+            asWhite = data.orientation === 'white',
+            stPos = util.key2pos(cur.over),
+            vector = [
+              (asWhite ? stPos[0] - 1 : 8 - stPos[0]) * squareWidth,
+              (asWhite ? 8 - stPos[1] : stPos[1] - 1) * squareWidth
+            ];
+          squareTarget.style[util.transformProp()] = util.translate(vector);
+          cur.prevTarget = cur.over;
         }
       }
     }
