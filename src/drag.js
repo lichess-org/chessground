@@ -70,45 +70,46 @@ function processDrag(data, e) {
     if (hashPiece(data.pieces[cur.orig]) !== cur.piece) cancel(data);
     else {
       if (!cur.started && util.distance(cur.epos, cur.rel) >= data.draggable.distance) {
-        if (!cur.started) {
-          // intended for mobile only: big pieces and position in top center
-          draggingPiece.style.width = '200%';
-          draggingPiece.style.height = '200%';
-          var pieceBounds = draggingPiece.getBoundingClientRect();
-          var position = util.eventPosition(e);
-          data.draggable.current.dec = data.draggable.centerPiece ? [
-            position[0] - (pieceBounds.left + pieceBounds.width / 2),
-            0
-          ] : [0, 0];
-          cur.started = true;
-          // render once for ghost and dragging style
-          data.render();
-        }
+        // intended for mobile only: big pieces and position in top center
+        draggingPiece.style.width = '200%';
+        draggingPiece.style.height = '200%';
+        var pieceBounds = draggingPiece.getBoundingClientRect();
+        var position = util.eventPosition(e);
+        data.draggable.current.dec = data.draggable.centerPiece ? [
+          position[0] - (pieceBounds.left + pieceBounds.width / 2),
+          0
+        ] : [0, 0];
+        cur.started = true;
+        // render once for ghost and dragging style
+        data.render();
       }
       if (cur.started) {
         cur.pos = [
           cur.epos[0] - cur.rel[0],
           cur.epos[1] - cur.rel[1]
         ];
-        // render once for square target
+
+        // square target setup
         if (!cur.over) {
           cur.over = board.getKeyAtDomPos(data, cur.epos, cur.bounds);
-          // setup square target if dragging into bounds
           if (cur.over) {
             cur.prevTarget = cur.over;
             data.render();
             squareTarget = document.getElementById('cg-square-target');
-          } else squareTarget = null;
+          } else {
+            squareTarget = null;
+            data.render();
+          }
         }
         cur.over = board.getKeyAtDomPos(data, cur.epos, cur.bounds);
 
-        // update dom live to avoid mithril costly rendering on each touchmove
+        // move piece
         draggingPiece.style[util.transformProp()] = util.translate([
           cur.pos[0] + cur.dec[0],
           cur.pos[1] + cur.dec[1]
         ]);
-        // only mobile board will render square target so this apply only to
-        // mobile devices
+
+        // move square target
         if (cur.over && squareTarget && cur.over !== cur.prevTarget) {
           var squareWidth = cur.bounds.width / 8,
             asWhite = data.orientation === 'white',
