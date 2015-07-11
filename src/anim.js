@@ -4,7 +4,7 @@ var util = require('./util');
 var easing = {
   easeInOutCubic: function(t) {
     return t < 0.5 ? 4 * t * t * t : (t - 1) * (2 * t - 2) * (2 * t - 2) + 1;
-  },
+  }
 };
 
 function fixPieceElementsAfterAnimating(data) {
@@ -40,7 +40,7 @@ function closer(piece, pieces) {
 }
 
 function computePlan(prev, current) {
-  var bounds = current.bounds(),
+  var bounds = current.bounds,
     width = bounds.width / 8,
     height = bounds.height / 8,
     anims = {},
@@ -73,13 +73,13 @@ function computePlan(prev, current) {
     }
   }
   news.forEach(function(newP) {
-    var preP = closer(newP, missings.filter(util.partial(samePiece, newP)));
-    if (preP) {
-      var orig = white ? preP.pos : newP.pos;
-      var dest = white ? newP.pos : preP.pos;
+    var nPreP = closer(newP, missings.filter(util.partial(samePiece, newP)));
+    if (nPreP) {
+      var orig = white ? nPreP.pos : newP.pos;
+      var dest = white ? newP.pos : nPreP.pos;
       var vector = [(orig[0] - dest[0]) * width, (dest[1] - orig[1]) * height];
       anims[newP.key] = [vector, vector];
-      animedOrigs.push(preP.key);
+      animedOrigs.push(nPreP.key);
     }
   });
   missings.forEach(function(p) {

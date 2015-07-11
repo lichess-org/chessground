@@ -11,7 +11,7 @@ function start(data, e) {
   e.preventDefault();
   board.cancelMove(data);
   var position = util.eventPosition(e);
-  var bounds = data.bounds();
+  var bounds = data.bounds;
   var orig = board.getKeyAtDomPos(data, position, bounds);
   data.drawable.current = {
     orig: orig,

@@ -30,7 +30,7 @@ function start(data, e) {
   originTarget = e.target;
   var previouslySelected = data.selected;
   var position = util.eventPosition(e);
-  var bounds = data.bounds();
+  var bounds = data.bounds;
   var orig = board.getKeyAtDomPos(data, position, bounds);
   var hadPremove = !!data.premovable.current;
   board.selectSquare(data, orig);

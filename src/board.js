@@ -216,7 +216,7 @@ function stop(data) {
 
 function getKeyAtDomPos(data, pos, bounds) {
   if (!bounds && !data.bounds) return;
-  bounds = bounds || data.bounds(); // use provided value, or compute it
+  bounds = bounds || data.bounds; // use provided value, or get it from data
   var file = Math.ceil(8 * ((pos[0] - bounds.left) / bounds.width));
   file = data.orientation === 'white' ? file : 9 - file;
   var rank = Math.ceil(8 - (8 * ((pos[1] - bounds.top) / bounds.height)));
