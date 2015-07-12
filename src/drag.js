@@ -36,7 +36,7 @@ function start(data, e) {
   board.selectSquare(data, orig);
   var stillSelected = data.selected === orig;
   if (data.pieces[orig] && stillSelected && board.isDraggable(data, orig)) {
-    var pieceBounds = data.element.querySelector('.' + orig).getBoundingClientRect();
+    var bpos = util.boardpos(util.key2pos(orig), data.orientation === 'white');
     data.draggable.current = {
       previouslySelected: previouslySelected,
       orig: orig,
@@ -44,21 +44,21 @@ function start(data, e) {
       rel: position,
       epos: position,
       pos: [0, 0],
-      dec: data.draggable.centerPiece ? [
-        position[0] - (pieceBounds.left + pieceBounds.width / 2),
-        position[1] - (pieceBounds.top + pieceBounds.height / 2)
-      ] : [0, 0],
+      dec: [
+        position[0] - (bounds.left + (bounds.width * bpos.left / 100) + (bounds.width * 0.25) / 2),
+        position[1] - (bounds.top + bounds.height - (bounds.height * bpos.bottom / 100) + 10)
+      ],
       bounds: bounds,
       started: false
     };
+    draggingPiece = data.element.querySelector('.' + data.draggable.current.orig + ' > .cg-piece');
     hold.start();
   } else if (hadPremove) board.unsetPremove(data);
-  data.render();
-  draggingPiece = data.element.querySelector('.' + data.draggable.current.orig + ' > .cg-piece');
+  data.renderRAF();
   processDrag(data, e);
 }
 
-function processDrag(data, e) {
+function processDrag(data) {
   var cur = data.draggable.current;
   if (cur.orig) {
     // cancel animations while dragging
@@ -70,18 +70,9 @@ function processDrag(data, e) {
     if (hashPiece(data.pieces[cur.orig]) !== cur.piece) cancel(data);
     else {
       if (!cur.started && util.distance(cur.epos, cur.rel) >= data.draggable.distance) {
-        // intended for mobile only: big pieces and position in top center
-        draggingPiece.style.width = '200%';
-        draggingPiece.style.height = '200%';
-        var pieceBounds = draggingPiece.getBoundingClientRect();
-        var position = util.eventPosition(e);
-        data.draggable.current.dec = data.draggable.centerPiece ? [
-          position[0] - (pieceBounds.left + pieceBounds.width / 2),
-          0
-        ] : [0, 0];
-        cur.started = true;
         // render once for ghost and dragging style
-        data.render();
+        cur.started = true;
+        data.renderRAF();
       }
       if (cur.started) {
         cur.pos = [
@@ -139,7 +130,7 @@ function end(data, e) {
   var draggable = data.draggable;
   var orig = draggable.current ? draggable.current.orig : null;
   var dest;
-  fixDraggingPieceElementAfterDrag();
+  requestAnimationFrame(fixDraggingPieceElementAfterDrag);
   if (!orig) return;
   // comparing with the origin target is an easy way to test that the end event
   // has the same touch origin
@@ -153,11 +144,11 @@ function end(data, e) {
     board.setSelected(data, null);
   }
   draggable.current = {};
-  data.render();
+  data.renderRAF();
 }
 
 function cancel(data) {
-  fixDraggingPieceElementAfterDrag();
+  requestAnimationFrame(fixDraggingPieceElementAfterDrag);
   if (data.draggable.current.orig) {
     data.draggable.current = {};
     board.selectSquare(data, null);

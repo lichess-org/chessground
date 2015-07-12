@@ -10,6 +10,13 @@ function key2pos(pos) {
   return [(files.indexOf(pos[0]) + 1), parseInt(pos[1])];
 }
 
+function boardpos(pos, asWhite) {
+  return {
+    left: (asWhite ? pos[0] - 1 : 8 - pos[0]) * 12.5,
+    bottom: (asWhite ? pos[1] - 1 : 8 - pos[1]) * 12.5
+  };
+}
+
 function invertKey(key) {
   return files[7 - files.indexOf(key[0])] + (9 - parseInt(key[1]));
 }
@@ -95,6 +102,7 @@ module.exports = {
   allKeys: allKeys,
   pos2key: pos2key,
   key2pos: key2pos,
+  boardpos: boardpos,
   invertKey: invertKey,
   classSet: classSet,
   opposite: opposite,
