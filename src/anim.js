@@ -12,7 +12,7 @@ function fixPieceElementsAfterAnimating(data) {
     var keys = Object.keys(data.animation.current.animating);
     for (var i = 0, len = keys.length; i < len; i++) {
       var p = data.animation.current.animating[keys[i]];
-      if (p && data.minimalDom) p.style.translate = '';
+      if (p && data.minimalDom) p.style[util.transformProp()] = '';
       else if (p) p.removeAttribute('style');
     }
   }
