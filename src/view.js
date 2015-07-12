@@ -44,6 +44,7 @@ function renderSquare(ctrl, pos, asWhite) {
   var key = file + rank;
   var piece = ctrl.data.pieces[key];
   var isDragOver = ctrl.data.highlight.dragOver && ctrl.data.draggable.current.over === key;
+  var bpos = util.boardpos(pos, asWhite);
   var attrs = {
     class: 'cg-square ' + key + ' ' + util.classSet({
       'selected': ctrl.data.selected === key,
@@ -57,8 +58,8 @@ function renderSquare(ctrl, pos, asWhite) {
       'exploding': ctrl.vm.exploding && ctrl.vm.exploding.indexOf(key) !== -1
     }),
     style: {
-      left: (asWhite ? pos[0] - 1 : 8 - pos[0]) * 12.5 + '%',
-      bottom: (asWhite ? pos[1] - 1 : 8 - pos[1]) * 12.5 + '%'
+      left: bpos.left + '%',
+      bottom: bpos.bottom + '%'
     }
   };
   if (ctrl.data.coordinates) {
@@ -129,13 +130,14 @@ function renderMinimalDom(ctrl, asWhite) {
   var children = [];
   if (ctrl.data.lastMove) ctrl.data.lastMove.forEach(function(key) {
     var pos = util.key2pos(key);
+    var bpos = util.boardpos(pos, asWhite);
     children.push({
       tag: 'div',
       attrs: {
         class: 'cg-square last-move',
         style: {
-          left: (asWhite ? pos[0] - 1 : 8 - pos[0]) * 12.5 + '%',
-          bottom: (asWhite ? pos[1] - 1 : 8 - pos[1]) * 12.5 + '%'
+          left: bpos.left + '%',
+          bottom: bpos.bottom + '%'
         }
       }
     });
@@ -144,10 +146,11 @@ function renderMinimalDom(ctrl, asWhite) {
   for (var i = 0, len = piecesKeys.length; i < len; i++) {
     var key = piecesKeys[i];
     var pos = util.key2pos(key);
+    var bpos = util.boardpos(pos, asWhite);
     var attrs = {
       style: {
-        left: (asWhite ? pos[0] - 1 : 8 - pos[0]) * 12.5 + '%',
-        bottom: (asWhite ? pos[1] - 1 : 8 - pos[1]) * 12.5 + '%'
+        left: bpos.left + '%',
+        bottom: bpos.bottom + '%'
       },
       class: pieceClass(ctrl.data.pieces[key]) + ' ' + key
     };
