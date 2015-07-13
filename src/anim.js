@@ -113,7 +113,7 @@ function go(data, running) {
     data.render();
     return;
   }
-  var rest = 1 - (new Date().getTime() - data.animation.current.start) / data.animation.current.duration;
+  var rest = 1 - (Date.now() - data.animation.current.start) / data.animation.current.duration;
   if (rest <= 0) {
     fixPieceElementsAfterAnimating(data);
     data.render();
@@ -140,9 +140,7 @@ function go(data, running) {
         newPieceEl.style[util.transformProp()] = util.translate(cfg[1]);
       }
     }
-    util.requestAnimationFrame(function() {
-      go(data, true);
-    });
+    requestAnimationFrame(go.bind(undefined, data, true));
   }
 }
 
@@ -168,13 +166,13 @@ function animate(transformation, data) {
     // directly at the latest when running animation is finished
     if (!alreadyRunning) {
       data.animation.current = {
-        start: new Date().getTime(),
+        start: Date.now(),
         duration: data.animation.duration,
         anims: plan.anims,
         fadings: plan.fadings,
         animating: {}
       };
-      go(data);
+      requestAnimationFrame(go.bind(undefined, data, false));
     }
   } else {
     // don't animate, just render right away
