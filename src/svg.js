@@ -2,20 +2,22 @@ var m = require('mithril');
 var key2pos = require('./util').key2pos;
 
 var colors = ['#15781B', '#882020', '#003088', '#E68F00'];
-var colorIndexes = colors.map(function(c, i) { return i; });
+var colorIndexes = colors.map(function(c, i) {
+  return i;
+});
 
 var bounds;
 
-function circleWidth(light) {
-  return (light ? 2 : 4) / 512 * bounds.width;
+function circleWidth(current) {
+  return (current ? 2 : 4) / 512 * bounds.width;
 }
 
-function lineWidth(light) {
-  return (light ? 7 : 10) / 512 * bounds.width;
+function lineWidth(current) {
+  return (current ? 7 : 10) / 512 * bounds.width;
 }
 
-function opacity(light) {
-  return light ? 0.5 : 1;
+function opacity(current) {
+  return current ? 0.5 : 1;
 }
 
 function arrowMargin() {
@@ -27,17 +29,18 @@ function pos2px(pos) {
   return [(pos[0] - 0.5) * squareSize, (8.5 - pos[1]) * squareSize];
 }
 
-function circle(drawColor, pos, light) {
+function circle(drawColor, pos, current) {
   var o = pos2px(pos);
-  var width = circleWidth(light);
+  var width = circleWidth(current);
   var radius = bounds.width / 16;
   return {
     tag: 'circle',
     attrs: {
+      key: current ? 'current' : pos,
       stroke: colors[drawColor],
       'stroke-width': width,
       fill: 'none',
-      opacity: opacity(light),
+      opacity: opacity(current),
       cx: o[0],
       cy: o[1],
       r: radius - width / 2 - drawColor * width * 1.5
@@ -45,7 +48,7 @@ function circle(drawColor, pos, light) {
   };
 }
 
-function arrow(drawColor, orig, dest, light) {
+function arrow(drawColor, orig, dest, current) {
   var m = arrowMargin();
   var a = pos2px(orig);
   var b = pos2px(dest);
@@ -57,11 +60,12 @@ function arrow(drawColor, orig, dest, light) {
   return {
     tag: 'line',
     attrs: {
+      key: current ? 'current' : orig + dest,
       stroke: colors[drawColor],
-      'stroke-width': lineWidth(light),
+      'stroke-width': lineWidth(current),
       'stroke-linecap': 'round',
       'marker-end': 'url(#arrowhead' + drawColor + ')',
-      opacity: opacity(light),
+      opacity: opacity(current),
       x1: a[0],
       y1: a[1],
       x2: b[0] - xo,
@@ -102,17 +106,17 @@ function orient(pos, color) {
   return color === 'white' ? pos : [9 - pos[0], 9 - pos[1]];
 }
 
-function renderShape(orientation, light) {
+function renderShape(orientation, current) {
   return function(shape) {
     if (shape.orig && shape.dest) return arrow(
       shape.drawColor,
       orient(key2pos(shape.orig), orientation),
       orient(key2pos(shape.dest), orientation),
-      light);
+      current);
     else if (shape.orig) return circle(
       shape.drawColor,
       orient(key2pos(shape.orig), orientation),
-      light);
+      current);
   };
 }
 
