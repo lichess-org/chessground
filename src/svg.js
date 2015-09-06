@@ -17,11 +17,11 @@ function lineWidth(current) {
 }
 
 function opacity(current) {
-  return current ? 0.5 : 1;
+  return current ? 0.6 : 1;
 }
 
-function arrowMargin() {
-  return 24 / 512 * bounds.width;
+function arrowMargin(current) {
+  return (current ? 12 : 24) / 512 * bounds.width;
 }
 
 function pos2px(pos) {
@@ -49,7 +49,7 @@ function circle(drawColor, pos, current) {
 }
 
 function arrow(drawColor, orig, dest, current) {
-  var m = arrowMargin();
+  var m = arrowMargin(current);
   var a = pos2px(orig);
   var b = pos2px(dest);
   var dx = b[0] - a[0],

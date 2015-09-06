@@ -46,7 +46,7 @@ function renderSquare(ctrl, pos, asWhite) {
   var piece = ctrl.data.pieces[key];
   var isDragOver = ctrl.data.highlight.dragOver && ctrl.data.draggable.current.over === key;
   var attrs = {
-    class: 'cg-square ' + key + ' ' + util.classSet({
+    class: 'cg-square ' + util.classSet({
       'selected': ctrl.data.selected === key,
       'check': ctrl.data.highlight.check && ctrl.data.check === key,
       'last-move': ctrl.data.highlight.lastMove && util.contains2(ctrl.data.lastMove, key),
@@ -54,7 +54,7 @@ function renderSquare(ctrl, pos, asWhite) {
       'premove-dest': (isDragOver || ctrl.data.premovable.showDests) && util.containsX(ctrl.data.premovable.dests, key),
       'current-premove': util.contains2(ctrl.data.premovable.current, key),
       'drag-over': isDragOver,
-      'occupied': !!piece,
+      'oc': !!piece,
       'exploding': ctrl.vm.exploding && ctrl.vm.exploding.indexOf(key) !== -1
     }),
     style: {
