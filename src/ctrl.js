@@ -52,4 +52,9 @@ module.exports = function(cfg) {
       this.data.renderRAF();
     }.bind(this), 200);
   }.bind(this);
+
+  this.setAutoShapes = function(shapes) {
+    this.data.drawable.autoShapes = shapes;
+    this.data.renderRAF();
+  }.bind(this);
 };

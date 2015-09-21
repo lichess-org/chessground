@@ -101,22 +101,22 @@ module.exports = function(cfg) {
     },
     drawable: {
       enabled: false, // allows SVG drawings
+      // user shapes
       shapes: [
-        // {drawColor: 0, orig: 'e8'},
-        // {drawColor: 1, orig: 'f7'],
-        // {drawColor: 0, orig: 'e2', dest: 'e4'},
-        // {drawColor: 0, orig: 'g1', dest: 'f3'},
-        // {drawColor: 0, orig: 'f3', dest: 'g5'},
-        // {drawColor: 1, orig: 'g5', dest: 'f7'},
-        // {drawColor: 1, orig: 'f1', dest: 'c4'},
-        // {drawColor: 1, orig: 'c4', dest: 'f7'},
+        // {style: 0, orig: 'e8'},
+        // {style: 1, orig: 'c4', dest: 'f7'}
+      ],
+      // computer shapes
+      autoShapes: [
+        // {style: 4, orig: 'e8'},
+        // {style: 4, orig: 'c4', dest: 'f7'}
       ],
       /*{ // current
        *  orig: "a2", // orig key of drawing
        *  pos: [20, -12] // relative current position
        *  dest: "b3" // square being moused over
        *  bounds: // current cached board bounds
-       *  drawColor: 0 // color number for shape
+       *  style: 0 // color number for shape
        *}*/
       current: {}
     }

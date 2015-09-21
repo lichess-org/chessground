@@ -25,6 +25,7 @@ module.exports = function(controller) {
     cancelPremove: controller.cancelPremove,
     cancelMove: controller.cancelMove,
     stop: controller.stop,
-    explode: controller.explode
+    explode: controller.explode,
+    setAutoShapes: controller.setAutoShapes
   };
 };

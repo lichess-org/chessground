@@ -17,7 +17,7 @@ function start(data, e) {
     orig: orig,
     epos: position,
     bounds: bounds,
-    drawColor: (e.shiftKey & util.isRightButton(e)) + (e.altKey ? 2 : 0)
+    style: (e.shiftKey & util.isRightButton(e)) + (e.altKey ? 2 : 0)
   };
   processDraw(data);
 }
@@ -67,17 +67,17 @@ function not(f) {
 }
 
 function addCircle(drawable, key) {
-  var drawColor = drawable.current.drawColor;
+  var style = drawable.current.style;
   var sameCircle = function(s) {
-    return s.drawColor === drawColor && s.orig === key && !s.dest;
+    return s.style === style && s.orig === key && !s.dest;
   };
   var exists = drawable.shapes.filter(sameCircle).length > 0;
   if (exists) drawable.shapes = drawable.shapes.filter(not(sameCircle));
-  else drawable.shapes.push({drawColor: drawColor, orig: key});
+  else drawable.shapes.push({style: style, orig: key});
 }
 
 function addLine(drawable, orig, dest) {
-  var drawColor = drawable.current.drawColor;
+  var style = drawable.current.style;
   var sameLine = function(s) {
     return s.orig && s.dest && (
       (s.orig === orig && s.dest === dest) ||
@@ -86,7 +86,7 @@ function addLine(drawable, orig, dest) {
   };
   var exists = drawable.shapes.filter(sameLine).length > 0;
   if (exists) drawable.shapes = drawable.shapes.filter(not(sameLine));
-  else drawable.shapes.push({drawColor: drawColor, orig: orig, dest: dest});
+  else drawable.shapes.push({style: style, orig: orig, dest: dest});
 }
 
 module.exports = {
