@@ -54,7 +54,8 @@ module.exports = function(cfg) {
   }.bind(this);
 
   this.setAutoShapes = function(shapes) {
-    this.data.drawable.autoShapes = shapes;
-    this.data.renderRAF();
+    anim(function(data) {
+      data.drawable.autoShapes = shapes;
+    }, this.data, false)();
   }.bind(this);
 };
