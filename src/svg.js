@@ -31,7 +31,7 @@ function circle(brush, pos, current) {
   return {
     tag: 'circle',
     attrs: {
-      key: current ? 'current' : pos,
+      key: current ? 'current' : pos + brush.key,
       stroke: brush.color,
       'stroke-width': width,
       fill: 'none',
@@ -55,7 +55,7 @@ function arrow(brush, orig, dest, current) {
   return {
     tag: 'line',
     attrs: {
-      key: current ? 'current' : orig + dest,
+      key: current ? 'current' : orig + dest + brush.key,
       stroke: brush.color,
       'stroke-width': lineWidth(brush, current),
       'stroke-linecap': 'round',
@@ -75,6 +75,7 @@ function defs(brushes) {
     children: [
       brushes.map(function(brush) {
         return {
+          key: brush.key,
           tag: 'marker',
           attrs: {
             id: 'arrowhead-' + brush.key,
