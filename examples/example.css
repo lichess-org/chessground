@@ -29,6 +29,7 @@ section p {
   height: 512px;
 }
 .cg-board-wrap svg {
+  opacity: 0.6;
   overflow: hidden;
   position: relative;
   top: 0px;
@@ -39,5 +40,5 @@ section p {
   z-index: 2;
 }
 .cg-board-wrap svg * {
-  transition: 0.3s;
+  transition: 0.35s;
 }

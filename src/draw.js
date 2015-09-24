@@ -1,6 +1,8 @@
 var board = require('./board');
 var util = require('./util');
 
+var brushes = ['green', 'red', 'blue', 'yellow'];
+
 function hashPiece(piece) {
   return piece ? piece.color + ' ' + piece.role : '';
 }
@@ -17,7 +19,7 @@ function start(data, e) {
     orig: orig,
     epos: position,
     bounds: bounds,
-    style: (e.shiftKey & util.isRightButton(e)) + (e.altKey ? 2 : 0)
+    brush: brushes[(e.shiftKey & util.isRightButton(e)) + (e.altKey ? 2 : 0)]
   };
   processDraw(data);
 }
@@ -67,17 +69,17 @@ function not(f) {
 }
 
 function addCircle(drawable, key) {
-  var style = drawable.current.style;
+  var brush = drawable.current.brush;
   var sameCircle = function(s) {
-    return s.style === style && s.orig === key && !s.dest;
+    return s.brush === brush && s.orig === key && !s.dest;
   };
   var exists = drawable.shapes.filter(sameCircle).length > 0;
   if (exists) drawable.shapes = drawable.shapes.filter(not(sameCircle));
-  else drawable.shapes.push({style: style, orig: key});
+  else drawable.shapes.push({brush: brush, orig: key});
 }
 
 function addLine(drawable, orig, dest) {
-  var style = drawable.current.style;
+  var brush = drawable.current.brush;
   var sameLine = function(s) {
     return s.orig && s.dest && (
       (s.orig === orig && s.dest === dest) ||
@@ -86,7 +88,7 @@ function addLine(drawable, orig, dest) {
   };
   var exists = drawable.shapes.filter(sameLine).length > 0;
   if (exists) drawable.shapes = drawable.shapes.filter(not(sameLine));
-  else drawable.shapes.push({style: style, orig: orig, dest: dest});
+  else drawable.shapes.push({brush: brush, orig: orig, dest: dest});
 }
 
 module.exports = {

@@ -103,22 +103,66 @@ module.exports = function(cfg) {
       enabled: false, // allows SVG drawings
       // user shapes
       shapes: [
-        // {style: 0, orig: 'e8'},
-        // {style: 1, orig: 'c4', dest: 'f7'}
+        // {brush: 'green', orig: 'e8'},
+        // {brush: 'yellow', orig: 'c4', dest: 'f7'}
       ],
       // computer shapes
       autoShapes: [
-        // {style: 4, orig: 'e8'},
-        // {style: 4, orig: 'c4', dest: 'f7'}
+        // {brush: 'paleBlue', orig: 'e8'},
+        // {brush: 'paleRed', orig: 'c4', dest: 'f7'}
       ],
       /*{ // current
        *  orig: "a2", // orig key of drawing
        *  pos: [20, -12] // relative current position
        *  dest: "b3" // square being moused over
        *  bounds: // current cached board bounds
-       *  style: 0 // color number for shape
+       *  brush: 'green' // brush name for shape
        *}*/
-      current: {}
+      current: {},
+      brushes: {
+        green: {
+          key: 'g',
+          color: '#15781B',
+          opacity: 1,
+          lineWidth: 10,
+          circleMargin: 0
+        },
+        red: {
+          key: 'r',
+          color: '#882020',
+          opacity: 1,
+          lineWidth: 10,
+          circleMargin: 1
+        },
+        blue: {
+          key: 'b',
+          color: '#003088',
+          opacity: 1,
+          lineWidth: 10,
+          circleMargin: 2
+        },
+        yellow: {
+          key: 'y',
+          color: '#e68f00',
+          opacity: 1,
+          lineWidth: 10,
+          circleMargin: 3
+        },
+        paleBlue: {
+          key: 'pb',
+          color: '#003088',
+          opacity: 0.45,
+          lineWidth: 15,
+          circleMargin: 0
+        },
+        paleGreen: {
+          key: 'pg',
+          color: '#15781B',
+          opacity: 0.55,
+          lineWidth: 15,
+          circleMargin: 0
+        }
+      }
     }
   };
 
