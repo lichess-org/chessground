@@ -5,7 +5,7 @@ var svg = require('./svg');
 var m = require('mithril');
 
 function pieceClass(p) {
-  return ['cg-piece', p.role, p.color].join(' ');
+  return p.role + ' ' +  p.color;
 }
 
 function renderPiece(ctrl, key, p) {
@@ -25,7 +25,7 @@ function renderPiece(ctrl, key, p) {
     if (animation) attrs.style[util.transformProp()] = util.translate(animation[1]);
   }
   return {
-    tag: 'div',
+    tag: 'piece',
     attrs: attrs
   };
 }
@@ -46,7 +46,7 @@ function renderSquare(ctrl, pos, asWhite) {
   var piece = ctrl.data.pieces[key];
   var isDragOver = ctrl.data.highlight.dragOver && ctrl.data.draggable.current.over === key;
   var attrs = {
-    class: 'cg-square ' + util.classSet({
+    class: util.classSet({
       'selected': ctrl.data.selected === key,
       'check': ctrl.data.highlight.check && ctrl.data.check === key,
       'last-move': ctrl.data.highlight.lastMove && util.contains2(ctrl.data.lastMove, key),
@@ -74,7 +74,7 @@ function renderSquare(ctrl, pos, asWhite) {
     }
   }
   return {
-    tag: 'div',
+    tag: 'square',
     attrs: attrs,
     children: children
   };
@@ -100,9 +100,9 @@ function renderSquareTarget(ctrl, cur) {
 
 function renderFading(cfg) {
   return {
-    tag: 'div',
+    tag: 'square',
     attrs: {
-      class: 'cg-square fading',
+      class: 'fading',
       style: {
         left: cfg.left,
         bottom: cfg.bottom,
@@ -123,9 +123,9 @@ function renderMinimalDom(ctrl, asWhite) {
   if (ctrl.data.lastMove) ctrl.data.lastMove.forEach(function(key) {
     var pos = util.key2pos(key);
     children.push({
-      tag: 'div',
+      tag: 'square',
       attrs: {
-        class: 'cg-square last-move',
+        class: 'last-move',
         style: {
           left: (asWhite ? pos[0] - 1 : 8 - pos[0]) * 12.5 + '%',
           bottom: (asWhite ? pos[1] - 1 : 8 - pos[1]) * 12.5 + '%'
