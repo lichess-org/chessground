@@ -5,7 +5,7 @@ var svg = require('./svg');
 var m = require('mithril');
 
 function pieceClass(p) {
-  return p.role + ' ' +  p.color;
+  return p.role + ' ' + p.color;
 }
 
 function renderPiece(ctrl, key, p) {
@@ -45,23 +45,24 @@ function renderSquare(ctrl, pos, asWhite) {
   var key = file + rank;
   var piece = ctrl.data.pieces[key];
   var isDragOver = ctrl.data.highlight.dragOver && ctrl.data.draggable.current.over === key;
+  var classes = util.classSet({
+    'selected': ctrl.data.selected === key,
+    'check': ctrl.data.highlight.check && ctrl.data.check === key,
+    'last-move': ctrl.data.highlight.lastMove && util.contains2(ctrl.data.lastMove, key),
+    'move-dest': (isDragOver || ctrl.data.movable.showDests) && util.containsX(ctrl.data.movable.dests[ctrl.data.selected], key),
+    'premove-dest': (isDragOver || ctrl.data.premovable.showDests) && util.containsX(ctrl.data.premovable.dests, key),
+    'current-premove': util.contains2(ctrl.data.premovable.current, key),
+    'drag-over': isDragOver,
+    'oc': !!piece,
+    'exploding': ctrl.vm.exploding && ctrl.vm.exploding.indexOf(key) !== -1
+  });
   var attrs = {
-    class: util.classSet({
-      'selected': ctrl.data.selected === key,
-      'check': ctrl.data.highlight.check && ctrl.data.check === key,
-      'last-move': ctrl.data.highlight.lastMove && util.contains2(ctrl.data.lastMove, key),
-      'move-dest': (isDragOver || ctrl.data.movable.showDests) && util.containsX(ctrl.data.movable.dests[ctrl.data.selected], key),
-      'premove-dest': (isDragOver || ctrl.data.premovable.showDests) && util.containsX(ctrl.data.premovable.dests, key),
-      'current-premove': util.contains2(ctrl.data.premovable.current, key),
-      'drag-over': isDragOver,
-      'oc': !!piece,
-      'exploding': ctrl.vm.exploding && ctrl.vm.exploding.indexOf(key) !== -1
-    }),
     style: {
       left: (asWhite ? pos[0] - 1 : 8 - pos[0]) * 12.5 + '%',
       bottom: (asWhite ? pos[1] - 1 : 8 - pos[1]) * 12.5 + '%'
     }
   };
+  if (classes) attrs.class = classes;
   if (ctrl.data.coordinates) {
     if (pos[1] === (asWhite ? 1 : 8)) attrs['data-coord-x'] = file;
     if (pos[0] === (asWhite ? 8 : 1)) attrs['data-coord-y'] = rank;
