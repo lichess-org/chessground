@@ -32,7 +32,7 @@ function renderPiece(ctrl, key, p) {
 
 function renderGhost(p) {
   return {
-    tag: 'div',
+    tag: 'piece',
     attrs: {
       class: pieceClass(p) + ' ghost'
     }
@@ -110,7 +110,7 @@ function renderFading(cfg) {
       }
     },
     children: [{
-      tag: 'div',
+      tag: 'piece',
       attrs: {
         class: pieceClass(cfg.piece)
       }
@@ -149,7 +149,7 @@ function renderMinimalDom(ctrl, asWhite) {
       if (animation) attrs.style[util.transformProp()] = util.translate(animation[1]);
     }
     children.push({
-      tag: 'div',
+      tag: 'piece',
       attrs: attrs
     });
   }
