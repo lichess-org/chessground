@@ -67,7 +67,7 @@ function transformProp() {
 }
 
 function translate(pos) {
-  return 'translate3d(' + pos[0] + 'px,' + pos[1] + 'px,0)';
+  return 'translate(' + pos[0] + 'px,' + pos[1] + 'px)';
 }
 
 function eventPosition(e) {
