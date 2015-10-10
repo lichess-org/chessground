@@ -58,8 +58,10 @@ function cancel(data) {
 
 function clear(data, e) {
   if (e.button !== 0 || e.shiftKey) return; // only left click
-  data.drawable.shapes = [];
-  data.render();
+  if (data.drawable.shapes.length) {
+    data.drawable.shapes = [];
+    data.render();
+  }
 }
 
 function not(f) {
