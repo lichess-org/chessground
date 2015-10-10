@@ -18,6 +18,7 @@ module.exports = function(cfg) {
     viewOnly: false, // don't bind events: the user will never be able to move pieces around
     minimalDom: false, // don't use square elements. Optimization to use only with viewOnly
     disableContextMenu: false, // because who needs a context menu on a chessboard
+    resizable: true, // listens to chessground.resize on document.body to clear bounds cache
     highlight: {
       lastMove: true, // add last-move class to squares
       check: true, // add check class to squares

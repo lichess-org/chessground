@@ -86,6 +86,17 @@ function isRightButton(e) {
   return e.buttons === 2 || e.button === 2;
 }
 
+function memo(f) {
+  var v, ret = function() {
+    if (v === undefined) v = f();
+    return v;
+  };
+  ret.clear = function() {
+    v = undefined;
+  }
+  return ret;
+}
+
 module.exports = {
   files: files,
   ranks: ranks,
@@ -107,5 +118,6 @@ module.exports = {
   partial: partial,
   transformProp: transformProp,
   requestAnimationFrame: (window.requestAnimationFrame || window.setTimeout).bind(window),
-  isRightButton: isRightButton
+  isRightButton: isRightButton,
+  memo: memo
 };

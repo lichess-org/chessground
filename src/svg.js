@@ -1,13 +1,11 @@
 var m = require('mithril');
 var key2pos = require('./util').key2pos;
 
-var bounds;
-
-function circleWidth(current) {
+function circleWidth(current, bounds) {
   return (current ? 2 : 4) / 512 * bounds.width;
 }
 
-function lineWidth(brush, current) {
+function lineWidth(brush, current, bounds) {
   return (brush.lineWidth || 10) * (current ? 0.7 : 1) / 512 * bounds.width;
 }
 
@@ -15,18 +13,18 @@ function opacity(brush, current) {
   return (brush.opacity || 1) * (current ? 0.6 : 1);
 }
 
-function arrowMargin(current) {
+function arrowMargin(current, bounds) {
   return (current ? 12 : 24) / 512 * bounds.width;
 }
 
-function pos2px(pos) {
+function pos2px(pos, bounds) {
   var squareSize = bounds.width / 8;
   return [(pos[0] - 0.5) * squareSize, (8.5 - pos[1]) * squareSize];
 }
 
-function circle(brush, pos, current) {
-  var o = pos2px(pos);
-  var width = circleWidth(current);
+function circle(brush, pos, current, bounds) {
+  var o = pos2px(pos, bounds);
+  var width = circleWidth(current, bounds);
   var radius = bounds.width / 16;
   return {
     tag: 'circle',
@@ -43,10 +41,10 @@ function circle(brush, pos, current) {
   };
 }
 
-function arrow(brush, orig, dest, current) {
-  var m = arrowMargin(current);
-  var a = pos2px(orig);
-  var b = pos2px(dest);
+function arrow(brush, orig, dest, current, bounds) {
+  var m = arrowMargin(current, bounds);
+  var a = pos2px(orig, bounds);
+  var b = pos2px(dest, bounds);
   var dx = b[0] - a[0],
     dy = b[1] - a[1],
     angle = Math.atan2(dy, dx);
@@ -57,7 +55,7 @@ function arrow(brush, orig, dest, current) {
     attrs: {
       key: current ? 'current' : orig + dest + brush.key,
       stroke: brush.color,
-      'stroke-width': lineWidth(brush, current),
+      'stroke-width': lineWidth(brush, current, bounds),
       'stroke-linecap': 'round',
       'marker-end': 'url(#arrowhead-' + brush.key + ')',
       opacity: opacity(brush, current),
@@ -102,27 +100,27 @@ function orient(pos, color) {
   return color === 'white' ? pos : [9 - pos[0], 9 - pos[1]];
 }
 
-function renderShape(orientation, current, brushes) {
+function renderShape(orientation, current, brushes, bounds) {
   return function(shape) {
     if (shape.orig && shape.dest) return arrow(
       brushes[shape.brush],
       orient(key2pos(shape.orig), orientation),
       orient(key2pos(shape.dest), orientation),
-      current);
+      current, bounds);
     else if (shape.orig) return circle(
       brushes[shape.brush],
       orient(key2pos(shape.orig), orientation),
-      current);
+      current, bounds);
   };
 }
 
 module.exports = function(ctrl) {
   if (!ctrl.data.bounds) return;
+  var bounds = ctrl.data.bounds();
+  if (bounds.width !== bounds.height) return;
   var d = ctrl.data.drawable;
   var allShapes = d.shapes.concat(d.autoShapes);
   if (!allShapes.length && !d.current.orig) return;
-  if (!bounds) bounds = ctrl.data.bounds();
-  if (bounds.width !== bounds.height) return;
   var usedBrushes = Object.keys(ctrl.data.drawable.brushes).filter(function(name) {
     return (d.current && d.current.dest && d.current.brush === name) || allShapes.filter(function(s) {
       return s.dest && s.brush === name;
@@ -134,8 +132,8 @@ module.exports = function(ctrl) {
     tag: 'svg',
     children: [
       defs(usedBrushes),
-      allShapes.map(renderShape(ctrl.data.orientation, false, ctrl.data.drawable.brushes)),
-      renderShape(ctrl.data.orientation, true, ctrl.data.drawable.brushes)(d.current)
+      allShapes.map(renderShape(ctrl.data.orientation, false, ctrl.data.drawable.brushes, bounds)),
+      renderShape(ctrl.data.orientation, true, ctrl.data.drawable.brushes, bounds)(d.current)
     ]
   };
 }

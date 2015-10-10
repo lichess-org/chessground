@@ -235,7 +235,7 @@ function renderBoard(ctrl) {
         ctrl.data.renderRAF = function() {
           util.requestAnimationFrame(ctrl.data.render);
         };
-        ctrl.data.bounds = el.getBoundingClientRect.bind(el);
+        ctrl.data.bounds = util.memo(el.getBoundingClientRect.bind(el));
         ctrl.data.element = el;
         ctrl.data.render();
       }
@@ -249,12 +249,18 @@ module.exports = function(ctrl) {
     tag: 'div',
     attrs: {
       config: function(el, isUpdate) {
-        if (!isUpdate) el.addEventListener('contextmenu', function(e) {
+        if (isUpdate) return;
+        el.addEventListener('contextmenu', function(e) {
           if (ctrl.data.disableContextMenu || ctrl.data.drawable.enabled) {
             e.preventDefault();
             return false;
           }
         });
+        if (ctrl.data.resizable)
+          document.body.addEventListener('chessground.resize', function(e) {
+            ctrl.data.bounds.clear();
+            ctrl.data.render();
+          }, false);
       },
       class: [
         'cg-board-wrap',

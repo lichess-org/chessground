@@ -73,6 +73,7 @@ piece {
   height: 100%;
   background-size: cover;
   z-index: 2;
+  will-change: transform;
 }
 piece.dragging {
   z-index: 9;
