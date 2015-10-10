@@ -75,7 +75,10 @@ function addCircle(drawable, key) {
   };
   var exists = drawable.shapes.filter(sameCircle).length > 0;
   if (exists) drawable.shapes = drawable.shapes.filter(not(sameCircle));
-  else drawable.shapes.push({brush: brush, orig: key});
+  else drawable.shapes.push({
+    brush: brush,
+    orig: key
+  });
 }
 
 function addLine(drawable, orig, dest) {
@@ -88,7 +91,11 @@ function addLine(drawable, orig, dest) {
   };
   var exists = drawable.shapes.filter(sameLine).length > 0;
   if (exists) drawable.shapes = drawable.shapes.filter(not(sameLine));
-  else drawable.shapes.push({brush: brush, orig: orig, dest: dest});
+  else drawable.shapes.push({
+    brush: brush,
+    orig: orig,
+    dest: dest
+  });
 }
 
 module.exports = {
@@ -96,6 +103,6 @@ module.exports = {
   move: move,
   end: end,
   cancel: cancel,
-    clear: clear,
+  clear: clear,
   processDraw: processDraw
 };
