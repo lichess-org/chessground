@@ -261,11 +261,13 @@ module.exports = function(ctrl) {
             ctrl.data.bounds.clear();
             ctrl.data.render();
           }, false);
-        var prev = window.onscroll;
-        window.onscroll = function() {
-          prev && prev();
-          ctrl.data.bounds.clear();
-        };
+        ['onscroll', 'onresize'].forEach(function(n) {
+          var prev = window[n];
+          window[n] = function() {
+            prev && prev();
+            ctrl.data.bounds.clear();
+          };
+        });
       },
       class: [
         'cg-board-wrap',
