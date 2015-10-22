@@ -210,6 +210,7 @@ function playPremove(data) {
       callUserFunction(util.partial(data.movable.events.after, orig, dest, {
         premove: true
       }));
+      return true;
     }
   }
   unsetPremove(data);
