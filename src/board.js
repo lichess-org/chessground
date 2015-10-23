@@ -140,8 +140,7 @@ function selectSquare(data, key) {
     if (key) {
       if (data.selected !== key) {
         if (userMove(data, data.selected, key)) data.stats.dragged = false;
-      }
-      else hold.start();
+      } else hold.start();
     } else {
       setSelected(data, null);
       hold.cancel();
@@ -204,16 +203,18 @@ function playPremove(data) {
   var move = data.premovable.current;
   if (!move) return;
   var orig = move[0],
-    dest = move[1];
+    dest = move[1],
+    success = false;
   if (canMove(data, orig, dest)) {
     if (baseUserMove(data, orig, dest)) {
       callUserFunction(util.partial(data.movable.events.after, orig, dest, {
         premove: true
       }));
-      return true;
+      success = true;
     }
   }
   unsetPremove(data);
+  return success;
 }
 
 function cancelMove(data) {
