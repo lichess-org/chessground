@@ -32,7 +32,7 @@
 }
 /*
 whole: 1400x1310
-useful: 1400x1271, 
+useful: 1400x1271,
 top: 8, bottom: 31
 
 
@@ -153,54 +153,54 @@ top: 8, bottom: 31
 .merida piece.king.black {
   background-image: url('images/pieces/merida/bK.svg');
 }
-.staunton div.pawn.white {
-  background-image: url(images/pieces/staunton/basic/White-Pawn.png);
+.staunton piece.pawn.white {
+  background-image: url('images/pieces/staunton/basic/White-Pawn.png');
 }
-.staunton div.bishop.white {
-  background-image: url(images/pieces/staunton/basic/White-Bishop.png);
+.staunton piece.bishop.white {
+  background-image: url('images/pieces/staunton/basic/White-Bishop.png');
 }
 .staunton .cg-board.orientation-black div.bishop.white {
-  background-image: url(images/pieces/staunton/basic/White-Bishop-Flipped.png);
+  background-image: url('images/pieces/staunton/basic/White-Bishop-Flipped.png');
 }
-.staunton div.knight.white,
+.staunton piece.knight.white,
 #top div.piece_demo.staunton {
-  background-image: url(images/pieces/staunton/basic/White-Knight.png);
+  background-image: url('images/pieces/staunton/basic/White-Knight.png');
 }
 .staunton .cg-board.orientation-black div.knight.white {
-  background-image: url(images/pieces/staunton/basic/White-Knight-Flipped.png);
+  background-image: url('images/pieces/staunton/basic/White-Knight-Flipped.png');
 }
-.staunton div.rook.white {
-  background-image: url(images/pieces/staunton/basic/White-Rook.png);
+.staunton piece.rook.white {
+  background-image: url('images/pieces/staunton/basic/White-Rook.png');
 }
-.staunton div.queen.white {
-  background-image: url(images/pieces/staunton/basic/White-Queen.png);
+.staunton piece.queen.white {
+  background-image: url('images/pieces/staunton/basic/White-Queen.png');
 }
-.staunton div.king.white {
-  background-image: url(images/pieces/staunton/basic/White-King.png);
+.staunton piece.king.white {
+  background-image: url('images/pieces/staunton/basic/White-King.png');
 }
-.staunton div.pawn.black {
-  background-image: url(images/pieces/staunton/basic/Black-Pawn.png);
+.staunton piece.pawn.black {
+  background-image: url('images/pieces/staunton/basic/Black-Pawn.png');
 }
-.staunton div.bishop.black {
-  background-image: url(images/pieces/staunton/basic/Black-Bishop.png);
+.staunton piece.bishop.black {
+  background-image: url('images/pieces/staunton/basic/Black-Bishop.png');
 }
 .staunton .cg-board.orientation-white div.bishop.black {
-  background-image: url(images/pieces/staunton/basic/Black-Bishop-Flipped.png);
+  background-image: url('images/pieces/staunton/basic/Black-Bishop-Flipped.png');
 }
-.staunton div.knight.black {
-  background-image: url(images/pieces/staunton/basic/Black-Knight.png);
+.staunton piece.knight.black {
+  background-image: url('images/pieces/staunton/basic/Black-Knight.png');
 }
 .staunton .cg-board.orientation-white div.knight.black {
-  background-image: url(images/pieces/staunton/basic/Black-Knight-Flipped.png);
+  background-image: url('images/pieces/staunton/basic/Black-Knight-Flipped.png');
 }
-.staunton div.rook.black {
-  background-image: url(images/pieces/staunton/basic/Black-Rook.png);
+.staunton piece.rook.black {
+  background-image: url('images/pieces/staunton/basic/Black-Rook.png');
 }
-.staunton div.queen.black {
-  background-image: url(images/pieces/staunton/basic/Black-Queen.png);
+.staunton piece.queen.black {
+  background-image: url('images/pieces/staunton/basic/Black-Queen.png');
 }
-.staunton div.king.black {
-  background-image: url(images/pieces/staunton/basic/Black-King.png);
+.staunton piece.king.black {
+  background-image: url('images/pieces/staunton/basic/Black-King.png');
 }
 .staunton piece {
   /* original size:
