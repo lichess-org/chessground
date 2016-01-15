@@ -40,18 +40,19 @@ function renderGhost(p) {
 }
 
 function renderSquare(ctrl, pos, asWhite) {
+  var d = ctrl.data;
   var file = util.files[pos[0] - 1];
   var rank = pos[1];
   var key = file + rank;
-  var piece = ctrl.data.pieces[key];
-  var isDragOver = ctrl.data.highlight.dragOver && ctrl.data.draggable.current.over === key;
+  var piece = d.pieces[key];
+  var isDragOver = d.highlight.dragOver && d.draggable.current.over === key;
   var classes = util.classSet({
-    'selected': ctrl.data.selected === key,
-    'check': ctrl.data.highlight.check && ctrl.data.check === key,
-    'last-move': ctrl.data.highlight.lastMove && util.contains2(ctrl.data.lastMove, key),
-    'move-dest': (isDragOver || ctrl.data.movable.showDests) && util.containsX(ctrl.data.movable.dests[ctrl.data.selected], key),
-    'premove-dest': (isDragOver || ctrl.data.premovable.showDests) && util.containsX(ctrl.data.premovable.dests, key),
-    'current-premove': util.contains2(ctrl.data.premovable.current, key),
+    'selected': d.selected === key,
+    'check': d.highlight.check && d.check === key,
+    'last-move': d.highlight.lastMove && util.contains2(d.lastMove, key),
+    'move-dest': (isDragOver || d.movable.showDests) && util.containsX(d.movable.dests[d.selected], key),
+    'premove-dest': (isDragOver || d.premovable.showDests) && util.containsX(d.premovable.dests, key),
+    'current-premove': util.contains2(d.premovable.current, key),
     'drag-over': isDragOver,
     'oc': !!piece,
     'exploding': ctrl.vm.exploding && ctrl.vm.exploding.indexOf(key) !== -1
@@ -63,14 +64,14 @@ function renderSquare(ctrl, pos, asWhite) {
     }
   };
   if (classes) attrs.class = classes;
-  if (ctrl.data.coordinates) {
+  if (d.coordinates) {
     if (pos[1] === (asWhite ? 1 : 8)) attrs['data-coord-x'] = file;
     if (pos[0] === (asWhite ? 8 : 1)) attrs['data-coord-y'] = rank;
   }
   var children = [];
   if (piece) {
     children.push(renderPiece(ctrl, key, piece));
-    if (ctrl.data.draggable.current.orig === key && ctrl.data.draggable.showGhost) {
+    if (d.draggable.current.orig === key && d.draggable.showGhost && !d.draggable.current.noGhost) {
       children.push(renderGhost(piece));
     }
   }
