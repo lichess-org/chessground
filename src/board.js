@@ -135,6 +135,23 @@ function userMove(data, orig, dest) {
   } else setSelected(data, null);
 }
 
+function dropNewPiece(data, orig, dest) {
+  if (!dest) {
+    delete data.pieces[orig];
+  } else if (data.pieces[orig] && !data.pieces[dest]) {
+    callUserFunction(util.partial(data.events.dropNewPiece, role, dest));
+    data.pieces[dest] = data.pieces[orig];
+    delete data.pieces[orig];
+    data.check = null;
+    callUserFunction(data.events.change);
+    data.movable.dropped = [];
+    setSelected(data, null);
+    var role = data.pieces[dest].role;
+    callUserFunction(util.partial(data.movable.events.afterNewPiece, role, dest));
+    return true;
+  } else setSelected(data, null);
+}
+
 function selectSquare(data, key) {
   if (data.selected) {
     if (key) {
@@ -274,6 +291,7 @@ module.exports = {
   isDraggable: isDraggable,
   canMove: canMove,
   userMove: userMove,
+  dropNewPiece: dropNewPiece,
   apiMove: apiMove,
   playPremove: playPremove,
   unsetPremove: unsetPremove,

@@ -71,7 +71,7 @@ function renderSquare(ctrl, pos, asWhite) {
   var children = [];
   if (piece) {
     children.push(renderPiece(ctrl, key, piece));
-    if (d.draggable.current.orig === key && d.draggable.showGhost && !d.draggable.current.noGhost) {
+    if (d.draggable.current.orig === key && d.draggable.showGhost && !d.draggable.current.newPiece) {
       children.push(renderGhost(piece));
     }
   }

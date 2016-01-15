@@ -97,8 +97,11 @@ function end(data, e) {
   board.unsetPremove(data);
   var dest = draggable.current.over;
   if (draggable.current.started) {
-    if (orig !== dest) data.movable.dropped = [orig, dest];
-    if (board.userMove(data, orig, dest)) data.stats.dragged = true;
+    if (draggable.current.newPiece) board.dropNewPiece(data, orig, dest)
+    else {
+      if (orig !== dest) data.movable.dropped = [orig, dest];
+      if (board.userMove(data, orig, dest)) data.stats.dragged = true;
+    }
   }
   if (orig === draggable.current.previouslySelected && (orig === dest || !dest))
     board.setSelected(data, null);

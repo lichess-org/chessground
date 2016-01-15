@@ -55,7 +55,8 @@ module.exports = function(cfg) {
       dropped: [], // last dropped [orig, dest], not to be animated
       showDests: true, // whether to add the move-dest class on squares
       events: {
-        after: function(orig, dest, metadata) {} // called after the move has been played
+        after: function(orig, dest, metadata) {}, // called after the move has been played
+        afterNewPiece: function(role, pos) {} // called after a new piece is dropped on the board
       }
     },
     premovable: {
@@ -97,6 +98,7 @@ module.exports = function(cfg) {
       // called after a piece has been moved.
       // capturedPiece is null or like {color: 'white', 'role': 'queen'}
       move: function(orig, dest, capturedPiece) {},
+      dropNewPiece: function(role, pos) {},
       capture: function(key, piece) {}, // DEPRECATED called when a piece has been captured
       select: function(key) {} // called when a square is selected
     },
