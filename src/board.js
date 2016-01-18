@@ -95,6 +95,17 @@ function baseMove(data, orig, dest) {
   return success;
 }
 
+function baseNewPiece(data, piece, pos) {
+  if (data.pieces[pos]) return false;
+  callUserFunction(util.partial(data.events.dropNewPiece, piece, pos));
+  data.pieces[pos] = piece;
+  data.check = null;
+  callUserFunction(data.events.change);
+  data.movable.dropped = [];
+  data.renderRAF();
+  return true;
+}
+
 function baseUserMove(data, orig, dest) {
   var result = baseMove(data, orig, dest);
   if (result) {
@@ -106,6 +117,10 @@ function baseUserMove(data, orig, dest) {
 
 function apiMove(data, orig, dest) {
   return baseMove(data, orig, dest);
+}
+
+function apiNewPiece(data, piece, pos) {
+  return baseNewPiece(data, piece, pos);
 }
 
 function userMove(data, orig, dest) {
@@ -124,7 +139,6 @@ function userMove(data, orig, dest) {
         premove: false,
         holdTime: holdTime
       }));
-      return true;
     }
   } else if (canPremove(data, orig, dest)) {
     setPremove(data, orig, dest);
@@ -136,19 +150,14 @@ function userMove(data, orig, dest) {
 }
 
 function dropNewPiece(data, orig, dest) {
-  if (!dest) {
+  var piece = data.pieces[orig];
+  if (!dest || (data.pieces[dest] && orig !== dest)) delete data.pieces[orig];
+  else if (piece) {
     delete data.pieces[orig];
-  } else if (data.pieces[orig] && !data.pieces[dest]) {
-    callUserFunction(util.partial(data.events.dropNewPiece, role, dest));
-    data.pieces[dest] = data.pieces[orig];
-    delete data.pieces[orig];
-    data.check = null;
-    callUserFunction(data.events.change);
+    baseNewPiece(data, piece, dest);
     data.movable.dropped = [];
     setSelected(data, null);
-    var role = data.pieces[dest].role;
-    callUserFunction(util.partial(data.movable.events.afterNewPiece, role, dest));
-    return true;
+    callUserFunction(util.partial(data.movable.events.afterNewPiece, piece, dest));
   } else setSelected(data, null);
 }
 
@@ -293,6 +302,7 @@ module.exports = {
   userMove: userMove,
   dropNewPiece: dropNewPiece,
   apiMove: apiMove,
+  apiNewPiece: apiNewPiece,
   playPremove: playPremove,
   unsetPremove: unsetPremove,
   cancelMove: cancelMove,

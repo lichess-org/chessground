@@ -19,6 +19,7 @@ module.exports = function(controller) {
       return controller.data;
     },
     move: controller.apiMove,
+    newPiece: controller.apiNewPiece,
     setPieces: controller.setPieces,
     setCheck: controller.setCheck,
     playPremove: controller.playPremove,
