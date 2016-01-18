@@ -99,6 +99,7 @@ function baseNewPiece(data, piece, pos) {
   if (data.pieces[pos]) return false;
   callUserFunction(util.partial(data.events.dropNewPiece, piece, pos));
   data.pieces[pos] = piece;
+  data.lastMove = [pos, pos];
   data.check = null;
   callUserFunction(data.events.change);
   data.movable.dropped = [];
