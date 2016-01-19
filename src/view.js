@@ -180,6 +180,7 @@ function renderContent(ctrl) {
 function dragOrDraw(d, withDrag, withDraw) {
   return function(e) {
     if (util.isRightButton(e) && d.draggable.current.orig) {
+      if (d.draggable.current.newPiece) delete d.pieces[d.draggable.current.orig];
       d.draggable.current = {}
       d.selected = null;
     }
