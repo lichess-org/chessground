@@ -23,7 +23,7 @@ var letters = {
 function read(fen) {
   if (fen === 'start') fen = initial;
   var pieces = {};
-  fen.replace(/ .+$/, '').split('/').forEach(function(row, y) {
+  fen.replace(/ .+$/, '').replace(/~/g, '').split('/').forEach(function(row, y) {
     var x = 0;
     row.split('').forEach(function(v) {
       var nb = parseInt(v);
