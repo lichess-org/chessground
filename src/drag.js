@@ -93,7 +93,10 @@ function end(data, e) {
   if (!orig) return;
   // comparing with the origin target is an easy way to test that the end event
   // has the same touch origin
-  if (e && e.type === "touchend" && originTarget !== e.target) return;
+  if (e && e.type === "touchend" && originTarget !== e.target && !draggable.current.newPiece) {
+    draggable.current = {};
+    return;
+  }
   board.unsetPremove(data);
   var dest = draggable.current.over;
   if (draggable.current.started) {
