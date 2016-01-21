@@ -103,6 +103,8 @@ function baseNewPiece(data, piece, pos) {
   data.check = null;
   callUserFunction(data.events.change);
   data.movable.dropped = [];
+  data.movable.dests = {};
+  data.turnColor = util.opposite(data.turnColor);
   data.renderRAF();
   return true;
 }
