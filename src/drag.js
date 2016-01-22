@@ -32,6 +32,7 @@ function start(data, e) {
   var bounds = data.bounds();
   var orig = board.getKeyAtDomPos(data, position, bounds);
   var hadPremove = !!data.premovable.current;
+  var hadPredrop = !!data.predroppable.current.key;
   board.selectSquare(data, orig);
   var stillSelected = data.selected === orig;
   if (data.pieces[orig] && stillSelected && board.isDraggable(data, orig)) {
@@ -50,7 +51,10 @@ function start(data, e) {
       bounds: bounds,
       started: data.draggable.autoDistance && data.stats.dragged
     };
-  } else if (hadPremove) board.unsetPremove(data);
+  } else {
+    if (hadPremove) board.unsetPremove(data);
+    if (hadPredrop) board.unsetPredrop(data);
+  }
   processDrag(data);
 }
 
@@ -98,6 +102,7 @@ function end(data, e) {
     return;
   }
   board.unsetPremove(data);
+  board.unsetPredrop(data);
   var dest = draggable.current.over;
   if (draggable.current.started) {
     if (draggable.current.newPiece) board.dropNewPiece(data, orig, dest);

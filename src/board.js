@@ -15,6 +15,7 @@ function reset(data) {
   data.lastMove = null;
   setSelected(data, null);
   unsetPremove(data);
+  unsetPredrop(data);
 }
 
 function setPieces(data, pieces) {
@@ -33,6 +34,7 @@ function setCheck(data, color) {
 }
 
 function setPremove(data, orig, dest) {
+  unsetPredrop(data);
   data.premovable.current = [orig, dest];
   callUserFunction(util.partial(data.premovable.events.set, orig, dest));
 }
@@ -41,6 +43,22 @@ function unsetPremove(data) {
   if (data.premovable.current) {
     data.premovable.current = null;
     callUserFunction(data.premovable.events.unset);
+  }
+}
+
+function setPredrop(data, role, key) {
+  unsetPremove(data);
+  data.predroppable.current = {
+    role: role,
+    key: key
+  };
+  callUserFunction(util.partial(data.predroppable.events.set, role, key));
+}
+
+function unsetPredrop(data) {
+  if (data.predroppable.current.key) {
+    data.predroppable.current = {};
+    callUserFunction(data.predroppable.events.unset);
   }
 }
 
@@ -95,11 +113,11 @@ function baseMove(data, orig, dest) {
   return success;
 }
 
-function baseNewPiece(data, piece, pos) {
-  if (data.pieces[pos]) return false;
-  callUserFunction(util.partial(data.events.dropNewPiece, piece, pos));
-  data.pieces[pos] = piece;
-  data.lastMove = [pos, pos];
+function baseNewPiece(data, piece, key) {
+  if (data.pieces[key]) return false;
+  callUserFunction(util.partial(data.events.dropNewPiece, piece, key));
+  data.pieces[key] = piece;
+  data.lastMove = [key, key];
   data.check = null;
   callUserFunction(data.events.change);
   data.movable.dropped = [];
@@ -122,8 +140,8 @@ function apiMove(data, orig, dest) {
   return baseMove(data, orig, dest);
 }
 
-function apiNewPiece(data, piece, pos) {
-  return baseNewPiece(data, piece, pos);
+function apiNewPiece(data, piece, key) {
+  return baseNewPiece(data, piece, key);
 }
 
 function userMove(data, orig, dest) {
@@ -153,15 +171,20 @@ function userMove(data, orig, dest) {
 }
 
 function dropNewPiece(data, orig, dest) {
-  var piece = data.pieces[orig];
-  if (!dest || (data.pieces[dest] && orig !== dest)) delete data.pieces[orig];
-  else if (piece) {
+  if (canDrop(data, orig, dest)) {
+    var piece = data.pieces[orig];
     delete data.pieces[orig];
     baseNewPiece(data, piece, dest);
     data.movable.dropped = [];
-    setSelected(data, null);
-    callUserFunction(util.partial(data.movable.events.afterNewPiece, piece, dest));
-  } else setSelected(data, null);
+    callUserFunction(util.partial(data.movable.events.afterNewPiece, piece.role, dest));
+  } else if (canPredrop(data, orig, dest)) {
+    setPredrop(data, data.pieces[orig].role, dest);
+  } else {
+    unsetPremove(data);
+    unsetPredrop(data);
+  }
+  delete data.pieces[orig];
+  setSelected(data, null);
 }
 
 function selectSquare(data, key) {
@@ -204,6 +227,16 @@ function canMove(data, orig, dest) {
   );
 }
 
+function canDrop(data, orig, dest) {
+  var piece = data.pieces[orig];
+  return piece && dest && (orig === dest || !data.pieces[dest]) && (
+    data.movable.color === 'both' || (
+      data.movable.color === piece.color &&
+      data.turnColor === piece.color
+    ));
+}
+
+
 function isPremovable(data, orig) {
   var piece = data.pieces[orig];
   return piece && data.premovable.enabled &&
@@ -215,6 +248,16 @@ function canPremove(data, orig, dest) {
   return orig !== dest &&
     isPremovable(data, orig) &&
     util.containsX(premove(data.pieces, orig, data.premovable.castle), dest);
+}
+
+function canPredrop(data, orig, dest) {
+  var piece = data.pieces[orig];
+  return piece && dest &&
+    (!data.pieces[dest] || data.pieces[dest].color !== data.movable.color) &&
+    data.predroppable.enabled &&
+    (piece.role !== 'pawn' || (dest[1] !== '1' && dest[1] !== '8')) &&
+    data.movable.color === piece.color &&
+    data.turnColor !== piece.color;
 }
 
 function isDraggable(data, orig) {
@@ -246,8 +289,29 @@ function playPremove(data) {
   return success;
 }
 
+function playPredrop(data, validate) {
+  var drop = data.predroppable.current,
+    success = false;
+  if (!drop.key) return;
+  if (validate(drop)) {
+    var piece = {
+      role: drop.role,
+      color: data.movable.color
+    };
+    if (baseNewPiece(data, piece, drop.key)) {
+      callUserFunction(util.partial(data.movable.events.afterNewPiece, drop.role, drop.key, {
+        predrop: true
+      }));
+      success = true;
+    }
+  }
+  unsetPredrop(data);
+  return success;
+}
+
 function cancelMove(data) {
   unsetPremove(data);
+  unsetPreDrop(data);
   selectSquare(data, null);
 }
 
@@ -307,7 +371,9 @@ module.exports = {
   apiMove: apiMove,
   apiNewPiece: apiNewPiece,
   playPremove: playPremove,
+  playPredrop: playPredrop,
   unsetPremove: unsetPremove,
+  unsetPredrop: unsetPredrop,
   cancelMove: cancelMove,
   stop: stop,
   getKeyAtDomPos: getKeyAtDomPos,

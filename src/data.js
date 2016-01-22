@@ -70,6 +70,14 @@ module.exports = function(cfg) {
         unset: function() {} // called after the premove has been unset
       }
     },
+    predroppable: {
+      enabled: false, // allow predrops for color that can not move
+      current: {}, // current saved predrop {role: 'knight', key: 'e4'} | {}
+      events: {
+        set: function(role, key) {}, // called after the predrop has been set
+        unset: function() {} // called after the predrop has been unset
+      }
+    },
     draggable: {
       enabled: true, // allow moves & premoves to use drag'n drop
       distance: 3, // minimum distance to initiate a drag, in pixels

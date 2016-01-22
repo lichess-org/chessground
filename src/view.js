@@ -52,7 +52,7 @@ function renderSquare(ctrl, pos, asWhite) {
     'last-move': d.highlight.lastMove && util.contains2(d.lastMove, key),
     'move-dest': (isDragOver || d.movable.showDests) && util.containsX(d.movable.dests[d.selected], key),
     'premove-dest': (isDragOver || d.premovable.showDests) && util.containsX(d.premovable.dests, key),
-    'current-premove': util.contains2(d.premovable.current, key),
+    'current-premove': key === d.predroppable.current.key || util.contains2(d.premovable.current, key),
     'drag-over': isDragOver,
     'oc': !!piece,
     'exploding': ctrl.vm.exploding && ctrl.vm.exploding.indexOf(key) !== -1
@@ -183,8 +183,7 @@ function dragOrDraw(d, withDrag, withDraw) {
       if (d.draggable.current.newPiece) delete d.pieces[d.draggable.current.orig];
       d.draggable.current = {}
       d.selected = null;
-    }
-    else if (d.drawable.enabled && (e.shiftKey || util.isRightButton(e))) withDraw(d, e);
+    } else if (d.drawable.enabled && (e.shiftKey || util.isRightButton(e))) withDraw(d, e);
     else if (!d.viewOnly) withDrag(d, e);
   };
 }
