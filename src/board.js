@@ -311,7 +311,7 @@ function playPredrop(data, validate) {
 
 function cancelMove(data) {
   unsetPremove(data);
-  unsetPreDrop(data);
+  unsetPredrop(data);
   selectSquare(data, null);
 }
 
