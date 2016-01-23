@@ -55,8 +55,10 @@ function renderSquare(ctrl, pos, asWhite) {
     'current-premove': key === d.predroppable.current.key || util.contains2(d.premovable.current, key),
     'drag-over': isDragOver,
     'oc': !!piece,
-    'exploding': ctrl.vm.exploding && ctrl.vm.exploding.indexOf(key) !== -1
   });
+  if (ctrl.vm.exploding && ctrl.vm.exploding.keys.indexOf(key) !== -1) {
+    classes += ' exploding' + ctrl.vm.exploding.stage;
+  }
   var attrs = {
     style: {
       left: (asWhite ? pos[0] - 1 : 8 - pos[0]) * 12.5 + '%',

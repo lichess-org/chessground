@@ -51,12 +51,19 @@ module.exports = function(cfg) {
 
   this.explode = function(keys) {
     if (!this.data.render) return;
-    this.vm.exploding = keys;
+    this.vm.exploding = {
+      stage: 1,
+      keys: keys
+    };
     this.data.renderRAF();
     setTimeout(function() {
-      this.vm.exploding = false;
+      this.vm.exploding.stage = 2;
       this.data.renderRAF();
-    }.bind(this), 200);
+      setTimeout(function() {
+        this.vm.exploding = false;
+        this.data.renderRAF();
+      }.bind(this), 120);
+    }.bind(this), 120);
   }.bind(this);
 
   this.setAutoShapes = function(shapes) {
