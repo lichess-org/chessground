@@ -176,7 +176,9 @@ function dropNewPiece(data, orig, dest) {
     delete data.pieces[orig];
     baseNewPiece(data, piece, dest);
     data.movable.dropped = [];
-    callUserFunction(util.partial(data.movable.events.afterNewPiece, piece.role, dest));
+    callUserFunction(util.partial(data.movable.events.afterNewPiece, piece.role, dest, {
+      predrop: false
+    }));
   } else if (canPredrop(data, orig, dest)) {
     setPredrop(data, data.pieces[orig].role, dest);
   } else {
