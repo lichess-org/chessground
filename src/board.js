@@ -359,6 +359,23 @@ function getMaterialDiff(data) {
   return diff;
 }
 
+var pieceScores = {
+  pawn: 1,
+  knight: 3,
+  bishop: 3,
+  rook: 5,
+  queen: 9,
+  king: 0
+};
+
+function getScore(data) {
+  var score = 0;
+  for (var k in data.pieces) {
+    score += pieceScores[data.pieces[k].role] * (data.pieces[k].color === 'white' ? 1 : -1);
+  }
+  return score;
+}
+
 module.exports = {
   reset: reset,
   toggleOrientation: toggleOrientation,
@@ -379,5 +396,6 @@ module.exports = {
   cancelMove: cancelMove,
   stop: stop,
   getKeyAtDomPos: getKeyAtDomPos,
-  getMaterialDiff: getMaterialDiff
+  getMaterialDiff: getMaterialDiff,
+  getScore: getScore
 };
