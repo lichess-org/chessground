@@ -160,6 +160,7 @@ function userMove(data, orig, dest) {
         premove: false,
         holdTime: holdTime
       }));
+      return true;
     }
   } else if (canPremove(data, orig, dest)) {
     setPremove(data, orig, dest);
