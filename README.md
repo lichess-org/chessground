@@ -111,6 +111,9 @@ All options are, well, optional.
     centerPiece: true,    // center the piece on cursor at drag start
     showGhost: true,      // show ghost of piece being dragged
   },
+  selectable: {
+    enabled: true         // disable to enforce dragging over click-click move
+  },
   drawable: {
     enabled: true         // enable SVG circle and arrow drawing on the board
   },

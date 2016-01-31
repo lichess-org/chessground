@@ -96,6 +96,10 @@ module.exports = function(cfg) {
        *}*/
       current: {}
     },
+    selectable: {
+      // disable to enforce dragging over click-click move
+      enabled: true
+    },
     stats: {
       // was last piece dragged or clicked?
       // needs default to false for touch

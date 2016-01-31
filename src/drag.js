@@ -113,6 +113,7 @@ function end(data, e) {
   }
   if (orig === draggable.current.previouslySelected && (orig === dest || !dest))
     board.setSelected(data, null);
+  else if (!data.selectable.enabled) board.setSelected(data, null);
   draggable.current = {};
 }
 
