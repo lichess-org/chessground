@@ -1,5 +1,6 @@
 var m = require('mithril');
 var key2pos = require('./util').key2pos;
+var isTrident = require('./util').isTrident;
 
 function circleWidth(current, bounds) {
   return (current ? 2 : 4) / 512 * bounds.width;
@@ -14,7 +15,7 @@ function opacity(brush, current) {
 }
 
 function arrowMargin(current, bounds) {
-  return (current ? 12 : 24) / 512 * bounds.width;
+  return isTrident() ? 0 : ((current ? 10 : 20) / 512 * bounds.width);
 }
 
 function pos2px(pos, bounds) {
@@ -57,7 +58,7 @@ function arrow(brush, orig, dest, current, bounds) {
       stroke: brush.color,
       'stroke-width': lineWidth(brush, current, bounds),
       'stroke-linecap': 'round',
-      'marker-end': 'url(#arrowhead-' + brush.key + ')',
+      'marker-end': isTrident() ? null : 'url(#arrowhead-' + brush.key + ')',
       opacity: opacity(brush, current),
       x1: a[0],
       y1: a[1],

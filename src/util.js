@@ -66,6 +66,14 @@ function transformProp() {
   return cachedTransformProp;
 }
 
+var cachedIsTrident = null;
+
+function isTrident() {
+  if (cachedIsTrident === null)
+    cachedIsTrident = window.navigator.userAgent.indexOf('Trident/') > -1;
+  return cachedIsTrident;
+}
+
 function translate(pos) {
   return 'translate(' + pos[0] + 'px,' + pos[1] + 'px)';
 }
@@ -117,6 +125,7 @@ module.exports = {
   partialApply: partialApply,
   partial: partial,
   transformProp: transformProp,
+  isTrident: isTrident,
   requestAnimationFrame: (window.requestAnimationFrame || window.setTimeout).bind(window),
   isRightButton: isRightButton,
   memo: memo
