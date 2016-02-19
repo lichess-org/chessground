@@ -84,24 +84,6 @@ function renderSquare(ctrl, pos, asWhite) {
   };
 }
 
-function renderSquareTarget(ctrl, cur) {
-  var pos = util.key2pos(cur.over),
-    x = ctrl.data.orientation === 'white' ? pos[0] : 9 - pos[0],
-    y = ctrl.data.orientation === 'white' ? pos[1] : 9 - pos[1];
-  return {
-    tag: 'div',
-    attrs: {
-      id: 'cg-square-target',
-      style: {
-        width: cur.bounds.width / 4 + 'px',
-        height: cur.bounds.height / 4 + 'px',
-        left: (x - 1.5) * cur.bounds.width / 8 + 'px',
-        top: (7.5 - y) * cur.bounds.height / 8 + 'px'
-      }
-    }
-  };
-}
-
 function renderFading(cfg) {
   return {
     tag: 'square',
@@ -169,8 +151,6 @@ function renderContent(ctrl) {
   for (var i = 0, len = positions.length; i < len; i++) {
     children.push(renderSquare(ctrl, positions[i], asWhite));
   }
-  if (ctrl.data.draggable.current.over && ctrl.data.draggable.squareTarget)
-    children.push(renderSquareTarget(ctrl, ctrl.data.draggable.current));
   if (ctrl.data.animation.current.fadings)
     ctrl.data.animation.current.fadings.forEach(function(p) {
       children.push(renderFading(p));
