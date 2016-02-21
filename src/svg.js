@@ -117,11 +117,11 @@ function renderShape(orientation, current, brushes, bounds) {
 
 module.exports = function(ctrl) {
   if (!ctrl.data.bounds) return;
-  var bounds = ctrl.data.bounds();
-  if (bounds.width !== bounds.height) return;
   var d = ctrl.data.drawable;
   var allShapes = d.shapes.concat(d.autoShapes);
   if (!allShapes.length && !d.current.orig) return;
+  var bounds = ctrl.data.bounds();
+  if (bounds.width !== bounds.height) return;
   var usedBrushes = Object.keys(ctrl.data.drawable.brushes).filter(function(name) {
     return (d.current && d.current.dest && d.current.brush === name) || allShapes.filter(function(s) {
       return s.dest && s.brush === name;
