@@ -115,6 +115,7 @@ module.exports = function(cfg) {
     },
     drawable: {
       enabled: false, // allows SVG drawings
+      onChange: function(shapes) {},
       // user shapes
       shapes: [
         // {brush: 'green', orig: 'e8'},

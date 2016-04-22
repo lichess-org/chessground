@@ -61,6 +61,7 @@ function clear(data, e) {
   if (data.drawable.shapes.length) {
     data.drawable.shapes = [];
     data.render();
+    onChange(data.drawable);
   }
 }
 
@@ -81,6 +82,7 @@ function addCircle(drawable, key) {
     brush: brush,
     orig: key
   });
+  onChange(drawable);
 }
 
 function addLine(drawable, orig, dest) {
@@ -98,6 +100,11 @@ function addLine(drawable, orig, dest) {
     orig: orig,
     dest: dest
   });
+  onChange(drawable);
+}
+
+function onChange(drawable) {
+  drawable.onChange(drawable.shapes);
 }
 
 module.exports = {
