@@ -29,6 +29,7 @@ module.exports = function(controller) {
     cancelMove: controller.cancelMove,
     stop: controller.stop,
     explode: controller.explode,
-    setAutoShapes: controller.setAutoShapes
+    setAutoShapes: controller.setAutoShapes,
+    setShapes: controller.setShapes
   };
 };

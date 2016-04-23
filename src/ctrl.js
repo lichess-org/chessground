@@ -71,4 +71,10 @@ module.exports = function(cfg) {
       data.drawable.autoShapes = shapes;
     }, this.data, false)();
   }.bind(this);
+
+  this.setShapes = function(shapes) {
+    anim(function(data) {
+      data.drawable.shapes = shapes;
+    }, this.data, false)();
+  }.bind(this);
 };
