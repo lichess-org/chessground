@@ -175,7 +175,6 @@ function bindEvents(ctrl, el, context) {
   var onstart = dragOrDraw(d, drag.start, draw.start);
   var onmove = dragOrDraw(d, drag.move, draw.move);
   var onend = dragOrDraw(d, drag.end, draw.end);
-  var drawClear = util.partial(draw.clear, d);
   var startEvents = ['touchstart', 'mousedown'];
   var moveEvents = ['touchmove', 'mousemove'];
   var endEvents = ['touchend', 'mouseup'];
@@ -188,7 +187,6 @@ function bindEvents(ctrl, el, context) {
   endEvents.forEach(function(ev) {
     document.addEventListener(ev, onend);
   });
-  el.addEventListener('mousedown', drawClear);
   context.onunload = function() {
     startEvents.forEach(function(ev) {
       el.removeEventListener(ev, onstart);
@@ -199,7 +197,6 @@ function bindEvents(ctrl, el, context) {
     endEvents.forEach(function(ev) {
       document.removeEventListener(ev, onend);
     });
-    el.removeEventListener('mousedown', drawClear);
   };
 }
 

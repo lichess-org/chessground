@@ -1,5 +1,6 @@
 var board = require('./board');
 var util = require('./util');
+var draw = require('./draw');
 
 var originTarget;
 
@@ -35,6 +36,7 @@ function start(data, e) {
   var hadPredrop = !!data.predroppable.current.key;
   board.selectSquare(data, orig);
   var stillSelected = data.selected === orig;
+  if (!previouslySelected && !data.pieces[orig]) draw.clear(data);
   if (data.pieces[orig] && stillSelected && board.isDraggable(data, orig)) {
     var squareBounds = computeSquareBounds(data, bounds, orig);
     data.draggable.current = {
@@ -86,7 +88,6 @@ function processDrag(data) {
 
 function move(data, e) {
   if (e.touches && e.touches.length > 1) return; // support one finger touch only
-
   if (data.draggable.current.orig)
     data.draggable.current.epos = util.eventPosition(e);
 }
