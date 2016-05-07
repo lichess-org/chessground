@@ -30,6 +30,7 @@ module.exports = function(controller) {
     stop: controller.stop,
     explode: controller.explode,
     setAutoShapes: controller.setAutoShapes,
-    setShapes: controller.setShapes
+    setShapes: controller.setShapes,
+    data: data // directly exposes chessground state for more messing around
   };
 };
