@@ -11,6 +11,20 @@
   width: 100%;
   height: 100%;
 }
+ .cg-board-wrap svg {
+  overflow: hidden;
+  position: relative;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 2;
+  opacity: 0.6;
+}
+.cg-board-wrap svg * {
+  transition: 0.3s;
+}
 .cg-board {
   -webkit-user-select: none;
   -moz-user-select: none;
