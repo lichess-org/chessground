@@ -181,6 +181,9 @@ var diff = ground.getMaterialDiff();
 // get the current FEN position
 // rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR
 var fen = ground.getFen();
+
+// get the current orientation
+var orientation = ground.getOrientation();
 ```
 
 ## Developers

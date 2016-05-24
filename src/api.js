@@ -5,9 +5,7 @@ module.exports = function(controller) {
   return {
     set: controller.set,
     toggleOrientation: controller.toggleOrientation,
-    getOrientation: function () {
-      return controller.data.orientation;
-    },
+    getOrientation: controller.getOrientation,
     getPieces: function() {
       return controller.data.pieces;
     },
