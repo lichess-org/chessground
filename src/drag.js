@@ -36,13 +36,17 @@ function start(data, e) {
   var hadPredrop = !!data.predroppable.current.key;
   board.selectSquare(data, orig);
   var stillSelected = data.selected === orig;
-  if (!previouslySelected && !data.pieces[orig]) draw.clear(data);
-  if (data.pieces[orig] && stillSelected && board.isDraggable(data, orig)) {
+  var piece = data.pieces[orig];
+  if (!previouslySelected && (
+    data.drawable.eraseOnClick ||
+    (!piece || piece.color !== data.turnColor)
+  )) draw.clear(data);
+  if (piece && stillSelected && board.isDraggable(data, orig)) {
     var squareBounds = computeSquareBounds(data, bounds, orig);
     data.draggable.current = {
       previouslySelected: previouslySelected,
       orig: orig,
-      piece: hashPiece(data.pieces[orig]),
+      piece: hashPiece(piece),
       rel: position,
       epos: position,
       pos: [0, 0],
