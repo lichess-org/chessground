@@ -159,20 +159,27 @@ function renderContent(ctrl) {
   return children;
 }
 
-function dragOrDraw(d, withDrag, withDraw) {
+function startDragOrDraw(d) {
   return function(e) {
     if (util.isRightButton(e) && d.draggable.current.orig) {
       if (d.draggable.current.newPiece) delete d.pieces[d.draggable.current.orig];
       d.draggable.current = {}
       d.selected = null;
-    } else if (d.drawable.enabled && (e.shiftKey || util.isRightButton(e))) withDraw(d, e);
+    } else if (d.drawable.enabled && (e.shiftKey || util.isRightButton(e))) draw.start(d, e);
+    else drag.start(d, e);
+  };
+}
+
+function dragOrDraw(d, withDrag, withDraw) {
+  return function(e) {
+    if (d.drawable.enabled && (e.shiftKey || util.isRightButton(e))) withDraw(d, e);
     else if (!d.viewOnly) withDrag(d, e);
   };
 }
 
 function bindEvents(ctrl, el, context) {
   var d = ctrl.data;
-  var onstart = dragOrDraw(d, drag.start, draw.start);
+  var onstart = startDragOrDraw(d);
   var onmove = dragOrDraw(d, drag.move, draw.move);
   var onend = dragOrDraw(d, drag.end, draw.end);
   var startEvents = ['touchstart', 'mousedown'];
