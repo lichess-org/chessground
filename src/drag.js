@@ -32,15 +32,16 @@ function start(data, e) {
   var position = util.eventPosition(e);
   var bounds = data.bounds();
   var orig = board.getKeyAtDomPos(data, position, bounds);
-  var hadPremove = !!data.premovable.current;
-  var hadPredrop = !!data.predroppable.current.key;
-  board.selectSquare(data, orig);
-  var stillSelected = data.selected === orig;
   var piece = data.pieces[orig];
   if (!previouslySelected && (
     data.drawable.eraseOnClick ||
     (!piece || piece.color !== data.turnColor)
   )) draw.clear(data);
+  if (data.viewOnly) return;
+  var hadPremove = !!data.premovable.current;
+  var hadPredrop = !!data.predroppable.current.key;
+  board.selectSquare(data, orig);
+  var stillSelected = data.selected === orig;
   if (piece && stillSelected && board.isDraggable(data, orig)) {
     var squareBounds = computeSquareBounds(data, bounds, orig);
     data.draggable.current = {
