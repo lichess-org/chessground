@@ -104,6 +104,47 @@
             console.log(ground.getFen());
           };
           ground = Chessground(document.getElementById('ground7'), {
+            viewOnly: true,
+            turnColor: 'white',
+            animation: {
+              duration: 500
+            },
+            movable: {
+              free: false,
+              color: null, //chessToColor(chess),
+              premove: true,
+              dests: {}, //chessToDests(chess),
+              events: {
+                after: onMove
+              }
+            },
+            drawable: {
+              enabled: true
+            }
+          });
+              window.cg6 = ground;
+        })();
+        </script>
+    </section>
+    <section>
+        <div class="chessground small wood cburnett" id="ground8"></div>
+        <p>Play a game on a single board</p>
+        <script>
+            (function() {
+          var ground;
+          var chess = new Chess();
+          var onMove = function(orig, dest) {
+            chess.move({from: orig, to: dest});
+            ground.set({
+              turnColor: chessToColor(chess),
+              movable: {
+                color: chessToColor(chess),
+                dests: chessToDests(chess)
+              }
+            });
+            console.log(ground.getFen());
+          };
+          ground = Chessground(document.getElementById('ground8'), {
             viewOnly: false,
             turnColor: 'white',
             animation: {
@@ -122,7 +163,7 @@
               enabled: true
             }
           });
-              window.cg6 = ground;
+              window.cg7 = ground;
         })();
         </script>
     </section>
