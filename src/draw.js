@@ -73,11 +73,11 @@ function not(f) {
 function addCircle(drawable, key) {
   var brush = drawable.current.brush;
   var sameCircle = function(s) {
-    return s.brush === brush && s.orig === key && !s.dest;
+    return s.orig === key && !s.dest;
   };
-  var exists = drawable.shapes.filter(sameCircle).length > 0;
-  if (exists) drawable.shapes = drawable.shapes.filter(not(sameCircle));
-  else drawable.shapes.push({
+  var similar = drawable.shapes.filter(sameCircle)[0];
+  if (similar) drawable.shapes = drawable.shapes.filter(not(sameCircle));
+  if (!similar || similar.brush !== brush) drawable.shapes.push({
     brush: brush,
     orig: key
   });
