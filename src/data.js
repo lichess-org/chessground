@@ -152,7 +152,7 @@ module.exports = function(cfg) {
           key: 'b',
           color: '#003088',
           opacity: 1,
-          lineWidth: 1
+          lineWidth: 10
         },
         yellow: {
           key: 'y',
