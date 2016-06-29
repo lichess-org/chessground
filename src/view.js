@@ -46,6 +46,7 @@ function renderSquare(ctrl, pos, asWhite) {
   var key = file + rank;
   var piece = d.pieces[key];
   var isDragOver = d.highlight.dragOver && d.draggable.current.over === key;
+  var item = d.items ? d.items.render(pos, key) : null;
   var classes = util.classSet({
     'selected': d.selected === key,
     'check': d.highlight.check && d.check === key,
@@ -55,6 +56,7 @@ function renderSquare(ctrl, pos, asWhite) {
     'current-premove': key === d.predroppable.current.key || util.contains2(d.premovable.current, key),
     'drag-over': isDragOver,
     'oc': !!piece,
+    'has-item': !!item
   });
   if (ctrl.vm.exploding && ctrl.vm.exploding.keys.indexOf(key) !== -1) {
     classes += ' exploding' + ctrl.vm.exploding.stage;
@@ -71,7 +73,8 @@ function renderSquare(ctrl, pos, asWhite) {
     if (pos[0] === (asWhite ? 8 : 1)) attrs['data-coord-y'] = rank;
   }
   var children = [];
-  if (piece) {
+  if (item) children.push(item);
+  else if (piece) {
     children.push(renderPiece(ctrl, key, piece));
     if (d.draggable.current.orig === key && d.draggable.showGhost && !d.draggable.current.newPiece) {
       children.push(renderGhost(piece));

@@ -71,7 +71,11 @@ function computePlan(prev, current) {
     }
   });
   missings.forEach(function(p) {
-    if (p.key !== current.movable.dropped[0] && !util.containsX(animedOrigs, p.key)) {
+    if (
+      p.key !== current.movable.dropped[0] &&
+      !util.containsX(animedOrigs, p.key) &&
+      !(current.items ? current.items.render(p.pos, p.key) : false)
+    )
       fadings.push({
         piece: {
           role: p.role,

@@ -113,6 +113,7 @@ module.exports = function(cfg) {
       capture: function(key, piece) {}, // DEPRECATED called when a piece has been captured
       select: function(key) {} // called when a square is selected
     },
+    items: null, // items on the board { render: key -> vdom }
     drawable: {
       enabled: false, // allows SVG drawings
       eraseOnClick: true,
