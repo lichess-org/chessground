@@ -85,7 +85,6 @@ function computePlan(prev, current) {
         bottom: 12.5 * (white ? (p.pos[1] - 1) : (8 - p.pos[1])) + '%',
         opacity: 1
       });
-    }
   });
 
   return {
@@ -134,18 +133,23 @@ function animate(transformation, data) {
     };
   }
   var result = transformation();
-  var plan = computePlan(prev, data);
-  if (Object.keys(plan.anims).length > 0 || plan.fadings.length > 0) {
-    var alreadyRunning = data.animation.current.start;
-    data.animation.current = {
-      start: new Date().getTime(),
-      duration: data.animation.duration,
-      anims: plan.anims,
-      fadings: plan.fadings
-    };
-    if (!alreadyRunning) go(data);
+  if (data.animation.enabled) {
+    var plan = computePlan(prev, data);
+    if (Object.keys(plan.anims).length > 0 || plan.fadings.length > 0) {
+      var alreadyRunning = data.animation.current.start;
+      data.animation.current = {
+        start: new Date().getTime(),
+        duration: data.animation.duration,
+        anims: plan.anims,
+        fadings: plan.fadings
+      };
+      if (!alreadyRunning) go(data);
+    } else {
+      // don't animate, just render right away
+      data.renderRAF();
+    }
   } else {
-    // don't animate, just render right away
+    // animations are now disabled
     data.renderRAF();
   }
   return result;
