@@ -13,9 +13,6 @@ module.exports = function(controller) {
       return board.getMaterialDiff(controller.data);
     },
     getFen: controller.getFen,
-    dump: function() {
-      return controller.data;
-    },
     move: controller.apiMove,
     newPiece: controller.apiNewPiece,
     setPieces: controller.setPieces,
