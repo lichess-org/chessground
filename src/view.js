@@ -72,6 +72,7 @@ function renderSquare(ctrl, pos, asWhite) {
     if (pos[1] === (asWhite ? 1 : 8)) attrs['data-coord-x'] = file;
     if (pos[0] === (asWhite ? 8 : 1)) attrs['data-coord-y'] = rank;
   }
+  if (d.squareKey) attrs['data-key'] = key;
   var children = [];
   if (item) children.push(item);
   else if (piece) {
