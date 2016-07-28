@@ -98,29 +98,29 @@ function move(data, e) {
 }
 
 function end(data, e) {
-  var draggable = data.draggable;
-  var orig = draggable.current ? draggable.current.orig : null;
+  var cur = data.draggable.current;
+  var orig = cur ? cur.orig : null;
   if (!orig) return;
   // comparing with the origin target is an easy way to test that the end event
   // has the same touch origin
-  if (e && e.type === "touchend" && originTarget !== e.target && !draggable.current.newPiece) {
-    draggable.current = {};
+  if (e && e.type === "touchend" && originTarget !== e.target && !cur.newPiece) {
+    data.draggable.current = {};
     return;
   }
   board.unsetPremove(data);
   board.unsetPredrop(data);
-  var dest = draggable.current.over;
-  if (draggable.current.started) {
-    if (draggable.current.newPiece) board.dropNewPiece(data, orig, dest);
+  var dest = board.getKeyAtDomPos(data, util.eventPosition(e), cur.bounds);
+  if (cur.started) {
+    if (cur.newPiece) board.dropNewPiece(data, orig, dest);
     else {
       if (orig !== dest) data.movable.dropped = [orig, dest];
       if (board.userMove(data, orig, dest)) data.stats.dragged = true;
     }
   }
-  if (orig === draggable.current.previouslySelected && (orig === dest || !dest))
+  if (orig === cur.previouslySelected && (orig === dest || !dest))
     board.setSelected(data, null);
   else if (!data.selectable.enabled) board.setSelected(data, null);
-  draggable.current = {};
+  data.draggable.current = {};
 }
 
 function cancel(data) {
