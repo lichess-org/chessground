@@ -109,7 +109,8 @@ function end(data, e) {
   }
   board.unsetPremove(data);
   board.unsetPredrop(data);
-  var dest = board.getKeyAtDomPos(data, util.eventPosition(e), cur.bounds);
+  var eventPos = util.eventPosition(e)
+  var dest = eventPos ? board.getKeyAtDomPos(data, eventPos, cur.bounds) : cur.over;
   if (cur.started) {
     if (cur.newPiece) board.dropNewPiece(data, orig, dest);
     else {
