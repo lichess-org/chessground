@@ -56,7 +56,8 @@ function start(data, e) {
         position[1] - (squareBounds.top + squareBounds.height / 2)
       ] : [0, 0],
       bounds: bounds,
-      started: data.draggable.autoDistance && data.stats.dragged
+      started: data.draggable.autoDistance && data.stats.dragged,
+      pieceEl: originTarget.tagName === 'PIECE' ? originTarget : originTarget.children[0]
     };
   } else {
     if (hadPremove) board.unsetPremove(data);
@@ -68,32 +69,39 @@ function start(data, e) {
 function processDrag(data) {
   util.requestAnimationFrame(function() {
     var cur = data.draggable.current;
-    if (cur.orig) {
-      // cancel animations while dragging
-      if (data.animation.current.start && data.animation.current.anims[cur.orig])
-        data.animation.current = {};
-      // if moving piece is gone, cancel
-      if (hashPiece(data.pieces[cur.orig]) !== cur.piece) cancel(data);
-      else {
-        if (!cur.started && util.distance(cur.epos, cur.rel) >= data.draggable.distance)
-          cur.started = true;
-        if (cur.started) {
-          cur.pos = [
-            cur.epos[0] - cur.rel[0],
-            cur.epos[1] - cur.rel[1]
-          ];
-          cur.over = board.getKeyAtDomPos(data, cur.epos, cur.bounds);
-        }
+    if (!cur.orig) {
+      data.render();
+      return;
+    }
+    // cancel animations while dragging
+    if (data.animation.current.start && data.animation.current.anims[cur.orig])
+      data.animation.current = {};
+    // if moving piece is gone, cancel
+    if (hashPiece(data.pieces[cur.orig]) !== cur.piece) cancel(data);
+    else {
+      if (!cur.started && util.distance(cur.epos, cur.rel) >= data.draggable.distance)
+        cur.started = true;
+      if (cur.started) {
+        cur.pos = [
+          cur.epos[0] - cur.rel[0],
+          cur.epos[1] - cur.rel[1]
+        ];
+        var previousOver = cur.over;
+        cur.over = board.getKeyAtDomPos(data, cur.epos, cur.bounds);
+        if (previousOver !== cur.over) data.render();
       }
     }
-    data.render();
-    if (cur.orig) processDrag(data);
+    cur.pieceEl.style[util.transformProp()] = util.translate([
+      cur.pos[0] + cur.dec[0],
+      cur.pos[1] + cur.dec[1]
+    ]);
+    processDrag(data);
   });
 }
 
 function move(data, e) {
-  if (e.touches && e.touches.length > 1) return; // support one finger touch only
-  if (data.draggable.current.orig)
+  // support one finger touch only
+  if (data.draggable.current.orig && !(e.touches && e.touches.length > 1))
     data.draggable.current.epos = util.eventPosition(e);
 }
 
@@ -104,6 +112,7 @@ function end(data, e) {
   // comparing with the origin target is an easy way to test that the end event
   // has the same touch origin
   if (e && e.type === "touchend" && originTarget !== e.target && !cur.newPiece) {
+    util.resetTransform(cur.pieceEl);
     data.draggable.current = {};
     return;
   }
@@ -116,8 +125,10 @@ function end(data, e) {
     else {
       if (orig !== dest) data.movable.dropped = [orig, dest];
       if (board.userMove(data, orig, dest)) data.stats.dragged = true;
+      else util.resetTransform(cur.pieceEl);
     }
   }
+  if (orig === dest || !dest) util.resetTransform(cur.pieceEl);
   if (orig === cur.previouslySelected && (orig === dest || !dest))
     board.setSelected(data, null);
   else if (!data.selectable.enabled) board.setSelected(data, null);

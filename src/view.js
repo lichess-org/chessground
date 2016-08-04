@@ -13,14 +13,7 @@ function renderPiece(ctrl, key, p) {
     style: {},
     class: pieceClass(p)
   };
-  var draggable = ctrl.data.draggable.current;
-  if (draggable.orig === key && draggable.started) {
-    attrs.style[util.transformProp()] = util.translate([
-      draggable.pos[0] + draggable.dec[0],
-      draggable.pos[1] + draggable.dec[1]
-    ]);
-    attrs.class += ' dragging';
-  } else if (ctrl.data.animation.current.anims) {
+  if (ctrl.data.animation.current.anims) {
     var animation = ctrl.data.animation.current.anims[key];
     if (animation) attrs.style[util.transformProp()] = util.translate(animation[1]);
   }
@@ -167,6 +160,7 @@ function startDragOrDraw(d) {
   return function(e) {
     if (util.isRightButton(e) && d.draggable.current.orig) {
       if (d.draggable.current.newPiece) delete d.pieces[d.draggable.current.orig];
+      util.resetTransform(d.draggable.current.pieceEl);
       d.draggable.current = {}
       d.selected = null;
     } else if ((e.shiftKey || util.isRightButton(e)) && d.drawable.enabled) draw.start(d, e);

@@ -66,6 +66,10 @@ function transformProp() {
   return cachedTransformProp;
 }
 
+function resetTransform(el) {
+  el.style[transformProp()] = null;
+}
+
 var cachedIsTrident = null;
 
 function isTrident() {
@@ -126,6 +130,7 @@ module.exports = {
   partialApply: partialApply,
   partial: partial,
   transformProp: transformProp,
+  resetTransform: resetTransform,
   isTrident: isTrident,
   requestAnimationFrame: (window.requestAnimationFrame || window.setTimeout).bind(window),
   isRightButton: isRightButton,
