@@ -19,10 +19,10 @@ function reset(data) {
 }
 
 function setPieces(data, pieces) {
-  Object.keys(pieces).forEach(function(key) {
+  for (var key in pieces) {
     if (pieces[key]) data.pieces[key] = pieces[key];
     else delete data.pieces[key];
-  });
+  }
   data.movable.dropped = [];
 }
 
@@ -316,6 +316,8 @@ function cancelMove(data) {
   unsetPremove(data);
   unsetPredrop(data);
   selectSquare(data, null);
+  var cur = data.draggable.current;
+  if (cur && cur.pieceEl) util.resetDragging(cur.pieceEl);
 }
 
 function stop(data) {

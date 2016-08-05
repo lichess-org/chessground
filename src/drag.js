@@ -139,6 +139,7 @@ function end(data, e) {
 
 function cancel(data) {
   if (data.draggable.current.orig) {
+    util.resetDragging(data.draggable.current.pieceEl);
     data.draggable.current = {};
     board.selectSquare(data, null);
   }
