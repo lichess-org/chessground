@@ -19,7 +19,6 @@ function renderPiece(ctrl, key, p) {
       draggable.pos[0] + draggable.dec[0],
       draggable.pos[1] + draggable.dec[1]
     ]);
-    attrs.class += ' dragging';
   } else if (ctrl.data.animation.current.anims) {
     var animation = ctrl.data.animation.current.anims[key];
     if (animation) attrs.style[util.transformProp()] = util.translate(animation[1]);
