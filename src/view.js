@@ -160,7 +160,7 @@ function startDragOrDraw(d) {
   return function(e) {
     if (util.isRightButton(e) && d.draggable.current.orig) {
       if (d.draggable.current.newPiece) delete d.pieces[d.draggable.current.orig];
-      util.resetTransform(d.draggable.current.pieceEl);
+      util.resetDragging(d.draggable.current.pieceEl);
       d.draggable.current = {}
       d.selected = null;
     } else if ((e.shiftKey || util.isRightButton(e)) && d.drawable.enabled) draw.start(d, e);

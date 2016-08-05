@@ -66,8 +66,9 @@ function transformProp() {
   return cachedTransformProp;
 }
 
-function resetTransform(el) {
+function resetDragging(el) {
   el.style[transformProp()] = null;
+  el.classList.remove('dragging');
 }
 
 var cachedIsTrident = null;
@@ -130,7 +131,7 @@ module.exports = {
   partialApply: partialApply,
   partial: partial,
   transformProp: transformProp,
-  resetTransform: resetTransform,
+  resetDragging: resetDragging,
   isTrident: isTrident,
   requestAnimationFrame: (window.requestAnimationFrame || window.setTimeout).bind(window),
   isRightButton: isRightButton,

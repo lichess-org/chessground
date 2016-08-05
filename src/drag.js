@@ -44,6 +44,8 @@ function start(data, e) {
   var stillSelected = data.selected === orig;
   if (piece && stillSelected && board.isDraggable(data, orig)) {
     var squareBounds = computeSquareBounds(data, bounds, orig);
+    var pieceEl = originTarget.tagName === 'PIECE' ? originTarget : originTarget.children[0];
+    pieceEl.classList.add('dragging');
     data.draggable.current = {
       previouslySelected: previouslySelected,
       orig: orig,
@@ -57,7 +59,7 @@ function start(data, e) {
       ] : [0, 0],
       bounds: bounds,
       started: data.draggable.autoDistance && data.stats.dragged,
-      pieceEl: originTarget.tagName === 'PIECE' ? originTarget : originTarget.children[0]
+      pieceEl: pieceEl
     };
   } else {
     if (hadPremove) board.unsetPremove(data);
@@ -112,7 +114,7 @@ function end(data, e) {
   // comparing with the origin target is an easy way to test that the end event
   // has the same touch origin
   if (e && e.type === "touchend" && originTarget !== e.target && !cur.newPiece) {
-    util.resetTransform(cur.pieceEl);
+    util.resetDragging(cur.pieceEl);
     data.draggable.current = {};
     return;
   }
@@ -125,10 +127,10 @@ function end(data, e) {
     else {
       if (orig !== dest) data.movable.dropped = [orig, dest];
       if (board.userMove(data, orig, dest)) data.stats.dragged = true;
-      else util.resetTransform(cur.pieceEl);
+      else util.resetDragging(cur.pieceEl);
     }
   }
-  if (orig === dest || !dest) util.resetTransform(cur.pieceEl);
+  if (orig === dest || !dest) util.resetDragging(cur.pieceEl);
   if (orig === cur.previouslySelected && (orig === dest || !dest))
     board.setSelected(data, null);
   else if (!data.selectable.enabled) board.setSelected(data, null);
