@@ -34,6 +34,7 @@ var allPos = (function() {
   return ps;
 })();
 var allKeys = allPos.map(pos2key);
+var invKeys = allKeys.slice(0).reverse();
 
 function classSet(classes) {
   var arr = [];
@@ -117,6 +118,7 @@ module.exports = {
   invRanks: invRanks,
   allPos: allPos,
   allKeys: allKeys,
+  invKeys: invKeys,
   pos2key: pos2key,
   key2pos: key2pos,
   invertKey: invertKey,

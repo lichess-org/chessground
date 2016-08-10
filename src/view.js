@@ -11,11 +11,11 @@ function pieceClass(p) {
   return p.role + ' ' + p.color;
 }
 
-function renderPiece(d, key, piece, ctx) {
+function renderPiece(d, key, ctx) {
   var attrs = {
     key: 'p' + key,
     style: {},
-    class: pieceClass(piece)
+    class: pieceClass(d.pieces[key])
   };
   var translate = posToTranslate(util.key2pos(key), ctx);
   var draggable = d.draggable.current;
@@ -142,10 +142,11 @@ function renderContent(ctrl) {
     d.animation.current.fadings.forEach(function(p) {
       children.push(renderFading(p, ctx));
     });
-  for (var key in d.pieces) {
-    var piece = d.pieces[key];
-    children.push(renderPiece(d, key, piece, ctx));
-  }
+
+  (ctx.asWhite ? util.allKeys : util.invKeys).forEach(function(key) {
+    if (d.pieces[key]) children.push(renderPiece(d, key, ctx));
+  });
+
   if (d.draggable.showGhost) {
     var dragOrig = d.draggable.current.orig;
     if (dragOrig && !d.draggable.current.newPiece)
