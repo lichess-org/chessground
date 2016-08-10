@@ -77,12 +77,7 @@ function computePlan(prev, current) {
       !(current.items ? current.items.render(p.pos, p.key) : false)
     )
       fadings.push({
-        piece: {
-          role: p.role,
-          color: p.color
-        },
-        left: 12.5 * (white ? (p.pos[0] - 1) : (8 - p.pos[0])) + '%',
-        bottom: 12.5 * (white ? (p.pos[1] - 1) : (8 - p.pos[1])) + '%',
+        piece: p,
         opacity: 1
       });
   });

@@ -4,163 +4,173 @@ var util = require('./util');
 var svg = require('./svg');
 var m = require('mithril');
 
+var pieceTag = 'piece';
+var squareTag = 'square';
+
 function pieceClass(p) {
   return p.role + ' ' + p.color;
 }
 
-function renderPiece(ctrl, key, p) {
+function renderPiece(d, key, piece, ctx) {
   var attrs = {
+    key: 'p' + key,
     style: {},
-    class: pieceClass(p)
+    class: pieceClass(piece)
   };
-  var draggable = ctrl.data.draggable.current;
+  var pos = util.key2pos(key);
+  var translate = posToTranslate(pos, ctx);
+  var draggable = d.draggable.current;
   if (draggable.orig === key && draggable.started) {
-    attrs.style[util.transformProp()] = util.translate([
-      draggable.pos[0] + draggable.dec[0],
-      draggable.pos[1] + draggable.dec[1]
-    ]);
+    translate[0] += draggable.pos[0] + draggable.dec[0];
+    translate[1] += draggable.pos[1] + draggable.dec[1];
     attrs.class += ' dragging';
-  } else if (ctrl.data.animation.current.anims) {
-    var animation = ctrl.data.animation.current.anims[key];
-    if (animation) attrs.style[util.transformProp()] = util.translate(animation[1]);
+  } else if (d.animation.current.anims) {
+    var animation = d.animation.current.anims[key];
+    if (animation) {
+      translate[0] += animation[1][0];
+      translate[1] += animation[1][1];
+    }
   }
+  attrs.style[ctx.transformProp] = util.translate(translate);
   return {
-    tag: 'piece',
+    tag: pieceTag,
     attrs: attrs
   };
 }
 
-function renderGhost(p) {
-  return {
-    tag: 'piece',
-    attrs: {
-      class: pieceClass(p) + ' ghost'
-    }
-  };
-}
-
-function renderSquare(ctrl, pos, asWhite) {
-  var d = ctrl.data;
-  var file = util.files[pos[0] - 1];
-  var rank = pos[1];
-  var key = file + rank;
-  var piece = d.pieces[key];
-  var isDragOver = d.highlight.dragOver && d.draggable.current.over === key;
-  var item = d.items ? d.items.render(pos, key) : null;
-  var classes = util.classSet({
-    'selected': d.selected === key,
-    'check': d.highlight.check && d.check === key,
-    'last-move': d.highlight.lastMove && util.contains2(d.lastMove, key),
-    'move-dest': (isDragOver || d.movable.showDests) && util.containsX(d.movable.dests[d.selected], key),
-    'premove-dest': (isDragOver || d.premovable.showDests) && util.containsX(d.premovable.dests, key),
-    'current-premove': key === d.predroppable.current.key || util.contains2(d.premovable.current, key),
-    'drag-over': isDragOver,
-    'oc': !!piece,
-    'has-item': !!item
-  });
-  if (ctrl.vm.exploding && ctrl.vm.exploding.keys.indexOf(key) !== -1) {
-    classes += ' exploding' + ctrl.vm.exploding.stage;
-  }
-  if (!classes) return;
+function renderSquare(key, classes, ctx) {
+  var pos = util.key2pos(key);
+  // var isDragOver = d.highlight.dragOver && d.draggable.current.over === key;
+  // var item = d.items ? d.items.render(pos, key) : null;
+  // var classes = util.classSet({
+  //   'selected': d.selected === key,
+  //   'check': d.highlight.check && d.check === key,
+  //   'last-move': d.highlight.lastMove && util.contains2(d.lastMove, key),
+  //   'move-dest': (isDragOver || d.movable.showDests) && util.containsX(d.movable.dests[d.selected], key),
+  //   'premove-dest': (isDragOver || d.premovable.showDests) && util.containsX(d.premovable.dests, key),
+  //   'current-premove': key === d.predroppable.current.key || util.contains2(d.premovable.current, key),
+  //   'drag-over': isDragOver,
+  //   'oc': !!d.pieces[key],
+  //   'has-item': !!item
+  // });
+  // if (ctrl.vm.exploding && ctrl.vm.exploding.keys.indexOf(key) !== -1) {
+  //   classes += ' exploding' + ctrl.vm.exploding.stage;
+  // }
+  // if (!classes) return;
   var attrs = {
+    key: 's' + key,
     class: classes,
-    style: {
-      left: (asWhite ? pos[0] - 1 : 8 - pos[0]) * 12.5 + '%',
-      bottom: (asWhite ? pos[1] - 1 : 8 - pos[1]) * 12.5 + '%'
-    }
+    style: {}
   };
-  if (d.coordinates) {
-    if (pos[1] === (asWhite ? 1 : 8)) attrs['data-coord-x'] = file;
-    if (pos[0] === (asWhite ? 8 : 1)) attrs['data-coord-y'] = rank;
-  }
+  attrs.style[ctx.transformProp] = util.translate(posToTranslate(pos, ctx));
   // if (d.squareKey) attrs['data-key'] = key;
-  var children = [];
-  if (item) children.push(item);
-  else if (piece) {
-    children.push(renderPiece(ctrl, key, piece));
-    if (d.draggable.current.orig === key && d.draggable.showGhost && !d.draggable.current.newPiece) {
-      children.push(renderGhost(piece));
+  // if (item) children.push(item);
+  return {
+    tag: squareTag,
+    attrs: attrs
+  };
+}
+
+function posToTranslate(pos, ctx) {
+  return [
+    (ctx.asWhite ? pos[0] - 1 : 8 - pos[0]) * ctx.bounds.width / 8, (ctx.asWhite ? 8 - pos[1] : pos[1] - 1) * ctx.bounds.height / 8
+  ];
+}
+
+function renderGhost(key, piece, ctx) {
+  var attrs = {
+    key: 'g' + key,
+    style: {},
+    class: pieceClass(piece) + ' ghost'
+  };
+  attrs.style[ctx.transformProp] = util.translate(posToTranslate(util.key2pos(key), ctx));
+  return {
+    tag: pieceTag,
+    attrs: attrs
+  };
+}
+
+function renderFading(cfg, ctx) {
+  var attrs = {
+    key: 'f' + util.pos2key(cfg.piece.pos),
+    class: 'fading ' + pieceClass(cfg.piece),
+    style: {
+      opacity: cfg.opacity
     }
-  }
+  };
+  attrs.style[ctx.transformProp] = util.translate(posToTranslate(cfg.piece.pos, ctx));
   return {
-    tag: 'square',
-    attrs: attrs,
-    children: children
+    tag: pieceTag,
+    attrs: attrs
   };
 }
 
-function renderFading(cfg) {
-  return {
-    tag: 'square',
-    attrs: {
-      class: 'fading',
-      style: {
-        left: cfg.left,
-        bottom: cfg.bottom,
-        opacity: cfg.opacity
-      }
-    },
-    children: [{
-      tag: 'piece',
-      attrs: {
-        class: pieceClass(cfg.piece)
-      }
-    }]
-  };
+function addSquare(squares, key, klass) {
+  if (squares[key]) squares[key].push(klass);
+  else squares[key] = [klass];
 }
 
-function renderMinimalDom(ctrl, asWhite) {
-  var children = [];
-  if (ctrl.data.lastMove) ctrl.data.lastMove.forEach(function(key) {
-    var pos = util.key2pos(key);
-    children.push({
-      tag: 'square',
-      attrs: {
-        class: 'last-move',
-        style: {
-          left: (asWhite ? pos[0] - 1 : 8 - pos[0]) * 12.5 + '%',
-          bottom: (asWhite ? pos[1] - 1 : 8 - pos[1]) * 12.5 + '%'
-        }
-      }
-    });
+function renderSquares(ctrl, ctx) {
+  var d = ctrl.data;
+  var squares = {};
+  if (d.lastMove) d.lastMove.forEach(function(k) {
+    addSquare(squares, k, 'last-move');
   });
-  var piecesKeys = Object.keys(ctrl.data.pieces);
-  for (var i = 0, len = piecesKeys.length; i < len; i++) {
-    var key = piecesKeys[i];
-    var pos = util.key2pos(key);
-    var attrs = {
-      style: {
-        left: (asWhite ? pos[0] - 1 : 8 - pos[0]) * 12.5 + '%',
-        bottom: (asWhite ? pos[1] - 1 : 8 - pos[1]) * 12.5 + '%'
-      },
-      class: pieceClass(ctrl.data.pieces[key])
-    };
-    if (ctrl.data.animation.current.anims) {
-      var animation = ctrl.data.animation.current.anims[key];
-      if (animation) attrs.style[util.transformProp()] = util.translate(animation[1]);
-    }
-    children.push({
-      tag: 'piece',
-      attrs: attrs
+  if (d.check && d.highlight.check) addSquare(squares, d.check, 'check');
+  if (d.selected) {
+    addSquare(squares, d.selected, 'selected');
+    var over = d.draggable.current.over;
+    var dests = d.movable.dests[d.selected];
+    if (dests) dests.forEach(function(k) {
+      if (k === over) addSquare(squares, k, 'move-dest drag-over');
+      else if (d.movable.showDests) addSquare(squares, k, 'move-dest' + (d.pieces[k] ? ' oc' : ''));
+    });
+    var pDests = d.premovable.dests;
+    if (pDests && pDests[d.selected]) pDests[d.selected].forEach(function(k) {
+      if (k === over) addSquare(squares, k, 'premove-dest drag-over');
+      else if (d.movable.showDests) addSquare(squares, k, 'premove-dest' + (d.pieces[k] ? ' oc' : ''));
     });
   }
+  var premove = d.premovable.current;
+  if (premove) premove.forEach(function(k) {
+    addSquare(squares, k, 'current-premove');
+  });
+  else if (d.predroppable.current.key)
+    addSquare(squares, d.predroppable.current.key, 'current-premove');
 
-  return children;
+  if (ctrl.vm.exploding) ctrl.vm.exploding.keys.forEach(function(k) {
+    addSquare(squares, k, ' exploding' + ctrl.vm.exploding.stage);
+  });
+  // if (d.items) d.items.forEach(function(i) {
+  //   d.items.render(pos, key) : null;
+  // });
+
+  var dom = [];
+  for (var key in squares)
+    dom.push(renderSquare(key, squares[key].join(' '), ctx));
+  return dom;
 }
 
 function renderContent(ctrl) {
-  var asWhite = ctrl.data.orientation === 'white';
-  if (ctrl.data.minimalDom) return renderMinimalDom(ctrl, asWhite);
-  var positions = asWhite ? util.allPos : util.invPos;
-  var children = [];
-  for (var i = 0, len = positions.length; i < len; i++) {
-    children.push(renderSquare(ctrl, positions[i], asWhite));
-  }
-  if (ctrl.data.animation.current.fadings)
-    ctrl.data.animation.current.fadings.forEach(function(p) {
-      children.push(renderFading(p));
+  var d = ctrl.data;
+  var ctx = {
+    asWhite: d.orientation === 'white',
+    bounds: d.bounds(),
+    transformProp: util.transformProp()
+  };
+  var children = renderSquares(ctrl, ctx);
+  if (d.animation.current.fadings)
+    d.animation.current.fadings.forEach(function(p) {
+      children.push(renderFading(p, ctx));
     });
-  if (ctrl.data.drawable.enabled) children.push(svg(ctrl));
+  for (var key in d.pieces) {
+    var piece = d.pieces[key];
+    children.push(renderPiece(d, key, piece, ctx));
+    if (d.draggable.current.orig === key && d.draggable.showGhost && !d.draggable.current.newPiece) {
+      children.push(renderGhost(key, piece, ctx));
+    }
+  }
+  if (d.drawable.enabled) children.push(svg(ctrl));
   return children;
 }
 
@@ -267,8 +277,7 @@ module.exports = function(ctrl) {
       },
       class: [
         'cg-board-wrap',
-        ctrl.data.viewOnly ? 'view-only' : 'manipulable',
-        ctrl.data.minimalDom ? 'minimal-dom' : 'full-dom'
+        ctrl.data.viewOnly ? 'view-only' : 'manipulable'
       ].join(' ')
     },
     children: [renderBoard(ctrl)]

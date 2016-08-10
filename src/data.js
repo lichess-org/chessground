@@ -16,7 +16,6 @@ module.exports = function(cfg) {
     bounds: null, // function that calculates the board bounds
     autoCastle: false, // immediately complete the castle by moving the rook after king move
     viewOnly: false, // don't bind events: the user will never be able to move pieces around
-    minimalDom: false, // don't use square elements. Optimization to use only with viewOnly
     disableContextMenu: false, // because who needs a context menu on a chessboard
     resizable: true, // listens to chessground.resize on document.body to clear bounds cache
     squareKey: false, // add a data-key attribute to square elements
@@ -179,6 +178,8 @@ module.exports = function(cfg) {
   };
 
   configure(defaults, cfg || {});
+
+  defaults.animation.duration = 5000;
 
   return defaults;
 };

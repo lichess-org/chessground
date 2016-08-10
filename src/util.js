@@ -1,17 +1,27 @@
 var files = "abcdefgh".split('');
 var ranks = [1, 2, 3, 4, 5, 6, 7, 8];
 var invRanks = [8, 7, 6, 5, 4, 3, 2, 1];
+var fileNumbers = {
+  a: 1,
+  b: 2,
+  c: 3,
+  d: 4,
+  e: 5,
+  f: 6,
+  g: 7,
+  h: 8
+};
 
 function pos2key(pos) {
   return files[pos[0] - 1] + pos[1];
 }
 
 function key2pos(pos) {
-  return [(files.indexOf(pos[0]) + 1), parseInt(pos[1])];
+  return [fileNumbers[pos[0]], parseInt(pos[1])];
 }
 
 function invertKey(key) {
-  return files[7 - files.indexOf(key[0])] + (9 - parseInt(key[1]));
+  return files[8 - fileNumbers[key[0]]] + (9 - parseInt(key[1]));
 }
 
 var allPos = (function() {
@@ -23,7 +33,6 @@ var allPos = (function() {
   });
   return ps;
 })();
-var invPos = allPos.slice().reverse();
 var allKeys = allPos.map(pos2key);
 
 function classSet(classes) {
@@ -36,10 +45,6 @@ function classSet(classes) {
 
 function opposite(color) {
   return color === 'white' ? 'black' : 'white';
-}
-
-function contains2(xs, x) {
-  return xs && (xs[0] === x || xs[1] === x);
 }
 
 function containsX(xs, x) {
@@ -111,7 +116,6 @@ module.exports = {
   ranks: ranks,
   invRanks: invRanks,
   allPos: allPos,
-  invPos: invPos,
   allKeys: allKeys,
   pos2key: pos2key,
   key2pos: key2pos,
@@ -119,7 +123,6 @@ module.exports = {
   classSet: classSet,
   opposite: opposite,
   translate: translate,
-  contains2: contains2,
   containsX: containsX,
   distance: distance,
   eventPosition: eventPosition,
