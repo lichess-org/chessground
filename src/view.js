@@ -2,6 +2,7 @@ var drag = require('./drag');
 var draw = require('./draw');
 var util = require('./util');
 var svg = require('./svg');
+var makeCoords = require('./coords');
 var m = require('mithril');
 
 var pieceTag = 'piece';
@@ -164,9 +165,9 @@ function renderContent(ctrl) {
       if (d.pieces[keys[i]] && !d.items.render(util.key2pos(keys[i]), keys[i]))
         children.push(renderPiece(d, keys[i], ctx));
     } else
-    for (var i = 0; i < 64; i++) {
-      if (d.pieces[keys[i]]) children.push(renderPiece(d, keys[i], ctx));
-    }
+      for (var i = 0; i < 64; i++) {
+        if (d.pieces[keys[i]]) children.push(renderPiece(d, keys[i], ctx));
+      }
 
   if (d.draggable.showGhost) {
     var dragOrig = d.draggable.current.orig;
@@ -257,8 +258,12 @@ module.exports = function(ctrl) {
   return {
     tag: 'div',
     attrs: {
-      config: function(el, isUpdate) {
-        if (isUpdate) return;
+      config: function(el, isUpdate, ctx) {
+        if (isUpdate) {
+          ctx.coords(ctrl.data.orientation);
+          return;
+        }
+        ctx.coords = makeCoords(ctrl.getOrientation(), el);
         el.addEventListener('contextmenu', function(e) {
           if (ctrl.data.disableContextMenu || ctrl.data.drawable.enabled) {
             e.preventDefault();
