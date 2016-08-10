@@ -132,6 +132,7 @@ function renderSquares(ctrl, ctx) {
 
 function renderContent(ctrl) {
   var d = ctrl.data;
+  if (!d.bounds) return;
   var ctx = {
     asWhite: d.orientation === 'white',
     bounds: d.bounds(),
