@@ -61,18 +61,19 @@ function renderSquare(ctrl, pos, asWhite) {
   if (ctrl.vm.exploding && ctrl.vm.exploding.keys.indexOf(key) !== -1) {
     classes += ' exploding' + ctrl.vm.exploding.stage;
   }
+  if (!classes) return;
   var attrs = {
+    class: classes,
     style: {
       left: (asWhite ? pos[0] - 1 : 8 - pos[0]) * 12.5 + '%',
       bottom: (asWhite ? pos[1] - 1 : 8 - pos[1]) * 12.5 + '%'
     }
   };
-  if (classes) attrs.class = classes;
   if (d.coordinates) {
     if (pos[1] === (asWhite ? 1 : 8)) attrs['data-coord-x'] = file;
     if (pos[0] === (asWhite ? 8 : 1)) attrs['data-coord-y'] = rank;
   }
-  if (d.squareKey) attrs['data-key'] = key;
+  // if (d.squareKey) attrs['data-key'] = key;
   var children = [];
   if (item) children.push(item);
   else if (piece) {
