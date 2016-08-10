@@ -121,13 +121,23 @@ function renderSquares(ctrl, ctx) {
   if (ctrl.vm.exploding) ctrl.vm.exploding.keys.forEach(function(k) {
     addSquare(squares, k, 'exploding' + ctrl.vm.exploding.stage);
   });
-  // if (d.items) d.items.forEach(function(i) {
-  //   d.items.render(pos, key) : null;
-  // });
 
   var dom = [];
-  for (var key in squares)
-    dom.push(renderSquare(key, squares[key].join(' '), ctx));
+  if (d.items) {
+    for (var i = 0; i < 64; i++) {
+      var key = util.allKeys[i];
+      var square = squares[key];
+      var item = d.items.render(util.key2pos(key), key);
+      if (square || item) {
+        var sq = renderSquare(key, square ? square.join(' ') + (item ? ' has-item' : '') : 'has-item', ctx);
+        if (item) sq.children = [item];
+        dom.push(sq);
+      }
+    }
+  } else {
+    for (var key in squares)
+      dom.push(renderSquare(key, squares[key].join(' '), ctx));
+  }
   return dom;
 }
 
@@ -145,9 +155,12 @@ function renderContent(ctrl) {
       children.push(renderFading(p, ctx));
     });
 
-  (ctx.asWhite ? util.allKeys : util.invKeys).forEach(function(key) {
-    if (d.pieces[key]) children.push(renderPiece(d, key, ctx));
-  });
+  // must insert pieces in the right order
+  // for 3D to display correctly
+  var keys = ctx.asWhite ? util.allKeys : util.invKeys;
+  for (var i = 0; i < 64; i++) {
+    if (d.pieces[keys[i]]) children.push(renderPiece(d, keys[i], ctx));
+  }
 
   if (d.draggable.showGhost) {
     var dragOrig = d.draggable.current.orig;
