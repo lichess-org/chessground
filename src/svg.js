@@ -131,6 +131,9 @@ module.exports = function(ctrl) {
   });
   return {
     tag: 'svg',
+    attrs: {
+      key: 'svg'
+    },
     children: [
       defs(usedBrushes),
       allShapes.map(renderShape(ctrl.data.orientation, false, ctrl.data.drawable.brushes, bounds)),
