@@ -57,6 +57,7 @@ function posToTranslate(pos, ctx) {
 }
 
 function renderGhost(key, piece, ctx) {
+  if (!piece) return;
   var attrs = {
     key: 'g' + key,
     style: {},
