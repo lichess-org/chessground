@@ -158,9 +158,14 @@ function renderContent(ctrl) {
   // must insert pieces in the right order
   // for 3D to display correctly
   var keys = ctx.asWhite ? util.allKeys : util.invKeys;
-  for (var i = 0; i < 64; i++) {
-    if (d.pieces[keys[i]]) children.push(renderPiece(d, keys[i], ctx));
-  }
+  if (d.items)
+    for (var i = 0; i < 64; i++) {
+      if (d.pieces[keys[i]] && !d.items.render(util.key2pos(keys[i]), keys[i]))
+        children.push(renderPiece(d, keys[i], ctx));
+    } else
+    for (var i = 0; i < 64; i++) {
+      if (d.pieces[keys[i]]) children.push(renderPiece(d, keys[i], ctx));
+    }
 
   if (d.draggable.showGhost) {
     var dragOrig = d.draggable.current.orig;
