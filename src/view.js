@@ -17,8 +17,7 @@ function renderPiece(d, key, piece, ctx) {
     style: {},
     class: pieceClass(piece)
   };
-  var pos = util.key2pos(key);
-  var translate = posToTranslate(pos, ctx);
+  var translate = posToTranslate(util.key2pos(key), ctx);
   var draggable = d.draggable.current;
   if (draggable.orig === key && draggable.started) {
     translate[0] += draggable.pos[0] + draggable.dec[0];
@@ -39,32 +38,12 @@ function renderPiece(d, key, piece, ctx) {
 }
 
 function renderSquare(key, classes, ctx) {
-  var pos = util.key2pos(key);
-  // var isDragOver = d.highlight.dragOver && d.draggable.current.over === key;
-  // var item = d.items ? d.items.render(pos, key) : null;
-  // var classes = util.classSet({
-  //   'selected': d.selected === key,
-  //   'check': d.highlight.check && d.check === key,
-  //   'last-move': d.highlight.lastMove && util.contains2(d.lastMove, key),
-  //   'move-dest': (isDragOver || d.movable.showDests) && util.containsX(d.movable.dests[d.selected], key),
-  //   'premove-dest': (isDragOver || d.premovable.showDests) && util.containsX(d.premovable.dests, key),
-  //   'current-premove': key === d.predroppable.current.key || util.contains2(d.premovable.current, key),
-  //   'drag-over': isDragOver,
-  //   'oc': !!d.pieces[key],
-  //   'has-item': !!item
-  // });
-  // if (ctrl.vm.exploding && ctrl.vm.exploding.keys.indexOf(key) !== -1) {
-  //   classes += ' exploding' + ctrl.vm.exploding.stage;
-  // }
-  // if (!classes) return;
   var attrs = {
     key: 's' + key,
     class: classes,
     style: {}
   };
-  attrs.style[ctx.transformProp] = util.translate(posToTranslate(pos, ctx));
-  // if (d.squareKey) attrs['data-key'] = key;
-  // if (item) children.push(item);
+  attrs.style[ctx.transformProp] = util.translate(posToTranslate(util.key2pos(key), ctx));
   return {
     tag: squareTag,
     attrs: attrs
@@ -92,7 +71,7 @@ function renderGhost(key, piece, ctx) {
 
 function renderFading(cfg, ctx) {
   var attrs = {
-    key: 'f' + util.pos2key(cfg.piece.pos),
+    key: 'f' + cfg.piece.key,
     class: 'fading ' + pieceClass(cfg.piece),
     style: {
       opacity: cfg.opacity
@@ -126,7 +105,7 @@ function renderSquares(ctrl, ctx) {
       else if (d.movable.showDests) addSquare(squares, k, 'move-dest' + (d.pieces[k] ? ' oc' : ''));
     });
     var pDests = d.premovable.dests;
-    if (pDests && pDests[d.selected]) pDests[d.selected].forEach(function(k) {
+    if (pDests) pDests.forEach(function(k) {
       if (k === over) addSquare(squares, k, 'premove-dest drag-over');
       else if (d.movable.showDests) addSquare(squares, k, 'premove-dest' + (d.pieces[k] ? ' oc' : ''));
     });
@@ -139,7 +118,7 @@ function renderSquares(ctrl, ctx) {
     addSquare(squares, d.predroppable.current.key, 'current-premove');
 
   if (ctrl.vm.exploding) ctrl.vm.exploding.keys.forEach(function(k) {
-    addSquare(squares, k, ' exploding' + ctrl.vm.exploding.stage);
+    addSquare(squares, k, 'exploding' + ctrl.vm.exploding.stage);
   });
   // if (d.items) d.items.forEach(function(i) {
   //   d.items.render(pos, key) : null;
@@ -166,9 +145,11 @@ function renderContent(ctrl) {
   for (var key in d.pieces) {
     var piece = d.pieces[key];
     children.push(renderPiece(d, key, piece, ctx));
-    if (d.draggable.current.orig === key && d.draggable.showGhost && !d.draggable.current.newPiece) {
-      children.push(renderGhost(key, piece, ctx));
-    }
+  }
+  if (d.draggable.showGhost) {
+    var dragOrig = d.draggable.current.orig;
+    if (dragOrig && !d.draggable.current.newPiece)
+      children.push(renderGhost(dragOrig, d.pieces[dragOrig], ctx));
   }
   if (d.drawable.enabled) children.push(svg(ctrl));
   return children;

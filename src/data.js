@@ -179,7 +179,5 @@ module.exports = function(cfg) {
 
   configure(defaults, cfg || {});
 
-  defaults.animation.duration = 5000;
-
   return defaults;
 };
