@@ -18,7 +18,7 @@ module.exports = function(cfg) {
     viewOnly: false, // don't bind events: the user will never be able to move pieces around
     disableContextMenu: false, // because who needs a context menu on a chessboard
     resizable: true, // listens to chessground.resize on document.body to clear bounds cache
-    squareKey: false, // add a data-key attribute to square elements
+    pieceKey: false, // add a data-key attribute to piece elements
     highlight: {
       lastMove: true, // add last-move class to squares
       check: true, // add check class to squares

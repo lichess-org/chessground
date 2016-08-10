@@ -31,6 +31,7 @@ function renderPiece(d, key, ctx) {
     }
   }
   attrs.style[ctx.transformProp] = util.translate(translate);
+  if (d.pieceKey) attrs['data-key'] = key;
   return {
     tag: pieceTag,
     attrs: attrs
