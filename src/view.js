@@ -227,27 +227,28 @@ function bindEvents(ctrl, el, context) {
 }
 
 function renderBoard(ctrl) {
+  var d = ctrl.data;
   return {
     tag: 'div',
     attrs: {
-      class: 'cg-board orientation-' + ctrl.data.orientation,
+      class: 'cg-board orientation-' + d.orientation,
       config: function(el, isUpdate, context) {
         if (isUpdate) return;
-        if (!ctrl.data.viewOnly || ctrl.data.drawable.enabled)
+        if (!d.viewOnly || d.drawable.enabled)
           bindEvents(ctrl, el, context);
         // this function only repaints the board itself.
         // it's called when dragging or animating pieces,
         // to prevent the full application embedding chessground
         // rendering on every animation frame
-        ctrl.data.render = function() {
+        d.render = function() {
           m.render(el, renderContent(ctrl));
         };
-        ctrl.data.renderRAF = function() {
-          util.requestAnimationFrame(ctrl.data.render);
+        d.renderRAF = function() {
+          util.requestAnimationFrame(d.render);
         };
-        ctrl.data.bounds = util.memo(el.getBoundingClientRect.bind(el));
-        ctrl.data.element = el;
-        ctrl.data.render();
+        d.bounds = util.memo(el.getBoundingClientRect.bind(el));
+        d.element = el;
+        d.render();
       }
     },
     children: []
@@ -255,37 +256,38 @@ function renderBoard(ctrl) {
 }
 
 module.exports = function(ctrl) {
+  var d = ctrl.data;
   return {
     tag: 'div',
     attrs: {
       config: function(el, isUpdate, ctx) {
         if (isUpdate) {
-          ctx.coords(ctrl.data.orientation);
+          if (ctx.coords) ctx.coords(d.orientation);
           return;
         }
-        ctx.coords = makeCoords(ctrl.getOrientation(), el);
+        if (d.coordinates) ctx.coords = makeCoords(ctrl.getOrientation(), el);
         el.addEventListener('contextmenu', function(e) {
-          if (ctrl.data.disableContextMenu || ctrl.data.drawable.enabled) {
+          if (d.disableContextMenu || d.drawable.enabled) {
             e.preventDefault();
             return false;
           }
         });
-        if (ctrl.data.resizable)
+        if (d.resizable)
           document.body.addEventListener('chessground.resize', function(e) {
-            ctrl.data.bounds.clear();
-            ctrl.data.render();
+            d.bounds.clear();
+            d.render();
           }, false);
         ['onscroll', 'onresize'].forEach(function(n) {
           var prev = window[n];
           window[n] = function() {
             prev && prev();
-            ctrl.data.bounds.clear();
+            d.bounds.clear();
           };
         });
       },
       class: [
         'cg-board-wrap',
-        ctrl.data.viewOnly ? 'view-only' : 'manipulable'
+        d.viewOnly ? 'view-only' : 'manipulable'
       ].join(' ')
     },
     children: [renderBoard(ctrl)]
