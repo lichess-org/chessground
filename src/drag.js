@@ -103,7 +103,7 @@ function end(data, e) {
   if (!orig) return;
   // comparing with the origin target is an easy way to test that the end event
   // has the same touch origin
-  if (e && e.type === "touchend" && originTarget !== e.target && !cur.newPiece) {
+  if (e.type === "touchend" && originTarget !== e.target && !cur.newPiece) {
     data.draggable.current = {};
     return;
   }
