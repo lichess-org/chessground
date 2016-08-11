@@ -95,7 +95,7 @@ function addSquare(squares, key, klass) {
 function renderSquares(ctrl, ctx) {
   var d = ctrl.data;
   var squares = {};
-  if (d.lastMove) d.lastMove.forEach(function(k) {
+  if (d.lastMove && d.highlight.lastMove) d.lastMove.forEach(function(k) {
     addSquare(squares, k, 'last-move');
   });
   if (d.check && d.highlight.check) addSquare(squares, d.check, 'check');
