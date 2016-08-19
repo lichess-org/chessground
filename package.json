@@ -2,7 +2,7 @@
   "name": "chessground",
   "version": "4.2.0",
   "description": "lichess.org Chess UI",
-  "main": "src/main.js",
+  "main": "chessground.js",
   "directories": {
     "example": "examples"
   },
@@ -30,6 +30,11 @@
     "chessboard",
     "UI"
   ],
+  "scripts": {
+    "build": "npm install && gulp",
+    "test": "gulp && gulp lint"
+  },
+  
   "author": "Thibault Duplessis (https://github.com/ornicar)",
   "license": "MIT",
   "bugs": {

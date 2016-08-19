@@ -1,0 +1,15 @@
+{
+  "name": "chessground",
+  "version": "2.0.11",
+  "main": "chessground.js",
+  "ignore": [
+    "package.json",
+    "Gulpfile.js",
+    ".gitignore",
+    ".jshintrc",
+    "assets",
+    "screenshot",
+    "src"
+  ]
+}
+
