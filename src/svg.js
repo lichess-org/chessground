@@ -11,7 +11,7 @@ function lineWidth(brush, current, bounds) {
 }
 
 function opacity(brush, current) {
-  return (brush.opacity || 1) * (current ? 0.6 : 1);
+  return (brush.opacity || 1) * (current ? 0.8 : 1);
 }
 
 function arrowMargin(current, bounds) {
