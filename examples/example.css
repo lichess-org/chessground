@@ -39,6 +39,9 @@ section p {
   pointer-events: none;
   z-index: 2;
 }
-.cg-board-wrap svg * {
+.cg-board svg * {
   transition: 0.35s;
+}
+.cg-board svg image {
+  opacity: 0.5;
 }

@@ -68,6 +68,25 @@ function arrow(brush, orig, dest, current, bounds) {
   };
 }
 
+function piece(cfg, pos, piece, bounds) {
+  var o = pos2px(pos, bounds);
+  var size = bounds.width / 8 * (piece.scale || 1);
+  var name = piece.color === 'white' ? 'w' : 'b';
+  name += (piece.role === 'knight' ? 'n' : piece.role[0]).toUpperCase();
+  var href = cfg.baseUrl + name + '.svg';
+  return {
+    tag: 'image',
+    attrs: {
+      class: piece.color + ' ' + piece.role,
+      x: o[0] - size / 2,
+      y: o[1] - size / 2,
+      width: size,
+      height: size,
+      href: href
+    }
+  };
+}
+
 function defs(brushes) {
   return {
     tag: 'defs',
@@ -101,16 +120,21 @@ function orient(pos, color) {
   return color === 'white' ? pos : [9 - pos[0], 9 - pos[1]];
 }
 
-function renderShape(orientation, current, brushes, bounds) {
+function renderShape(data, current, bounds) {
   return function(shape) {
     if (shape.orig && shape.dest) return arrow(
-      brushes[shape.brush],
-      orient(key2pos(shape.orig), orientation),
-      orient(key2pos(shape.dest), orientation),
+      data.drawable.brushes[shape.brush],
+      orient(key2pos(shape.orig), data.orientation),
+      orient(key2pos(shape.dest), data.orientation),
       current, bounds);
+    else if (shape.piece) return piece(
+      data.drawable.pieces,
+      orient(key2pos(shape.orig), data.orientation),
+      shape.piece,
+      bounds);
     else if (shape.orig) return circle(
-      brushes[shape.brush],
-      orient(key2pos(shape.orig), orientation),
+      data.drawable.brushes[shape.brush],
+      orient(key2pos(shape.orig), data.orientation),
       current, bounds);
   };
 }
@@ -122,12 +146,12 @@ module.exports = function(ctrl) {
   if (!allShapes.length && !d.current.orig) return;
   var bounds = ctrl.data.bounds();
   if (bounds.width !== bounds.height) return;
-  var usedBrushes = Object.keys(ctrl.data.drawable.brushes).filter(function(name) {
+  var usedBrushes = Object.keys(d.brushes).filter(function(name) {
     return (d.current && d.current.dest && d.current.brush === name) || allShapes.filter(function(s) {
       return s.dest && s.brush === name;
     }).length;
   }).map(function(name) {
-    return ctrl.data.drawable.brushes[name];
+    return d.brushes[name];
   });
   return {
     tag: 'svg',
@@ -136,8 +160,8 @@ module.exports = function(ctrl) {
     },
     children: [
       defs(usedBrushes),
-      allShapes.map(renderShape(ctrl.data.orientation, false, ctrl.data.drawable.brushes, bounds)),
-      renderShape(ctrl.data.orientation, true, ctrl.data.drawable.brushes, bounds)(d.current)
+      allShapes.map(renderShape(ctrl.data, false, bounds)),
+      renderShape(ctrl.data, true, bounds)(d.current)
     ]
   };
 }

@@ -173,6 +173,10 @@ module.exports = function(cfg) {
           opacity: 0.35,
           lineWidth: 15
         }
+      },
+      // drawable SVG pieces, used for crazyhouse drop
+      pieces: {
+        baseUrl: 'https://lichess1.org/assets/piece/cburnett/'
       }
     }
   };

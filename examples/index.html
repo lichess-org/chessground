@@ -122,7 +122,14 @@
               enabled: true
             }
           });
-              window.cg6 = ground;
+          window.cg6 = ground;
+              ground.setAutoShapes([{
+                orig: 'd4',
+                piece: { role: 'queen', color: 'black' }
+              }, {
+                orig: 'd4',
+                brush: 'paleBlue'
+              }]);
         })();
         </script>
     </section>
