@@ -3,15 +3,15 @@ var key2pos = require('./util').key2pos;
 var isTrident = require('./util').isTrident;
 
 function circleWidth(current, bounds) {
-  return (current ? 2 : 4) / 512 * bounds.width;
+  return (current ? 3 : 4) / 512 * bounds.width;
 }
 
 function lineWidth(brush, current, bounds) {
-  return (brush.lineWidth || 10) * (current ? 0.7 : 1) / 512 * bounds.width;
+  return (brush.lineWidth || 10) * (current ? 0.85 : 1) / 512 * bounds.width;
 }
 
 function opacity(brush, current) {
-  return (brush.opacity || 1) * (current ? 0.8 : 1);
+  return (brush.opacity || 1) * (current ? 0.9 : 1);
 }
 
 function arrowMargin(current, bounds) {
