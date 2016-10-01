@@ -121,22 +121,55 @@ function orient(pos, color) {
 }
 
 function renderShape(data, current, bounds) {
-  return function(shape) {
-    if (shape.orig && shape.dest) return arrow(
-      data.drawable.brushes[shape.brush],
-      orient(key2pos(shape.orig), data.orientation),
-      orient(key2pos(shape.dest), data.orientation),
-      current, bounds);
-    else if (shape.piece) return piece(
+  return function(shape, i) {
+    if (shape.piece) return piece(
       data.drawable.pieces,
       orient(key2pos(shape.orig), data.orientation),
       shape.piece,
       bounds);
-    else if (shape.orig) return circle(
-      data.drawable.brushes[shape.brush],
-      orient(key2pos(shape.orig), data.orientation),
-      current, bounds);
+    else if (shape.brush) {
+      var brush = shape.brushModifiers ?
+        makeCustomBrush(data.drawable.brushes[shape.brush], shape.brushModifiers, i) :
+        data.drawable.brushes[shape.brush];
+      var orig = orient(key2pos(shape.orig), data.orientation);
+      if (shape.orig && shape.dest) return arrow(
+        brush,
+        orig,
+        orient(key2pos(shape.dest), data.orientation),
+        current, bounds);
+      else if (shape.orig) return circle(
+        brush,
+        orig,
+        current, bounds);
+    }
   };
+}
+
+function makeCustomBrush(base, modifiers, i) {
+  return {
+    key: 'bm' + i,
+    color: modifiers.color || base.color,
+    opacity: modifiers.opacity || base.opacity,
+    lineWidth: modifiers.lineWidth || base.lineWidth
+  };
+}
+
+function computeUsedBrushes(d, shapes) {
+  var brushes = [];
+  var keys = [];
+  for (var i in shapes) {
+    var shape = shapes[i];
+    var brushKey = shape.brush;
+    if (shape.brushModifiers)
+      brushes.push(makeCustomBrush(d.brushes[brushKey], shape.brushModifiers, i));
+    else {
+      if (keys.indexOf(brushKey) === -1) {
+        brushes.push(d.brushes[brushKey]);
+        keys.push(brushKey);
+      }
+    }
+  }
+  return brushes;
 }
 
 module.exports = function(ctrl) {
@@ -146,13 +179,7 @@ module.exports = function(ctrl) {
   if (!allShapes.length && !d.current.orig) return;
   var bounds = ctrl.data.bounds();
   if (bounds.width !== bounds.height) return;
-  var usedBrushes = Object.keys(d.brushes).filter(function(name) {
-    return (d.current && d.current.dest && d.current.brush === name) || allShapes.filter(function(s) {
-      return s.dest && s.brush === name;
-    }).length;
-  }).map(function(name) {
-    return d.brushes[name];
-  });
+  var usedBrushes = computeUsedBrushes(d, allShapes);
   return {
     tag: 'svg',
     attrs: {
@@ -161,7 +188,7 @@ module.exports = function(ctrl) {
     children: [
       defs(usedBrushes),
       allShapes.map(renderShape(ctrl.data, false, bounds)),
-      renderShape(ctrl.data, true, bounds)(d.current)
+      renderShape(ctrl.data, true, bounds)(d.current, 9999)
     ]
   };
 }
