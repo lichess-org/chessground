@@ -193,7 +193,10 @@ function dropNewPiece(data, orig, dest) {
 function selectSquare(data, key) {
   if (data.selected) {
     if (key) {
-      if (data.selectable.enabled && data.selected !== key) {
+      if (data.selected === key && !data.draggable.enabled) {
+        setSelected(data, null);
+        hold.cancel();
+      } else if (data.selectable.enabled && data.selected !== key) {
         if (userMove(data, data.selected, key)) data.stats.dragged = false;
       } else hold.start();
     } else {
