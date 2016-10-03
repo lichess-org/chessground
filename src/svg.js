@@ -154,9 +154,10 @@ function makeCustomBrush(base, modifiers, i) {
   };
 }
 
-function computeUsedBrushes(d, shapes) {
+function computeUsedBrushes(d, drawn, current) {
   var brushes = [];
   var keys = [];
+  var shapes = (current && current.dest) ? drawn.concat(current) : drawn;
   for (var i in shapes) {
     var shape = shapes[i];
     if (!shape.dest) continue;
@@ -180,7 +181,7 @@ module.exports = function(ctrl) {
   if (!allShapes.length && !d.current.orig) return;
   var bounds = ctrl.data.bounds();
   if (bounds.width !== bounds.height) return;
-  var usedBrushes = computeUsedBrushes(d, allShapes);
+  var usedBrushes = computeUsedBrushes(d, allShapes, d.current);
   return {
     tag: 'svg',
     attrs: {
