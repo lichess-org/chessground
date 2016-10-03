@@ -159,6 +159,7 @@ function computeUsedBrushes(d, shapes) {
   var keys = [];
   for (var i in shapes) {
     var shape = shapes[i];
+    if (!shape.dest) continue;
     var brushKey = shape.brush;
     if (shape.brushModifiers)
       brushes.push(makeCustomBrush(d.brushes[brushKey], shape.brushModifiers, i));
