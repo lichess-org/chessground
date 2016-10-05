@@ -164,13 +164,19 @@ module.exports = function(cfg) {
         paleBlue: {
           key: 'pb',
           color: '#003088',
-          opacity: 0.35,
+          opacity: 0.4,
           lineWidth: 15
         },
         paleGreen: {
           key: 'pg',
           color: '#15781B',
-          opacity: 0.35,
+          opacity: 0.4,
+          lineWidth: 15
+        },
+        paleRed: {
+          key: 'pr',
+          color: '#882020',
+          opacity: 0.4,
           lineWidth: 15
         },
         paleGrey: {
