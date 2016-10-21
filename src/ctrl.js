@@ -23,7 +23,10 @@ module.exports = function(cfg) {
 
   this.set = anim(configure, this.data);
 
-  this.toggleOrientation = anim(board.toggleOrientation, this.data);
+  this.toggleOrientation = function() {
+    anim(board.toggleOrientation, this.data)();
+    if (this.data.redrawCoords) this.data.redrawCoords(this.data.orientation);
+  }
 
   this.setPieces = anim(board.setPieces, this.data);
 

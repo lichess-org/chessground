@@ -260,12 +260,12 @@ module.exports = function(ctrl) {
   return {
     tag: 'div',
     attrs: {
-      config: function(el, isUpdate, ctx) {
+      config: function(el, isUpdate) {
         if (isUpdate) {
-          if (ctx.coords) ctx.coords(d.orientation);
+          if (d.redrawCoords) d.redrawCoords(d.orientation);
           return;
         }
-        if (d.coordinates) ctx.coords = makeCoords(ctrl.getOrientation(), el);
+        if (d.coordinates) d.redrawCoords = makeCoords(d.orientation, el);
         el.addEventListener('contextmenu', function(e) {
           if (d.disableContextMenu || d.drawable.enabled) {
             e.preventDefault();

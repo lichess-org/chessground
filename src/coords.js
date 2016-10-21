@@ -27,6 +27,8 @@ module.exports = function(orientation, el) {
   return function(o) {
     if (o === orientation) return;
     orientation = o;
-    $(el).find('coords').toggleClass('black', orientation === 'black');
+    var coords = el.querySelectorAll('coords');
+    for (i = 0; i < coords.length; ++i)
+      coords[i].classList.toggle('black', o === 'black');
   };
 }
