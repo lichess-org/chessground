@@ -34,12 +34,11 @@ module.exports = function(data, config) {
   if (!data.movable.rookCastle) {
     var rank = data.movable.color === 'white' ? 1 : 8;
     var kingStartPos = 'e' + rank;
-    if (data.movable.dests && data.movable.dests[kingStartPos]) {
+    if (data.movable.dests) {
       var dests = data.movable.dests[kingStartPos];
-      if (data.pieces[kingStartPos].role !== 'king') return;
-      Object.keys(dests).forEach(function(i) {
-        if (dests[i] === 'a' + rank || dests[i] === 'h' + rank)
-          delete dests[i];
+      if (!dests || data.pieces[kingStartPos].role !== 'king') return;
+      data.movable.dests[kingStartPos] = dests.filter(function(d) {
+        return d !== 'a' + rank && d !== 'h' + rank
       });
     }
   }
