@@ -57,7 +57,8 @@ module.exports = function(cfg) {
       events: {
         after: function(orig, dest, metadata) {}, // called after the move has been played
         afterNewPiece: function(role, pos) {} // called after a new piece is dropped on the board
-      }
+      },
+      rookCastle: true // castle by moving the king to the rook
     },
     premovable: {
       enabled: true, // allow premoves for color that can not move

@@ -30,4 +30,17 @@ module.exports = function(data, config) {
   // no need for such short animations
   if (!data.animation.duration || data.animation.duration < 40)
     data.animation.enabled = false;
+
+  if (!data.movable.rookCastle) {
+    var rank = data.movable.color === 'white' ? 1 : 8;
+    var kingStartPos = 'e' + rank;
+    if (data.movable.dests && data.movable.dests[kingStartPos]) {
+      var dests = data.movable.dests[kingStartPos];
+      if (data.pieces[kingStartPos].role !== 'king') return;
+      Object.keys(dests).forEach(function(i) {
+        if (dests[i] === 'a' + rank || dests[i] === 'h' + rank)
+          delete dests[i];
+      });
+    }
+  }
 };
