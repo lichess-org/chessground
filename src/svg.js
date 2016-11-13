@@ -1,4 +1,4 @@
-var m = require('mithril');
+var m = require('mithril/hyperscript');
 var key2pos = require('./util').key2pos;
 var isTrident = require('./util').isTrident;
 

@@ -3,7 +3,7 @@ var draw = require('./draw');
 var util = require('./util');
 var svg = require('./svg');
 var makeCoords = require('./coords');
-var m = require('mithril');
+var m = require('mithril/render');
 
 var pieceTag = 'piece';
 var squareTag = 'square';
