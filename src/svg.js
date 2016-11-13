@@ -30,7 +30,7 @@ function circle(brush, pos, current, bounds) {
   return {
     tag: 'circle',
     attrs: {
-      key: current ? 'current' : pos + brush.key,
+      key: current ? 'circle-current' : pos + brush.key,
       stroke: brush.color,
       'stroke-width': width,
       fill: 'none',
@@ -54,7 +54,7 @@ function arrow(brush, orig, dest, current, bounds) {
   return {
     tag: 'line',
     attrs: {
-      key: current ? 'current' : orig + dest + brush.key,
+      key: current ? 'line-current' : orig + dest + brush.key,
       stroke: brush.color,
       'stroke-width': lineWidth(brush, current, bounds),
       'stroke-linecap': 'round',
@@ -88,31 +88,29 @@ function piece(cfg, pos, piece, bounds) {
 }
 
 function defs(brushes) {
-  return {
+  if (brushes.length) return {
     tag: 'defs',
-    children: [
-      brushes.map(function(brush) {
-        return {
-          key: brush.key,
-          tag: 'marker',
+    children: brushes.map(function(brush) {
+      return {
+        key: brush.key,
+        tag: 'marker',
+        attrs: {
+          id: 'arrowhead-' + brush.key,
+          orient: 'auto',
+          markerWidth: 4,
+          markerHeight: 8,
+          refX: 2.05,
+          refY: 2.01
+        },
+        children: [{
+          tag: 'path',
           attrs: {
-            id: 'arrowhead-' + brush.key,
-            orient: 'auto',
-            markerWidth: 4,
-            markerHeight: 8,
-            refX: 2.05,
-            refY: 2.01
-          },
-          children: [{
-            tag: 'path',
-            attrs: {
-              d: 'M0,0 V4 L3,2 Z',
-              fill: brush.color
-            }
-          }]
-        }
-      })
-    ]
+            d: 'M0,0 V4 L3,2 Z',
+            fill: brush.color
+          }
+        }]
+      }
+    })
   };
 }
 
@@ -189,7 +187,7 @@ module.exports = function(ctrl) {
     },
     children: [
       defs(usedBrushes),
-      allShapes.map(renderShape(ctrl.data, false, bounds)),
+      allShapes.length ? allShapes.map(renderShape(ctrl.data, false, bounds)) : null,
       renderShape(ctrl.data, true, bounds)(d.current, 9999)
     ]
   };
