@@ -196,7 +196,7 @@ function dragOrDraw(d, withDrag, withDraw) {
   };
 }
 
-function bindEvents(ctrl, el, context) {
+function bindEvents(ctrl, el) {
   var d = ctrl.data;
   var onstart = startDragOrDraw(d);
   var onmove = dragOrDraw(d, drag.move, draw.move);
@@ -213,17 +213,6 @@ function bindEvents(ctrl, el, context) {
   endEvents.forEach(function(ev) {
     document.addEventListener(ev, onend);
   });
-  context.onunload = function() {
-    startEvents.forEach(function(ev) {
-      el.removeEventListener(ev, onstart);
-    });
-    moveEvents.forEach(function(ev) {
-      document.removeEventListener(ev, onmove);
-    });
-    endEvents.forEach(function(ev) {
-      document.removeEventListener(ev, onend);
-    });
-  };
 }
 
 function renderBoard(ctrl) {
@@ -232,10 +221,9 @@ function renderBoard(ctrl) {
     tag: 'div',
     attrs: {
       class: 'cg-board orientation-' + d.orientation,
-      config: function(el, isUpdate, context) {
-        if (isUpdate) return;
-        if (!d.viewOnly || d.drawable.enabled)
-          bindEvents(ctrl, el, context);
+      oncreate: function(vnode) {
+        var el = vnode.dom;
+        if (!d.viewOnly || d.drawable.enabled) bindEvents(ctrl, el);
         // this function only repaints the board itself.
         // it's called when dragging or animating pieces,
         // to prevent the full application embedding chessground
@@ -260,11 +248,8 @@ module.exports = function(ctrl) {
   return {
     tag: 'div',
     attrs: {
-      config: function(el, isUpdate) {
-        if (isUpdate) {
-          if (d.redrawCoords) d.redrawCoords(d.orientation);
-          return;
-        }
+      oncreate: function(vnode) {
+        var el = vnode.dom;
         if (d.coordinates) d.redrawCoords = makeCoords(d.orientation, el);
         el.addEventListener('contextmenu', function(e) {
           if (d.disableContextMenu || d.drawable.enabled) {
@@ -284,6 +269,9 @@ module.exports = function(ctrl) {
             d.bounds.clear();
           };
         });
+      },
+      onupdate: function(vnode) {
+        if (d.redrawCoords) d.redrawCoords(d.orientation);
       },
       class: [
         'cg-board-wrap',
