@@ -1,6 +1,6 @@
 {
   "name": "chessground",
-  "version": "5.0.0",
+  "version": "5.0.1",
   "description": "lichess.org Chess UI",
   "main": "src/main.js",
   "directories": {
@@ -8,7 +8,7 @@
   },
   "dependencies": {
     "merge": "1.2.0",
-    "mithril": "ornicar/mithril.js#7163d5f"
+    "mithril": "lhorie/mithril.js#rewrite"
   },
   "devDependencies": {
     "browserify": "~9.0.8",
