@@ -180,15 +180,11 @@ module.exports = function(ctrl) {
   var bounds = ctrl.data.bounds();
   if (bounds.width !== bounds.height) return;
   var usedBrushes = computeUsedBrushes(d, allShapes, d.current);
-  return {
-    tag: 'svg',
-    attrs: {
-      key: 'svg'
-    },
-    children: [
-      defs(usedBrushes),
-      allShapes.length ? allShapes.map(renderShape(ctrl.data, false, bounds)) : null,
-      renderShape(ctrl.data, true, bounds)(d.current, 9999)
-    ]
-  };
+  return m('svg', {
+    key: 'svg'
+  }, [
+    defs(usedBrushes),
+    allShapes.length ? allShapes.map(renderShape(ctrl.data, false, bounds)) : null,
+    renderShape(ctrl.data, true, bounds)(d.current, 9999)
+  ]);
 }
