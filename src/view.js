@@ -4,6 +4,8 @@ var util = require('./util');
 var svg = require('./svg');
 var makeCoords = require('./coords');
 var m = require('mithril/render');
+var fragment = require('mithril/render/fragment');
+var vn = require('mithril/render/vnode');
 
 var pieceTag = 'piece';
 var squareTag = 'square';
@@ -33,10 +35,7 @@ function renderPiece(d, key, ctx) {
   }
   attrs.style[ctx.transformProp] = util.translate(translate);
   if (d.pieceKey) attrs['data-key'] = key;
-  return {
-    tag: pieceTag,
-    attrs: attrs
-  };
+  return vn(pieceTag, undefined, attrs);
 }
 
 function renderSquare(key, classes, ctx) {
@@ -46,10 +45,7 @@ function renderSquare(key, classes, ctx) {
     style: {}
   };
   attrs.style[ctx.transformProp] = util.translate(posToTranslate(util.key2pos(key), ctx));
-  return {
-    tag: squareTag,
-    attrs: attrs
-  };
+  return vn(squareTag, undefined, attrs);
 }
 
 function posToTranslate(pos, ctx) {
@@ -66,10 +62,7 @@ function renderGhost(key, piece, ctx) {
     class: pieceClass(piece) + ' ghost'
   };
   attrs.style[ctx.transformProp] = util.translate(posToTranslate(util.key2pos(key), ctx));
-  return {
-    tag: pieceTag,
-    attrs: attrs
-  };
+  return vn(pieceTag, undefined, attrs);
 }
 
 function renderFading(cfg, ctx) {
@@ -81,10 +74,7 @@ function renderFading(cfg, ctx) {
     }
   };
   attrs.style[ctx.transformProp] = util.translate(posToTranslate(cfg.piece.pos, ctx));
-  return {
-    tag: pieceTag,
-    attrs: attrs
-  };
+  return vn(pieceTag, undefined, attrs);
 }
 
 function addSquare(squares, key, klass) {
@@ -151,23 +141,32 @@ function renderContent(ctrl) {
     bounds: d.bounds(),
     transformProp: util.transformProp()
   };
-  var children = renderSquares(ctrl, ctx);
+  var children = [fragment({
+    key: 'squares'
+  }, renderSquares(ctrl, ctx))];
   if (d.animation.current.fadings)
-    d.animation.current.fadings.forEach(function(p) {
-      children.push(renderFading(p, ctx));
-    });
+    children.push(fragment({
+        key: 'fadings'
+      },
+      d.animation.current.fadings.map(function(p) {
+        return renderFading(p, ctx);
+      })));
 
+  var pieces = [];
   // must insert pieces in the right order
   // for 3D to display correctly
   var keys = ctx.asWhite ? util.allKeys : util.invKeys;
   if (d.items)
     for (var i = 0; i < 64; i++) {
       if (d.pieces[keys[i]] && !d.items.render(util.key2pos(keys[i]), keys[i]))
-        children.push(renderPiece(d, keys[i], ctx));
+        pieces.push(renderPiece(d, keys[i], ctx));
     } else
       for (var i = 0; i < 64; i++) {
-        if (d.pieces[keys[i]]) children.push(renderPiece(d, keys[i], ctx));
+        if (d.pieces[keys[i]]) pieces.push(renderPiece(d, keys[i], ctx));
       }
+  children.push(fragment({
+    key: 'pieces'
+  }, pieces));
 
   if (d.draggable.showGhost) {
     var dragOrig = d.draggable.current.orig;
@@ -217,67 +216,59 @@ function bindEvents(ctrl, el) {
 
 function renderBoard(ctrl) {
   var d = ctrl.data;
-  return {
-    tag: 'div',
-    attrs: {
-      class: 'cg-board orientation-' + d.orientation,
-      oncreate: function(vnode) {
-        var el = vnode.dom;
-        if (!d.viewOnly || d.drawable.enabled) bindEvents(ctrl, el);
-        // this function only repaints the board itself.
-        // it's called when dragging or animating pieces,
-        // to prevent the full application embedding chessground
-        // rendering on every animation frame
-        d.render = function() {
-          m.render(el, renderContent(ctrl));
-        };
-        d.renderRAF = function() {
-          util.requestAnimationFrame(d.render);
-        };
-        d.bounds = util.memo(el.getBoundingClientRect.bind(el));
-        d.element = el;
-        d.render();
-      }
-    },
-    children: []
-  };
+  return vn('div', undefined, {
+    class: 'cg-board orientation-' + d.orientation,
+    oncreate: function(vnode) {
+      var el = vnode.dom;
+      if (!d.viewOnly || d.drawable.enabled) bindEvents(ctrl, el);
+      // this function only repaints the board itself.
+      // it's called when dragging or animating pieces,
+      // to prevent the full application embedding chessground
+      // rendering on every animation frame
+      d.render = function() {
+        m.render(el, renderContent(ctrl));
+      };
+      d.renderRAF = function() {
+        util.requestAnimationFrame(d.render);
+      };
+      d.bounds = util.memo(el.getBoundingClientRect.bind(el));
+      d.element = el;
+      d.render();
+    }
+  });
 }
 
 module.exports = function(ctrl) {
   var d = ctrl.data;
-  return {
-    tag: 'div',
-    attrs: {
-      oncreate: function(vnode) {
-        var el = vnode.dom;
-        if (d.coordinates) d.redrawCoords = makeCoords(d.orientation, el);
-        el.addEventListener('contextmenu', function(e) {
-          if (d.disableContextMenu || d.drawable.enabled) {
-            e.preventDefault();
-            return false;
-          }
-        });
-        if (d.resizable)
-          document.body.addEventListener('chessground.resize', function(e) {
-            d.bounds.clear();
-            d.render();
-          }, false);
-        ['onscroll', 'onresize'].forEach(function(n) {
-          var prev = window[n];
-          window[n] = function() {
-            prev && prev();
-            d.bounds.clear();
-          };
-        });
-      },
-      onupdate: function(vnode) {
-        if (d.redrawCoords) d.redrawCoords(d.orientation);
-      },
-      class: [
-        'cg-board-wrap',
-        d.viewOnly ? 'view-only' : 'manipulable'
-      ].join(' ')
+  return vn('div', undefined, {
+    oncreate: function(vnode) {
+      var el = vnode.dom;
+      if (d.coordinates) d.redrawCoords = makeCoords(d.orientation, el);
+      el.addEventListener('contextmenu', function(e) {
+        if (d.disableContextMenu || d.drawable.enabled) {
+          e.preventDefault();
+          return false;
+        }
+      });
+      if (d.resizable)
+        document.body.addEventListener('chessground.resize', function(e) {
+          d.bounds.clear();
+          d.render();
+        }, false);
+      ['onscroll', 'onresize'].forEach(function(n) {
+        var prev = window[n];
+        window[n] = function() {
+          prev && prev();
+          d.bounds.clear();
+        };
+      });
     },
-    children: [renderBoard(ctrl)]
-  };
+    onupdate: function(vnode) {
+      if (d.redrawCoords) d.redrawCoords(d.orientation);
+    },
+    class: [
+      'cg-board-wrap',
+      d.viewOnly ? 'view-only' : 'manipulable'
+    ].join(' ')
+  }, [renderBoard(ctrl)]);
 };
