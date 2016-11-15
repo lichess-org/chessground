@@ -56,12 +56,11 @@ function posToTranslate(pos, ctx) {
 function renderGhost(key, piece, ctx) {
   if (!piece) return;
   var attrs = {
-    key: 'g' + key,
     style: {},
     class: pieceClass(piece) + ' ghost'
   };
   attrs.style[ctx.transformProp] = util.translate(posToTranslate(util.key2pos(key), ctx));
-  return vn(pieceTag, undefined, attrs);
+  return vn(pieceTag, 'g' + key, attrs);
 }
 
 function renderFading(cfg, ctx) {
@@ -167,7 +166,10 @@ function renderContent(ctrl) {
     if (dragOrig && !d.draggable.current.newPiece)
       children.push(renderGhost(dragOrig, d.pieces[dragOrig], ctx));
   }
-  if (d.drawable.enabled) children.push(svg(ctrl));
+  if (d.drawable.enabled) {
+    var svgNode = svg(ctrl);
+    if (svgNode) children.push(svgNode);
+  }
   return children;
 }
 
