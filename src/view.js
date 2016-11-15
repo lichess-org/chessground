@@ -4,7 +4,6 @@ var util = require('./util');
 var svg = require('./svg');
 var makeCoords = require('./coords');
 var m = require('mithril/render');
-var fragment = require('mithril/render/fragment');
 var vn = require('mithril/render/vnode');
 
 var pieceTag = 'piece';
@@ -141,16 +140,13 @@ function renderContent(ctrl) {
     bounds: d.bounds(),
     transformProp: util.transformProp()
   };
-  var children = [fragment({
-    key: 'squares'
-  }, renderSquares(ctrl, ctx))];
-  if (d.animation.current.fadings)
-    children.push(fragment({
-        key: 'fadings'
-      },
+  var children = [vn('[', 'squares', undefined, renderSquares(ctrl, ctx))];
+  if (d.animation.current.fadings) children.push(
+    vn('[', 'fadings', undefined,
       d.animation.current.fadings.map(function(p) {
         return renderFading(p, ctx);
-      })));
+      }))
+  );
 
   var pieces = [];
   // must insert pieces in the right order
@@ -164,9 +160,7 @@ function renderContent(ctrl) {
       for (var i = 0; i < 64; i++) {
         if (d.pieces[keys[i]]) pieces.push(renderPiece(d, keys[i], ctx));
       }
-  children.push(fragment({
-    key: 'pieces'
-  }, pieces));
+  children.push(vn('[', 'pieces', undefined, pieces));
 
   if (d.draggable.showGhost) {
     var dragOrig = d.draggable.current.orig;
@@ -226,6 +220,7 @@ function renderBoard(ctrl) {
       // to prevent the full application embedding chessground
       // rendering on every animation frame
       d.render = function() {
+        console.log(renderContent(ctrl));
         m.render(el, renderContent(ctrl));
       };
       d.renderRAF = function() {
