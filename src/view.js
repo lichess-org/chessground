@@ -222,7 +222,6 @@ function renderBoard(ctrl) {
       // to prevent the full application embedding chessground
       // rendering on every animation frame
       d.render = function() {
-        console.log(renderContent(ctrl));
         m.render(el, renderContent(ctrl));
       };
       d.renderRAF = function() {
