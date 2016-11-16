@@ -15,7 +15,6 @@ function pieceClass(p) {
 
 function renderPiece(d, key, ctx) {
   var attrs = {
-    key: 'p' + key,
     style: {},
     class: pieceClass(d.pieces[key])
   };
@@ -34,17 +33,16 @@ function renderPiece(d, key, ctx) {
   }
   attrs.style[ctx.transformProp] = util.translate(translate);
   if (d.pieceKey) attrs['data-key'] = key;
-  return vn(pieceTag, undefined, attrs);
+  return vn(pieceTag, 'p' + key, attrs);
 }
 
 function renderSquare(key, classes, ctx) {
   var attrs = {
-    key: 's' + key,
     class: classes,
     style: {}
   };
   attrs.style[ctx.transformProp] = util.translate(posToTranslate(util.key2pos(key), ctx));
-  return vn(squareTag, undefined, attrs);
+  return vn(squareTag, 's' + key, attrs);
 }
 
 function posToTranslate(pos, ctx) {
@@ -65,14 +63,13 @@ function renderGhost(key, piece, ctx) {
 
 function renderFading(cfg, ctx) {
   var attrs = {
-    key: 'f' + cfg.piece.key,
     class: 'fading ' + pieceClass(cfg.piece),
     style: {
       opacity: cfg.opacity
     }
   };
   attrs.style[ctx.transformProp] = util.translate(posToTranslate(cfg.piece.pos, ctx));
-  return vn(pieceTag, undefined, attrs);
+  return vn(pieceTag, 'f' + cfg.piece.key, attrs);
 }
 
 function addSquare(squares, key, klass) {
@@ -262,9 +259,6 @@ module.exports = function(ctrl) {
     onupdate: function(vnode) {
       if (d.redrawCoords) d.redrawCoords(d.orientation);
     },
-    class: [
-      'cg-board-wrap',
-      d.viewOnly ? 'view-only' : 'manipulable'
-    ].join(' ')
+    class: 'cg-board-wrap ' + (d.viewOnly ? 'view-only' : 'manipulable')
   }, [renderBoard(ctrl)]);
 };
