@@ -15,7 +15,6 @@ function pieceClass(p) {
 
 function renderPiece(d, key, ctx) {
   var attrs = {
-    style: {},
     class: pieceClass(d.pieces[key])
   };
   var translate = posToTranslate(util.key2pos(key), ctx);
@@ -31,18 +30,16 @@ function renderPiece(d, key, ctx) {
       translate[1] += animation[1][1];
     }
   }
-  attrs.style[ctx.transformProp] = util.translate(translate);
+  attrs.style = ctx.transformProp + ':' + util.translate(translate);
   if (d.pieceKey) attrs['data-key'] = key;
   return vn(pieceTag, 'p' + key, attrs);
 }
 
 function renderSquare(key, classes, ctx) {
-  var attrs = {
+  return vn(squareTag, 's' + key, {
     class: classes,
-    style: {}
-  };
-  attrs.style[ctx.transformProp] = util.translate(posToTranslate(util.key2pos(key), ctx));
-  return vn(squareTag, 's' + key, attrs);
+    style: ctx.transformProp + ':' + util.translate(posToTranslate(util.key2pos(key), ctx))
+  });
 }
 
 function posToTranslate(pos, ctx) {
@@ -52,13 +49,10 @@ function posToTranslate(pos, ctx) {
 }
 
 function renderGhost(key, piece, ctx) {
-  if (!piece) return;
-  var attrs = {
-    style: {},
+  if (piece) return vn(pieceTag, 'g' + key, {
+    style: ctx.transformProp + ':' + util.translate(posToTranslate(util.key2pos(key), ctx)),
     class: pieceClass(piece) + ' ghost'
-  };
-  attrs.style[ctx.transformProp] = util.translate(posToTranslate(util.key2pos(key), ctx));
-  return vn(pieceTag, 'g' + key, attrs);
+  });
 }
 
 function renderFading(cfg, ctx) {
