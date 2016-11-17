@@ -36,7 +36,7 @@ function renderPiece(d, key, ctx) {
 }
 
 function renderSquare(key, classes, ctx) {
-  return vn(squareTag, 's' + key, {
+  return vn(squareTag, undefined, {
     class: classes,
     style: ctx.transformProp + ':' + util.translate(posToTranslate(util.key2pos(key), ctx))
   });
@@ -130,13 +130,6 @@ function renderContent(ctrl) {
     bounds: d.bounds(),
     transformProp: util.transformProp()
   };
-  var children = [vn('[', 'squares', undefined, renderSquares(ctrl, ctx))];
-  if (d.animation.current.fadings) children.push(
-    vn('[', 'fadings', undefined,
-      d.animation.current.fadings.map(function(p) {
-        return renderFading(p, ctx);
-      }))
-  );
 
   var pieces = [];
   // must insert pieces in the right order
@@ -150,7 +143,14 @@ function renderContent(ctrl) {
       for (var i = 0; i < 64; i++) {
         if (d.pieces[keys[i]]) pieces.push(renderPiece(d, keys[i], ctx));
       }
-  children.push(vn('[', 'pieces', undefined, pieces));
+
+  var children = [
+    vn('[', 'squares', undefined, renderSquares(ctrl, ctx)),
+    vn('[', 'fadings', undefined, (d.animation.current.fadings || []).map(function(p) {
+      return renderFading(p, ctx);
+    })),
+    vn('[', 'pieces', undefined, pieces)
+  ];
 
   if (d.draggable.showGhost) {
     var dragOrig = d.draggable.current.orig;
