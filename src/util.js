@@ -11,17 +11,27 @@ var fileNumbers = {
   g: 7,
   h: 8
 };
+var rankNumbers = {
+  '1': 1,
+  '2': 2,
+  '3': 3,
+  '4': 4,
+  '5': 5,
+  '6': 6,
+  '7': 7,
+  '8': 8
+};
 
 function pos2key(pos) {
   return files[pos[0] - 1] + pos[1];
 }
 
 function key2pos(pos) {
-  return [fileNumbers[pos[0]], parseInt(pos[1])];
+  return [fileNumbers[pos[0]], rankNumbers[pos[1]]];
 }
 
 function invertKey(key) {
-  return files[8 - fileNumbers[key[0]]] + (9 - parseInt(key[1]));
+  return files[8 - fileNumbers[key[0]]] + (9 - rankNumbers[key[1]]);
 }
 
 var allPos = (function() {
