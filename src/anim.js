@@ -130,7 +130,7 @@ function animate(transformation, data) {
   var result = transformation();
   if (data.animation.enabled) {
     var plan = computePlan(prev, data);
-    if (Object.keys(plan.anims).length > 0 || plan.fadings.length > 0) {
+    if (Object.keys(plan.anims).length || plan.fadings.length) {
       var alreadyRunning = data.animation.current.start;
       data.animation.current = {
         start: new Date().getTime(),
