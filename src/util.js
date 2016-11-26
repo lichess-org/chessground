@@ -36,14 +36,6 @@ var allPos = (function() {
 var allKeys = allPos.map(pos2key);
 var invKeys = allKeys.slice(0).reverse();
 
-function classSet(classes) {
-  var arr = [];
-  for (var i in classes) {
-    if (classes[i]) arr.push(i);
-  }
-  return arr.join(' ');
-}
-
 function opposite(color) {
   return color === 'white' ? 'black' : 'white';
 }
@@ -122,7 +114,6 @@ module.exports = {
   pos2key: pos2key,
   key2pos: key2pos,
   invertKey: invertKey,
-  classSet: classSet,
   opposite: opposite,
   translate: translate,
   containsX: containsX,
