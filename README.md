@@ -64,6 +64,7 @@ All options are, well, optional.
 
 ```js
 {
+  fen: '2r3k1/pp2Qpbp/4b1p1/3p4/3n1PP1/2N4P/Pq6/R2K1B1R w -', // or leave null for initial position
   orientation: "white",   // board orientation (or view angle) "white" | "black"
   turnColor: "white",     // turn to play. "white" | "black"
   check: null,            // square currently in check "a2" | null
