@@ -38,7 +38,9 @@ module.exports = function(data, config) {
       var dests = data.movable.dests[kingStartPos];
       if (!dests || data.pieces[kingStartPos].role !== 'king') return;
       data.movable.dests[kingStartPos] = dests.filter(function(d) {
-        return d !== 'a' + rank && d !== 'h' + rank
+        if ((d === 'a' + rank) && dests.indexOf('c' + rank) !== -1) return false;
+        if ((d === 'h' + rank) && dests.indexOf('g' + rank) !== -1) return false;
+        return true;
       });
     }
   }
