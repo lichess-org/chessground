@@ -30,7 +30,6 @@ function circle(brush, pos, current, bounds) {
   return {
     tag: 'circle',
     attrs: {
-      key: pos + 'circle',
       stroke: brush.color,
       'stroke-width': width,
       fill: 'none',
@@ -54,7 +53,6 @@ function arrow(brush, orig, dest, current, bounds) {
   return {
     tag: 'line',
     attrs: {
-      key: current ? 'current' : orig + dest + brush.key,
       stroke: brush.color,
       'stroke-width': lineWidth(brush, current, bounds),
       'stroke-linecap': 'round',
@@ -77,7 +75,6 @@ function piece(cfg, pos, piece, bounds) {
   return {
     tag: 'image',
     attrs: {
-      key: pos + 'piece',
       class: piece.color + ' ' + piece.role,
       x: o[0] - size / 2,
       y: o[1] - size / 2,
@@ -94,7 +91,6 @@ function defs(brushes) {
     children: [
       brushes.map(function(brush) {
         return {
-          key: brush.key,
           tag: 'marker',
           attrs: {
             id: 'arrowhead-' + brush.key,
@@ -148,7 +144,6 @@ function renderShape(data, current, bounds) {
 
 function makeCustomBrush(base, modifiers, i) {
   return {
-    key: 'bm' + i,
     color: modifiers.color || base.color,
     opacity: modifiers.opacity || base.opacity,
     lineWidth: modifiers.lineWidth || base.lineWidth
@@ -175,17 +170,9 @@ function computeUsedBrushes(d, drawn, current) {
   return brushes;
 }
 
-function ensureUniqueKey(shapes) {
-  if (shapes.length < 2) return shapes;
-  var keys = [];
-  for (var i in shapes) {
-    var k = shapes[i].attrs.key;
-    if (keys.indexOf(k) !== -1) shapes[i] = null;
-    else keys.push(k);
-  }
-  return shapes;
-}
-
+// don't use mithril keys here, they're buggy with SVG
+// likely because of var dummy = $document.createElement("div");
+// in handleKeysDiffer
 module.exports = function(ctrl) {
   if (!ctrl.data.bounds) return;
   var d = ctrl.data.drawable;
@@ -197,7 +184,6 @@ module.exports = function(ctrl) {
   var renderedShapes = allShapes.map(renderShape(ctrl.data, false, bounds));
   var renderedCurrent = renderShape(ctrl.data, true, bounds)(d.current, 9999);
   if (renderedCurrent) renderedShapes.push(renderedCurrent);
-  var uniqueShapes = ensureUniqueKey(renderedShapes);
   return {
     tag: 'svg',
     attrs: {
@@ -205,7 +191,7 @@ module.exports = function(ctrl) {
     },
     children: [
       defs(usedBrushes),
-      uniqueShapes
+      renderedShapes
     ]
   };
 }
