@@ -30,7 +30,7 @@ function circle(brush, pos, current, bounds) {
   return {
     tag: 'circle',
     attrs: {
-      key: current ? 'current' : pos + brush.key,
+      key: pos + 'circle',
       stroke: brush.color,
       'stroke-width': width,
       fill: 'none',
@@ -77,7 +77,7 @@ function piece(cfg, pos, piece, bounds) {
   return {
     tag: 'image',
     attrs: {
-      key: pos + piece.color + piece.role,
+      key: pos + 'piece',
       class: piece.color + ' ' + piece.role,
       x: o[0] - size / 2,
       y: o[1] - size / 2,
@@ -175,6 +175,17 @@ function computeUsedBrushes(d, drawn, current) {
   return brushes;
 }
 
+function ensureUniqueKey(shapes) {
+  if (shapes.length < 2) return shapes;
+  var keys = [];
+  for (var i in shapes) {
+    var k = shapes[i].attrs.key;
+    if (keys.indexOf(k) !== -1) shapes[i] = null;
+    else keys.push(k);
+  }
+  return shapes;
+}
+
 module.exports = function(ctrl) {
   if (!ctrl.data.bounds) return;
   var d = ctrl.data.drawable;
@@ -183,6 +194,10 @@ module.exports = function(ctrl) {
   var bounds = ctrl.data.bounds();
   if (bounds.width !== bounds.height) return;
   var usedBrushes = computeUsedBrushes(d, allShapes, d.current);
+  var renderedShapes = allShapes.map(renderShape(ctrl.data, false, bounds));
+  var renderedCurrent = renderShape(ctrl.data, true, bounds)(d.current, 9999);
+  if (renderedCurrent) renderedShapes.push(renderedCurrent);
+  var uniqueShapes = ensureUniqueKey(renderedShapes);
   return {
     tag: 'svg',
     attrs: {
@@ -190,8 +205,7 @@ module.exports = function(ctrl) {
     },
     children: [
       defs(usedBrushes),
-      allShapes.map(renderShape(ctrl.data, false, bounds)),
-      renderShape(ctrl.data, true, bounds)(d.current, 9999)
+      uniqueShapes
     ]
   };
 }
