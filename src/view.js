@@ -231,7 +231,7 @@ function renderBoard(ctrl) {
   return {
     tag: 'div',
     attrs: {
-      class: 'cg-board orientation-' + d.orientation,
+      class: 'cg-board',
       config: function(el, isUpdate, context) {
         if (isUpdate) return;
         if (!d.viewOnly || d.drawable.enabled)
@@ -287,6 +287,7 @@ module.exports = function(ctrl) {
       },
       class: [
         'cg-board-wrap',
+        'orientation-' + d.orientation,
         d.viewOnly ? 'view-only' : 'manipulable'
       ].join(' ')
     },
