@@ -33,10 +33,10 @@ function setCheck(data, color) {
   });
 }
 
-function setPremove(data, orig, dest) {
+function setPremove(data, orig, dest, meta) {
   unsetPredrop(data);
   data.premovable.current = [orig, dest];
-  callUserFunction(util.partial(data.premovable.events.set, orig, dest));
+  callUserFunction(util.partial(data.premovable.events.set, orig, dest, meta));
 }
 
 function unsetPremove(data) {
@@ -158,12 +158,15 @@ function userMove(data, orig, dest) {
       setSelected(data, null);
       callUserFunction(util.partial(data.movable.events.after, orig, dest, {
         premove: false,
+        ctrlKey: data.stats.ctrlKey,
         holdTime: holdTime
       }));
       return true;
     }
   } else if (canPremove(data, orig, dest)) {
-    setPremove(data, orig, dest);
+    setPremove(data, orig, dest, {
+      ctrlKey: data.stats.ctrlKey
+    });
     setSelected(data, null);
   } else if (isMovable(data, dest) || isPremovable(data, dest)) {
     setSelected(data, dest);

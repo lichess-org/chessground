@@ -40,6 +40,7 @@ function start(data, e) {
   if (data.viewOnly) return;
   var hadPremove = !!data.premovable.current;
   var hadPredrop = !!data.predroppable.current.key;
+  data.stats.ctrlKey = e.ctrlKey;
   board.selectSquare(data, orig);
   var stillSelected = data.selected === orig;
   if (piece && stillSelected && board.isDraggable(data, orig)) {
@@ -115,6 +116,7 @@ function end(data, e) {
     if (cur.newPiece) board.dropNewPiece(data, orig, dest);
     else {
       if (orig !== dest) data.movable.dropped = [orig, dest];
+      data.stats.ctrlKey = e.ctrlKey;
       if (board.userMove(data, orig, dest)) data.stats.dragged = true;
     }
   }
