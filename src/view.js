@@ -272,18 +272,21 @@ module.exports = function(ctrl) {
             return false;
           }
         });
-        if (d.resizable)
-          document.body.addEventListener('chessground.resize', function(e) {
-            d.bounds.clear();
-            d.render();
-          }, false);
-        ['onscroll', 'onresize'].forEach(function(n) {
-          var prev = window[n];
-          window[n] = function() {
-            prev && prev();
-            d.bounds.clear();
-          };
-        });
+        if (!d.stats.boundWindowEvents) {
+          d.stats.boundWindowEvents = 1;
+          if (d.resizable)
+            document.body.addEventListener('chessground.resize', function(e) {
+              d.bounds.clear();
+              d.render();
+            }, false);
+          ['onscroll', 'onresize'].forEach(function(n) {
+            var prev = window[n];
+            window[n] = function() {
+              prev && prev();
+              d.bounds.clear();
+            };
+          });
+        }
       },
       class: [
         'cg-board-wrap',
