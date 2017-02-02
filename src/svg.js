@@ -144,6 +144,7 @@ function renderShape(data, current, bounds) {
 
 function makeCustomBrush(base, modifiers, i) {
   return {
+    key: 'cb_' + i,
     color: modifiers.color || base.color,
     opacity: modifiers.opacity || base.opacity,
     lineWidth: modifiers.lineWidth || base.lineWidth
