@@ -160,14 +160,20 @@ function renderContent(ctrl) {
   // must insert pieces in the right order
   // for 3D to display correctly
   var keys = ctx.asWhite ? util.allKeys : util.invKeys;
-  if (d.items)
+  if (d.items) {
     for (var i = 0; i < 64; i++) {
       if (d.pieces[keys[i]] && !d.items.render(util.key2pos(keys[i]), keys[i]))
         children.push(renderPiece(d, keys[i], ctx));
-    } else
-      for (var i = 0; i < 64; i++) {
-        if (d.pieces[keys[i]]) children.push(renderPiece(d, keys[i], ctx));
-      }
+    }
+  } else {
+    for (var i = 0; i < 64; i++) {
+      if (d.pieces[keys[i]]) children.push(renderPiece(d, keys[i], ctx));
+    }
+    // the hack to drag new pieces on the board (editor and crazyhouse)
+    // is to put it on a0 then set it as being dragged
+    if (d.draggable.current && d.draggable.current.newPiece) 
+      children.push(renderPiece(d, 'a0', ctx));
+  }
 
   if (d.draggable.showGhost) {
     var dragOrig = d.draggable.current.orig;
