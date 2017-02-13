@@ -52,7 +52,7 @@ function rookFilesOf(pieces, color) {
   });
 }
 
-function compute(pieces, key, canCastle) {
+module.exports = function(pieces, key, canCastle) {
   var piece = pieces[key];
   var pos = util.key2pos(key);
   var mobility;
@@ -79,6 +79,4 @@ function compute(pieces, key, canCastle) {
   return util.allPos.filter(function(pos2) {
     return (pos[0] !== pos2[0] || pos[1] !== pos2[1]) && mobility(pos[0], pos[1], pos2[0], pos2[1]);
   }).map(util.pos2key);
-}
-
-module.exports = compute;
+};
