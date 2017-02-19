@@ -102,7 +102,7 @@ function move(data, e) {
     data.draggable.current.epos = util.eventPosition(e);
 }
 
-function end(data, e) {
+function end(data, e, ctrl) {
   var cur = data.draggable.current;
   var pointerIsSelected = pointerSelected(ctrl);
   if (!orig && pointerIsSelected) return;
