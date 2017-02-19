@@ -12,7 +12,11 @@ function pieceClass(p) {
   return p.role + ' ' + p.color;
 }
 
-function renderPiece(d, key, ctx) {
+function pointerSelected(ctrl) {
+  return (!ctrl.sparePieceSelected || ctrl.sparePieceSelected === 'pointer');
+}
+
+function renderPiece(d, key, ctx, ctrl) {
   var attrs = {
     key: 'p' + key,
     style: {},
@@ -20,7 +24,7 @@ function renderPiece(d, key, ctx) {
   };
   var translate = posToTranslate(util.key2pos(key), ctx);
   var draggable = d.draggable.current;
-  if (draggable.orig === key && draggable.started) {
+  if (draggable.orig === key && draggable.started && pointerSelected(ctrl)) {
     translate[0] += draggable.pos[0] + draggable.dec[0];
     translate[1] += draggable.pos[1] + draggable.dec[1];
     attrs.class += ' dragging';
@@ -163,16 +167,16 @@ function renderContent(ctrl) {
   if (d.items) {
     for (var i = 0; i < 64; i++) {
       if (d.pieces[keys[i]] && !d.items.render(util.key2pos(keys[i]), keys[i]))
-        children.push(renderPiece(d, keys[i], ctx));
+        children.push(renderPiece(d, keys[i], ctx, ctrl));
     }
   } else {
     for (var i = 0; i < 64; i++) {
-      if (d.pieces[keys[i]]) children.push(renderPiece(d, keys[i], ctx));
+      if (d.pieces[keys[i]]) children.push(renderPiece(d, keys[i], ctx, ctrl));
     }
     // the hack to drag new pieces on the board (editor and crazyhouse)
     // is to put it on a0 then set it as being dragged
     if (d.draggable.current && d.draggable.current.newPiece) 
-      children.push(renderPiece(d, 'a0', ctx));
+      children.push(renderPiece(d, 'a0', ctx, ctrl));
   }
 
   if (d.draggable.showGhost) {
@@ -204,9 +208,23 @@ function dragOrDraw(d, withDrag, withDraw) {
 
 function bindEvents(ctrl, el, context) {
   var d = ctrl.data;
-  var onstart = startDragOrDraw(d);
+  var start = startDragOrDraw(d);
+
+  var onstart = function(data, e) {
+    if (pointerSelected(ctrl)) {
+      start(data, e);
+    }
+  };
+
   var onmove = dragOrDraw(d, drag.move, draw.move);
-  var onend = dragOrDraw(d, drag.end, draw.end);
+  var end = dragOrDraw(d, drag.end, draw.end);
+
+  var onend = function(data, e) {
+    if (pointerSelected(ctrl)) {
+      end(data, e);
+    }
+  };
+
   var startEvents = ['touchstart', 'mousedown'];
   var moveEvents = ['touchmove', 'mousemove'];
   var endEvents = ['touchend', 'mouseup'];
