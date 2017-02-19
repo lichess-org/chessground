@@ -104,6 +104,7 @@ function move(data, e) {
 
 function end(data, e, ctrl) {
   var cur = data.draggable.current;
+  var orig = cur ? cur.orig : null;
   var pointerIsSelected = pointerSelected(ctrl);
   if (!orig && pointerIsSelected) return;
   // comparing with the origin target is an easy way to test that the end event
