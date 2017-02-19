@@ -113,8 +113,14 @@ function baseMove(data, orig, dest) {
   return success;
 }
 
-function baseNewPiece(data, piece, key) {
-  if (data.pieces[key]) return false;
+function baseNewPiece(data, piece, key, force) {
+  if (data.pieces[key]) {
+    if (force) {
+      delete data.pieces[key];
+    } else {
+      return false;
+    }
+  }
   callUserFunction(util.partial(data.events.dropNewPiece, piece, key));
   data.pieces[key] = piece;
   data.lastMove = [key, key];
@@ -174,11 +180,11 @@ function userMove(data, orig, dest) {
   } else setSelected(data, null);
 }
 
-function dropNewPiece(data, orig, dest) {
-  if (canDrop(data, orig, dest)) {
+function dropNewPiece(data, orig, dest, force) {
+  if (canDrop(data, orig, dest) || force) {
     var piece = data.pieces[orig];
     delete data.pieces[orig];
-    baseNewPiece(data, piece, dest);
+    baseNewPiece(data, piece, dest, true);
     data.movable.dropped = [];
     callUserFunction(util.partial(data.movable.events.afterNewPiece, piece.role, dest, {
       predrop: false

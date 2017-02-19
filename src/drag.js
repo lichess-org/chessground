@@ -127,7 +127,7 @@ function end(data, e) {
         role  : selectedParts[1]
       };
 
-      board.dropNewPiece(data, 'drop', dest);
+      board.dropNewPiece(data, 'drop', dest, true);
     }
   } else if (cur.started) {
     if (cur.newPiece) board.dropNewPiece(data, orig, dest);
