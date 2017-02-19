@@ -211,11 +211,22 @@ function bindEvents(ctrl, el, context) {
   var start = startDragOrDraw(d);
   var move = dragOrDraw(d, drag.move, draw.move);
   var end = dragOrDraw(d, drag.end, draw.end, ctrl);
+  var mousedown = false;
+
+  document.addEventListener('mousedown', function() {
+    mousedown = true;
+  });
+
+  document.addEventListener('mouseup', function() {
+    mousedown = false;
+  });
 
   var onstart = function(data, e) {
     if (pointerSelected(ctrl)) {
-      start(data, e);
-    } else {
+      if (data.type !== 'mousemove') {
+        start(data, e);
+      }
+    } else if (data.type !== 'mousemove' || mousedown) {
       end(data, e);
     }
   };
@@ -232,7 +243,7 @@ function bindEvents(ctrl, el, context) {
     }
   };
 
-  var startEvents = ['touchstart', 'mousedown'];
+  var startEvents = ['touchstart', 'mousedown', 'mousemove'];
   var moveEvents = ['touchmove', 'mousemove'];
   var endEvents = ['touchend', 'mouseup'];
   startEvents.forEach(function(ev) {
