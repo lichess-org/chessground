@@ -199,25 +199,32 @@ function startDragOrDraw(d) {
   };
 }
 
-function dragOrDraw(d, withDrag, withDraw) {
+function dragOrDraw(d, withDrag, withDraw, ctrl) {
   return function(e) {
     if ((e.shiftKey || util.isRightButton(e)) && d.drawable.enabled) withDraw(d, e);
-    else if (!d.viewOnly) withDrag(d, e);
+    else if (!d.viewOnly) withDrag(d, e, ctrl);
   };
 }
 
 function bindEvents(ctrl, el, context) {
   var d = ctrl.data;
   var start = startDragOrDraw(d);
+  var move = dragOrDraw(d, drag.move, draw.move);
+  var end = dragOrDraw(d, drag.end, draw.end, ctrl);
 
   var onstart = function(data, e) {
     if (pointerSelected(ctrl)) {
       start(data, e);
+    } else {
+      end(data, e);
     }
   };
 
-  var onmove = dragOrDraw(d, drag.move, draw.move);
-  var end = dragOrDraw(d, drag.end, draw.end);
+  var onmove = function(data, e) {
+    if (pointerSelected(ctrl)) {
+      move(data, e);
+    }
+  };
 
   var onend = function(data, e) {
     if (pointerSelected(ctrl)) {
