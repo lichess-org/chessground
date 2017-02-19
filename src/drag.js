@@ -118,7 +118,8 @@ function end(data, e) {
   var dest = eventPos ? board.getKeyAtDomPos(data, eventPos, cur.bounds) : cur.over;
   if (!pointerSelected(ctrl)) {
     if (ctrl.sparePieceSelected === 'trash') {
-
+      delete data.pieces[dest];
+      data.renderRAF();
     } else {
       var selectedParts = ctrl.sparePieceSelected.split(' ');
 
