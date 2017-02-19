@@ -184,7 +184,7 @@ function dropNewPiece(data, orig, dest, force) {
   if (canDrop(data, orig, dest) || force) {
     var piece = data.pieces[orig];
     delete data.pieces[orig];
-    baseNewPiece(data, piece, dest, true);
+    baseNewPiece(data, piece, dest, force);
     data.movable.dropped = [];
     callUserFunction(util.partial(data.movable.events.afterNewPiece, piece.role, dest, {
       predrop: false
