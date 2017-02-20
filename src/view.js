@@ -212,6 +212,9 @@ function bindEvents(ctrl, el, context) {
   var start = startDragOrDraw(d);
   var move = dragOrDraw(d, drag.move, draw.move);
   var end = dragOrDraw(d, drag.end, draw.end, ctrl);
+  var onstart;
+  var onmove;
+  var onend;
   var mousedown = false;
 
   if (ctrl.sparePieceSelected) {
@@ -223,7 +226,7 @@ function bindEvents(ctrl, el, context) {
       mousedown = false;
     });
 
-    var onstart = function(data, e) {
+    onstart = function(data, e) {
       if (pointerSelected(ctrl)) {
         if (data.type !== 'mousemove') {
           start(data, e);
@@ -233,13 +236,13 @@ function bindEvents(ctrl, el, context) {
       }
     };
 
-    var onmove = function(data, e) {
+    onmove = function(data, e) {
       if (pointerSelected(ctrl)) {
         move(data, e);
       }
     };
 
-    var onend = function(data, e) {
+    onend = function(data, e) {
       if (pointerSelected(ctrl)) {
         end(data, e);
       }
