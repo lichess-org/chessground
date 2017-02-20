@@ -16,7 +16,7 @@ function pointerSelected(ctrl) {
   return (!ctrl.sparePieceSelected || ctrl.sparePieceSelected === 'pointer');
 }
 
-function renderPiece(d, key, ctx, ctrl) {
+function renderPiece(d, key, ctx) {
   var attrs = {
     key: 'p' + key,
     style: {},
@@ -24,7 +24,7 @@ function renderPiece(d, key, ctx, ctrl) {
   };
   var translate = posToTranslate(util.key2pos(key), ctx);
   var draggable = d.draggable.current;
-  if (draggable.orig === key && draggable.started && pointerSelected(ctrl)) {
+  if (draggable.orig === key && draggable.started && ctx.pointerSelected) {
     translate[0] += draggable.pos[0] + draggable.dec[0];
     translate[1] += draggable.pos[1] + draggable.dec[1];
     attrs.class += ' dragging';
@@ -153,7 +153,8 @@ function renderContent(ctrl) {
   var ctx = {
     asWhite: d.orientation === 'white',
     bounds: d.bounds(),
-    transformProp: util.transformProp()
+    transformProp: util.transformProp(),
+    pointerSelected : pointerSelected(ctrl)
   };
   var children = renderSquares(ctrl, ctx);
   if (d.animation.current.fadings)
@@ -167,16 +168,16 @@ function renderContent(ctrl) {
   if (d.items) {
     for (var i = 0; i < 64; i++) {
       if (d.pieces[keys[i]] && !d.items.render(util.key2pos(keys[i]), keys[i]))
-        children.push(renderPiece(d, keys[i], ctx, ctrl));
+        children.push(renderPiece(d, keys[i], ctx));
     }
   } else {
     for (var i = 0; i < 64; i++) {
-      if (d.pieces[keys[i]]) children.push(renderPiece(d, keys[i], ctx, ctrl));
+      if (d.pieces[keys[i]]) children.push(renderPiece(d, keys[i], ctx));
     }
     // the hack to drag new pieces on the board (editor and crazyhouse)
     // is to put it on a0 then set it as being dragged
     if (d.draggable.current && d.draggable.current.newPiece) 
-      children.push(renderPiece(d, 'a0', ctx, ctrl));
+      children.push(renderPiece(d, 'a0', ctx));
   }
 
   if (d.draggable.showGhost) {
