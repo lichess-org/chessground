@@ -229,25 +229,25 @@ function bindEvents(ctrl, el, context) {
       mousedown = false;
     });
 
-    onstart = function(data, e) {
+    onstart = function(data) {
       if (pointerSelected(ctrl)) {
         if (data.type !== 'mousemove') {
-          start(data, e);
+          start(data);
         }
       } else if (data.type !== 'mousemove' || mousedown) {
-        end(data, e);
+        end(data);
       }
     };
 
-    onmove = function(data, e) {
+    onmove = function(data) {
       if (pointerSelected(ctrl)) {
-        move(data, e);
+        move(data);
       }
     };
 
-    onend = function(data, e) {
+    onend = function(data) {
       if (pointerSelected(ctrl)) {
-        end(data, e);
+        end(data);
       }
     };
 
