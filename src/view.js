@@ -215,6 +215,9 @@ function bindEvents(ctrl, el, context) {
   var onstart;
   var onmove;
   var onend;
+  var startEvents = ['touchstart', 'mousedown'];
+  var moveEvents = ['touchmove', 'mousemove'];
+  var endEvents = ['touchend', 'mouseup'];
   var mousedown = false;
 
   if (ctrl.sparePieceSelected) {
@@ -247,15 +250,14 @@ function bindEvents(ctrl, el, context) {
         end(data, e);
       }
     };
+
+    startEvents.push('mousemove');
   } else {
     onstart = start;
     onmove = move;
     onend = end;
   }
 
-  var startEvents = ['touchstart', 'mousedown', 'mousemove'];
-  var moveEvents = ['touchmove', 'mousemove'];
-  var endEvents = ['touchend', 'mouseup'];
   startEvents.forEach(function(ev) {
     el.addEventListener(ev, onstart);
   });
