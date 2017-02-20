@@ -274,7 +274,6 @@ function renderBoard(ctrl) {
     tag: 'div',
     attrs: {
       class: 'cg-board',
-      style: 'cursor: ' + ((ctrl.cursor) ? ctrl.cursor : 'pointer'),
       config: function(el, isUpdate, context) {
         if (isUpdate) return;
         if (!d.viewOnly || d.drawable.enabled)
