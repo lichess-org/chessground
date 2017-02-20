@@ -89,6 +89,10 @@ function partial() {
   return partialApply(arguments[0], Array.prototype.slice.call(arguments, 1));
 }
 
+function isLeftButton(e) {
+  return e.buttons === 1 || e.button === 1;
+}
+
 function isRightButton(e) {
   return e.buttons === 2 || e.button === 2;
 }
@@ -124,6 +128,7 @@ module.exports = {
   transformProp: transformProp,
   isTrident: isTrident,
   requestAnimationFrame: (window.requestAnimationFrame || window.setTimeout).bind(window),
+  isLeftButton: isLeftButton,
   isRightButton: isRightButton,
   memo: memo
 };

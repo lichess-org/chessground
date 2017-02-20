@@ -218,23 +218,14 @@ function bindEvents(ctrl, el, context) {
   var startEvents = ['touchstart', 'mousedown'];
   var moveEvents = ['touchmove', 'mousemove'];
   var endEvents = ['touchend', 'mouseup'];
-  var mousedown = false;
 
   if (ctrl.sparePieceSelected) {
-    document.addEventListener('mousedown', function() {
-      mousedown = true;
-    });
-
-    document.addEventListener('mouseup', function() {
-      mousedown = false;
-    });
-
     onstart = function(data) {
       if (pointerSelected(ctrl)) {
         if (data.type !== 'mousemove') {
           start(data);
         }
-      } else if (data.type !== 'mousemove' || mousedown) {
+      } else if (data.type !== 'mousemove' || util.isLeftButton(data)) {
         end(data);
       }
     };
