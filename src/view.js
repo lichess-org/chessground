@@ -214,35 +214,41 @@ function bindEvents(ctrl, el, context) {
   var end = dragOrDraw(d, drag.end, draw.end, ctrl);
   var mousedown = false;
 
-  document.addEventListener('mousedown', function() {
-    mousedown = true;
-  });
+  if (ctrl.sparePieceSelected) {
+    document.addEventListener('mousedown', function() {
+      mousedown = true;
+    });
 
-  document.addEventListener('mouseup', function() {
-    mousedown = false;
-  });
+    document.addEventListener('mouseup', function() {
+      mousedown = false;
+    });
 
-  var onstart = function(data, e) {
-    if (pointerSelected(ctrl)) {
-      if (data.type !== 'mousemove') {
-        start(data, e);
+    var onstart = function(data, e) {
+      if (pointerSelected(ctrl)) {
+        if (data.type !== 'mousemove') {
+          start(data, e);
+        }
+      } else if (data.type !== 'mousemove' || mousedown) {
+        end(data, e);
       }
-    } else if (data.type !== 'mousemove' || mousedown) {
-      end(data, e);
-    }
-  };
+    };
 
-  var onmove = function(data, e) {
-    if (pointerSelected(ctrl)) {
-      move(data, e);
-    }
-  };
+    var onmove = function(data, e) {
+      if (pointerSelected(ctrl)) {
+        move(data, e);
+      }
+    };
 
-  var onend = function(data, e) {
-    if (pointerSelected(ctrl)) {
-      end(data, e);
-    }
-  };
+    var onend = function(data, e) {
+      if (pointerSelected(ctrl)) {
+        end(data, e);
+      }
+    };
+  } else {
+    onstart = start;
+    onmove = move;
+    onend = end;
+  }
 
   var startEvents = ['touchstart', 'mousedown', 'mousemove'];
   var moveEvents = ['touchmove', 'mousemove'];
