@@ -13,7 +13,7 @@ function pieceClass(p) {
 }
 
 function pointerSelected(ctrl) {
-  return (!ctrl.sparePieceSelected || ctrl.sparePieceSelected === 'pointer');
+  return !ctrl.sparePieceSelected || ctrl.sparePieceSelected === 'pointer';
 }
 
 function renderPiece(d, key, ctx) {
@@ -210,7 +210,7 @@ function dragOrDraw(d, withDrag, withDraw, ctrl) {
 function bindEvents(ctrl, el, context) {
   var d = ctrl.data;
   var start = startDragOrDraw(d);
-  var move = dragOrDraw(d, drag.move, draw.move);
+  var move = dragOrDraw(d, drag.move, draw.move, ctrl);
   var end = dragOrDraw(d, drag.end, draw.end, ctrl);
   var onstart;
   var onmove;
