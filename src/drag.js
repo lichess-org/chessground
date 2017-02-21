@@ -67,7 +67,7 @@ function start(data, e) {
 }
 
 function pointerSelected(ctrl) {
-  return (ctrl && (!ctrl.sparePieceSelected || ctrl.sparePieceSelected === 'pointer'));
+  return ctrl && (!ctrl.sparePieceSelected || ctrl.sparePieceSelected === 'pointer');
 }
 
 function processDrag(data) {
@@ -117,7 +117,7 @@ function end(data, e, ctrl) {
   board.unsetPredrop(data);
   var eventPos = util.eventPosition(e)
   var dest = eventPos ? board.getKeyAtDomPos(data, eventPos, cur.bounds) : cur.over;
-  if (!pointerSelected(ctrl)) {
+  if (!pointerIsSelected) {
     if (ctrl.sparePieceSelected === 'trash') {
       delete data.pieces[dest];
       data.renderRAF();
