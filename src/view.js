@@ -176,7 +176,7 @@ function renderContent(ctrl) {
     }
     // the hack to drag new pieces on the board (editor and crazyhouse)
     // is to put it on a0 then set it as being dragged
-    if (d.draggable.current && d.draggable.current.newPiece) 
+    if (d.draggable.current && d.draggable.current.newPiece)
       children.push(renderPiece(d, 'a0', ctx));
   }
 
@@ -220,25 +220,25 @@ function bindEvents(ctrl, el, context) {
   var endEvents = ['touchend', 'mouseup'];
 
   if (ctrl.sparePieceSelected) {
-    onstart = function(data) {
+    onstart = function(e) {
       if (pointerSelected(ctrl)) {
-        if (data.type !== 'mousemove') {
-          start(data);
+        if (e.type !== 'mousemove') {
+          start(e);
         }
-      } else if (data.type !== 'mousemove' || util.isLeftButton(data)) {
-        end(data);
+      } else if (e.type !== 'mousemove' || util.isLeftButton(e)) {
+        end(e);
       }
     };
 
-    onmove = function(data) {
+    onmove = function(e) {
       if (pointerSelected(ctrl)) {
-        move(data);
+        move(e);
       }
     };
 
-    onend = function(data) {
+    onend = function(e) {
       if (pointerSelected(ctrl)) {
-        end(data);
+        end(e);
       }
     };
 
