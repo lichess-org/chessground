@@ -27,7 +27,7 @@ export default function(data: Data, config: any) {
 
   // no need for such short animations
   if (!data.animation.duration || data.animation.duration < 40)
-    data.animation.enabled = false;
+  data.animation.enabled = false;
 
   // if (!data.movable.rookCastle) {
   //   var rank = data.movable.color === 'white' ? 1 : 8;
@@ -42,13 +42,13 @@ export default function(data: Data, config: any) {
   //     });
   //   }
   // }
-};
+  };
 
 function merge(base: any, extend: any) {
-  for (var key in extend)
-  base[key] = (isObject(base[key]) && isObject(extend[key])) ?
-    merge(base[key], extend[key]) :
-    extend[key];
+  for (var key in extend) {
+    if (isObject(base[key]) && isObject(extend[key])) merge(base[key], extend[key]);
+    else base[key] = extend[key];
+  }
 }
 
 function isObject(o: any): boolean {

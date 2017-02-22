@@ -28,10 +28,10 @@ export default function Chessground(element: HTMLElement, config: any) {
   }
 
   let data: Data = defaults();
+
   configure(data, config);
 
   let ctrl = makeCtrl(data, redraw, dom);
-  redraw();
 
   vnode = patch(element, view(ctrl, dom.bounds));
 

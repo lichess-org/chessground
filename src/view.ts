@@ -36,7 +36,6 @@ function renderPiece(d: Data, key: Key, ctx: Ctx): VNode {
   translate = posToTranslate(util.key2pos(key), ctx),
   draggable = d.draggable.current,
   anim = d.animation.current;
-
   if (draggable && draggable.orig === key && draggable.started && ctx.pointerSelected) {
     translate[0] += draggable.pos[0] + draggable.dec[0];
     translate[1] += draggable.pos[1] + draggable.dec[1];
