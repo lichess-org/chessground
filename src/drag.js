@@ -123,13 +123,23 @@ function end(data, e, ctrl) {
       data.renderRAF();
     } else {
       var selectedParts = ctrl.sparePieceSelected.split(' ');
-
-      data.pieces.drop = {
+      var destPiece = data.pieces[dest];
+      var newPiece = {
         color : selectedParts[0],
         role  : selectedParts[1]
       };
 
-      board.dropNewPiece(data, 'drop', dest, true);
+      if (
+        e.type === 'mousedown' && destPiece &&
+          destPiece.color === newPiece.color && destPiece.role === newPiece.role
+      ) {
+        delete data.pieces[dest];
+        data.renderRAF();
+      } else {
+        data.pieces.drop = newPiece;
+
+        board.dropNewPiece(data, 'drop', dest, true);
+      }
     }
   } else if (cur.started) {
     if (cur.newPiece) board.dropNewPiece(data, orig, dest);
