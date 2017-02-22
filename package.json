@@ -7,7 +7,6 @@
     "example": "examples"
   },
   "dependencies": {
-    "merge": "1.2.0",
     "snabbdom": "^0.6.4"
   },
   "devDependencies": {

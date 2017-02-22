@@ -97,4 +97,4 @@ export function isRightButton(e: MouseEvent): boolean {
   return e.buttons === 2 || e.button === 2;
 }
 
-export const requestAnimationFrame = (window.requestAnimationFrame || window.setTimeout).bind(window);
+export const raf = (window.requestAnimationFrame || window.setTimeout).bind(window);

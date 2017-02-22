@@ -5,6 +5,8 @@ import { VNode } from 'snabbdom/vnode'
 
 // import makeCtrl from './ctrl';
 // import view from './view';
+import configure from './configure'
+import defaults from './defaults'
 
 import klass from 'snabbdom/modules/class';
 import attributes from 'snabbdom/modules/attributes';
@@ -22,10 +24,12 @@ export default function Chessground(element: Element, config: any) {
     vnode = patch(vnode, view(ctrl));
   }
 
-  ctrl = makeCtrl(config, redraw);
+  let data: Data = defaults();
+  configure(data, config);
+
+  ctrl = makeCtrl(data, redraw);
 
   vnode = patch(element, view(ctrl));
 
-  return {
-  };
+  return ctrl;
 };
