@@ -5,14 +5,15 @@ type Mutation<A> = (data: Data) => A;
 // transformation is a function
 // accepts board data and any number of arguments,
 // and mutates the board.
-export default function anim<A>(mutation: Mutation<A>, data: Data, skip?: boolean): A {
-  if (!data.dom) return mutation(data);
-  else if (data.animation.enabled && !skip) return animate(mutation, data, data.dom);
-  else {
-    var result = mutation(data);
-    data.dom.renderRaf();
-    return result;
-  }
+export default function(redraw: Redraw, dom: Dom) {
+  return function<A>(mutation: Mutation<A>, data: Data, skip?: boolean): A {
+    if (data.animation.enabled && !skip) return animate(mutation, data, redraw, dom.bounds);
+    else {
+      var result = mutation(data);
+      redraw();
+      return result;
+    }
+  };
 }
 
 interface MiniData {
@@ -47,19 +48,18 @@ function closer(piece: AnimPiece, pieces: AnimPiece[]): AnimPiece {
   })[0];
 }
 
-function computePlan(prev: MiniData, current: Data, dom: Dom): AnimPlan {
-  var bounds = dom.bounds(),
-    width = bounds.width / 8,
-    height = bounds.height / 8,
-    anims: AnimVectors = {},
-    animedOrigs: Key[] = [],
-    fadings: AnimFading[] = [],
-    missings: AnimPiece[] = [],
-    news: AnimPiece[] = [],
-    invert = prev.orientation !== current.orientation,
-    prePieces: AnimPieces = {},
-    white = current.orientation === 'white',
-    dropped = current.movable.dropped;
+function computePlan(prev: MiniData, current: Data, bounds: ClientRect): AnimPlan {
+  const width = bounds.width / 8,
+  height = bounds.height / 8,
+  anims: AnimVectors = {},
+  animedOrigs: Key[] = [],
+  fadings: AnimFading[] = [],
+  missings: AnimPiece[] = [],
+  news: AnimPiece[] = [],
+  invert = prev.orientation !== current.orientation,
+  prePieces: AnimPieces = {},
+  white = current.orientation === 'white',
+  dropped = current.movable.dropped;
   for (var pk in prev.pieces) {
     prePieces[pk] = makePiece(pk as Key, prev.pieces[pk], invert);
   }
@@ -114,12 +114,12 @@ function roundBy(n: number, by: number): number {
   return Math.round(n * by) / by;
 }
 
-function go(data: Data): void {
-  if (!data.dom || !data.animation.current || !data.animation.current.start) return; // animation was canceled
+function go(data: Data, redraw: Redraw): void {
+  if (!data.animation.current || !data.animation.current.start) return; // animation was canceled
   const rest = 1 - (new Date().getTime() - data.animation.current.start) / data.animation.current.duration;
   if (rest <= 0) {
     data.animation.current = undefined;
-    data.dom.render();
+    redraw();
   } else {
     var ease = easing(rest);
     for (var key in data.animation.current.plan.anims) {
@@ -129,12 +129,12 @@ function go(data: Data): void {
     for (var i in data.animation.current.plan.fadings) {
       data.animation.current.plan.fadings[i].opacity = roundBy(ease, 100);
     }
-    data.dom.render();
-    util.raf(() => go(data));
+    redraw();
+    util.raf(() => go(data, redraw));
   }
 }
 
-function animate<A>(mutation: Mutation<A>, data: Data, dom: Dom): A {
+function animate<A>(mutation: Mutation<A>, data: Data, redraw: Redraw, bounds: ClientRect): A {
   // clone data before mutating it
   const prev: MiniData = {
     orientation: data.orientation,
@@ -149,7 +149,7 @@ function animate<A>(mutation: Mutation<A>, data: Data, dom: Dom): A {
   }
   const result = mutation(data);
   if (data.animation.enabled) {
-    const plan = computePlan(prev, data, dom);
+    const plan = computePlan(prev, data, bounds);
     if (!isObjectEmpty(plan.anims) || !isObjectEmpty(plan.fadings)) {
       const alreadyRunning = data.animation.current && data.animation.current.start;
       data.animation.current = {
@@ -157,14 +157,14 @@ function animate<A>(mutation: Mutation<A>, data: Data, dom: Dom): A {
         duration: data.animation.duration,
         plan: plan
       };
-      if (!alreadyRunning) go(data);
+      if (!alreadyRunning) go(data, redraw);
     } else {
       // don't animate, just render right away
-      dom.renderRaf();
+      redraw();
     }
   } else {
     // animations are now disabled
-    dom.renderRaf();
+    redraw();
   }
   return result;
 }

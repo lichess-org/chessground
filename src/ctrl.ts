@@ -1,11 +1,12 @@
 import * as board from './board'
 import { write as fenWrite } from './fen'
 import configure from './configure'
-import anim from './anim'
+import makeAnim from './anim'
 // import drag from './drag'
 
-interface Api {
+export interface Api {
   data: Data;
+  state: State;
   getFen(): FEN;
   getMaterialDiff(): MaterialDiff;
   set(config: any): void;
@@ -24,13 +25,17 @@ interface Api {
   setShapes(shapes: Shape[]): void
 }
 
-export default function(data: Data): Api {
+export default function(data: Data, redraw: Redraw, dom: Dom): Api {
 
-  let exploding: Exploding | undefined
+  const state: State = {};
+
+  const anim = makeAnim(redraw, dom);
 
   return {
 
     data,
+
+    state,
 
     getFen: () => fenWrite(data.pieces),
 
@@ -92,21 +97,20 @@ export default function(data: Data): Api {
     // }.bind(this), this.data, true);
 
     explode(keys: Key[]) {
-      if (!data.dom) return;
-      exploding = {
+      state.exploding = {
         stage: 1,
         keys: keys
       };
-      data.dom.renderRaf();
+      redraw();
       setTimeout(() => {
-        if (exploding && data.dom) {
-          exploding.stage = 2;
-          data.dom.renderRaf();
+        if (state.exploding) {
+          state.exploding.stage = 2;
+          redraw();
         }
         setTimeout(() => {
-          if (exploding && data.dom) {
-            exploding = undefined;
-            data.dom.renderRaf();
+          if (state.exploding) {
+            state.exploding = undefined;
+            redraw();
           }
         }, 120);
       }, 120);

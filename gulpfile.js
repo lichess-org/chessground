@@ -14,7 +14,7 @@ function onError(error) {
 };
 
 function build(debug) {
-  return browserify('src/main.ts', {
+  return browserify('src/index.js', {
       standalone: 'Chessground',
       debug: debug
     })

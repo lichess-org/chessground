@@ -1,6 +1,6 @@
 type Color = 'white' | 'black';
 type Role = 'king' | 'queen' | 'rook' | 'bishop' | 'knight' | 'pawn';
-type Key = 'a1' | 'b1' | 'c1' | 'd1' | 'e1' | 'f1' | 'g1' | 'h1' | 'a2' | 'b2' | 'c2' | 'd2' | 'e2' | 'f2' | 'g2' | 'h2' | 'a3' | 'b3' | 'c3' | 'd3' | 'e3' | 'f3' | 'g3' | 'h3' | 'a4' | 'b4' | 'c4' | 'd4' | 'e4' | 'f4' | 'g4' | 'h4' | 'a5' | 'b5' | 'c5' | 'd5' | 'e5' | 'f5' | 'g5' | 'h5' | 'a6' | 'b6' | 'c6' | 'd6' | 'e6' | 'f6' | 'g6' | 'h6' | 'a7' | 'b7' | 'c7' | 'd7' | 'e7' | 'f7' | 'g7' | 'h7' | 'a8' | 'b8' | 'c8' | 'd8' | 'e8' | 'f8' | 'g8' | 'h8';
+type Key = 'a0' | 'a1' | 'b1' | 'c1' | 'd1' | 'e1' | 'f1' | 'g1' | 'h1' | 'a2' | 'b2' | 'c2' | 'd2' | 'e2' | 'f2' | 'g2' | 'h2' | 'a3' | 'b3' | 'c3' | 'd3' | 'e3' | 'f3' | 'g3' | 'h3' | 'a4' | 'b4' | 'c4' | 'd4' | 'e4' | 'f4' | 'g4' | 'h4' | 'a5' | 'b5' | 'c5' | 'd5' | 'e5' | 'f5' | 'g5' | 'h5' | 'a6' | 'b6' | 'c6' | 'd6' | 'e6' | 'f6' | 'g6' | 'h6' | 'a7' | 'b7' | 'c7' | 'd7' | 'e7' | 'f7' | 'g7' | 'h7' | 'a8' | 'b8' | 'c8' | 'd8' | 'e8' | 'f8' | 'g8' | 'h8';
 type Fil = 'a' | 'b' | 'c' | 'd' | 'e' | 'f' | 'g' | 'h';
 type Rank = 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8;
 type FEN = string;
@@ -15,12 +15,6 @@ interface Piece {
 interface Drop {
   role: Role;
   key: Key;
-}
-interface Bounds {
-  top: number;
-  left: number;
-  width: number;
-  height: number;
 }
 interface Pieces {
   [key: string]: Piece;
@@ -39,6 +33,7 @@ interface Brush {
 interface KeyPair {
   0: Key;
   1: Key;
+  [i: number]: Key
 }
 interface NumberPair {
   0: number;
@@ -61,10 +56,8 @@ interface AnimPlan {
   fadings: AnimFading[];
 }
 interface Dom {
-  render: () => void; // function that rerenders the board
-  renderRaf: () => void; // function that rerenders the board using requestAnimationFrame
   element: HTMLElement; // DOM element of the board; required for drag piece centering
-  bounds: () => Bounds; // function that calculates the board bounds
+  bounds: ClientRect; // cached element.getBoundingClientRect
 }
 interface MaterialDiff {
   white: { [role: string]: number }
@@ -79,7 +72,6 @@ interface Data {
   lastMove?: Key[]; // squares part of the last move ["c3"; "c4"]
   selected?: Key; // square currently selected "a1"
   coordinates: boolean; // include coords attributes
-  dom?: Dom // runtime stuff available after DOM insertion
   autoCastle: boolean; // immediately complete the castle by moving the rook after king move
   viewOnly: boolean; // don't bind events: the user will never be able to move pieces around
   disableContextMenu: boolean; // because who needs a context menu on a chessboard
@@ -148,8 +140,8 @@ interface Data {
       pos: NumberPair; // relative current position
       dec: NumberPair; // piece center decay
       over: Key; // square being moused over
-      bounds: Bounds; // current cached board bounds
-      started: boolean // whether the drag has started; as per the distance setting
+      started: boolean; // whether the drag has started; as per the distance setting
+      newPiece?: boolean
     }
   };
   selectable: {
@@ -181,7 +173,6 @@ interface Data {
       orig: Key; // orig key of drawing
       pos: NumberPair // relative current position
       dest: Key // square being moused over
-      bounds: Bounds; // current cached board bounds
       brush: string // brush name for shape
     };
     brushes: {
@@ -194,10 +185,19 @@ interface Data {
   }
 }
 
+interface State {
+  exploding?: Exploding;
+  sparePieceSelected?: Role | 'pointer';
+}
 interface Exploding {
   stage: number;
   keys: Key[];
 }
 
+interface Window {
+  [key: string]: any
+}
+
+type Redraw = () => void;
 type Timestamp = number;
 type Milliseconds = number;

@@ -1,6 +1,5 @@
 import { pos2key, key2pos, opposite, containsX } from './util'
 import premove from './premove'
-import anim from './anim'
 import * as hold from './hold'
 
 type Callback = (...args: any[]) => void;
@@ -97,23 +96,20 @@ function tryAutoCastle(data: Data, orig: Key, dest: Key): void {
 }
 
 export function baseMove(data: Data, orig: Key, dest: Key): boolean {
-  const success = anim(data => {
-    if (orig === dest || !data.pieces[orig]) return false;
-    var captured: Piece | undefined = (
-      data.pieces[dest] &&
-      data.pieces[dest].color !== data.pieces[orig].color
-    ) ? data.pieces[dest] : undefined;
-    callUserFunction(data.events.move, orig, dest, captured);
-    data.pieces[dest] = data.pieces[orig];
-    delete data.pieces[orig];
-    data.lastMove = [orig, dest];
-    data.check = undefined;
-    tryAutoCastle(data, orig, dest);
-    callUserFunction(data.events.change);
-    return true;
-  }, data);
-  if (success) data.movable.dropped = undefined;
-  return success;
+  if (orig === dest || !data.pieces[orig]) return false;
+  var captured: Piece | undefined = (
+    data.pieces[dest] &&
+    data.pieces[dest].color !== data.pieces[orig].color
+  ) ? data.pieces[dest] : undefined;
+  callUserFunction(data.events.move, orig, dest, captured);
+  data.pieces[dest] = data.pieces[orig];
+  delete data.pieces[orig];
+  data.lastMove = [orig, dest];
+  data.check = undefined;
+  tryAutoCastle(data, orig, dest);
+  callUserFunction(data.events.change);
+  data.movable.dropped = undefined;
+  return true;
 }
 
 export function baseNewPiece(data: Data, piece: Piece, key: Key, force?: boolean): boolean {
@@ -129,7 +125,6 @@ export function baseNewPiece(data: Data, piece: Piece, key: Key, force?: boolean
   data.movable.dropped = undefined;
   data.movable.dests = undefined;
   data.turnColor = opposite(data.turnColor);
-  if (data.dom) data.dom.renderRaf();
   return true;
 }
 
@@ -329,15 +324,11 @@ export function stop(data: Data): void {
   cancelMove(data);
 }
 
-export function getKeyAtDomPos(data: Data, pos: Pos, bounds?: Bounds): Key | undefined {
-  if (!bounds) {
-    if (data.dom) bounds = data.dom.bounds();
-    else return;
-  }
+export function getKeyAtDomPos(orientation: Color, pos: Pos, bounds: ClientRect): Key | undefined {
   let file = Math.ceil(8 * ((pos[0] - bounds.left) / bounds.width));
-  file = data.orientation === 'white' ? file : 9 - file;
+  file = orientation === 'white' ? file : 9 - file;
   let rank = Math.ceil(8 - (8 * ((pos[1] - bounds.top) / bounds.height)));
-  rank = data.orientation === 'white' ? rank : 9 - rank;
+  rank = orientation === 'white' ? rank : 9 - rank;
   return (file > 0 && file < 9 && rank > 0 && rank < 9) ? pos2key([file, rank]) : undefined;
 }
 
