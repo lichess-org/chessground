@@ -5,9 +5,9 @@ type Mutation<A> = (data: Data) => A;
 // transformation is a function
 // accepts board data and any number of arguments,
 // and mutates the board.
-export default function(redraw: Redraw, dom: Dom) {
+export default function(redraw: Redraw, getBounds: () => ClientRect) {
   return function<A>(mutation: Mutation<A>, data: Data, skip?: boolean): A {
-    if (data.animation.enabled && !skip) return animate(mutation, data, redraw, dom.bounds);
+    if (data.animation.enabled && !skip) return animate(mutation, data, redraw, getBounds());
     else {
       var result = mutation(data);
       redraw();

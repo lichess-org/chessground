@@ -55,10 +55,6 @@ interface AnimPlan {
   anims: AnimVectors;
   fadings: AnimFading[];
 }
-interface Dom {
-  element: HTMLElement; // DOM element of the board; required for drag piece centering
-  bounds: ClientRect; // cached element.getBoundingClientRect
-}
 interface MaterialDiff {
   white: { [role: string]: number }
   black: { [role: string]: number }

@@ -14,33 +14,30 @@ import attributes from 'snabbdom/modules/attributes';
 
 const patch = init([klass, style, attributes]);
 
-export default function Chessground(element: HTMLElement, config: any) {
+export default function Chessground(initialElement: HTMLElement, config: any) {
 
-  const dom: Dom = {
-    element: element,
-    bounds: element.getBoundingClientRect()
-  };
-
-  let vnode: VNode;
-
-  function redraw() {
-    vnode = patch(vnode, view(ctrl, dom.bounds));
-  }
-
-  let data: Data = defaults();
+  let data: Data = defaults(),
+  bounds: ClientRect = initialElement.getBoundingClientRect(),
+  vnode: VNode;
 
   configure(data, config);
 
-  let ctrl = makeCtrl(data, redraw, dom);
+  function redraw() {
+    vnode = patch(vnode, view(ctrl, bounds));
+  }
 
-  vnode = patch(element, view(ctrl, dom.bounds));
+  let ctrl = makeCtrl(data, redraw, () => bounds);
+
+  vnode = patch(initialElement, view(ctrl, bounds));
+
+  const element = vnode.elm as HTMLElement;
 
   function recomputeBounds() {
-    dom.bounds = element.getBoundingClientRect();
+    bounds = element.getBoundingClientRect();
     redraw();
   }
 
-  if (data.resizable) setTimeout(() => {
+  if (data.resizable) {
     document.body.addEventListener('chessground.resize', recomputeBounds, false);
     ['onscroll', 'onresize'].forEach(n => {
       const prev = window[n];
@@ -49,7 +46,7 @@ export default function Chessground(element: HTMLElement, config: any) {
         recomputeBounds();
       };
     });
-  }, 500);
+  }
 
   element.addEventListener('contextmenu', e => {
     if (data.disableContextMenu || data.drawable.enabled) {
@@ -58,6 +55,12 @@ export default function Chessground(element: HTMLElement, config: any) {
     }
     return true;
   });
+
+  function everyAF() {
+    redraw();
+    requestAnimationFrame(everyAF);
+  }
+  everyAF();
 
   return ctrl;
 };

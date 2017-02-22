@@ -25,11 +25,11 @@ export interface Api {
   setShapes(shapes: Shape[]): void
 }
 
-export default function(data: Data, redraw: Redraw, dom: Dom): Api {
+export default function(data: Data, redraw: Redraw, bounds: () => ClientRect): Api {
 
   const state: State = {};
 
-  const anim = makeAnim(redraw, dom);
+  const anim = makeAnim(redraw, bounds);
 
   return {
 
