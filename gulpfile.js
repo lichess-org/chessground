@@ -1,52 +1,54 @@
-var source = require('vinyl-source-stream');
-var gulp = require('gulp');
-var gutil = require('gulp-util');
-var jshint = require('gulp-jshint');
-var watchify = require('watchify');
-var browserify = require('browserify');
-var uglify = require('gulp-uglify');
-var streamify = require('gulp-streamify');
+const gulp = require("gulp");
+const browserify = require("browserify");
+const source = require('vinyl-source-stream');
+const tsify = require("tsify");
+const watchify = require("watchify");
+const gutil = require("gulp-util");
+const uglify = require('gulp-uglify');
+const buffer = require('vinyl-buffer');
 
-var sources = ['./src/main.js'];
-var destination = './';
-var onError = function(error) {
-  gutil.log(gutil.colors.red(error.message));
+const destination = './';
+
+function onError(error) {
+  return gutil.log(gutil.colors.red(error.message));
 };
-var standalone = 'Chessground';
 
-gulp.task('lint', function() {
-  return gulp.src('./src/main.js')
-    .pipe(jshint())
-    .pipe(jshint.reporter('default'));
-});
+function build(debug) {
+  return browserify('src/main.ts', {
+      standalone: 'Chessground',
+      debug: debug
+    })
+    .plugin(tsify);
+}
 
-gulp.task('prod', function() {
-  return browserify('./src/main.js', {
-    standalone: standalone
-  }).bundle()
+const watchedBrowserify = watchify(build(true));
+
+function bundle() {
+  return watchedBrowserify
+    .bundle()
     .on('error', onError)
-    .pipe(source('chessground.min.js'))
-    .pipe(streamify(uglify()))
+    .pipe(source('chessground.js'))
+    .pipe(buffer())
+    .pipe(gulp.dest(destination));
+}
+
+gulp.task("default", [], bundle);
+watchedBrowserify.on("update", bundle);
+watchedBrowserify.on("log", gutil.log);
+
+gulp.task('dev', function() {
+  return build(true)
+    .bundle()
+    .on('error', onError)
+    .pipe(source('chessground.js'))
     .pipe(gulp.dest(destination));
 });
 
-gulp.task('dev', function() {
-  var opts = watchify.args;
-  opts.debug = true;
-  opts.standalone = standalone;
-
-  var bundleStream = watchify(browserify(sources, opts))
-    .on('update', rebundle)
-    .on('log', gutil.log);
-
-  function rebundle() {
-    return bundleStream.bundle()
-      .on('error', onError)
-      .pipe(source('chessground.js'))
-      .pipe(gulp.dest(destination));
-  }
-
-  return rebundle();
+gulp.task("prod", [], function() {
+  return build(false)
+    .bundle()
+    .pipe(source('chessground.min.js'))
+    .pipe(buffer())
+    .pipe(uglify())
+    .pipe(gulp.dest(destination));
 });
-
-gulp.task('default', ['dev']);

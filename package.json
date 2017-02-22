@@ -1,6 +1,6 @@
 {
   "name": "chessground",
-  "version": "4.5.0",
+  "version": "5.0.0",
   "description": "lichess.org Chess UI",
   "main": "src/main.js",
   "directories": {
@@ -8,17 +8,20 @@
   },
   "dependencies": {
     "merge": "1.2.0",
-    "mithril": "github:ornicar/mithril.js#v1.0.1"
+    "snabbdom": "^0.6.4"
   },
   "devDependencies": {
-    "browserify": "~9.0.8",
-    "gulp": "~3.9.1",
-    "gulp-jshint": "~1.11.0",
-    "gulp-streamify": "~0.0.5",
-    "gulp-uglify": "~1.2.0",
-    "gulp-util": "~3.0.4",
-    "vinyl-source-stream": "~1.1.0",
-    "watchify": "~3.1.1"
+    "browserify": "^14.1.0",
+    "gulp": "^3.9.1",
+    "gulp-sourcemaps": "^2.4.1",
+    "gulp-typescript": "^3.1.5",
+    "gulp-uglify": "^2.0.1",
+    "gulp-util": "^3.0.8",
+    "tsify": "^3.0.1",
+    "typescript": "^2.1.6",
+    "vinyl-buffer": "^1.0.0",
+    "vinyl-source-stream": "^1.1.0",
+    "watchify": "^3.9.0"
   },
   "repository": {
     "type": "git",
