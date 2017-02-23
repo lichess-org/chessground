@@ -14,17 +14,20 @@ import style from 'snabbdom/modules/style';
 
 const patch = init([klass, style]);
 
-export default function Chessground(initialElement: HTMLElement, config: Config) {
+export default function Chessground(container: HTMLElement, config: Config) {
+
+  const placeholder: HTMLElement = document.createElement('div');
+  container.appendChild(placeholder);
 
   const data = defaults() as Data;
 
+  configure(data, config);
+
   data.dom = {
-    element: initialElement,
-    bounds: initialElement.getBoundingClientRect(),
+    element: placeholder,
+    bounds: container.getBoundingClientRect(),
     redraw() {}
   };
-
-  configure(data, config);
 
   let vnode: VNode;
 
@@ -34,23 +37,12 @@ export default function Chessground(initialElement: HTMLElement, config: Config)
 
   let api = makeApi(data);
 
-  vnode = patch(initialElement, view(api.data));
+  vnode = patch(placeholder, view(api.data));
 
-  const element = vnode.elm as HTMLElement;
-
-  data.dom = {
-    element: element,
-    bounds: element.getBoundingClientRect(),
-    redraw: redraw
-  };
+  data.dom.element = vnode.elm as HTMLElement;
+  data.dom.redraw = redraw;
 
   bindEvents(data);
-
-  // function everyAF() {
-  //   redraw();
-  //   requestAnimationFrame(everyAF);
-  // }
-  // everyAF();
 
   return api;
 };
