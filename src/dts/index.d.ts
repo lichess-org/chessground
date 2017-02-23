@@ -4,7 +4,6 @@ type Key = 'a0' | 'a1' | 'b1' | 'c1' | 'd1' | 'e1' | 'f1' | 'g1' | 'h1' | 'a2' |
 type Fil = 'a' | 'b' | 'c' | 'd' | 'e' | 'f' | 'g' | 'h';
 type Rank = 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8;
 type FEN = string;
-
 interface Pos {
   0: number;
   1: number;
@@ -13,13 +12,13 @@ interface Piece {
   role: Role;
   color: Color;
 }
-type Pieces = Record<Key, Piece>
-
 interface Drop {
   role: Role;
   key: Key;
 }
-
+interface Pieces {
+  [key: string]: Piece;
+}
 interface Shape {
   brush: string;
   orig: Key;
@@ -44,8 +43,9 @@ interface AnimVector {
   0: NumberPair; // animation goal
   1: NumberPair; // animation current status
 }
-type AnimVectors = Record<Key, AnimVector>
-
+interface AnimVectors {
+  [key: string]: AnimVector
+}
 interface AnimFading {
   pos: Pos;
   opacity: number
@@ -56,8 +56,8 @@ interface AnimPlan {
   fadings: AnimFading[];
 }
 interface MaterialDiff {
-  white: Record<Role, number>
-  black: Record<Role, number>
+  white: { [role: string]: number }
+  black: { [role: string]: number }
 }
 
 interface Data {
@@ -90,7 +90,9 @@ interface Data {
   movable: {
     free: boolean; // all moves are valid - board editor
     color?: Color | 'both'; // color that can move. white | black | both
-    dests?: Record<Key, Key[]>; // valid moves. {"a2" ["a3" "a4"] "b1" ["a3" "c3"]}
+    dests?: {
+      [key: string]: Key[]
+    }; // valid moves. {"a2" ["a3" "a4"] "b1" ["a3" "c3"]}
     dropOff: 'revert' | 'trash'; // when a piece is dropped outside the board. "revert" | "trash"
     dropped?: KeyPair; // last dropped [orig; dest]; not to be animated
     showDests: boolean; // whether to add the move-dest class on squares
@@ -173,7 +175,9 @@ interface Data {
       dest: Key // square being moused over
       brush: string // brush name for shape
     };
-    brushes: Record<string, Brush>;
+    brushes: {
+      [name: string]: Brush
+    };
     // drawable SVG pieces; used for crazyhouse drop
     pieces: {
       baseUrl: string
