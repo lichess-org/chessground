@@ -121,7 +121,7 @@ function end(data, e, ctrl) {
     if (ctrl.sparePieceSelected === 'trash') {
       delete data.pieces[dest];
       data.renderRAF();
-    } else {
+    } else if (e.type === 'mousedown' || ctrl.lastSquareDropped !== dest) {
       var selectedParts = ctrl.sparePieceSelected.split(' ');
 
       var destPiece = data.pieces[dest];
@@ -140,6 +140,7 @@ function end(data, e, ctrl) {
         data.pieces.drop = newPiece;
 
         board.dropNewPiece(data, 'drop', dest, true);
+        ctrl.lastSquareDropped = dest;
       }
     }
   } else if (cur.started) {
