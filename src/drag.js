@@ -135,10 +135,10 @@ function end(data, e, ctrl) {
       ) {
         delete data.pieces[dest];
         data.renderRAF();
-      } else {
+      } else if (e.type === 'mousedown' || ctrl.lastSquareDropped !== dest) {
         data.pieces.drop = newPiece;
-
         board.dropNewPiece(data, 'drop', dest, true);
+        ctrl.lastSquareDropped = dest;
       }
     }
   } else if (cur.started) {
