@@ -12,10 +12,6 @@ function pieceClass(p) {
   return p.role + ' ' + p.color;
 }
 
-function pointerSelected(ctrl) {
-  return !ctrl.sparePieceSelected || ctrl.sparePieceSelected === 'pointer';
-}
-
 function renderPiece(d, key, ctx) {
   var attrs = {
     key: 'p' + key,
@@ -154,7 +150,7 @@ function renderContent(ctrl) {
     asWhite: d.orientation === 'white',
     bounds: d.bounds(),
     transformProp: util.transformProp(),
-    pointerSelected : pointerSelected(ctrl)
+    pointerSelected : ctrl.pointerSelected()
   };
   var children = renderSquares(ctrl, ctx);
   if (d.animation.current.fadings)
@@ -221,7 +217,7 @@ function bindEvents(ctrl, el, context) {
 
   if (ctrl.sparePieceSelected) {
     onstart = function(e) {
-      if (pointerSelected(ctrl)) {
+      if (ctrl.pointerSelected()) {
         if (e.type !== 'mousemove') {
           start(e);
         }
@@ -231,13 +227,13 @@ function bindEvents(ctrl, el, context) {
     };
 
     onmove = function(e) {
-      if (pointerSelected(ctrl)) {
+      if (ctrl.pointerSelected()) {
         move(e);
       }
     };
 
     onend = function(e) {
-      if (pointerSelected(ctrl)) {
+      if (ctrl.pointerSelected()) {
         end(e);
       }
     };
@@ -272,6 +268,10 @@ function bindEvents(ctrl, el, context) {
 }
 
 function renderBoard(ctrl) {
+  ctrl.pointerSelected = function pointerSelected() {
+    return !ctrl.sparePieceSelected || ctrl.sparePieceSelected === 'pointer';
+  };
+
   var d = ctrl.data;
   return {
     tag: 'div',
