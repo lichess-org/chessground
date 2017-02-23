@@ -24,6 +24,10 @@ function start(data, e) {
   processDraw(data);
 }
 
+function pointerSelected(ctrl) {
+  return (ctrl && (!ctrl.sparePieceSelected || ctrl.sparePieceSelected === 'pointer'));
+}
+
 function processDraw(data) {
   util.requestAnimationFrame(function() {
     var cur = data.drawable.current;
@@ -42,7 +46,11 @@ function move(data, e) {
     data.drawable.current.epos = util.eventPosition(e);
 }
 
-function end(data, e) {
+function end(data, e, ctrl) {
+  if (!pointerSelected(ctrl)) {
+    return;
+  }
+
   var drawable = data.drawable;
   var orig = drawable.current.orig;
   var dest = drawable.current.dest;
