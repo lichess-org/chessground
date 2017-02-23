@@ -97,6 +97,10 @@ function isRightButton(e) {
   return e.buttons === 2 || e.button === 2;
 }
 
+function isRightClick(e) {
+  return isRightButton(e) || (e.ctrlKey && isLeftButton(e));
+}
+
 function memo(f) {
   var v, ret = function() {
     if (v === undefined) v = f();
@@ -130,5 +134,6 @@ module.exports = {
   requestAnimationFrame: (window.requestAnimationFrame || window.setTimeout).bind(window),
   isLeftButton: isLeftButton,
   isRightButton: isRightButton,
+  isRightClick: isRightClick,
   memo: memo
 };

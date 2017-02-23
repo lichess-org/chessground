@@ -19,9 +19,13 @@ function start(data, e) {
     orig: orig,
     epos: position,
     bounds: bounds,
-    brush: brushes[(e.shiftKey & util.isRightButton(e)) + (e.altKey ? 2 : 0)]
+    brush: brushes[(e.shiftKey & util.isRightClick(e)) + (e.altKey ? 2 : 0)]
   };
   processDraw(data);
+}
+
+function pointerSelected(ctrl) {
+  return (ctrl && (!ctrl.sparePieceSelected || ctrl.sparePieceSelected === 'pointer'));
 }
 
 function processDraw(data) {
@@ -42,7 +46,11 @@ function move(data, e) {
     data.drawable.current.epos = util.eventPosition(e);
 }
 
-function end(data, e) {
+function end(data, e, ctrl) {
+  if (!pointerSelected(ctrl)) {
+    return;
+  }
+
   var drawable = data.drawable;
   var orig = drawable.current.orig;
   var dest = drawable.current.dest;
