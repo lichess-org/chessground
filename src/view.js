@@ -202,7 +202,7 @@ function startDragOrDraw(d) {
 
 function dragOrDraw(d, withDrag, withDraw, ctrl) {
   return function(e) {
-    if ((e.shiftKey || util.isRightButton(e)) && d.drawable.enabled) withDraw(d, e);
+    if ((e.shiftKey || util.isRightButton(e)) && d.drawable.enabled) withDraw(d, e, ctrl);
     else if (!d.viewOnly) withDrag(d, e, ctrl);
   };
 }
