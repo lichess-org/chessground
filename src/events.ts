@@ -8,10 +8,9 @@ const endEvents = ['touchend', 'mouseup'];
 
 type MouchBind = (e: MouchEvent) => void;
 type DataMouchBind = (d: Data, e: MouchEvent) => void;
-type Unbind = () => void;
 
 // returns the unbind function
-export default function(d: Data): Unbind {
+export default function(d: Data): void {
 
   const start: MouchBind = startDragOrDraw(d);
   const move: MouchBind = dragOrDraw(d, drag.move, draw.move);
@@ -50,7 +49,7 @@ export default function(d: Data): Unbind {
 
   endEvents.forEach(ev => document.addEventListener(ev, onend));
 
-  const unbindResize = bindResize(d);
+  bindResize(d);
 
   const onContextMenu: MouchBind = e => {
     if (d.disableContextMenu || d.drawable.enabled) {
@@ -60,14 +59,6 @@ export default function(d: Data): Unbind {
     return true;
   };
   d.dom.element.addEventListener('contextmenu', onContextMenu);
-
-  return () => {
-    startEvents.forEach(ev => d.dom.element.removeEventListener(ev, onstart));
-    moveEvents.forEach(ev => document.removeEventListener(ev, onmove));
-    endEvents.forEach(ev => document.removeEventListener(ev, onend));
-    unbindResize();
-    d.dom.element.removeEventListener('contextmenu', onContextMenu);
-  };
 }
 
 function startDragOrDraw(d: Data): MouchBind {
@@ -88,9 +79,9 @@ function dragOrDraw(d: Data, withDrag: DataMouchBind, withDraw: DataMouchBind): 
   };
 }
 
-function bindResize(d: Data): Unbind {
+function bindResize(d: Data): void {
 
-  if (!d.resizable) return () => {};
+  if (!d.resizable) return;
 
   function recomputeBounds() {
     d.dom.bounds = d.dom.element.getBoundingClientRect();
@@ -106,6 +97,4 @@ function bindResize(d: Data): Unbind {
   });
 
   document.body.addEventListener('chessground.resize', recomputeBounds, false);
-
-  return () => document.body.removeEventListener('chessground.resize', recomputeBounds);
 }
