@@ -60,6 +60,29 @@ interface MaterialDiff {
   black: { [role: string]: number }
 }
 
+interface Drawable {
+  enabled: boolean; // allows SVG drawings
+  eraseOnClick: boolean;
+  onChange?: (shapes: Shape[]) => void;
+  shapes: Shape[]; // user shapes
+  autoShapes: Shape[]; // computer shapes
+  current?: DrawableCurrent;
+  brushes: {
+    [name: string]: Brush
+  };
+  // drawable SVG pieces; used for crazyhouse drop
+  pieces: {
+    baseUrl: string
+  }
+}
+
+interface DrawableCurrent {
+  orig: Key; // orig key of drawing
+  dest?: Key; // square being moused over, if != orig
+  pos: NumberPair; // relative current position
+  brush: string; // brush name for shape
+}
+
 interface Data {
   pieces: Pieces;
   orientation: Color; // board orientation. white | black
@@ -141,7 +164,6 @@ interface Data {
       started: boolean; // whether the drag has started; as per the distance setting
       newPiece?: boolean;
       previouslySelected?: Key;
-      bounds: ClientRect
     }
   };
   selectable: {
@@ -163,31 +185,19 @@ interface Data {
     select?: (key: Key) => void // called when a square is selected
   };
   items?: (pos: Pos, key: Key) => any | undefined; // items on the board { render: key -> vdom }
-  drawable: {
-    enabled: boolean; // allows SVG drawings
-    eraseOnClick: boolean;
-    onChange?: (shapes: Shape[]) => void;
-    shapes: Shape[]; // user shapes
-    autoShapes: Shape[]; // computer shapes
-    current?: {
-      orig: Key; // orig key of drawing
-      pos: NumberPair // relative current position
-      dest: Key // square being moused over
-      brush: string // brush name for shape
-    };
-    brushes: {
-      [name: string]: Brush
-    };
-    // drawable SVG pieces; used for crazyhouse drop
-    pieces: {
-      baseUrl: string
-    }
+  drawable: Drawable,
+  editable: {
+    enabled: boolean;
+    selected: Piece | 'pointer' | 'trash';
   }
+  exploding?: Exploding;
+  dom: Dom
 }
 
-interface State {
-  exploding?: Exploding;
-  sparePieceSelected?: Role | 'pointer';
+interface Dom {
+  element: HTMLElement;
+  bounds: ClientRect;
+  redraw: () => void;
 }
 interface Exploding {
   stage: number;
@@ -197,6 +207,8 @@ interface Exploding {
 interface Window {
   [key: string]: any
 }
+
+type MouchEvent = MouseEvent & TouchEvent;
 
 type Redraw = () => void;
 type Timestamp = number;

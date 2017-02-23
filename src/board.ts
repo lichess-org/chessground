@@ -14,13 +14,13 @@ export function toggleOrientation(data: Data): void {
 
 export function reset(data: Data): void {
   data.lastMove = undefined;
-  setSelected(data);
+  unselect(data);
   unsetPremove(data);
   unsetPredrop(data);
 }
 
 export function setPieces(data: Data, pieces: Pieces): void {
-  for (var key in pieces) {
+  for (let key in pieces) {
     if (pieces[key]) data.pieces[key] = pieces[key];
     else delete data.pieces[key];
   }
@@ -29,7 +29,7 @@ export function setPieces(data: Data, pieces: Pieces): void {
 
 export function setCheck(data: Data, color?: Color): void {
   const checkColor: Color = color || data.turnColor;
-  for (var key in data.pieces) {
+  for (let key in data.pieces) {
     if (data.pieces[key].role === 'king' && data.pieces[key].color === checkColor) data.check = key as Key;
   }
 }
@@ -97,7 +97,7 @@ function tryAutoCastle(data: Data, orig: Key, dest: Key): void {
 
 export function baseMove(data: Data, orig: Key, dest: Key): boolean {
   if (orig === dest || !data.pieces[orig]) return false;
-  var captured: Piece | undefined = (
+  const captured: Piece | undefined = (
     data.pieces[dest] &&
     data.pieces[dest].color !== data.pieces[orig].color
   ) ? data.pieces[dest] : undefined;
@@ -129,7 +129,7 @@ export function baseNewPiece(data: Data, piece: Piece, key: Key, force?: boolean
 }
 
 function baseUserMove(data: Data, orig: Key, dest: Key): boolean {
-  var result = baseMove(data, orig, dest);
+  const result = baseMove(data, orig, dest);
   if (result) {
     data.movable.dests = {};
     data.turnColor = opposite(data.turnColor);
@@ -137,18 +137,11 @@ function baseUserMove(data: Data, orig: Key, dest: Key): boolean {
   return result;
 }
 
-function userMove(data: Data, orig: Key, dest: Key): boolean {
-  if (!dest) {
-    hold.cancel();
-    setSelected(data);
-    if (data.movable.dropOff === 'trash') {
-      delete data.pieces[orig];
-      callUserFunction(data.events.change);
-    }
-  } else if (canMove(data, orig, dest)) {
+export function userMove(data: Data, orig: Key, dest: Key): boolean {
+  if (canMove(data, orig, dest)) {
     if (baseUserMove(data, orig, dest)) {
-      var holdTime = hold.stop();
-      setSelected(data);
+      const holdTime = hold.stop();
+      unselect(data);
       callUserFunction(data.movable.events.after, orig, dest, {
         premove: false,
         ctrlKey: data.stats.ctrlKey,
@@ -160,17 +153,17 @@ function userMove(data: Data, orig: Key, dest: Key): boolean {
     setPremove(data, orig, dest, {
       ctrlKey: data.stats.ctrlKey
     });
-    setSelected(data);
+    unselect(data);
   } else if (isMovable(data, dest) || isPremovable(data, dest)) {
     setSelected(data, dest);
     hold.start();
-  } else setSelected(data);
+  } else unselect(data);
   return false;
 }
 
 export function dropNewPiece(data: Data, orig: Key, dest: Key, force?: boolean): void {
   if (canDrop(data, orig, dest) || force) {
-    var piece = data.pieces[orig];
+    const piece = data.pieces[orig];
     delete data.pieces[orig];
     baseNewPiece(data, piece, dest, force);
     data.movable.dropped = undefined;
@@ -184,39 +177,40 @@ export function dropNewPiece(data: Data, orig: Key, dest: Key, force?: boolean):
     unsetPredrop(data);
   }
   delete data.pieces[orig];
-  setSelected(data);
+  unselect(data);
 }
 
-export function selectSquare(data: Data, key?: Key, force?: boolean): void {
+export function selectSquare(data: Data, key: Key, force?: boolean): void {
   if (data.selected) {
-    if (key) {
-      if (data.selected === key && !data.draggable.enabled) {
-        setSelected(data);
-        hold.cancel();
-      } else if ((data.selectable.enabled || force) && data.selected !== key) {
-        if (userMove(data, data.selected, key)) data.stats.dragged = false;
-      } else hold.start();
-    } else {
-      setSelected(data);
+    if (data.selected === key && !data.draggable.enabled) {
+      unselect(data);
       hold.cancel();
-    }
-  } else if (key && (isMovable(data, key) || isPremovable(data, key))) {
+    } else if ((data.selectable.enabled || force) && data.selected !== key) {
+      if (userMove(data, data.selected, key)) data.stats.dragged = false;
+    } else hold.start();
+  } else if (isMovable(data, key) || isPremovable(data, key)) {
     setSelected(data, key);
     hold.start();
   }
   if (key) callUserFunction(data.events.select, key);
 }
 
-function setSelected(data: Data, key?: Key): void {
+export function setSelected(data: Data, key: Key): void {
   data.selected = key;
-  if (key && isPremovable(data, key)) {
+  if (isPremovable(data, key)) {
     data.premovable.dests = premove(data.pieces, key, data.premovable.castle);
   }
   else data.premovable.dests = undefined;
 }
 
+export function unselect(data: Data): void {
+  data.selected = undefined;
+  data.premovable.dests = undefined;
+  hold.cancel();
+}
+
 function isMovable(data: Data, orig: Key): boolean {
-  var piece = data.pieces[orig];
+  const piece = data.pieces[orig];
   return piece && (
     data.movable.color === 'both' || (
       data.movable.color === piece.color &&
@@ -231,7 +225,7 @@ function canMove(data: Data, orig: Key, dest: Key): boolean {
 }
 
 function canDrop(data: Data, orig: Key, dest: Key): boolean {
-  var piece = data.pieces[orig];
+  const piece = data.pieces[orig];
   return piece && dest && (orig === dest || !data.pieces[dest]) && (
     data.movable.color === 'both' || (
       data.movable.color === piece.color &&
@@ -241,7 +235,7 @@ function canDrop(data: Data, orig: Key, dest: Key): boolean {
 
 
 function isPremovable(data: Data, orig: Key): boolean {
-  var piece = data.pieces[orig];
+  const piece = data.pieces[orig];
   return piece && data.premovable.enabled &&
   data.movable.color === piece.color &&
     data.turnColor !== piece.color;
@@ -254,7 +248,7 @@ function canPremove(data: Data, orig: Key, dest: Key): boolean {
 }
 
 function canPredrop(data: Data, orig: Key, dest: Key): boolean {
-  var piece = data.pieces[orig];
+  const piece = data.pieces[orig];
   return piece && dest &&
   (!data.pieces[dest] || data.pieces[dest].color !== data.movable.color) &&
   data.predroppable.enabled &&
@@ -264,7 +258,7 @@ function canPredrop(data: Data, orig: Key, dest: Key): boolean {
 }
 
 export function isDraggable(data: Data, orig: Key): boolean {
-  var piece = data.pieces[orig];
+  const piece = data.pieces[orig];
   return piece && data.draggable.enabled && (
     data.movable.color === 'both' || (
       data.movable.color === piece.color && (
@@ -275,11 +269,10 @@ export function isDraggable(data: Data, orig: Key): boolean {
 }
 
 export function playPremove(data: Data): boolean {
-  var move = data.premovable.current;
+  const move = data.premovable.current;
   if (!move) return false;
-  var orig = move[0],
-    dest = move[1],
-    success = false;
+  const orig = move[0], dest = move[1];
+  let success = false;
   if (canMove(data, orig, dest)) {
     if (baseUserMove(data, orig, dest)) {
       callUserFunction(data.movable.events.after, orig, dest, {
@@ -297,7 +290,7 @@ export function playPredrop(data: Data, validate: (drop: Drop) => boolean): bool
   success = false;
   if (!drop) return false;
   if (validate(drop)) {
-    var piece = {
+    const piece = {
       role: drop.role,
       color: data.movable.color as Color
     };
@@ -312,10 +305,10 @@ export function playPredrop(data: Data, validate: (drop: Drop) => boolean): bool
   return success;
 }
 
-function cancelMove(data: Data): void {
+export function cancelMove(data: Data): void {
   unsetPremove(data);
   unsetPredrop(data);
-  selectSquare(data);
+  unselect(data);
 }
 
 export function stop(data: Data): void {
@@ -324,11 +317,11 @@ export function stop(data: Data): void {
   cancelMove(data);
 }
 
-export function getKeyAtDomPos(orientation: Color, pos: NumberPair, bounds: ClientRect): Key | undefined {
-  let file = Math.ceil(8 * ((pos[0] - bounds.left) / bounds.width));
-  file = orientation === 'white' ? file : 9 - file;
-  let rank = Math.ceil(8 - (8 * ((pos[1] - bounds.top) / bounds.height)));
-  rank = orientation === 'white' ? rank : 9 - rank;
+export function getKeyAtDomPos(data: Data, pos: NumberPair): Key | undefined {
+  let file = Math.ceil(8 * ((pos[0] - data.dom.bounds.left) / data.dom.bounds.width));
+  file = data.orientation === 'white' ? file : 9 - file;
+  let rank = Math.ceil(8 - (8 * ((pos[1] - data.dom.bounds.top) / data.dom.bounds.height)));
+  rank = data.orientation === 'white' ? rank : 9 - rank;
   return (file > 0 && file < 9 && rank > 0 && rank < 9) ? pos2key([file, rank]) : undefined;
 }
 
@@ -342,7 +335,7 @@ export function getMaterialDiff(data: Data): MaterialDiff {
     knight: 0,
     pawn: 0
   }, p: Piece, role: Role, c: number;
-  for (var k in data.pieces) {
+  for (let k in data.pieces) {
     p = data.pieces[k];
     counts[p.role] += ((p.color === 'white') ? 1 : -1);
   }
@@ -369,7 +362,7 @@ const pieceScores = {
 
 export function getScore(data: Data): number {
   let score = 0;
-  for (var k in data.pieces) {
+  for (let k in data.pieces) {
     score += pieceScores[data.pieces[k].role] * (data.pieces[k].color === 'white' ? 1 : -1);
   }
   return score;

@@ -50,7 +50,7 @@ function rookFilesOf(pieces: Pieces, color: Color) {
   return Object.keys(pieces).filter(key => {
     piece = pieces[key];
     return piece && piece.color === color && piece.role === 'rook';
-  }).map(key => util.key2pos(key as Key)[0]);
+  }).map((key: Key) => util.key2pos(key)[0]);
 }
 
 export default function(pieces: Pieces, key: Key, canCastle: boolean): Key[] {

@@ -8,13 +8,12 @@ import * as util from './util'
 // var makeCoords = require('./coords');
 
 interface Ctx {
-  asWhite: boolean;
-  bounds: ClientRect;
-  transformProp: string;
-  pointerSelected: boolean;
+  readonly asWhite: boolean;
+  readonly bounds: ClientRect;
+  readonly transformProp: string;
 }
 
-type Classes = { [name: string]: boolean };
+type Classes = Record<string, boolean>
 
 const pieceTag = 'piece';
 const squareTag = 'square';
@@ -26,17 +25,13 @@ function pieceClasses(p: Piece): Classes {
   };
 }
 
-function pointerSelected(api: Api): boolean {
-  return !api.state.sparePieceSelected || api.state.sparePieceSelected === 'pointer';
-}
-
 function renderPiece(d: Data, key: Key, ctx: Ctx): VNode {
 
   const classes = pieceClasses(d.pieces[key]),
   translate = posToTranslate(util.key2pos(key), ctx),
   draggable = d.draggable.current,
   anim = d.animation.current;
-  if (draggable && draggable.orig === key && draggable.started && ctx.pointerSelected) {
+  if (draggable && draggable.orig === key && draggable.started) {
     translate[0] += draggable.pos[0] + draggable.dec[0];
     translate[1] += draggable.pos[1] + draggable.dec[1];
     classes['dragging'] = true;
@@ -103,8 +98,8 @@ function addSquare(squares: SquareClasses, key: Key, klass: string): void {
   else squares[key] = { [klass]: true };
 }
 
-function renderSquares(api: Api, ctx: Ctx): VNode[] {
-  const d = api.data, squares: SquareClasses = {};
+function renderSquares(d: Data, ctx: Ctx): VNode[] {
+  const squares: SquareClasses = {};
   let i: any, k: Key;
   if (d.lastMove && d.highlight.lastMove) for (i in d.lastMove) {
     addSquare(squares, d.lastMove[i], 'last-move');
@@ -132,7 +127,7 @@ function renderSquares(api: Api, ctx: Ctx): VNode[] {
   if (premove) for (i in premove) addSquare(squares, premove[i], 'current-premove');
   else if (d.predroppable.current) addSquare(squares, d.predroppable.current.key, 'current-premove');
 
-  let o = api.state.exploding;
+  let o = d.exploding;
   if (o) for (i in o.keys) addSquare(squares, o.keys[i], 'exploding' + o.stage);
 
   var nodes: VNode[] = [];
@@ -153,16 +148,14 @@ function renderSquares(api: Api, ctx: Ctx): VNode[] {
   return nodes;
 }
 
-function renderContent(api: Api, bounds: ClientRect): VNode[] {
-  const d = api.data,
-  ctx: Ctx = {
+function renderContent(d: Data): VNode[] {
+  const ctx: Ctx = {
     asWhite: d.orientation === 'white',
-    bounds: bounds,
-    transformProp: util.transformProp(),
-    pointerSelected : pointerSelected(api)
+    bounds: d.dom.bounds,
+    transformProp: util.transformProp()
   },
   animation = d.animation.current,
-  nodes: VNode[] = renderSquares(api, ctx),
+  nodes: VNode[] = renderSquares(d, ctx),
   fadings = animation && animation.plan.fadings,
   draggable = d.draggable.current;
   let i: any;
@@ -194,7 +187,7 @@ function renderContent(api: Api, bounds: ClientRect): VNode[] {
     return nodes;
 }
 
-export default function(api: Api, bounds: ClientRect): VNode {
+export default function(api: Api): VNode {
   var d = api.data;
   return h('div', {
     class: {
@@ -213,6 +206,6 @@ export default function(api: Api, bounds: ClientRect): VNode {
       //     // if (!d.viewOnly || d.drawable.enabled) bindEvents(api, el, context);
       //     }
       // }
-      }, renderContent(api, bounds))
+      }, renderContent(d))
   ]);
 };

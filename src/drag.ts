@@ -1,7 +1,6 @@
 import * as board from './board'
 import * as util from './util'
-import { Api } from './ctrl'
-// var draw = require('./draw');
+import * as draw from './draw'
 
 let originTarget: EventTarget | undefined;
 
@@ -9,8 +8,8 @@ function hashPiece(piece?: Piece): string {
   return piece ? piece.color + piece.role : '';
 }
 
-function computeSquareBounds(data: Data, bounds: ClientRect, key: Key) {
-  const pos = util.key2pos(key);
+function computeSquareBounds(data: Data, key: Key) {
+  const pos = util.key2pos(key), bounds = data.dom.bounds;
   if (data.orientation !== 'white') {
     pos[0] = 9 - pos[0];
     pos[1] = 9 - pos[1];
@@ -23,7 +22,7 @@ function computeSquareBounds(data: Data, bounds: ClientRect, key: Key) {
   };
 }
 
-function start(data: Data, bounds: ClientRect, e: MouseEvent & TouchEvent): void {
+export function start(data: Data, e: MouchEvent): void {
   if (e.button !== undefined && e.button !== 0) return; // only touch or left click
   if (e.touches && e.touches.length > 1) return; // support one finger touch only
   e.stopPropagation();
@@ -31,14 +30,12 @@ function start(data: Data, bounds: ClientRect, e: MouseEvent & TouchEvent): void
   originTarget = e.target;
   const previouslySelected = data.selected;
   const position = util.eventPosition(e);
-  if (!position) return;
-  const orig = board.getKeyAtDomPos(data.orientation, position, bounds);
+  const orig = board.getKeyAtDomPos(data, position);
   if (!orig) return;
   const piece = data.pieces[orig];
-  // if (!previouslySelected && (
-  //   data.drawable.eraseOnClick ||
-  //   (!piece || piece.color !== data.turnColor)
-  // )) draw.clear(data);
+  if (!previouslySelected && (
+    data.drawable.eraseOnClick || (!piece || piece.color !== data.turnColor)
+  )) draw.clear(data);
   if (data.viewOnly) return;
   const hadPremove = !!data.premovable.current;
   const hadPredrop = !!data.predroppable.current;
@@ -46,7 +43,7 @@ function start(data: Data, bounds: ClientRect, e: MouseEvent & TouchEvent): void
   board.selectSquare(data, orig);
   var stillSelected = data.selected === orig;
   if (piece && stillSelected && board.isDraggable(data, orig)) {
-    var squareBounds = computeSquareBounds(data, bounds, orig);
+    const squareBounds = computeSquareBounds(data, orig);
     data.draggable.current = {
       previouslySelected: previouslySelected,
       orig: orig,
@@ -58,7 +55,6 @@ function start(data: Data, bounds: ClientRect, e: MouseEvent & TouchEvent): void
         position[0] - (squareBounds.left + squareBounds.width / 2),
         position[1] - (squareBounds.top + squareBounds.height / 2)
       ] : [0, 0],
-      bounds: bounds,
       started: data.draggable.autoDistance && data.stats.dragged
     };
   } else {
@@ -68,96 +64,79 @@ function start(data: Data, bounds: ClientRect, e: MouseEvent & TouchEvent): void
   processDrag(data);
 }
 
-function pointerSelected(api: Api): boolean {
-  return !api.state.sparePieceSelected || api.state.sparePieceSelected === 'pointer';
-}
-
 function processDrag(data: Data): void {
   util.raf(() => {
     var cur = data.draggable.current;
     if (cur) {
       // cancel animations while dragging
       if (data.animation.current && data.animation.current.plan.anims[cur.orig])
-        data.animation.current = undefined;
+      data.animation.current = undefined;
       // if moving piece is gone, cancel
-      if (hashPiece(data.pieces[cur.orig]) !== cur.piece) cancel(data);
+      if (hashPiece(data.pieces[cur.orig]) !== cur.pieceHash) cancel(data);
       else {
         if (!cur.started && util.distance(cur.epos, cur.rel) >= data.draggable.distance)
-          cur.started = true;
+        cur.started = true;
         if (cur.started) {
           cur.pos = [
             cur.epos[0] - cur.rel[0],
             cur.epos[1] - cur.rel[1]
           ];
-          cur.over = board.getKeyAtDomPos(data, cur.epos, cur.bounds);
+          cur.over = board.getKeyAtDomPos(data, cur.epos);
         }
       }
     }
-    data.render();
-    if (cur.orig) processDrag(data);
+    data.dom.redraw();
+    if (cur) processDrag(data);
   });
 }
 
-function move(data, e) {
+export function move(data: Data, e: TouchEvent): void {
   if (e.touches && e.touches.length > 1) return; // support one finger touch only
-  if (data.draggable.current.orig)
-    data.draggable.current.epos = util.eventPosition(e);
+  if (data.draggable.current) data.draggable.current.epos = util.eventPosition(e);
 }
 
-function end(data, e, ctrl) {
-  var cur = data.draggable.current;
-  var orig = cur ? cur.orig : null;
-  var pointerIsSelected = pointerSelected(ctrl);
-  if (!orig && pointerIsSelected) return;
+export function end(data: Data, e: TouchEvent): void {
+  const cur = data.draggable.current;
+  if (!cur && (!data.editable.enabled || data.editable.selected === 'pointer')) return;
   // comparing with the origin target is an easy way to test that the end event
   // has the same touch origin
-  if (e.type === "touchend" && originTarget !== e.target && !cur.newPiece) {
-    data.draggable.current = {};
+  if (e.type === 'touchend' && originTarget !== e.target && cur && !cur.newPiece) {
+    data.draggable.current = undefined;
     return;
   }
   board.unsetPremove(data);
   board.unsetPredrop(data);
-  var eventPos = util.eventPosition(e)
-  var dest = eventPos ? board.getKeyAtDomPos(data, eventPos, cur.bounds) : cur.over;
-  if (!pointerIsSelected) {
-    if (ctrl.sparePieceSelected === 'trash') {
-      delete data.pieces[dest];
-      data.renderRAF();
-    } else {
-      var selectedParts = ctrl.sparePieceSelected.split(' ');
-
-      data.pieces.drop = {
-        color : selectedParts[0],
-        role  : selectedParts[1]
-      };
-
-      board.dropNewPiece(data, 'drop', dest, true);
-    }
-  } else if (cur.started) {
-    if (cur.newPiece) board.dropNewPiece(data, orig, dest);
-    else {
-      if (orig !== dest) data.movable.dropped = [orig, dest];
-      data.stats.ctrlKey = e.ctrlKey;
-      if (board.userMove(data, orig, dest)) data.stats.dragged = true;
+  const eventPos: NumberPair = util.eventPosition(e);
+  const dest = board.getKeyAtDomPos(data, eventPos);
+  if (dest) {
+    if (data.editable.enabled && data.editable.selected !== 'pointer') {
+      if (data.editable.selected === 'trash') {
+        delete data.pieces[dest];
+        data.dom.redraw();
+      } else {
+        // where pieces to be dropped live. Fix me.
+        const key = 'a0';
+        data.pieces[key] = data.editable.selected as Piece;
+        board.dropNewPiece(data, key, dest, true);
+      }
+    } else if (cur && cur.started) {
+      if (cur.newPiece) board.dropNewPiece(data, cur.orig, dest);
+      else {
+        if (cur.orig !== dest) data.movable.dropped = [cur.orig, dest];
+        data.stats.ctrlKey = e.ctrlKey;
+        if (board.userMove(data, cur.orig, dest)) data.stats.dragged = true;
+      }
     }
   }
-  if (orig === cur.previouslySelected && (orig === dest || !dest))
-    board.setSelected(data, null);
-  else if (!data.selectable.enabled) board.setSelected(data, null);
-  data.draggable.current = {};
+  if (cur && cur.orig === cur.previouslySelected && (cur.orig === dest || !dest))
+    board.unselect(data);
+  else if (!data.selectable.enabled) board.unselect(data);
+  data.draggable.current = undefined;
 }
 
-function cancel(data) {
-  if (data.draggable.current.orig) {
-    data.draggable.current = {};
-    board.selectSquare(data, null);
+export function cancel(data: Data): void {
+  if (data.draggable.current) {
+    data.draggable.current = undefined;
+    board.unselect(data);
   }
 }
-
-module.exports = {
-  start: start,
-  move: move,
-  end: end,
-  cancel: cancel,
-  processDrag: processDrag // must be exposed for board editors
-};

@@ -1,7 +1,7 @@
 import * as fen from './fen'
 
 // see dts/index.d.ts for documentation on the Data type
-export default function(): Data {
+export default function(): Partial<Data> {
   return {
     pieces: fen.read(fen.initial),
     orientation: 'white',
@@ -71,6 +71,10 @@ export default function(): Data {
       pieces: {
         baseUrl: 'https://lichess1.org/assets/piece/cburnett/'
       }
+    },
+    editable: {
+      enabled: false,
+      selected: 'pointer'
     }
   };
 }

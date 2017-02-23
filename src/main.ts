@@ -16,24 +16,36 @@ const patch = init([klass, style, attributes]);
 
 export default function Chessground(initialElement: HTMLElement, config: any) {
 
-  let data: Data = defaults(),
-  bounds: ClientRect = initialElement.getBoundingClientRect(),
-  vnode: VNode;
+  const data = defaults() as Data;
+
+  data.dom = {
+    element: initialElement,
+    bounds: initialElement.getBoundingClientRect(),
+    redraw() {}
+  };
 
   configure(data, config);
 
+  let vnode: VNode;
+
   function redraw() {
-    vnode = patch(vnode, view(ctrl, bounds));
+    vnode = patch(vnode, view(ctrl));
   }
 
-  let ctrl = makeCtrl(data, redraw, () => bounds);
+  let ctrl = makeCtrl(data);
 
-  vnode = patch(initialElement, view(ctrl, bounds));
+  vnode = patch(initialElement, view(ctrl));
 
   const element = vnode.elm as HTMLElement;
 
+  data.dom = {
+    element: element,
+    bounds: element.getBoundingClientRect(),
+    redraw: redraw
+  };
+
   function recomputeBounds() {
-    bounds = element.getBoundingClientRect();
+    data.dom.bounds = element.getBoundingClientRect();
     redraw();
   }
 

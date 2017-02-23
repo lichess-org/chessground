@@ -5,15 +5,13 @@ type Mutation<A> = (data: Data) => A;
 // transformation is a function
 // accepts board data and any number of arguments,
 // and mutates the board.
-export default function(redraw: Redraw, getBounds: () => ClientRect) {
-  return function<A>(mutation: Mutation<A>, data: Data, skip?: boolean): A {
-    if (data.animation.enabled && !skip) return animate(mutation, data, redraw, getBounds());
-    else {
-      var result = mutation(data);
-      redraw();
-      return result;
-    }
-  };
+export default function<A>(mutation: Mutation<A>, data: Data, skip?: boolean): A {
+  if (data.animation.enabled && !skip) return animate(mutation, data);
+  else {
+    var result = mutation(data);
+    data.dom.redraw();
+    return result;
+  }
 }
 
 interface MiniData {
@@ -48,9 +46,9 @@ function closer(piece: AnimPiece, pieces: AnimPiece[]): AnimPiece {
   })[0];
 }
 
-function computePlan(prev: MiniData, current: Data, bounds: ClientRect): AnimPlan {
-  const width = bounds.width / 8,
-  height = bounds.height / 8,
+function computePlan(prev: MiniData, current: Data): AnimPlan {
+  const width = current.dom.bounds.width / 8,
+  height = current.dom.bounds.height / 8,
   anims: AnimVectors = {},
   animedOrigs: Key[] = [],
   fadings: AnimFading[] = [],
@@ -114,12 +112,12 @@ function roundBy(n: number, by: number): number {
   return Math.round(n * by) / by;
 }
 
-function go(data: Data, redraw: Redraw): void {
+function go(data: Data): void {
   if (!data.animation.current || !data.animation.current.start) return; // animation was canceled
   const rest = 1 - (new Date().getTime() - data.animation.current.start) / data.animation.current.duration;
   if (rest <= 0) {
     data.animation.current = undefined;
-    redraw();
+    data.dom.redraw();
   } else {
     var ease = easing(rest);
     for (var key in data.animation.current.plan.anims) {
@@ -129,12 +127,12 @@ function go(data: Data, redraw: Redraw): void {
     for (var i in data.animation.current.plan.fadings) {
       data.animation.current.plan.fadings[i].opacity = roundBy(ease, 100);
     }
-    redraw();
-    util.raf(() => go(data, redraw));
+    data.dom.redraw();
+    util.raf(() => go(data));
   }
 }
 
-function animate<A>(mutation: Mutation<A>, data: Data, redraw: Redraw, bounds: ClientRect): A {
+function animate<A>(mutation: Mutation<A>, data: Data): A {
   // clone data before mutating it
   const prev: MiniData = {
     orientation: data.orientation,
@@ -149,7 +147,7 @@ function animate<A>(mutation: Mutation<A>, data: Data, redraw: Redraw, bounds: C
   }
   const result = mutation(data);
   if (data.animation.enabled) {
-    const plan = computePlan(prev, data, bounds);
+    const plan = computePlan(prev, data);
     if (!isObjectEmpty(plan.anims) || !isObjectEmpty(plan.fadings)) {
       const alreadyRunning = data.animation.current && data.animation.current.start;
       data.animation.current = {
@@ -157,14 +155,14 @@ function animate<A>(mutation: Mutation<A>, data: Data, redraw: Redraw, bounds: C
         duration: data.animation.duration,
         plan: plan
       };
-      if (!alreadyRunning) go(data, redraw);
+      if (!alreadyRunning) go(data);
     } else {
       // don't animate, just render right away
-      redraw();
+      data.dom.redraw();
     }
   } else {
     // animations are now disabled
-    redraw();
+    data.dom.redraw();
   }
   return result;
 }

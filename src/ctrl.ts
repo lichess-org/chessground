@@ -1,41 +1,37 @@
 import * as board from './board'
 import { write as fenWrite } from './fen'
 import configure from './configure'
-import makeAnim from './anim'
-// import drag from './drag'
+import anim from './anim'
+import * as drag from './drag'
+import explosion from './explosion'
 
 export interface Api {
   data: Data;
-  state: State;
   getFen(): FEN;
   getMaterialDiff(): MaterialDiff;
   set(config: any): void;
   toggleOrientation(): void;
   setPieces(pieces: Pieces): void;
-  selectSquare(key: Key): void
-  apiMove(orig: Key, dest: Key): void
-  apiNewPiece(piece: Piece, key: Key): void
-  playPremove(): void
-  playPredrop(validate: (drop: Drop) => boolean): void
-  cancelPremove(): void
-  cancelPredrop(): void
-  setCheck(color?: Color): void
-  explode(keys: Key[]): void
-  setAutoShapes(shapes: Shape[]): void
-  setShapes(shapes: Shape[]): void
-}
+  selectSquare(key: Key): void;
+  apiMove(orig: Key, dest: Key): void;
+  apiNewPiece(piece: Piece, key: Key): void;
+  playPremove(): void;
+  playPredrop(validate: (drop: Drop) => boolean): void;
+  cancelMove(): void;
+  stop(): void;
+  cancelPremove(): void;
+  cancelPredrop(): void;
+  setCheck(color?: Color): void;
+  explode(keys: Key[]): void;
+  setAutoShapes(shapes: Shape[]): void;
+  setShapes(shapes: Shape[]): void;
+};
 
-export default function(data: Data, redraw: Redraw, bounds: () => ClientRect): Api {
-
-  const state: State = {};
-
-  const anim = makeAnim(redraw, bounds);
+export default function(data: Data): Api {
 
   return {
 
     data,
-
-    state,
 
     getFen: () => fenWrite(data.pieces),
 
@@ -86,34 +82,16 @@ export default function(data: Data, redraw: Redraw, bounds: () => ClientRect): A
       anim(data => board.setCheck(data, color), data, true);
     },
 
-    // this.cancelMove = anim(function(data) {
-    //   board.cancelMove(data);
-    //   drag.cancel(data);
-    // }.bind(this), this.data, true);
+    cancelMove() {
+      anim(data => { board.cancelMove(data); drag.cancel(data); }, data, true);
+    },
 
-    // this.stop = anim(function(data) {
-    //   board.stop(data);
-    //   drag.cancel(data);
-    // }.bind(this), this.data, true);
+    stop() {
+      anim(data => { board.stop(data); drag.cancel(data); }, data, true);
+    },
 
     explode(keys: Key[]) {
-      state.exploding = {
-        stage: 1,
-        keys: keys
-      };
-      redraw();
-      setTimeout(() => {
-        if (state.exploding) {
-          state.exploding.stage = 2;
-          redraw();
-        }
-        setTimeout(() => {
-          if (state.exploding) {
-            state.exploding = undefined;
-            redraw();
-          }
-        }, 120);
-      }, 120);
+      explosion(data, keys);
     },
 
     setAutoShapes(shapes: Shape[]) {
