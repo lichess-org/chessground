@@ -324,7 +324,7 @@ export function stop(data: Data): void {
   cancelMove(data);
 }
 
-export function getKeyAtDomPos(orientation: Color, pos: Pos, bounds: ClientRect): Key | undefined {
+export function getKeyAtDomPos(orientation: Color, pos: NumberPair, bounds: ClientRect): Key | undefined {
   let file = Math.ceil(8 * ((pos[0] - bounds.left) / bounds.width));
   file = orientation === 'white' ? file : 9 - file;
   let rank = Math.ceil(8 - (8 * ((pos[1] - bounds.top) / bounds.height)));
