@@ -8,7 +8,7 @@ type Mutation<A> = (data: Data) => A;
 export default function<A>(mutation: Mutation<A>, data: Data, skip?: boolean): A {
   if (data.animation.enabled && !skip) return animate(mutation, data);
   else {
-    var result = mutation(data);
+    const result = mutation(data);
     data.dom.redraw();
     return result;
   }
@@ -28,7 +28,7 @@ interface AnimPieces {
 }
 
 function makePiece(k: Key, piece: Piece, invert: boolean): AnimPiece {
-  var key = invert ? util.invertKey(k) : k;
+  const key = invert ? util.invertKey(k) : k;
   return {
     key: key,
     pos: util.key2pos(key),
@@ -58,10 +58,10 @@ function computePlan(prev: MiniData, current: Data): AnimPlan {
   prePieces: AnimPieces = {},
   white = current.orientation === 'white',
   dropped = current.movable.dropped;
-  for (var pk in prev.pieces) {
-    prePieces[pk] = makePiece(pk as Key, prev.pieces[pk], invert);
+  let curP: Piece, preP: AnimPiece, i: any, key: Key, orig: Pos, dest: Pos, vector: NumberPair;
+  for (i in prev.pieces) {
+    prePieces[i] = makePiece(i as Key, prev.pieces[i], invert);
   }
-  let curP: Piece, preP: AnimPiece, i: number, key: Key, orig: Pos, dest: Pos, vector: NumberPair;
   for (i = 0; i < util.allKeys.length; i++) {
     key = util.allKeys[i];
     if (!dropped || key !== dropped[1]) {
@@ -119,12 +119,13 @@ function go(data: Data): void {
     data.animation.current = undefined;
     data.dom.redraw();
   } else {
-    var ease = easing(rest);
-    for (var key in data.animation.current.plan.anims) {
-      var cfg = data.animation.current.plan.anims[key];
+    let i: any;
+    const ease = easing(rest);
+    for (i in data.animation.current.plan.anims) {
+      const cfg = data.animation.current.plan.anims[i];
       cfg[1] = [roundBy(cfg[0][0] * ease, 10), roundBy(cfg[0][1] * ease, 10)];
     }
-    for (var i in data.animation.current.plan.fadings) {
+    for (i in data.animation.current.plan.fadings) {
       data.animation.current.plan.fadings[i].opacity = roundBy(ease, 100);
     }
     data.dom.redraw();
@@ -139,7 +140,7 @@ function animate<A>(mutation: Mutation<A>, data: Data): A {
     pieces: {} as Pieces
   };
   // clone pieces
-  for (var key in data.pieces) {
+  for (let key in data.pieces) {
     prev.pieces[key] = {
       role: data.pieces[key].role,
       color: data.pieces[key].color
@@ -168,7 +169,7 @@ function animate<A>(mutation: Mutation<A>, data: Data): A {
 }
 
 function isObjectEmpty(o: any): boolean {
-  for (var _ in o) return false;
+  for (let _ in o) return false;
   return true;
 }
 // https://gist.github.com/gre/1650294

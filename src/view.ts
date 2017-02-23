@@ -1,11 +1,6 @@
 import { h } from 'snabbdom'
 import { VNode } from 'snabbdom/vnode'
-import { Api } from './ctrl'
-// var drag = require('./drag');
-// var draw = require('./draw');
 import * as util from './util'
-// var svg = require('./svg');
-// var makeCoords = require('./coords');
 
 interface Ctx {
   readonly asWhite: boolean;
@@ -15,7 +10,7 @@ interface Ctx {
 
 type Classes = Record<string, boolean>
 
-const pieceTag = 'piece';
+  const pieceTag = 'piece';
 const squareTag = 'square';
 
 function pieceClasses(p: Piece): Classes {
@@ -36,7 +31,7 @@ function renderPiece(d: Data, key: Key, ctx: Ctx): VNode {
     translate[1] += draggable.pos[1] + draggable.dec[1];
     classes['dragging'] = true;
   } else if (anim) {
-    var myAnim = anim.plan.anims[key];
+    const myAnim = anim.plan.anims[key];
     if (myAnim) {
       translate[0] += myAnim[1][0];
       translate[1] += myAnim[1][1];
@@ -115,7 +110,7 @@ function renderSquares(d: Data, ctx: Ctx): VNode[] {
       if (k === over) addSquare(squares, k, 'drag-over');
       else if (d.movable.showDests && d.pieces[k]) addSquare(squares, k, 'oc');
     }
-    var pDests = d.premovable.dests;
+    const pDests = d.premovable.dests;
     if (pDests) for (i in pDests) {
       k = pDests[i];
       if (d.movable.showDests) addSquare(squares, k, 'premove-dest');
@@ -130,7 +125,7 @@ function renderSquares(d: Data, ctx: Ctx): VNode[] {
   let o = d.exploding;
   if (o) for (i in o.keys) addSquare(squares, o.keys[i], 'exploding' + o.stage);
 
-  var nodes: VNode[] = [];
+  const nodes: VNode[] = [];
 
   if (d.items) return nodes;
   // for (i = 0; i < 64; i++) {
@@ -187,8 +182,7 @@ function renderContent(d: Data): VNode[] {
     return nodes;
 }
 
-export default function(api: Api): VNode {
-  var d = api.data;
+export default function(d: Data): VNode {
   return h('div', {
     class: {
       'cg-board-wrap': true,
@@ -201,11 +195,6 @@ export default function(api: Api): VNode {
       class: {
         'cg-board': true
       }
-      // hook: {
-      //   insert(vnode: VNode) {
-      //     // if (!d.viewOnly || d.drawable.enabled) bindEvents(api, el, context);
-      //     }
-      // }
-      }, renderContent(d))
+    }, renderContent(d))
   ]);
 };

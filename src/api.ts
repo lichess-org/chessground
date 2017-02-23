@@ -2,7 +2,7 @@ import * as board from './board'
 import { write as fenWrite } from './fen'
 import configure from './configure'
 import anim from './anim'
-import * as drag from './drag'
+import { cancel as dragCancel } from './drag'
 import explosion from './explosion'
 
 export interface Api {
@@ -83,11 +83,11 @@ export default function(data: Data): Api {
     },
 
     cancelMove() {
-      anim(data => { board.cancelMove(data); drag.cancel(data); }, data, true);
+      anim(data => { board.cancelMove(data); dragCancel(data); }, data, true);
     },
 
     stop() {
-      anim(data => { board.stop(data); drag.cancel(data); }, data, true);
+      anim(data => { board.stop(data); dragCancel(data); }, data, true);
     },
 
     explode(keys: Key[]) {

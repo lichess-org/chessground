@@ -41,7 +41,7 @@ export function start(data: Data, e: MouchEvent): void {
   const hadPredrop = !!data.predroppable.current;
   data.stats.ctrlKey = e.ctrlKey;
   board.selectSquare(data, orig);
-  var stillSelected = data.selected === orig;
+  const stillSelected = data.selected === orig;
   if (piece && stillSelected && board.isDraggable(data, orig)) {
     const squareBounds = computeSquareBounds(data, orig);
     data.draggable.current = {
@@ -66,7 +66,7 @@ export function start(data: Data, e: MouchEvent): void {
 
 function processDrag(data: Data): void {
   util.raf(() => {
-    var cur = data.draggable.current;
+    const cur = data.draggable.current;
     if (cur) {
       // cancel animations while dragging
       if (data.animation.current && data.animation.current.plan.anims[cur.orig])

@@ -26,9 +26,9 @@ export function invertKey(key: Key) {
 
 export const allPos: Pos[] = [];
 export const allKeys: Key[] = [];
-for (var y = 8; y > 0; --y) {
-  for (var x = 1; x < 9; ++x) {
-    var pos: Pos = [x, y];
+for (let y = 8; y > 0; --y) {
+  for (let x = 1; x < 9; ++x) {
+    const pos: Pos = [x, y];
     allPos.push(pos);
     allKeys.push(pos2key(pos));
   }

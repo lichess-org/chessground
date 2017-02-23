@@ -8,9 +8,10 @@ const endEvents = ['touchend', 'mouseup'];
 
 type MouchBind = (e: MouchEvent) => void;
 type DataMouchBind = (d: Data, e: MouchEvent) => void;
+type Unbind = () => void;
 
 // returns the unbind function
-export default function(d: Data, el: HTMLElement): () => void {
+export default function(d: Data): Unbind {
 
   const start: MouchBind = startDragOrDraw(d);
   const move: MouchBind = dragOrDraw(d, drag.move, draw.move);
@@ -43,16 +44,29 @@ export default function(d: Data, el: HTMLElement): () => void {
     onend = end;
   }
 
-  startEvents.forEach(ev => el.addEventListener(ev, onstart));
+  startEvents.forEach(ev => d.dom.element.addEventListener(ev, onstart));
 
   moveEvents.forEach(ev => document.addEventListener(ev, onmove));
 
   endEvents.forEach(ev => document.addEventListener(ev, onend));
 
+  const unbindResize = bindResize(d);
+
+  const onContextMenu: MouchBind = e => {
+    if (d.disableContextMenu || d.drawable.enabled) {
+      e.preventDefault();
+      return false;
+    }
+    return true;
+  };
+  d.dom.element.addEventListener('contextmenu', onContextMenu);
+
   return () => {
-    startEvents.forEach(ev => el.removeEventListener(ev, onstart));
+    startEvents.forEach(ev => d.dom.element.removeEventListener(ev, onstart));
     moveEvents.forEach(ev => document.removeEventListener(ev, onmove));
     endEvents.forEach(ev => document.removeEventListener(ev, onend));
+    unbindResize();
+    d.dom.element.removeEventListener('contextmenu', onContextMenu);
   };
 }
 
@@ -72,4 +86,26 @@ function dragOrDraw(d: Data, withDrag: DataMouchBind, withDraw: DataMouchBind): 
     if ((e.shiftKey || isRightButton(e)) && d.drawable.enabled) withDraw(d, e);
     else if (!d.viewOnly) withDrag(d, e);
   };
+}
+
+function bindResize(d: Data): Unbind {
+
+  if (!d.resizable) return () => {};
+
+  function recomputeBounds() {
+    d.dom.bounds = d.dom.element.getBoundingClientRect();
+    d.dom.redraw();
+  }
+
+  ['onscroll', 'onresize'].forEach(n => {
+    const prev = window[n];
+    window[n] = () => {
+      prev && prev();
+      recomputeBounds();
+    };
+  });
+
+  document.body.addEventListener('chessground.resize', recomputeBounds, false);
+
+  return () => document.body.removeEventListener('chessground.resize', recomputeBounds);
 }
