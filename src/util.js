@@ -94,8 +94,11 @@ function isLeftButton(e) {
 }
 
 function isRightButton(e) {
-  return e.buttons === 2 || e.button === 2 || 
-    (e.ctrlKey && (e.buttons === 1 || e.button === 1));
+  return e.buttons === 2 || e.button === 2;
+}
+
+function isRightClick(e) {
+  return isRightButton(e) || (e.ctrlKey && isLeftButton(e));
 }
 
 function memo(f) {
