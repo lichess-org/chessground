@@ -1,6 +1,8 @@
 /// <reference path="config.d.ts" />
 /// <reference path="data.d.ts" />
 
+type Constructor = (el: HTMLElement, config?: Config) => Api
+
 interface Api {
   data: Data;
   getFen(): FEN;

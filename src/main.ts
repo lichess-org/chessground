@@ -14,14 +14,14 @@ import style from 'snabbdom/modules/style';
 
 const patch = init([klass, style]);
 
-export default function Chessground(container: HTMLElement, config: Config) {
+export default function Chessground(container: HTMLElement, config?: Config): Constructor {
 
   const placeholder: HTMLElement = document.createElement('div');
   container.appendChild(placeholder);
 
   const data = defaults() as Data;
 
-  configure(data, config);
+  configure(data, config || {});
 
   data.dom = {
     element: placeholder,

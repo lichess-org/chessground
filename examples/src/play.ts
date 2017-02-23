@@ -3,13 +3,13 @@ import { toColor, toDests } from './util'
 
 export const initial: Example = {
   name: 'Play legal moves from initial position',
-  config: {
-    movable: {
-      color: 'white',
-      free: false,
-    }
-  },
-  run(cg) {
+  run(el) {
+    const cg = window.Chessground(el, {
+      movable: {
+        color: 'white',
+        free: false,
+      }
+    });
     const chess = new Chess();
     cg.set({
       movable: {

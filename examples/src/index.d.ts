@@ -2,9 +2,8 @@
 
 interface Example {
   name: string;
-  config: Config;
-  run?: (cg: Api) => void
+  run: (el: HTMLElement) => void
 }
 interface Window {
-  Chessground: (e: HTMLElement, config: Config) => Api
+  Chessground: Constructor
 }

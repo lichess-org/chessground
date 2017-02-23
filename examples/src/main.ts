@@ -35,9 +35,7 @@ export function run(element: Element) {
   function runExample(vnode: VNode) {
     const el = vnode.elm as HTMLElement;
     el.innerHTML = '';
-    const cg = window.Chessground(el, example.config);
-    console.log(example.config, cg.getFen());
-    if (example.run) example.run(cg);
+    example.run(el);
   }
 
   function render() {
