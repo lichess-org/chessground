@@ -1,9 +1,28 @@
 body {
   background: #202020;
-  text-align: center;
   color: #b0b0b0;
+  font-family: "Helvetica Neue",Helvetica,Arial,sans-serif;
   font-size: 11px;
+}
+#chessground-examples {
   margin: 30px 0 0 0;
+  display: flex;
+  flex-flow: row;
+}
+menu {
+  flex: 0 0 300px;
+  margin: 0 15px 0 0;
+}
+menu a {
+  display: block;
+  cursor: pointer;
+  padding: 5px 15px;
+}
+menu a:hover {
+  background: #333;
+}
+menu a.active {
+  border-left: 5px solid #b0b0b0;
 }
 section {
   display: inline-block;
@@ -13,6 +32,7 @@ section {
   border-radius: 2px;
 }
 section p {
+  text-align: center;
   margin: 5px 0 0 0;
 }
 
