@@ -28,6 +28,9 @@ interface NumberPair {
   0: number;
   1: number;
 }
+interface Dests {
+  [key: string]: Key[]
+}
 interface MaterialDiff {
   white: { [role: string]: number }
   black: { [role: string]: number }

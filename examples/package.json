@@ -9,7 +9,7 @@
   "author": "Thibault Duplessis",
   "license": "MIT",
   "dependencies": {
-    "chess": "^0.2.8",
+    "chess.js": "^0.10.2",
     "snabbdom": "^0.6.4"
   },
   "devDependencies": {

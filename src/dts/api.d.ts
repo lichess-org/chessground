@@ -1,10 +1,11 @@
+/// <reference path="config.d.ts" />
 /// <reference path="data.d.ts" />
 
 interface Api {
   data: Data;
   getFen(): FEN;
   getMaterialDiff(): MaterialDiff;
-  set(config: any): void;
+  set(config: Config): void;
   toggleOrientation(): void;
   setPieces(pieces: Pieces): void;
   selectSquare(key: Key): void;

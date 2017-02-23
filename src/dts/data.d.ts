@@ -32,9 +32,7 @@ interface Data {
   movable: {
     free: boolean; // all moves are valid - board editor
     color?: Color | 'both'; // color that can move. white | black | both
-    dests?: {
-      [key: string]: Key[]
-    }; // valid moves. {"a2" ["a3" "a4"] "b1" ["a3" "c3"]}
+    dests?: Dests; // valid moves. {"a2" ["a3" "a4"] "b1" ["a3" "c3"]}
     dropOff: 'revert' | 'trash'; // when a piece is dropped outside the board. "revert" | "trash"
     dropped?: KeyPair; // last dropped [orig; dest]; not to be animated
     showDests: boolean; // whether to add the move-dest class on squares

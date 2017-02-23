@@ -7,14 +7,18 @@ import attributes from 'snabbdom/modules/attributes';
 import listeners from 'snabbdom/modules/eventlisteners';
 
 import * as basics from './basics'
+import * as play from './play'
 
 const patch = init([klass, attributes, listeners]);
 
 export function run(element: Element) {
 
-  const examples: Example[] = [ basics.defaults, basics.fromFen ];
+  const examples: Example[] = [
+    basics.defaults, basics.fromFen,
+    play.initial
+  ];
 
-  let example: Example = examples[1],
+  let example: Example = examples[2],
   vnode: VNode;
 
   function redraw() {
