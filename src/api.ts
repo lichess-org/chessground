@@ -5,28 +5,6 @@ import anim from './anim'
 import { cancel as dragCancel } from './drag'
 import explosion from './explosion'
 
-export interface Api {
-  data: Data;
-  getFen(): FEN;
-  getMaterialDiff(): MaterialDiff;
-  set(config: any): void;
-  toggleOrientation(): void;
-  setPieces(pieces: Pieces): void;
-  selectSquare(key: Key): void;
-  apiMove(orig: Key, dest: Key): void;
-  apiNewPiece(piece: Piece, key: Key): void;
-  playPremove(): void;
-  playPredrop(validate: (drop: Drop) => boolean): void;
-  cancelMove(): void;
-  stop(): void;
-  cancelPremove(): void;
-  cancelPredrop(): void;
-  setCheck(color?: Color): void;
-  explode(keys: Key[]): void;
-  setAutoShapes(shapes: Shape[]): void;
-  setShapes(shapes: Shape[]): void;
-};
-
 export default function(data: Data): Api {
 
   return {
@@ -54,11 +32,11 @@ export default function(data: Data): Api {
       anim(data => board.selectSquare(data, key), data, true);
     },
 
-    apiMove(orig, dest) {
+    move(orig, dest) {
       anim(data => board.baseMove(data, orig, dest), data);
     },
 
-    apiNewPiece(piece, key) {
+    newPiece(piece, key) {
       anim(data => board.baseNewPiece(data, piece, key), data);
     },
 
@@ -76,10 +54,6 @@ export default function(data: Data): Api {
 
     cancelPredrop() {
       anim(board.unsetPredrop, data, true);
-    },
-
-    setCheck(color) {
-      anim(data => board.setCheck(data, color), data, true);
     },
 
     cancelMove() {

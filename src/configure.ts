@@ -1,48 +1,46 @@
-// import { setCheck, setSelected } from './board'
+import { setCheck, setSelected } from './board'
 import { read as fenRead } from './fen'
 
-export default function(data: Data, config: any) {
-
-  if (!config) return;
+export default function(data: Data, config: Config) {
 
   // don't merge destinations. Just override.
   if (config.movable && config.movable.dests) data.movable.dests = undefined;
+
+  let configCheck: Color | boolean | undefined = config.check;
+
+  delete config.check;
 
   merge(data, config);
 
   // if a fen was provided, replace the pieces
   if (config.fen) {
     data.pieces = fenRead(config.fen);
-    data.check = config.check;
     data.drawable.shapes = [];
   }
 
-  // if (data.check === true) board.setCheck(data);
+  if (configCheck !== undefined) setCheck(data, configCheck);
 
   // forget about the last dropped piece
   data.movable.dropped = undefined;
 
   // fix move/premove dests
-  // if (data.selected) board.setSelected(data, data.selected);
+  if (data.selected) setSelected(data, data.selected);
 
   // no need for such short animations
-  if (!data.animation.duration || data.animation.duration < 40)
-  data.animation.enabled = false;
+  if (!data.animation.duration || data.animation.duration < 40) data.animation.enabled = false;
 
-  // if (!data.movable.rookCastle) {
-  //   var rank = data.movable.color === 'white' ? 1 : 8;
-  //   var kingStartPos = 'e' + rank;
-  //   if (data.movable.dests) {
-  //     var dests = data.movable.dests[kingStartPos];
-  //     if (!dests || data.pieces[kingStartPos].role !== 'king') return;
-  //     data.movable.dests[kingStartPos] = dests.filter(function(d) {
-  //       if ((d === 'a' + rank) && dests.indexOf('c' + rank) !== -1) return false;
-  //       if ((d === 'h' + rank) && dests.indexOf('g' + rank) !== -1) return false;
-  //       return true;
-  //     });
-  //   }
-  // }
-  };
+  if (!data.movable.rookCastle && data.movable.dests) {
+    const rank = data.movable.color === 'white' ? 1 : 8;
+    const kingStartPos = 'e' + rank;
+    const dests = data.movable.dests[kingStartPos];
+    if (!dests || data.pieces[kingStartPos].role !== 'king') return;
+    data.movable.dests[kingStartPos] = dests.filter(d => {
+      if ((d === 'a' + rank) && dests.indexOf('c' + rank as Key) !== -1) return false;
+      if ((d === 'h' + rank) && dests.indexOf('g' + rank as Key) !== -1) return false;
+      return true;
+    });
+  }
+};
 
 function merge(base: any, extend: any) {
   for (var key in extend) {

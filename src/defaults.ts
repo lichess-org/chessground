@@ -1,6 +1,6 @@
 import * as fen from './fen'
 
-// see dts/index.d.ts for documentation on the Data type
+// see dts/data.d.ts for documentation on the Data type
 export default function(): Partial<Data> {
   return {
     pieces: fen.read(fen.initial),

@@ -1,4 +1,7 @@
 {
+  "include": [
+    "src/*.ts"
+  ],
   "compilerOptions": {
     "noImplicitAny": true,
     "strictNullChecks": true,

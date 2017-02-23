@@ -27,10 +27,13 @@ export function setPieces(data: Data, pieces: Pieces): void {
   data.movable.dropped = undefined;
 }
 
-export function setCheck(data: Data, color?: Color): void {
-  const checkColor: Color = color || data.turnColor;
-  for (let key in data.pieces) {
-    if (data.pieces[key].role === 'king' && data.pieces[key].color === checkColor) data.check = key as Key;
+export function setCheck(data: Data, color: Color | boolean): void {
+  if (color === true) color = data.turnColor;
+  if (!color) data.check = undefined;
+  else for (let k in data.pieces) {
+    if (data.pieces[k].role === 'king' && data.pieces[k].color === color) {
+      data.check = k as Key;
+    }
   }
 }
 

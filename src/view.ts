@@ -42,7 +42,7 @@ function renderPiece(d: Data, key: Key, ctx: Ctx): VNode {
     key: 'p' + key,
     class: pieceClasses(d.pieces[key]),
     style: { [ctx.transformProp]: util.translate(translate) },
-    attrs: d.pieceKey ? {'data-key': key } : undefined
+    // attrs: d.pieceKey ? {'data-key': key } : undefined
   });
 }
 

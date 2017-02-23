@@ -1,4 +1,4 @@
-/// <reference path="dts/index.d.ts" />
+/// <reference path="./dts/index.d.ts" />
 
 import { init } from 'snabbdom';
 import { VNode } from 'snabbdom/vnode'
@@ -11,11 +11,10 @@ import bindEvents from './events'
 
 import klass from 'snabbdom/modules/class';
 import style from 'snabbdom/modules/style';
-import attributes from 'snabbdom/modules/attributes';
 
-const patch = init([klass, style, attributes]);
+const patch = init([klass, style]);
 
-export default function Chessground(initialElement: HTMLElement, config: any) {
+export default function Chessground(initialElement: HTMLElement, config: Config) {
 
   const data = defaults() as Data;
 
