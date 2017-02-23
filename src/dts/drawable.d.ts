@@ -1,9 +1,17 @@
 /// <reference path="chess.d.ts" />
 
 interface Shape {
-  brush: string;
   orig: Key;
-  dest?: Key
+  dest?: Key;
+  brush: string;
+  brushModifiers?: BrushModifiers;
+  piece?: ShapePiece
+}
+
+interface ShapePiece {
+  role: Role;
+  color: Color;
+  scale?: number;
 }
 
 interface Brush {
@@ -11,6 +19,12 @@ interface Brush {
   color: string;
   opacity: number;
   lineWidth: number
+}
+
+interface BrushModifiers {
+  color?: string;
+  opacity?: number;
+  lineWidth?: number;
 }
 
 interface Drawable {

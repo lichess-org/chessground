@@ -1,6 +1,7 @@
 import { h } from 'snabbdom'
 import { VNode } from 'snabbdom/vnode'
 import * as util from './util'
+import svg from './svg'
 
 interface Ctx {
   readonly asWhite: boolean;
@@ -178,7 +179,10 @@ function renderContent(d: Data): VNode[] {
       nodes.push(renderGhost(draggable.orig, d.pieces[draggable.orig], ctx));
     }
 
-    // if (d.drawable.enabled) children.push(svg(api));
+    if (d.drawable.enabled) {
+      let node = svg(d);
+      if (node) nodes.push(node);
+    }
     return nodes;
 }
 

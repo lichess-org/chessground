@@ -4,16 +4,16 @@ import { toColor, toDests } from './util'
 export const initial: Example = {
   name: 'Play legal moves from initial position',
   run(el) {
+    const chess = new Chess();
     const cg = window.Chessground(el, {
       movable: {
         color: 'white',
         free: false,
+        dests: toDests(chess)
       }
     });
-    const chess = new Chess();
     cg.set({
       movable: {
-        dests: toDests(chess),
         events: {
           after(orig, dest) {
             chess.move({from: orig, to: dest});

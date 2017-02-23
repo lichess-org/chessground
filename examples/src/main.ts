@@ -18,7 +18,7 @@ export function run(element: Element) {
     play.initial
   ];
 
-  let example: Example = examples[2],
+  let example: Example = examples[0],
   vnode: VNode;
 
   function redraw() {

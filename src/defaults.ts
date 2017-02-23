@@ -54,7 +54,7 @@ export default function(): Partial<Data> {
     },
     events: {},
     drawable: {
-      enabled: false,
+      enabled: true,
       eraseOnClick: true,
       shapes: [],
       autoShapes: [],

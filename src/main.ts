@@ -10,11 +10,12 @@ import defaults from './defaults'
 import bindEvents from './events'
 
 import klass from 'snabbdom/modules/class';
+import attrs from 'snabbdom/modules/attributes';
 import style from 'snabbdom/modules/style';
 
-const patch = init([klass, style]);
+const patch = init([klass, attrs, style]);
 
-export default function Chessground(container: HTMLElement, config?: Config): Constructor {
+export default function Chessground(container: HTMLElement, config?: Config): Api {
 
   const placeholder: HTMLElement = document.createElement('div');
   container.appendChild(placeholder);
