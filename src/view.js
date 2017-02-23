@@ -191,18 +191,18 @@ function renderContent(ctrl) {
 
 function startDragOrDraw(d) {
   return function(e) {
-    if (util.isRightButton(e) && d.draggable.current.orig) {
+    if (util.isRightClick(e) && d.draggable.current.orig) {
       if (d.draggable.current.newPiece) delete d.pieces[d.draggable.current.orig];
       d.draggable.current = {}
       d.selected = null;
-    } else if ((e.shiftKey || util.isRightButton(e)) && d.drawable.enabled) draw.start(d, e);
+    } else if ((e.shiftKey || util.isRightClick(e)) && d.drawable.enabled) draw.start(d, e);
     else drag.start(d, e);
   };
 }
 
 function dragOrDraw(d, withDrag, withDraw, ctrl) {
   return function(e) {
-    if ((e.shiftKey || util.isRightButton(e)) && d.drawable.enabled) withDraw(d, e, ctrl);
+    if ((e.shiftKey || util.isRightClick(e)) && d.drawable.enabled) withDraw(d, e, ctrl);
     else if (!d.viewOnly) withDrag(d, e, ctrl);
   };
 }
