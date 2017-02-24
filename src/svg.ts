@@ -1,3 +1,4 @@
+import { State } from './state'
 import { h } from 'snabbdom'
 import { VNode } from 'snabbdom/vnode'
 import { key2pos, isTrident } from './util'

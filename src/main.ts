@@ -1,12 +1,14 @@
-/// <reference path="./dts/index.d.ts" />
+/// <reference path="./dts/anim.d.ts" />
+/// <reference path="./dts/chess.d.ts" />
+/// <reference path="./dts/drawable.d.ts" />
 
 import { init } from 'snabbdom';
 import { VNode } from 'snabbdom/vnode'
+import { Api, start } from './api'
+import { Config, configure } from './config'
+import { State, defaults } from './state'
 
-import makeApi from './api';
 import view from './view';
-import configure from './configure'
-import defaults from './defaults'
 import bindEvents from './events'
 import makeCoords from './coords'
 
@@ -40,7 +42,7 @@ export default function Chessground(container: HTMLElement, config?: Config): Ap
     updateCoords();
   }
 
-  const api = makeApi(state);
+  const api = start(state);
 
   vnode = patch(placeholder, view(api.state));
 

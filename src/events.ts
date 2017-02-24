@@ -1,3 +1,4 @@
+import { State } from './state'
 import * as drag from './drag'
 import * as draw from './draw'
 import { isLeftButton, isRightButton } from './util'

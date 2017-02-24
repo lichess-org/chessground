@@ -10,6 +10,7 @@
   "license": "MIT",
   "dependencies": {
     "chess.js": "^0.10.2",
+    "chessground": "^5.0.3",
     "page": "^1.7.1",
     "snabbdom": "^0.6.4"
   },

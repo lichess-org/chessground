@@ -2,9 +2,11 @@
   "name": "chessground",
   "version": "5.0.3",
   "description": "lichess.org Chess UI",
-  "main": "src/main.js",
+  "main": "dist/chessground.js",
+  "typings": "dist/",
   "directories": {
-    "example": "examples"
+    "example": "examples",
+    "dist": "dist"
   },
   "dependencies": {
     "snabbdom": "^0.6.4"
@@ -21,6 +23,11 @@
     "vinyl-buffer": "^1.0.0",
     "vinyl-source-stream": "^1.1.0",
     "watchify": "^3.9.0"
+  },
+  "scripts": {
+    "pretest": "npm run compile",
+    "compile": "tsc",
+    "prepublish": "npm run compile"
   },
   "repository": {
     "type": "git",

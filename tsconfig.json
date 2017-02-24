@@ -3,10 +3,13 @@
     "src/*.ts"
   ],
   "compilerOptions": {
+    "outDir": "./dist",
+    "declaration": true,
+    "declarationDir": "./dist",
     "noImplicitAny": true,
     "strictNullChecks": true,
     "noUnusedLocals": true,
-    "noEmitOnError": false,
+    "noEmitOnError": true,
     "alwaysStrict": true,
     "noImplicitReturns": true,
     "noImplicitThis": true,

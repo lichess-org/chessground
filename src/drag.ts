@@ -1,3 +1,4 @@
+import { State } from './state'
 import * as board from './board'
 import * as util from './util'
 import * as draw from './draw'

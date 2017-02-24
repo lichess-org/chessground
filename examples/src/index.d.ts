@@ -4,6 +4,3 @@ interface Example {
   name: string;
   run: (el: HTMLElement) => Api
 }
-interface Window {
-  Chessground: Constructor
-}

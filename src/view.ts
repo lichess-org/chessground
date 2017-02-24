@@ -1,5 +1,6 @@
 import { h } from 'snabbdom'
 import { VNode } from 'snabbdom/vnode'
+import { State } from './state'
 import * as util from './util'
 import svg from './svg'
 

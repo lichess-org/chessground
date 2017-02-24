@@ -1,3 +1,4 @@
+import { State } from './state'
 import { ranks, files } from './util'
 
 function renderCoords(elems: any[], klass: string): HTMLElement {

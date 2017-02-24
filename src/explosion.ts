@@ -1,3 +1,5 @@
+import { State } from './state'
+
 export default function(state: State, keys: Key[]): void {
   state.exploding = {
     stage: 1,

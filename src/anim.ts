@@ -1,6 +1,7 @@
+import { State } from './state'
 import * as util from './util'
 
-type Mutation<A> = (state: State) => A;
+export type Mutation<A> = (state: State) => A;
 
 // transformation is a function
 // accepts board state and any number of arguments,
