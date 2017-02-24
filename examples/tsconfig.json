@@ -1,0 +1,17 @@
+{
+  "include": [
+    "src/*.ts"
+  ],
+  "compilerOptions": {
+    "outDir": "./dist",
+    "noImplicitAny": false,
+    "strictNullChecks": true,
+    "noUnusedLocals": true,
+    "noEmitOnError": false,
+    "alwaysStrict": true,
+    "noImplicitReturns": true,
+    "noImplicitThis": true,
+    "noUnusedParameters": true,
+    "target": "es5"
+  }
+}

@@ -2,8 +2,7 @@
   "name": "chessground",
   "version": "5.0.3",
   "description": "lichess.org Chess UI",
-  "main": "dist/chessground.js",
-  "typings": "dist/",
+  "main": "chessground.js",
   "directories": {
     "example": "examples",
     "dist": "dist"

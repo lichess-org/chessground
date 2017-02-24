@@ -1,7 +1,10 @@
+import { Example } from './example';
+import chessground from 'chessground/chessground';
+
 export const move: Example = {
   name: 'Perf: piece move',
   run(cont) {
-    const cg = window.Chessground(cont, {
+    const cg = chessground(cont, {
       animation: { duration: 500 }
     });
     const el = cont.querySelector('.cg-board') as HTMLElement;
@@ -21,11 +24,11 @@ export const move: Example = {
 export const select: Example = {
   name: 'Perf: square select',
   run(cont) {
-    const cg = window.Chessground(cont, {
+    const cg = chessground(cont, {
       movable: {
         free: false,
         dests: {
-          e2: 'e3 e4 d3 f3'.split(' ') as Key[]
+          e2: ['e3', 'e4', 'd3', 'f3']
         }
       }
     });

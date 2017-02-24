@@ -1,2 +1,2 @@
-module.exports = require('./main').default;
+module.exports = require('./chessground').default;
 module.exports.util = require('./util');

@@ -1,4 +1,4 @@
-export function toDests(chess: any): Dests {
+export function toDests(chess: any) {
   const dests = {};
   chess.SQUARES.forEach(s => {
     const ms = chess.moves({square: s, verbose: true});
@@ -7,6 +7,6 @@ export function toDests(chess: any): Dests {
   return dests;
 }
 
-export function toColor(chess: any): Color {
+export function toColor(chess: any) {
   return (chess.turn() === 'w') ? 'white' : 'black';
 }

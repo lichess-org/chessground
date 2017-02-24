@@ -1,11 +1,13 @@
 import { Chess } from 'chess.js';
+import chessground from 'chessground/chessground';
+import { Example } from './example';
 import { toColor, toDests } from './util'
 
 export const initial: Example = {
   name: 'Play legal moves from initial position',
   run(el) {
     const chess = new Chess();
-    const cg = window.Chessground(el, {
+    const cg = chessground(el, {
       movable: {
         color: 'white',
         free: false,
