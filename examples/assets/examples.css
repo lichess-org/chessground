@@ -35,6 +35,9 @@ section p {
   text-align: center;
   margin: 20px 0 0 0;
 }
+control {
+  margin-left: 20px;
+}
 
 .chessground {
   margin: 8px;

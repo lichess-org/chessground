@@ -13,6 +13,9 @@ export const initial: Example = {
       }
     });
     cg.set({
+      // draggable: {
+      //   showGhost: false
+      // },
       movable: {
         events: {
           after(orig, dest) {
@@ -28,5 +31,6 @@ export const initial: Example = {
         }
       }
     });
+    return cg;
   }
 };

@@ -16,12 +16,12 @@ const patch = init([klass, attributes, listeners]);
 export function run(element: Element) {
 
   const examples: Example[] = [
-    basics.defaults, basics.fromFen, basics.orientationToggle,
+    basics.defaults, basics.fromFen,
     play.initial,
-    perf.move
+    perf.move, perf.select
   ];
 
-  let example: Example, vnode: VNode;
+  let example: Example, cg: Api, vnode: VNode;
 
   function redraw() {
     vnode = patch(vnode || element, render());
@@ -30,7 +30,7 @@ export function run(element: Element) {
   function runExample(vnode: VNode) {
     const el = vnode.elm as HTMLElement;
     el.innerHTML = '';
-    example.run(el);
+    cg = example.run(el);
   }
 
   function render() {
@@ -51,6 +51,9 @@ export function run(element: Element) {
           }
         }),
         h('p', example.name)
+      ]),
+      h('control', [
+        h('button', { on: { click() { cg.toggleOrientation(); }}}, 'Toggle orientation')
       ])
     ]);
   }

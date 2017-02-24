@@ -2,7 +2,7 @@
 
 interface Example {
   name: string;
-  run: (el: HTMLElement) => void
+  run: (el: HTMLElement) => Api
 }
 interface Window {
   Chessground: Constructor
