@@ -134,7 +134,7 @@ export function baseNewPiece(state: State, piece: Piece, key: Key, force?: boole
 function baseUserMove(state: State, orig: Key, dest: Key): boolean {
   const result = baseMove(state, orig, dest);
   if (result) {
-    state.movable.dests = {};
+    state.movable.dests = undefined;
     state.turnColor = opposite(state.turnColor);
   }
   return result;
