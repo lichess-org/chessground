@@ -18,7 +18,7 @@ import style from 'snabbdom/modules/style';
 
 const patch = init([klass, attrs, style]);
 
-export default function Chessground(container: HTMLElement, config?: Config): Api {
+export function Chessground(container: HTMLElement, config?: Config): Api {
 
   const placeholder: HTMLElement = document.createElement('div');
   container.appendChild(placeholder);

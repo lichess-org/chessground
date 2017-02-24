@@ -4,13 +4,12 @@ import * as basics from './basics'
 import * as play from './play'
 import * as perf from './perf'
 
-export interface Example {
+export interface Unit {
   name: string;
   run: (el: HTMLElement) => Api
 }
 
-
-export const examples: Example[] = [
+export const list: Unit[] = [
   basics.defaults, basics.fromFen,
   play.initial,
   perf.move, perf.select

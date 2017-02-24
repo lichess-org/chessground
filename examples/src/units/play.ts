@@ -1,9 +1,9 @@
 import { Chess } from 'chess.js';
 import chessground from 'chessground/chessground';
-import { Example } from './example';
-import { toColor, toDests } from './util'
+import { Unit } from './unit';
+import { toColor, toDests } from '../util'
 
-export const initial: Example = {
+export const initial: Unit = {
   name: 'Play legal moves from initial position',
   run(el) {
     const chess = new Chess();

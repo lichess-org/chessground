@@ -1,13 +1,13 @@
-import Chessground from 'chessground/chessground';
-import { Example } from './example';
+import Chessground  from 'chessground';
+import { Unit } from './unit';
 
-export const defaults: Example = {
+export const defaults: Unit = {
   name: 'Default configuration',
   run(el) {
     return Chessground(el);
   }
 };
-export const fromFen: Example = {
+export const fromFen: Unit = {
   name: 'From FEN, from black POV',
   run(el) {
     return Chessground(el, {
