@@ -21,19 +21,22 @@ export function key2pos(key: Key): Pos {
 }
 
 export function invertKey(key: Key) {
-  return files[8 - fileNumbers[key[0]]] + (9 - parseInt(key[1])) as Key
+  return files[8 - fileNumbers[key[0]]] + (9 - parseInt(key[1])) as Key;
 }
 
 export const allPos: Pos[] = [];
 export const allKeys: Key[] = [];
-for (let y = 8; y > 0; --y) {
-  for (let x = 1; x < 9; ++x) {
-    const pos: Pos = [x, y];
+export const invKeys: Key[] = [];
+let pos: Pos, key: Key, x: number, y: number;
+for (y = 8; y > 0; --y) {
+  for (x = 1; x < 9; ++x) {
+    pos = [x, y];
+    key = pos2key(pos);
     allPos.push(pos);
-    allKeys.push(pos2key(pos));
+    allKeys.push(key);
+    invKeys.unshift(key);
   }
 }
-export const invKeys: Key[] = allKeys.slice(0).reverse();
 
 export function opposite(color: Color): Color {
   return color === 'white' ? 'black' : 'white';
@@ -80,14 +83,6 @@ export function eventPosition(e: any): NumberPair {
   if (e.touches && e.targetTouches[0]) return [e.targetTouches[0].clientX, e.targetTouches[0].clientY];
   throw 'Cannot find position of event ' + e;
 }
-
-// function partialApply(fn, args) {
-//   return fn.bind.apply(fn, [null].concat(args));
-// }
-
-// function partial() {
-//   return partialApply(arguments[0], Array.prototype.slice.call(arguments, 1));
-// }
 
 export function isLeftButton(e: MouseEvent): boolean {
   return e.buttons === 1 || e.button === 1;
