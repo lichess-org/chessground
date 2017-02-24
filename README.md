@@ -17,11 +17,12 @@ It targets modern browsers, as well as mobile development using Cordova.
 
 Chessground is designed to fulfill all lichess.org web and mobile apps needs, so it is pretty featureful.
 
+- [Typed](https://github.com/ornicar/chessground/tree/master/src/dts) with typescript
 - Fast. Uses virtual DOM; runs smoothly even on elder mobile phones
 - Small footprint: 12K gzipped (35K unzipped) including dependencies
-- Standalone, or composable as a mithril.js module
+- Standalone, or composable as a [snabbdom](https://github.com/snabbdom/snabbdom) node
 - Entirely configurable and reconfigurable at any time
-- Styling with CSS: board and pieces can be changed by simply switching a class
+- Styling with CSS only: board and pieces can be changed by simply switching a class
 - Fluid layout: board can be resized at any time
 - Support for 3D pieces and boards
 - Full mobile support (touchstart, touchmove, touchend)
@@ -42,7 +43,7 @@ Chessground is designed to fulfill all lichess.org web and mobile apps needs, so
 
 ### Dependencies
 
-- [mithril.js](https://github.com/lhorie/mithril.js) - a minimalist virtual DOM library
+- [snabbdom](https://github.com/snabbdom/snabbdom) - a minimalist virtual DOM library
 
 ## Installation
 
@@ -58,75 +59,10 @@ var Chessground = require("chessground");
 var ground = Chessground(document.body, options);
 ```
 
-## Options
+## Config
 
-All options are, well, optional.
-
-```js
-{
-  fen: '2r3k1/pp2Qpbp/4b1p1/3p4/3n1PP1/2N4P/Pq6/R2K1B1R w -', // or leave null for initial position
-  orientation: "white",   // board orientation (or view angle) "white" | "black"
-  turnColor: "white",     // turn to play. "white" | "black"
-  check: null,            // square currently in check "a2" | null
-  lastMove: null,         // squares part of the last move ["c3", "c4"] | null
-  selected: null,         // square currently selected "a1" | null
-  coordinates: true,      // display board coordinates as square ::after elements
-  viewOnly: false,        // don't bind events: the user will never be able to move pieces around
-  minimalDom: false,      // don't use square elements. Optimization to use only with viewOnly
-  disableContextMenu: false
-  highlight: {
-    lastMove: true,       // add last-move class to squares
-    check: true,          // add check class to squares
-    dragOver: true        // add drag-over class to square when dragging over it
-  },
-  animation: {
-    enabled: true,        // enable piece animations, moving and fading
-    duration: 200,        // animation duration in milliseconds
-  },
-  movable: {
-    free: true,           // all moves are valid - board editor
-    color: "both",        // color that can move. "white" | "black" | "both" | null
-    dests: {},            // valid moves. {a2: ["a3", "a4"], b1: ["a3", "c3"]} | null
-    dropOff: "revert",    // when a piece is dropped outside the board. "revert" | "trash"
-    showDests: true,      // add the move-dest class to squares
-    events: {
-                          // called after the move has been played
-      after: function(orig, dest, metadata) {}
-    }
-  },
-  premovable: {
-    enabled: true,        // allow premoves for color that can not move
-    showDests: true,      // add the premove-dest class to squares
-    current: null         // keys of the current saved premove ["e2", "e4"] | null
-      events: {
-                          // called after the premove has been set
-        set: function(orig, dest) {},
-                          // called after the premove has been unset
-        unset: function() {}
-      }
-  },
-  draggable: {
-    enabled: true,        // allow moves & premoves to use drag'n drop
-    distance: 3,          // minimum distance to initiate a drag, in pixels
-    squareTarget: false,  // display big square target; intended for mobile
-    centerPiece: true,    // center the piece on cursor at drag start
-    showGhost: true,      // show ghost of piece being dragged
-  },
-  selectable: {
-    enabled: true         // disable to enforce dragging over click-click move
-  },
-  drawable: {
-    enabled: true         // enable SVG circle and arrow drawing on the board
-  },
-  events: {
-    change: function() {},   // called after the situation changes on the board
-    // called after a piece has been moved.
-    // capturedPiece is null or like {color: 'white', 'role': 'queen'}
-    move: function(orig, dest, capturedPiece) {},
-    select: function(key) {} // called when a square is selected
-  }
-}
-```
+- [Config documented types](https://github.com/ornicar/chessground/tree/master/src/dts/config.d.ts)
+- [Config default values](https://github.com/ornicar/chessground/tree/master/src/defaults.ts)
 
 ## A.P.I.
 
