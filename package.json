@@ -41,7 +41,7 @@
     "snabbdom"
   ],
   "author": "Thibault Duplessis (https://github.com/ornicar)",
-  "license": "MIT",
+  "license": "GPL-3.0",
   "bugs": {
     "url": "https://github.com/ornicar/chessground/issues"
   },
