@@ -33,9 +33,12 @@ section {
 }
 section p {
   text-align: center;
-  margin: 5px 0 0 0;
+  margin: 20px 0 0 0;
 }
 
+.chessground {
+  margin: 8px;
+}
 .chessground.tiny {
   width: 225px;
   height: 225px;

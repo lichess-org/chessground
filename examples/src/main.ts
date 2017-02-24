@@ -15,7 +15,7 @@ const patch = init([klass, attributes, listeners]);
 export function run(element: Element) {
 
   const examples: Example[] = [
-    basics.defaults, basics.fromFen,
+    basics.defaults, basics.fromFen, basics.orientationToggle,
     play.initial
   ];
 
