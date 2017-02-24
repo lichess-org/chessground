@@ -3,6 +3,9 @@
   "version": "5.0.4",
   "description": "lichess.org Chess UI",
   "main": "chessground.js",
+  "typings": "chessground.d.ts",
+  "directories": {
+  },
   "dependencies": {
     "snabbdom": "^0.6.4"
   },

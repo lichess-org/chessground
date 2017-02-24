@@ -1,3 +1,4 @@
+/// <reference path="dts/index.d.ts" />
 import * as fen from './fen'
 
 export interface State {

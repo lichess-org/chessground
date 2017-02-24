@@ -1,3 +1,4 @@
+/// <reference path="dts/index.d.ts" />
 import { State } from './state'
 import * as board from './board'
 import { write as fenWrite } from './fen'

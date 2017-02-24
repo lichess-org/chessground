@@ -1,3 +1,4 @@
+/// <reference path="dts/index.d.ts" />
 import { State } from './state'
 import { setCheck, setSelected } from './board'
 import { read as fenRead } from './fen'
