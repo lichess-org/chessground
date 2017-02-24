@@ -88,10 +88,10 @@ function bindResize(d: State): void {
     d.dom.redraw();
   }
 
-  ['onscroll', 'onresize'].forEach(n => {
+  ['onscroll', 'onresize'].forEach((n: WindowEvent) => {
     const prev = window[n];
-    window[n] = () => {
-      prev && prev();
+    window[n] = e => {
+      prev && prev.apply(window, e);
       recomputeBounds();
     };
   });

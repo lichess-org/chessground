@@ -45,9 +45,7 @@ interface MoveMetadata {
   holdTime?: number;
 }
 
-interface Window {
-  [key: string]: any
-}
+type WindowEvent = 'onscroll' | 'onresize';
 
 type MouchEvent = MouseEvent & TouchEvent;
 
