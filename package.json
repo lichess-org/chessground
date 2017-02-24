@@ -3,10 +3,6 @@
   "version": "5.0.4",
   "description": "lichess.org Chess UI",
   "main": "chessground.js",
-  "directories": {
-    "example": "examples",
-    "dist": "dist"
-  },
   "dependencies": {
     "snabbdom": "^0.6.4"
   },

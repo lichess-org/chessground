@@ -115,7 +115,7 @@ export function defaults(): Partial<State> {
     orientation: 'white',
     turnColor: 'white',
     coordinates: true,
-    autoCastle: false,
+    autoCastle: true,
     viewOnly: false,
     disableContextMenu: false,
     resizable: true,
