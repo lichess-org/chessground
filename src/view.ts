@@ -30,11 +30,11 @@ function renderPiece(d: State, key: Key, ctx: Ctx): VNode {
 
   const classes = pieceClasses(d.pieces[key]),
   translate = posToTranslate(util.key2pos(key), ctx),
-  draggable = d.draggable.current,
+  drag = d.draggable.current,
   anim = d.animation.current;
-  if (draggable && draggable.orig === key && draggable.started) {
-    translate[0] += draggable.pos[0] + draggable.dec[0];
-    translate[1] += draggable.pos[1] + draggable.dec[1];
+  if (drag && drag.orig === key && drag.started) {
+    translate[0] += drag.pos[0] + drag.dec[0];
+    translate[1] += drag.pos[1] + drag.dec[1];
     classes['dragging'] = true;
   } else if (anim) {
     const myAnim = anim.plan.anims[key];
@@ -48,8 +48,8 @@ function renderPiece(d: State, key: Key, ctx: Ctx): VNode {
     key: 'p' + key,
     class: classes,
     style: { [ctx.transformProp]: util.translate(translate) },
-    // attrs: d.pieceKey ? {'data-key': key } : undefined
-    });
+    attrs: d.pieceKey ? {'data-key': key } : undefined
+  });
 }
 
 function renderSquare(key: Key, classes: Classes, ctx: Ctx): VNode {
