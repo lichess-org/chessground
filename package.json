@@ -30,7 +30,9 @@
     "chess",
     "lichess.org",
     "chessboard",
-    "UI"
+    "UI",
+    "typescript",
+    "snabbdom"
   ],
   "author": "Thibault Duplessis (https://github.com/ornicar)",
   "license": "MIT",
