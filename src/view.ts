@@ -163,6 +163,13 @@ function renderContent(d: State): VNode[] {
   drag = d.draggable.current;
   let i: any;
 
+  // better put the ghost close to the squares
+  // to avoid snabbdom mass-rendering
+  if (drag && d.draggable.showGhost && !drag.newPiece) {
+    i = d.pieces[drag.orig];
+    if (i) nodes.push(renderGhost(drag.orig, i, ctx));
+  }
+
   if (fadings) for (i in fadings) nodes.push(renderFading(fadings[i], ctx));
 
   // must insert pieces in the right order
@@ -181,11 +188,6 @@ function renderContent(d: State): VNode[] {
     // the hack to drag new pieces on the board (editor and crazyhouse)
     // is to put it on a0 then set it as being dragged
     if (drag && drag.newPiece) nodes.push(renderPiece(d, 'a0', ctx));
-  }
-
-  if (drag && d.draggable.showGhost && !drag.newPiece) {
-    i = d.pieces[drag.orig];
-    if (i) nodes.push(renderGhost(drag.orig, i, ctx));
   }
 
   if (d.drawable.enabled) {
