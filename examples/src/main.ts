@@ -9,6 +9,7 @@ import * as page from 'page'
 
 import * as basics from './basics'
 import * as play from './play'
+import * as perf from './perf'
 
 const patch = init([klass, attributes, listeners]);
 
@@ -16,7 +17,8 @@ export function run(element: Element) {
 
   const examples: Example[] = [
     basics.defaults, basics.fromFen, basics.orientationToggle,
-    play.initial
+    play.initial,
+    perf.move
   ];
 
   let example: Example, vnode: VNode;
