@@ -6,12 +6,15 @@ const roles: { [letter: string]: Role } = { p: 'pawn', r: 'rook', n: 'knight', b
 
 const letters = { pawn: 'p', rook: 'r', knight: 'n', bishop: 'b', queen: 'q', king: 'k' };
 
+const flagsRegex = / .+$/;
+const zhRegex = /~/g;
+
 export function read(fen: FEN): Pieces {
   if (fen === 'start') fen = initial;
   let pieces: Pieces = {}, x: number, nb: number, role: Role;
-  fen.replace(/ .+$/, '').replace(/~/g, '').split('/').forEach((row, y) => {
+  fen.replace(flagsRegex, '').replace(zhRegex, '').split('/').forEach((row, y) => {
     x = 0;
-    row.split('').forEach(function(v) {
+    row.split('').forEach(v => {
       nb = parseInt(v);
       if (nb) x += nb;
       else {
@@ -19,7 +22,7 @@ export function read(fen: FEN): Pieces {
         role = v.toLowerCase() as Role;
         pieces[pos2key([x, 8 - y])] = {
           role: roles[role],
-          color: (v === role ? 'black' : 'white' as Color) as Color
+          color: (v === role ? 'black' : 'white') as Color
         };
       }
     });
