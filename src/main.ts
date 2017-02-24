@@ -8,6 +8,7 @@ import view from './view';
 import configure from './configure'
 import defaults from './defaults'
 import bindEvents from './events'
+import makeCoords from './coords'
 
 import klass from 'snabbdom/modules/class';
 import attrs from 'snabbdom/modules/attributes';
@@ -30,13 +31,16 @@ export default function Chessground(container: HTMLElement, config?: Config): Ap
     redraw() {}
   };
 
+  const updateCoords = makeCoords(state);
+
   let vnode: VNode;
 
   function redraw() {
     vnode = patch(vnode, view(api.state));
+    updateCoords();
   }
 
-  let api = makeApi(state);
+  const api = makeApi(state);
 
   vnode = patch(placeholder, view(api.state));
 

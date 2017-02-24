@@ -1,33 +1,34 @@
-// import { ranks, files, raf } from './util'
+import { ranks, files } from './util'
 
-// function renderCoords(elems, klass, orient) {
-//   var el = document.createElement('coords');
-//   el.className = klass;
-//   elems.forEach(function(content) {
-//     var f = document.createElement('coord');
-//     f.textContent = content;
-//     el.appendChild(f);
-//   });
-//   return el;
-// }
+function renderCoords(elems: any[], klass: string): HTMLElement {
+  const el = document.createElement('coords');
+  el.className = klass;
+  let f: HTMLElement;
+  for (let i in elems) {
+    f = document.createElement('coord');
+    f.textContent = elems[i];
+    el.appendChild(f);
+  }
+  return el;
+}
 
-// export default function(orientation, el) {
+export default function(state: State): () => void {
 
-//   util.requestAnimationFrame(function() {
-//     var coords = document.createDocumentFragment();
-//     var orientClass = orientation === 'black' ? ' black' : '';
-//     coords.appendChild(renderCoords(util.ranks, 'ranks' + orientClass));
-//     coords.appendChild(renderCoords(util.files, 'files' + orientClass));
-//     el.appendChild(coords);
-//   });
+  if (!state.coordinates) return () => {};
 
-//   var orientation;
+  let orientation: Color = state.orientation;
 
-//   return function(o) {
-//     if (o === orientation) return;
-//     orientation = o;
-//     var coords = el.querySelectorAll('coords');
-//     for (i = 0; i < coords.length; ++i)
-//       coords[i].classList.toggle('black', o === 'black');
-//   };
-// }
+  var coords = document.createDocumentFragment();
+  var orientClass = orientation === 'black' ? ' black' : '';
+  coords.appendChild(renderCoords(ranks, 'ranks' + orientClass));
+  coords.appendChild(renderCoords(files, 'files' + orientClass));
+  state.dom.element.appendChild(coords);
+
+  return () => {
+    if (state.orientation === orientation) return;
+    orientation = state.orientation;
+    const coords = state.dom.element.querySelectorAll('coords');
+    for (let i = 0; i < coords.length; ++i)
+      coords[i].classList.toggle('black', orientation === 'black');
+  };
+}
