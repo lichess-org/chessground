@@ -1,7 +1,7 @@
 import * as board from './board'
 import { write as fenWrite } from './fen'
 import configure from './configure'
-import anim from './anim'
+import { anim, render } from './anim'
 import { cancel as dragCancel } from './drag'
 import explosion from './explosion'
 
@@ -22,15 +22,14 @@ export default function(state: State): Api {
 
     toggleOrientation() {
       anim(board.toggleOrientation, state);
-      // if (this.state.redrawCoords) this.state.redrawCoords(this.state.orientation);
-      },
+    },
 
     setPieces(pieces) {
       anim(state => board.setPieces(state, pieces), state);
     },
 
     selectSquare(key) {
-      anim(state => board.selectSquare(state, key), state, true);
+      render(state => board.selectSquare(state, key), state);
     },
 
     move(orig, dest) {
@@ -50,19 +49,19 @@ export default function(state: State): Api {
     },
 
     cancelPremove() {
-      anim(board.unsetPremove, state, true);
+      render(board.unsetPremove, state);
     },
 
     cancelPredrop() {
-      anim(board.unsetPredrop, state, true);
+      render(board.unsetPredrop, state);
     },
 
     cancelMove() {
-      anim(state => { board.cancelMove(state); dragCancel(state); }, state, true);
+      render(state => { board.cancelMove(state); dragCancel(state); }, state);
     },
 
     stop() {
-      anim(state => { board.stop(state); dragCancel(state); }, state, true);
+      render(state => { board.stop(state); dragCancel(state); }, state);
     },
 
     explode(keys: Key[]) {

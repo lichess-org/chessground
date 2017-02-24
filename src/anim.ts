@@ -5,13 +5,14 @@ type Mutation<A> = (state: State) => A;
 // transformation is a function
 // accepts board state and any number of arguments,
 // and mutates the board.
-export default function<A>(mutation: Mutation<A>, state: State, skip?: boolean): A {
-  if (state.animation.enabled && !skip) return animate(mutation, state);
-  else {
-    const result = mutation(state);
-    state.dom.redraw();
-    return result;
-  }
+export function anim<A>(mutation: Mutation<A>, state: State): A {
+  return state.animation.enabled ? animate(mutation, state) : render(mutation, state);
+}
+
+export function render<A>(mutation: Mutation<A>, state: State): A {
+  const result = mutation(state);
+  state.dom.redraw();
+  return result;
 }
 
 interface MiniState {
