@@ -56,77 +56,18 @@ npm install --save chessground
 ```js
 var Chessground = require("chessground");
 
-var ground = Chessground(document.body, options);
+var ground = Chessground(document.body, config);
 ```
 
-## Config
+## Documentation
 
 - [Config documented types](https://github.com/ornicar/chessground/tree/master/src/dts/config.d.ts)
 - [Config default values](https://github.com/ornicar/chessground/tree/master/src/defaults.ts)
-
-## A.P.I.
-
-There are a few functions you can call on a Chessground instance:
-
-### Setters
-
-```js
-// reconfigure the instance. Accepts all options mentioned above (bar "viewOnly" & "minimalDom").
-// board will be animated accordingly, if animations are enabled.
-ground.set(options);
-
-// change the view angle
-ground.toggleOrientation();
-
-// perform a move programmatically
-ground.move("e2", "e4");
-
-// add and/or remove arbitrary pieces on the board
-ground.setPieces({a1: null, c5: {color: "black", role: "queen"}});
-
-// play the current premove, if any
-ground.playPremove();
-
-// cancel the current premove, if any
-ground.cancelPremove();
-
-// cancel the current move being made
-ground.cancelMove();
-
-// cancels current move and prevent further ones
-ground.stop();
-```
-
-### Getters
-
-```js
-// get the view angle
-var orientation = ground.getOrientation();
-
-// get pieces on the board
-// {a1: {color: "white", role: "rook"}, b1: {color: "white", role: "knight"}}
-var pieces = ground.getPieces();
-
-// get the material difference between white and black
-// {white: {pawn: 3 queen: 1}, black: {bishop: 2}}
-var diff = ground.getMaterialDiff();
-
-// get the current FEN position
-// rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR
-var fen = ground.getFen();
-
-// get the current orientation
-var orientation = ground.getOrientation();
-```
+- [API documented type signatures](https://github.com/ornicar/chessground/tree/master/src/dts/api.d.ts)
 
 ## Developers
 
-### Build
-
 ```
-npm install
+npm i
 gulp
 ```
-
-Then open `examples/index.html` in your browser.
-The examples are non exhaustive, but feel free to try things out by editing `index.html`.
