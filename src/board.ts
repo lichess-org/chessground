@@ -10,6 +10,7 @@ function callUserFunction(f: Callback | undefined, ...args: any[]): void {
 
 export function toggleOrientation(state: State): void {
   state.orientation = opposite(state.orientation);
+  state.animation.current = undefined;
 }
 
 export function reset(state: State): void {
