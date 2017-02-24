@@ -5,75 +5,76 @@ import anim from './anim'
 import { cancel as dragCancel } from './drag'
 import explosion from './explosion'
 
-export default function(data: Data): Api {
+// see API types and documentations in dts/api.d.ts
+export default function(state: State): Api {
 
   return {
 
-    data,
-
-    getFen: () => fenWrite(data.pieces),
-
-    getMaterialDiff: () => board.getMaterialDiff(data),
-
     set(config) {
-      anim(data => configure(data, config), data);
+      anim(state => configure(state, config), state);
     },
 
+    state,
+
+    getFen: () => fenWrite(state.pieces),
+
+    getMaterialDiff: () => board.getMaterialDiff(state),
+
     toggleOrientation() {
-      anim(board.toggleOrientation, data);
-      // if (this.data.redrawCoords) this.data.redrawCoords(this.data.orientation);
+      anim(board.toggleOrientation, state);
+      // if (this.state.redrawCoords) this.state.redrawCoords(this.state.orientation);
       },
 
     setPieces(pieces) {
-      anim(data => board.setPieces(data, pieces), data);
+      anim(state => board.setPieces(state, pieces), state);
     },
 
     selectSquare(key) {
-      anim(data => board.selectSquare(data, key), data, true);
+      anim(state => board.selectSquare(state, key), state, true);
     },
 
     move(orig, dest) {
-      anim(data => board.baseMove(data, orig, dest), data);
+      anim(state => board.baseMove(state, orig, dest), state);
     },
 
     newPiece(piece, key) {
-      anim(data => board.baseNewPiece(data, piece, key), data);
+      anim(state => board.baseNewPiece(state, piece, key), state);
     },
 
     playPremove() {
-      anim(board.playPremove, data);
+      anim(board.playPremove, state);
     },
 
     playPredrop(validate) {
-      anim(data => board.playPredrop(data, validate), data);
+      anim(state => board.playPredrop(state, validate), state);
     },
 
     cancelPremove() {
-      anim(board.unsetPremove, data, true);
+      anim(board.unsetPremove, state, true);
     },
 
     cancelPredrop() {
-      anim(board.unsetPredrop, data, true);
+      anim(board.unsetPredrop, state, true);
     },
 
     cancelMove() {
-      anim(data => { board.cancelMove(data); dragCancel(data); }, data, true);
+      anim(state => { board.cancelMove(state); dragCancel(state); }, state, true);
     },
 
     stop() {
-      anim(data => { board.stop(data); dragCancel(data); }, data, true);
+      anim(state => { board.stop(state); dragCancel(state); }, state, true);
     },
 
     explode(keys: Key[]) {
-      explosion(data, keys);
+      explosion(state, keys);
     },
 
     setAutoShapes(shapes: Shape[]) {
-      anim(data => data.drawable.autoShapes = shapes, data);
+      anim(state => state.drawable.autoShapes = shapes, state);
     },
 
     setShapes(shapes: Shape[]) {
-      anim(data => data.drawable.shapes = shapes, data);
+      anim(state => state.drawable.shapes = shapes, state);
     }
   };
 }

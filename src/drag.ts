@@ -8,9 +8,9 @@ function hashPiece(piece?: Piece): string {
   return piece ? piece.color + piece.role : '';
 }
 
-function computeSquareBounds(data: Data, key: Key) {
-  const pos = util.key2pos(key), bounds = data.dom.bounds;
-  if (data.orientation !== 'white') {
+function computeSquareBounds(state: State, key: Key) {
+  const pos = util.key2pos(key), bounds = state.dom.bounds;
+  if (state.orientation !== 'white') {
     pos[0] = 9 - pos[0];
     pos[1] = 9 - pos[1];
   }
@@ -22,121 +22,121 @@ function computeSquareBounds(data: Data, key: Key) {
   };
 }
 
-export function start(data: Data, e: MouchEvent): void {
+export function start(state: State, e: MouchEvent): void {
   if (e.button !== undefined && e.button !== 0) return; // only touch or left click
   if (e.touches && e.touches.length > 1) return; // support one finger touch only
   e.stopPropagation();
   e.preventDefault();
   originTarget = e.target;
-  const previouslySelected = data.selected;
+  const previouslySelected = state.selected;
   const position = util.eventPosition(e);
-  const orig = board.getKeyAtDomPos(data, position);
+  const orig = board.getKeyAtDomPos(state, position);
   if (!orig) return;
-  const piece = data.pieces[orig];
+  const piece = state.pieces[orig];
   if (!previouslySelected && (
-    data.drawable.eraseOnClick || (!piece || piece.color !== data.turnColor)
-  )) draw.clear(data);
-  if (data.viewOnly) return;
-  const hadPremove = !!data.premovable.current;
-  const hadPredrop = !!data.predroppable.current;
-  data.stats.ctrlKey = e.ctrlKey;
-  board.selectSquare(data, orig);
-  const stillSelected = data.selected === orig;
-  if (piece && stillSelected && board.isDraggable(data, orig)) {
-    const squareBounds = computeSquareBounds(data, orig);
-    data.draggable.current = {
+    state.drawable.eraseOnClick || (!piece || piece.color !== state.turnColor)
+  )) draw.clear(state);
+  if (state.viewOnly) return;
+  const hadPremove = !!state.premovable.current;
+  const hadPredrop = !!state.predroppable.current;
+  state.stats.ctrlKey = e.ctrlKey;
+  board.selectSquare(state, orig);
+  const stillSelected = state.selected === orig;
+  if (piece && stillSelected && board.isDraggable(state, orig)) {
+    const squareBounds = computeSquareBounds(state, orig);
+    state.draggable.current = {
       previouslySelected: previouslySelected,
       orig: orig,
       pieceHash: hashPiece(piece),
       rel: position,
       epos: position,
       pos: [0, 0],
-      dec: data.draggable.centerPiece ? [
+      dec: state.draggable.centerPiece ? [
         position[0] - (squareBounds.left + squareBounds.width / 2),
         position[1] - (squareBounds.top + squareBounds.height / 2)
       ] : [0, 0],
-      started: data.draggable.autoDistance && data.stats.dragged
+      started: state.draggable.autoDistance && state.stats.dragged
     };
   } else {
-    if (hadPremove) board.unsetPremove(data);
-    if (hadPredrop) board.unsetPredrop(data);
+    if (hadPremove) board.unsetPremove(state);
+    if (hadPredrop) board.unsetPredrop(state);
   }
-  processDrag(data);
+  processDrag(state);
 }
 
-function processDrag(data: Data): void {
+function processDrag(state: State): void {
   util.raf(() => {
-    const cur = data.draggable.current;
+    const cur = state.draggable.current;
     if (cur) {
       // cancel animations while dragging
-      if (data.animation.current && data.animation.current.plan.anims[cur.orig])
-      data.animation.current = undefined;
+      if (state.animation.current && state.animation.current.plan.anims[cur.orig])
+      state.animation.current = undefined;
       // if moving piece is gone, cancel
-      if (hashPiece(data.pieces[cur.orig]) !== cur.pieceHash) cancel(data);
+      if (hashPiece(state.pieces[cur.orig]) !== cur.pieceHash) cancel(state);
       else {
-        if (!cur.started && util.distance(cur.epos, cur.rel) >= data.draggable.distance)
+        if (!cur.started && util.distance(cur.epos, cur.rel) >= state.draggable.distance)
         cur.started = true;
         if (cur.started) {
           cur.pos = [
             cur.epos[0] - cur.rel[0],
             cur.epos[1] - cur.rel[1]
           ];
-          cur.over = board.getKeyAtDomPos(data, cur.epos);
+          cur.over = board.getKeyAtDomPos(state, cur.epos);
         }
       }
     }
-    data.dom.redraw();
-    if (cur) processDrag(data);
+    state.dom.redraw();
+    if (cur) processDrag(state);
   });
 }
 
-export function move(data: Data, e: TouchEvent): void {
+export function move(state: State, e: TouchEvent): void {
   if (e.touches && e.touches.length > 1) return; // support one finger touch only
-  if (data.draggable.current) data.draggable.current.epos = util.eventPosition(e);
+  if (state.draggable.current) state.draggable.current.epos = util.eventPosition(e);
 }
 
-export function end(data: Data, e: TouchEvent): void {
-  const cur = data.draggable.current;
-  if (!cur && (!data.editable.enabled || data.editable.selected === 'pointer')) return;
+export function end(state: State, e: TouchEvent): void {
+  const cur = state.draggable.current;
+  if (!cur && (!state.editable.enabled || state.editable.selected === 'pointer')) return;
   // comparing with the origin target is an easy way to test that the end event
   // has the same touch origin
   if (e.type === 'touchend' && originTarget !== e.target && cur && !cur.newPiece) {
-    data.draggable.current = undefined;
+    state.draggable.current = undefined;
     return;
   }
-  board.unsetPremove(data);
-  board.unsetPredrop(data);
+  board.unsetPremove(state);
+  board.unsetPredrop(state);
   const eventPos: NumberPair = util.eventPosition(e);
-  const dest = board.getKeyAtDomPos(data, eventPos);
+  const dest = board.getKeyAtDomPos(state, eventPos);
   if (dest) {
-    if (data.editable.enabled && data.editable.selected !== 'pointer') {
-      if (data.editable.selected === 'trash') {
-        delete data.pieces[dest];
-        data.dom.redraw();
+    if (state.editable.enabled && state.editable.selected !== 'pointer') {
+      if (state.editable.selected === 'trash') {
+        delete state.pieces[dest];
+        state.dom.redraw();
       } else {
         // where pieces to be dropped live. Fix me.
         const key = 'a0';
-        data.pieces[key] = data.editable.selected as Piece;
-        board.dropNewPiece(data, key, dest, true);
+        state.pieces[key] = state.editable.selected as Piece;
+        board.dropNewPiece(state, key, dest, true);
       }
     } else if (cur && cur.started) {
-      if (cur.newPiece) board.dropNewPiece(data, cur.orig, dest);
+      if (cur.newPiece) board.dropNewPiece(state, cur.orig, dest);
       else {
-        if (cur.orig !== dest) data.movable.dropped = [cur.orig, dest];
-        data.stats.ctrlKey = e.ctrlKey;
-        if (board.userMove(data, cur.orig, dest)) data.stats.dragged = true;
+        if (cur.orig !== dest) state.movable.dropped = [cur.orig, dest];
+        state.stats.ctrlKey = e.ctrlKey;
+        if (board.userMove(state, cur.orig, dest)) state.stats.dragged = true;
       }
     }
   }
   if (cur && cur.orig === cur.previouslySelected && (cur.orig === dest || !dest))
-    board.unselect(data);
-  else if (!data.selectable.enabled) board.unselect(data);
-  data.draggable.current = undefined;
+    board.unselect(state);
+  else if (!state.selectable.enabled) board.unselect(state);
+  state.draggable.current = undefined;
 }
 
-export function cancel(data: Data): void {
-  if (data.draggable.current) {
-    data.draggable.current = undefined;
-    board.unselect(data);
+export function cancel(state: State): void {
+  if (state.draggable.current) {
+    state.draggable.current = undefined;
+    board.unselect(state);
   }
 }

@@ -1,13 +1,19 @@
 /// <reference path="config.d.ts" />
-/// <reference path="data.d.ts" />
+/// <reference path="state.d.ts" />
 
 type Constructor = (el: HTMLElement, config?: Config) => Api
 
 interface Api {
-  data: Data;
+
+  // reconfigure the instance. Accepts all options mentioned above (bar "viewOnly" & "minimalDom").
+  // board will be animated accordingly, if animations are enabled.
+  set(config: Config): void;
+
+  // read chessground state; write at your own risks.
+  state: State;
+
   getFen(): FEN;
   getMaterialDiff(): MaterialDiff;
-  set(config: Config): void;
   toggleOrientation(): void;
   setPieces(pieces: Pieces): void;
   selectSquare(key: Key): void;

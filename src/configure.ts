@@ -1,40 +1,40 @@
 import { setCheck, setSelected } from './board'
 import { read as fenRead } from './fen'
 
-export default function(data: Data, config: Config) {
+export default function(state: State, config: Config) {
 
   // don't merge destinations. Just override.
-  if (config.movable && config.movable.dests) data.movable.dests = undefined;
+  if (config.movable && config.movable.dests) state.movable.dests = undefined;
 
   let configCheck: Color | boolean | undefined = config.check;
 
   delete config.check;
 
-  merge(data, config);
+  merge(state, config);
 
   // if a fen was provided, replace the pieces
   if (config.fen) {
-    data.pieces = fenRead(config.fen);
-    data.drawable.shapes = [];
+    state.pieces = fenRead(config.fen);
+    state.drawable.shapes = [];
   }
 
-  if (configCheck !== undefined) setCheck(data, configCheck);
+  if (configCheck !== undefined) setCheck(state, configCheck);
 
   // forget about the last dropped piece
-  data.movable.dropped = undefined;
+  state.movable.dropped = undefined;
 
   // fix move/premove dests
-  if (data.selected) setSelected(data, data.selected);
+  if (state.selected) setSelected(state, state.selected);
 
   // no need for such short animations
-  if (!data.animation.duration || data.animation.duration < 40) data.animation.enabled = false;
+  if (!state.animation.duration || state.animation.duration < 40) state.animation.enabled = false;
 
-  if (!data.movable.rookCastle && data.movable.dests) {
-    const rank = data.movable.color === 'white' ? 1 : 8;
+  if (!state.movable.rookCastle && state.movable.dests) {
+    const rank = state.movable.color === 'white' ? 1 : 8;
     const kingStartPos = 'e' + rank;
-    const dests = data.movable.dests[kingStartPos];
-    if (!dests || data.pieces[kingStartPos].role !== 'king') return;
-    data.movable.dests[kingStartPos] = dests.filter(d => {
+    const dests = state.movable.dests[kingStartPos];
+    if (!dests || state.pieces[kingStartPos].role !== 'king') return;
+    state.movable.dests[kingStartPos] = dests.filter(d => {
       if ((d === 'a' + rank) && dests.indexOf('c' + rank as Key) !== -1) return false;
       if ((d === 'h' + rank) && dests.indexOf('g' + rank as Key) !== -1) return false;
       return true;

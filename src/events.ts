@@ -7,10 +7,10 @@ const moveEvents = ['touchmove', 'mousemove'];
 const endEvents = ['touchend', 'mouseup'];
 
 type MouchBind = (e: MouchEvent) => void;
-type DataMouchBind = (d: Data, e: MouchEvent) => void;
+type StateMouchBind = (d: State, e: MouchEvent) => void;
 
 // returns the unbind function
-export default function(d: Data): void {
+export default function(d: State): void {
 
   const start: MouchBind = startDragOrDraw(d);
   const move: MouchBind = dragOrDraw(d, drag.move, draw.move);
@@ -61,7 +61,7 @@ export default function(d: Data): void {
   d.dom.element.addEventListener('contextmenu', onContextMenu);
 }
 
-function startDragOrDraw(d: Data): MouchBind {
+function startDragOrDraw(d: State): MouchBind {
   return e => {
     if (isRightButton(e) && d.draggable.current) {
       if (d.draggable.current.newPiece) delete d.pieces[d.draggable.current.orig];
@@ -72,14 +72,14 @@ function startDragOrDraw(d: Data): MouchBind {
   };
 }
 
-function dragOrDraw(d: Data, withDrag: DataMouchBind, withDraw: DataMouchBind): MouchBind {
+function dragOrDraw(d: State, withDrag: StateMouchBind, withDraw: StateMouchBind): MouchBind {
   return e => {
     if ((e.shiftKey || isRightButton(e)) && d.drawable.enabled) withDraw(d, e);
     else if (!d.viewOnly) withDrag(d, e);
   };
 }
 
-function bindResize(d: Data): void {
+function bindResize(d: State): void {
 
   if (!d.resizable) return;
 

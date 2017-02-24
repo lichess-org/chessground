@@ -2,7 +2,7 @@
 /// <reference path="drawable.d.ts" />
 /// <reference path="anim.d.ts" />
 
-interface Data {
+interface State {
   pieces: Pieces;
   orientation: Color; // board orientation. white | black
   turnColor: Color; // turn to play. white | black

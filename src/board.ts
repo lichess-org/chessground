@@ -8,68 +8,68 @@ function callUserFunction(f: Callback | undefined, ...args: any[]): void {
   if (f) setTimeout(() => f(...args), 1);
 }
 
-export function toggleOrientation(data: Data): void {
-  data.orientation = opposite(data.orientation);
+export function toggleOrientation(state: State): void {
+  state.orientation = opposite(state.orientation);
 }
 
-export function reset(data: Data): void {
-  data.lastMove = undefined;
-  unselect(data);
-  unsetPremove(data);
-  unsetPredrop(data);
+export function reset(state: State): void {
+  state.lastMove = undefined;
+  unselect(state);
+  unsetPremove(state);
+  unsetPredrop(state);
 }
 
-export function setPieces(data: Data, pieces: Pieces): void {
+export function setPieces(state: State, pieces: Pieces): void {
   for (let key in pieces) {
-    if (pieces[key]) data.pieces[key] = pieces[key];
-    else delete data.pieces[key];
+    if (pieces[key]) state.pieces[key] = pieces[key];
+    else delete state.pieces[key];
   }
-  data.movable.dropped = undefined;
+  state.movable.dropped = undefined;
 }
 
-export function setCheck(data: Data, color: Color | boolean): void {
-  if (color === true) color = data.turnColor;
-  if (!color) data.check = undefined;
-  else for (let k in data.pieces) {
-    if (data.pieces[k].role === 'king' && data.pieces[k].color === color) {
-      data.check = k as Key;
+export function setCheck(state: State, color: Color | boolean): void {
+  if (color === true) color = state.turnColor;
+  if (!color) state.check = undefined;
+  else for (let k in state.pieces) {
+    if (state.pieces[k].role === 'king' && state.pieces[k].color === color) {
+      state.check = k as Key;
     }
   }
 }
 
-function setPremove(data: Data, orig: Key, dest: Key, meta: any): void {
-  unsetPredrop(data);
-  data.premovable.current = [orig, dest];
-  callUserFunction(data.premovable.events.set, orig, dest, meta);
+function setPremove(state: State, orig: Key, dest: Key, meta: any): void {
+  unsetPredrop(state);
+  state.premovable.current = [orig, dest];
+  callUserFunction(state.premovable.events.set, orig, dest, meta);
 }
 
-export function unsetPremove(data: Data): void {
-  if (data.premovable.current) {
-    data.premovable.current = undefined;
-    callUserFunction(data.premovable.events.unset);
+export function unsetPremove(state: State): void {
+  if (state.premovable.current) {
+    state.premovable.current = undefined;
+    callUserFunction(state.premovable.events.unset);
   }
 }
 
-function setPredrop(data: Data, role: Role, key: Key): void {
-  unsetPremove(data);
-  data.predroppable.current = {
+function setPredrop(state: State, role: Role, key: Key): void {
+  unsetPremove(state);
+  state.predroppable.current = {
     role: role,
     key: key
   };
-  callUserFunction(data.predroppable.events.set, role, key);
+  callUserFunction(state.predroppable.events.set, role, key);
 }
 
-export function unsetPredrop(data: Data): void {
-  const pd = data.predroppable;
+export function unsetPredrop(state: State): void {
+  const pd = state.predroppable;
   if (pd.current) {
     pd.current = undefined;
     callUserFunction(pd.events.unset);
   }
 }
 
-function tryAutoCastle(data: Data, orig: Key, dest: Key): void {
-  if (!data.autoCastle) return;
-  const king = data.pieces[dest];
+function tryAutoCastle(state: State, orig: Key, dest: Key): void {
+  if (!state.autoCastle) return;
+  const king = state.pieces[dest];
   if (king.role !== 'king') return;
   const origPos = key2pos(orig);
   if (origPos[0] !== 5) return;
@@ -85,251 +85,251 @@ function tryAutoCastle(data: Data, orig: Key, dest: Key): void {
     newRookPos = pos2key([4, origPos[1]]);
     newKingPos = pos2key([3, origPos[1]]);
   } else return;
-  delete data.pieces[orig];
-  delete data.pieces[dest];
-  delete data.pieces[oldRookPos];
-  data.pieces[newKingPos] = {
+  delete state.pieces[orig];
+  delete state.pieces[dest];
+  delete state.pieces[oldRookPos];
+  state.pieces[newKingPos] = {
     role: 'king',
     color: king.color
   };
-  data.pieces[newRookPos] = {
+  state.pieces[newRookPos] = {
     role: 'rook',
     color: king.color
   };
 }
 
-export function baseMove(data: Data, orig: Key, dest: Key): boolean {
-  if (orig === dest || !data.pieces[orig]) return false;
+export function baseMove(state: State, orig: Key, dest: Key): boolean {
+  if (orig === dest || !state.pieces[orig]) return false;
   const captured: Piece | undefined = (
-    data.pieces[dest] &&
-    data.pieces[dest].color !== data.pieces[orig].color
-  ) ? data.pieces[dest] : undefined;
-  callUserFunction(data.events.move, orig, dest, captured);
-  data.pieces[dest] = data.pieces[orig];
-  delete data.pieces[orig];
-  data.lastMove = [orig, dest];
-  data.check = undefined;
-  tryAutoCastle(data, orig, dest);
-  callUserFunction(data.events.change);
-  data.movable.dropped = undefined;
+    state.pieces[dest] &&
+    state.pieces[dest].color !== state.pieces[orig].color
+  ) ? state.pieces[dest] : undefined;
+  callUserFunction(state.events.move, orig, dest, captured);
+  state.pieces[dest] = state.pieces[orig];
+  delete state.pieces[orig];
+  state.lastMove = [orig, dest];
+  state.check = undefined;
+  tryAutoCastle(state, orig, dest);
+  callUserFunction(state.events.change);
+  state.movable.dropped = undefined;
   return true;
 }
 
-export function baseNewPiece(data: Data, piece: Piece, key: Key, force?: boolean): boolean {
-  if (data.pieces[key]) {
-    if (force) delete data.pieces[key];
+export function baseNewPiece(state: State, piece: Piece, key: Key, force?: boolean): boolean {
+  if (state.pieces[key]) {
+    if (force) delete state.pieces[key];
     else return false;
   }
-  callUserFunction(data.events.dropNewPiece, piece, key);
-  data.pieces[key] = piece;
-  data.lastMove = [key, key];
-  data.check = undefined;
-  callUserFunction(data.events.change);
-  data.movable.dropped = undefined;
-  data.movable.dests = undefined;
-  data.turnColor = opposite(data.turnColor);
+  callUserFunction(state.events.dropNewPiece, piece, key);
+  state.pieces[key] = piece;
+  state.lastMove = [key, key];
+  state.check = undefined;
+  callUserFunction(state.events.change);
+  state.movable.dropped = undefined;
+  state.movable.dests = undefined;
+  state.turnColor = opposite(state.turnColor);
   return true;
 }
 
-function baseUserMove(data: Data, orig: Key, dest: Key): boolean {
-  const result = baseMove(data, orig, dest);
+function baseUserMove(state: State, orig: Key, dest: Key): boolean {
+  const result = baseMove(state, orig, dest);
   if (result) {
-    data.movable.dests = {};
-    data.turnColor = opposite(data.turnColor);
+    state.movable.dests = {};
+    state.turnColor = opposite(state.turnColor);
   }
   return result;
 }
 
-export function userMove(data: Data, orig: Key, dest: Key): boolean {
-  if (canMove(data, orig, dest)) {
-    if (baseUserMove(data, orig, dest)) {
+export function userMove(state: State, orig: Key, dest: Key): boolean {
+  if (canMove(state, orig, dest)) {
+    if (baseUserMove(state, orig, dest)) {
       const holdTime = hold.stop();
-      unselect(data);
-      callUserFunction(data.movable.events.after, orig, dest, {
+      unselect(state);
+      callUserFunction(state.movable.events.after, orig, dest, {
         premove: false,
-        ctrlKey: data.stats.ctrlKey,
+        ctrlKey: state.stats.ctrlKey,
         holdTime: holdTime
       });
       return true;
     }
-  } else if (canPremove(data, orig, dest)) {
-    setPremove(data, orig, dest, {
-      ctrlKey: data.stats.ctrlKey
+  } else if (canPremove(state, orig, dest)) {
+    setPremove(state, orig, dest, {
+      ctrlKey: state.stats.ctrlKey
     });
-    unselect(data);
-  } else if (isMovable(data, dest) || isPremovable(data, dest)) {
-    setSelected(data, dest);
+    unselect(state);
+  } else if (isMovable(state, dest) || isPremovable(state, dest)) {
+    setSelected(state, dest);
     hold.start();
-  } else unselect(data);
+  } else unselect(state);
   return false;
 }
 
-export function dropNewPiece(data: Data, orig: Key, dest: Key, force?: boolean): void {
-  if (canDrop(data, orig, dest) || force) {
-    const piece = data.pieces[orig];
-    delete data.pieces[orig];
-    baseNewPiece(data, piece, dest, force);
-    data.movable.dropped = undefined;
-    callUserFunction(data.movable.events.afterNewPiece, piece.role, dest, {
+export function dropNewPiece(state: State, orig: Key, dest: Key, force?: boolean): void {
+  if (canDrop(state, orig, dest) || force) {
+    const piece = state.pieces[orig];
+    delete state.pieces[orig];
+    baseNewPiece(state, piece, dest, force);
+    state.movable.dropped = undefined;
+    callUserFunction(state.movable.events.afterNewPiece, piece.role, dest, {
       predrop: false
     });
-  } else if (canPredrop(data, orig, dest)) {
-    setPredrop(data, data.pieces[orig].role, dest);
+  } else if (canPredrop(state, orig, dest)) {
+    setPredrop(state, state.pieces[orig].role, dest);
   } else {
-    unsetPremove(data);
-    unsetPredrop(data);
+    unsetPremove(state);
+    unsetPredrop(state);
   }
-  delete data.pieces[orig];
-  unselect(data);
+  delete state.pieces[orig];
+  unselect(state);
 }
 
-export function selectSquare(data: Data, key: Key, force?: boolean): void {
-  if (data.selected) {
-    if (data.selected === key && !data.draggable.enabled) {
-      unselect(data);
+export function selectSquare(state: State, key: Key, force?: boolean): void {
+  if (state.selected) {
+    if (state.selected === key && !state.draggable.enabled) {
+      unselect(state);
       hold.cancel();
-    } else if ((data.selectable.enabled || force) && data.selected !== key) {
-      if (userMove(data, data.selected, key)) data.stats.dragged = false;
+    } else if ((state.selectable.enabled || force) && state.selected !== key) {
+      if (userMove(state, state.selected, key)) state.stats.dragged = false;
     } else hold.start();
-  } else if (isMovable(data, key) || isPremovable(data, key)) {
-    setSelected(data, key);
+  } else if (isMovable(state, key) || isPremovable(state, key)) {
+    setSelected(state, key);
     hold.start();
   }
-  if (key) callUserFunction(data.events.select, key);
+  if (key) callUserFunction(state.events.select, key);
 }
 
-export function setSelected(data: Data, key: Key): void {
-  data.selected = key;
-  if (isPremovable(data, key)) {
-    data.premovable.dests = premove(data.pieces, key, data.premovable.castle);
+export function setSelected(state: State, key: Key): void {
+  state.selected = key;
+  if (isPremovable(state, key)) {
+    state.premovable.dests = premove(state.pieces, key, state.premovable.castle);
   }
-  else data.premovable.dests = undefined;
+  else state.premovable.dests = undefined;
 }
 
-export function unselect(data: Data): void {
-  data.selected = undefined;
-  data.premovable.dests = undefined;
+export function unselect(state: State): void {
+  state.selected = undefined;
+  state.premovable.dests = undefined;
   hold.cancel();
 }
 
-function isMovable(data: Data, orig: Key): boolean {
-  const piece = data.pieces[orig];
+function isMovable(state: State, orig: Key): boolean {
+  const piece = state.pieces[orig];
   return piece && (
-    data.movable.color === 'both' || (
-      data.movable.color === piece.color &&
-        data.turnColor === piece.color
+    state.movable.color === 'both' || (
+      state.movable.color === piece.color &&
+        state.turnColor === piece.color
     ));
 }
 
-function canMove(data: Data, orig: Key, dest: Key): boolean {
-  return orig !== dest && isMovable(data, orig) && (
-    data.movable.free || (!!data.movable.dests && containsX(data.movable.dests[orig], dest))
+function canMove(state: State, orig: Key, dest: Key): boolean {
+  return orig !== dest && isMovable(state, orig) && (
+    state.movable.free || (!!state.movable.dests && containsX(state.movable.dests[orig], dest))
   );
 }
 
-function canDrop(data: Data, orig: Key, dest: Key): boolean {
-  const piece = data.pieces[orig];
-  return piece && dest && (orig === dest || !data.pieces[dest]) && (
-    data.movable.color === 'both' || (
-      data.movable.color === piece.color &&
-        data.turnColor === piece.color
+function canDrop(state: State, orig: Key, dest: Key): boolean {
+  const piece = state.pieces[orig];
+  return piece && dest && (orig === dest || !state.pieces[dest]) && (
+    state.movable.color === 'both' || (
+      state.movable.color === piece.color &&
+        state.turnColor === piece.color
     ));
 }
 
 
-function isPremovable(data: Data, orig: Key): boolean {
-  const piece = data.pieces[orig];
-  return piece && data.premovable.enabled &&
-  data.movable.color === piece.color &&
-    data.turnColor !== piece.color;
+function isPremovable(state: State, orig: Key): boolean {
+  const piece = state.pieces[orig];
+  return piece && state.premovable.enabled &&
+  state.movable.color === piece.color &&
+    state.turnColor !== piece.color;
 }
 
-function canPremove(data: Data, orig: Key, dest: Key): boolean {
+function canPremove(state: State, orig: Key, dest: Key): boolean {
   return orig !== dest &&
-  isPremovable(data, orig) &&
-  containsX(premove(data.pieces, orig, data.premovable.castle), dest);
+  isPremovable(state, orig) &&
+  containsX(premove(state.pieces, orig, state.premovable.castle), dest);
 }
 
-function canPredrop(data: Data, orig: Key, dest: Key): boolean {
-  const piece = data.pieces[orig];
+function canPredrop(state: State, orig: Key, dest: Key): boolean {
+  const piece = state.pieces[orig];
   return piece && dest &&
-  (!data.pieces[dest] || data.pieces[dest].color !== data.movable.color) &&
-  data.predroppable.enabled &&
+  (!state.pieces[dest] || state.pieces[dest].color !== state.movable.color) &&
+  state.predroppable.enabled &&
   (piece.role !== 'pawn' || (dest[1] !== '1' && dest[1] !== '8')) &&
-  data.movable.color === piece.color &&
-    data.turnColor !== piece.color;
+  state.movable.color === piece.color &&
+    state.turnColor !== piece.color;
 }
 
-export function isDraggable(data: Data, orig: Key): boolean {
-  const piece = data.pieces[orig];
-  return piece && data.draggable.enabled && (
-    data.movable.color === 'both' || (
-      data.movable.color === piece.color && (
-        data.turnColor === piece.color || data.premovable.enabled
+export function isDraggable(state: State, orig: Key): boolean {
+  const piece = state.pieces[orig];
+  return piece && state.draggable.enabled && (
+    state.movable.color === 'both' || (
+      state.movable.color === piece.color && (
+        state.turnColor === piece.color || state.premovable.enabled
       )
     )
   );
 }
 
-export function playPremove(data: Data): boolean {
-  const move = data.premovable.current;
+export function playPremove(state: State): boolean {
+  const move = state.premovable.current;
   if (!move) return false;
   const orig = move[0], dest = move[1];
   let success = false;
-  if (canMove(data, orig, dest)) {
-    if (baseUserMove(data, orig, dest)) {
-      callUserFunction(data.movable.events.after, orig, dest, {
+  if (canMove(state, orig, dest)) {
+    if (baseUserMove(state, orig, dest)) {
+      callUserFunction(state.movable.events.after, orig, dest, {
         premove: true
       });
       success = true;
     }
   }
-  unsetPremove(data);
+  unsetPremove(state);
   return success;
 }
 
-export function playPredrop(data: Data, validate: (drop: Drop) => boolean): boolean {
-  let drop = data.predroppable.current,
+export function playPredrop(state: State, validate: (drop: Drop) => boolean): boolean {
+  let drop = state.predroppable.current,
   success = false;
   if (!drop) return false;
   if (validate(drop)) {
     const piece = {
       role: drop.role,
-      color: data.movable.color as Color
+      color: state.movable.color as Color
     };
-    if (baseNewPiece(data, piece, drop.key)) {
-      callUserFunction(data.movable.events.afterNewPiece, drop.role, drop.key, {
+    if (baseNewPiece(state, piece, drop.key)) {
+      callUserFunction(state.movable.events.afterNewPiece, drop.role, drop.key, {
         predrop: true
       });
       success = true;
     }
   }
-  unsetPredrop(data);
+  unsetPredrop(state);
   return success;
 }
 
-export function cancelMove(data: Data): void {
-  unsetPremove(data);
-  unsetPredrop(data);
-  unselect(data);
+export function cancelMove(state: State): void {
+  unsetPremove(state);
+  unsetPredrop(state);
+  unselect(state);
 }
 
-export function stop(data: Data): void {
-  data.movable.color = undefined;
-  data.movable.dests = undefined;
-  cancelMove(data);
+export function stop(state: State): void {
+  state.movable.color = undefined;
+  state.movable.dests = undefined;
+  cancelMove(state);
 }
 
-export function getKeyAtDomPos(data: Data, pos: NumberPair): Key | undefined {
-  let file = Math.ceil(8 * ((pos[0] - data.dom.bounds.left) / data.dom.bounds.width));
-  file = data.orientation === 'white' ? file : 9 - file;
-  let rank = Math.ceil(8 - (8 * ((pos[1] - data.dom.bounds.top) / data.dom.bounds.height)));
-  rank = data.orientation === 'white' ? rank : 9 - rank;
+export function getKeyAtDomPos(state: State, pos: NumberPair): Key | undefined {
+  let file = Math.ceil(8 * ((pos[0] - state.dom.bounds.left) / state.dom.bounds.width));
+  file = state.orientation === 'white' ? file : 9 - file;
+  let rank = Math.ceil(8 - (8 * ((pos[1] - state.dom.bounds.top) / state.dom.bounds.height)));
+  rank = state.orientation === 'white' ? rank : 9 - rank;
   return (file > 0 && file < 9 && rank > 0 && rank < 9) ? pos2key([file, rank]) : undefined;
 }
 
 // {white: {pawn: 3 queen: 1}, black: {bishop: 2}}
-export function getMaterialDiff(data: Data): MaterialDiff {
+export function getMaterialDiff(state: State): MaterialDiff {
   let counts = {
     king: 0,
     queen: 0,
@@ -338,8 +338,8 @@ export function getMaterialDiff(data: Data): MaterialDiff {
     knight: 0,
     pawn: 0
   }, p: Piece, role: Role, c: number;
-  for (let k in data.pieces) {
-    p = data.pieces[k];
+  for (let k in state.pieces) {
+    p = state.pieces[k];
     counts[p.role] += ((p.color === 'white') ? 1 : -1);
   }
   let diff: MaterialDiff = {
@@ -363,10 +363,10 @@ const pieceScores = {
   king: 0
 };
 
-export function getScore(data: Data): number {
+export function getScore(state: State): number {
   let score = 0;
-  for (let k in data.pieces) {
-    score += pieceScores[data.pieces[k].role] * (data.pieces[k].color === 'white' ? 1 : -1);
+  for (let k in state.pieces) {
+    score += pieceScores[state.pieces[k].role] * (state.pieces[k].color === 'white' ? 1 : -1);
   }
   return score;
 }

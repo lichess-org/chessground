@@ -20,11 +20,11 @@ export default function Chessground(container: HTMLElement, config?: Config): Ap
   const placeholder: HTMLElement = document.createElement('div');
   container.appendChild(placeholder);
 
-  const data = defaults() as Data;
+  const state = defaults() as State;
 
-  configure(data, config || {});
+  configure(state, config || {});
 
-  data.dom = {
+  state.dom = {
     element: placeholder,
     bounds: container.getBoundingClientRect(),
     redraw() {}
@@ -33,17 +33,17 @@ export default function Chessground(container: HTMLElement, config?: Config): Ap
   let vnode: VNode;
 
   function redraw() {
-    vnode = patch(vnode, view(api.data));
+    vnode = patch(vnode, view(api.state));
   }
 
-  let api = makeApi(data);
+  let api = makeApi(state);
 
-  vnode = patch(placeholder, view(api.data));
+  vnode = patch(placeholder, view(api.state));
 
-  data.dom.element = vnode.elm as HTMLElement;
-  data.dom.redraw = redraw;
+  state.dom.element = vnode.elm as HTMLElement;
+  state.dom.redraw = redraw;
 
-  bindEvents(data);
+  bindEvents(state);
 
   return api;
 };

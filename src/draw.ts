@@ -9,58 +9,58 @@ function eventBrush(e: MouchEvent): string {
   return brushes[a + b];
 }
 
-export function start(data: Data, e: MouchEvent): void {
+export function start(state: State, e: MouchEvent): void {
   if (e.touches && e.touches.length > 1) return; // support one finger touch only
   e.stopPropagation();
   e.preventDefault();
-  board.cancelMove(data);
+  board.cancelMove(state);
   const position = util.eventPosition(e);
-  const orig = board.getKeyAtDomPos(data, position);
+  const orig = board.getKeyAtDomPos(state, position);
   if (!orig) return;
-  data.drawable.current = {
+  state.drawable.current = {
     orig: orig,
     dest: undefined,
     pos: position,
     brush: eventBrush(e)
   };
-  processDraw(data);
+  processDraw(state);
 }
 
-export function processDraw(data: Data): void {
+export function processDraw(state: State): void {
   util.raf(() => {
-    const cur = data.drawable.current;
+    const cur = state.drawable.current;
     if (cur) {
-      const dest = board.getKeyAtDomPos(data, cur.pos);
+      const dest = board.getKeyAtDomPos(state, cur.pos);
       if (cur.orig === dest) cur.dest = undefined;
       else cur.dest = dest;
     }
-    data.dom.redraw();
-    if (cur) processDraw(data);
+    state.dom.redraw();
+    if (cur) processDraw(state);
   });
 }
 
-export function move(data: Data, e: MouchEvent): void {
-  if (data.drawable.current) data.drawable.current.pos = util.eventPosition(e);
+export function move(state: State, e: MouchEvent): void {
+  if (state.drawable.current) state.drawable.current.pos = util.eventPosition(e);
 }
 
-export function end(data: Data): void {
-  const cur = data.drawable.current;
+export function end(state: State): void {
+  const cur = state.drawable.current;
   if (!cur) return;
-  if (cur.dest) addLine(data.drawable, cur, cur.dest);
-  else addCircle(data.drawable, cur);
-  data.drawable.current = undefined;
-  data.dom.redraw();
+  if (cur.dest) addLine(state.drawable, cur, cur.dest);
+  else addCircle(state.drawable, cur);
+  state.drawable.current = undefined;
+  state.dom.redraw();
 }
 
-export function cancel(data: Data): void {
-  if (data.drawable.current) data.drawable.current = undefined;
+export function cancel(state: State): void {
+  if (state.drawable.current) state.drawable.current = undefined;
 }
 
-export function clear(data: Data): void {
-  if (data.drawable.shapes.length) {
-    data.drawable.shapes = [];
-    data.dom.redraw();
-    onChange(data.drawable);
+export function clear(state: State): void {
+  if (state.drawable.shapes.length) {
+    state.drawable.shapes = [];
+    state.dom.redraw();
+    onChange(state.drawable);
   }
 }
 

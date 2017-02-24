@@ -1,20 +1,20 @@
 import * as util from './util'
 
-type Mutation<A> = (data: Data) => A;
+type Mutation<A> = (state: State) => A;
 
 // transformation is a function
-// accepts board data and any number of arguments,
+// accepts board state and any number of arguments,
 // and mutates the board.
-export default function<A>(mutation: Mutation<A>, data: Data, skip?: boolean): A {
-  if (data.animation.enabled && !skip) return animate(mutation, data);
+export default function<A>(mutation: Mutation<A>, state: State, skip?: boolean): A {
+  if (state.animation.enabled && !skip) return animate(mutation, state);
   else {
-    const result = mutation(data);
-    data.dom.redraw();
+    const result = mutation(state);
+    state.dom.redraw();
     return result;
   }
 }
 
-interface MiniData {
+interface MiniState {
   orientation: Color;
   pieces: Pieces;
 }
@@ -46,7 +46,7 @@ function closer(piece: AnimPiece, pieces: AnimPiece[]): AnimPiece {
   })[0];
 }
 
-function computePlan(prev: MiniData, current: Data): AnimPlan {
+function computePlan(prev: MiniState, current: State): AnimPlan {
   const width = current.dom.bounds.width / 8,
   height = current.dom.bounds.height / 8,
   anims: AnimVectors = {},
@@ -112,58 +112,58 @@ function roundBy(n: number, by: number): number {
   return Math.round(n * by) / by;
 }
 
-function go(data: Data): void {
-  if (!data.animation.current || !data.animation.current.start) return; // animation was canceled
-  const rest = 1 - (new Date().getTime() - data.animation.current.start) / data.animation.current.duration;
+function go(state: State): void {
+  if (!state.animation.current || !state.animation.current.start) return; // animation was canceled
+  const rest = 1 - (new Date().getTime() - state.animation.current.start) / state.animation.current.duration;
   if (rest <= 0) {
-    data.animation.current = undefined;
-    data.dom.redraw();
+    state.animation.current = undefined;
+    state.dom.redraw();
   } else {
     let i: any;
     const ease = easing(rest);
-    for (i in data.animation.current.plan.anims) {
-      const cfg = data.animation.current.plan.anims[i];
+    for (i in state.animation.current.plan.anims) {
+      const cfg = state.animation.current.plan.anims[i];
       cfg[1] = [roundBy(cfg[0][0] * ease, 10), roundBy(cfg[0][1] * ease, 10)];
     }
-    for (i in data.animation.current.plan.fadings) {
-      data.animation.current.plan.fadings[i].opacity = roundBy(ease, 100);
+    for (i in state.animation.current.plan.fadings) {
+      state.animation.current.plan.fadings[i].opacity = roundBy(ease, 100);
     }
-    data.dom.redraw();
-    util.raf(() => go(data));
+    state.dom.redraw();
+    util.raf(() => go(state));
   }
 }
 
-function animate<A>(mutation: Mutation<A>, data: Data): A {
-  // clone data before mutating it
-  const prev: MiniData = {
-    orientation: data.orientation,
+function animate<A>(mutation: Mutation<A>, state: State): A {
+  // clone state before mutating it
+  const prev: MiniState = {
+    orientation: state.orientation,
     pieces: {} as Pieces
   };
   // clone pieces
-  for (let key in data.pieces) {
+  for (let key in state.pieces) {
     prev.pieces[key] = {
-      role: data.pieces[key].role,
-      color: data.pieces[key].color
+      role: state.pieces[key].role,
+      color: state.pieces[key].color
     };
   }
-  const result = mutation(data);
-  if (data.animation.enabled) {
-    const plan = computePlan(prev, data);
+  const result = mutation(state);
+  if (state.animation.enabled) {
+    const plan = computePlan(prev, state);
     if (!isObjectEmpty(plan.anims) || !isObjectEmpty(plan.fadings)) {
-      const alreadyRunning = data.animation.current && data.animation.current.start;
-      data.animation.current = {
+      const alreadyRunning = state.animation.current && state.animation.current.start;
+      state.animation.current = {
         start: new Date().getTime(),
-        duration: data.animation.duration,
+        duration: state.animation.duration,
         plan: plan
       };
-      if (!alreadyRunning) go(data);
+      if (!alreadyRunning) go(state);
     } else {
       // don't animate, just render right away
-      data.dom.redraw();
+      state.dom.redraw();
     }
   } else {
     // animations are now disabled
-    data.dom.redraw();
+    state.dom.redraw();
   }
   return result;
 }

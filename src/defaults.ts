@@ -1,7 +1,7 @@
 import * as fen from './fen'
 
-// see dts/data.d.ts for documentation on the Data type
-export default function(): Partial<Data> {
+// see dts/state.d.ts for documentation on the State type
+export default function(): Partial<State> {
   return {
     pieces: fen.read(fen.initial),
     orientation: 'white',

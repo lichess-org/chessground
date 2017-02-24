@@ -11,7 +11,7 @@ interface Ctx {
 
 type Classes = Record<string, boolean>;
 
-export default function(d: Data): VNode {
+export default function(d: State): VNode {
   return h('div', {
     class: {
       'cg-board-wrap': true,
@@ -28,7 +28,7 @@ export default function(d: Data): VNode {
   ]);
 };
 
-function renderPiece(d: Data, key: Key, ctx: Ctx): VNode {
+function renderPiece(d: State, key: Key, ctx: Ctx): VNode {
 
   const classes = pieceClasses(d.pieces[key]),
   translate = posToTranslate(util.key2pos(key), ctx),
@@ -101,7 +101,7 @@ function addSquare(squares: SquareClasses, key: Key, klass: string): void {
   else squares[key] = { [klass]: true };
 }
 
-function renderSquares(d: Data, ctx: Ctx): VNode[] {
+function renderSquares(d: State, ctx: Ctx): VNode[] {
   const squares: SquareClasses = {};
   let i: any, k: Key;
   if (d.lastMove && d.highlight.lastMove) for (i in d.lastMove) {
@@ -153,7 +153,7 @@ function renderSquares(d: Data, ctx: Ctx): VNode[] {
   return nodes;
 }
 
-function renderContent(d: Data): VNode[] {
+function renderContent(d: State): VNode[] {
   const ctx: Ctx = {
     asWhite: d.orientation === 'white',
     bounds: d.dom.bounds,

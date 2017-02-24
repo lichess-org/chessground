@@ -2,14 +2,14 @@ import { h } from 'snabbdom'
 import { VNode } from 'snabbdom/vnode'
 import { key2pos, isTrident } from './util'
 
-export default function(data: Data): VNode | undefined {
-  const d = data.drawable;
+export default function(state: State): VNode | undefined {
+  const d = state.drawable;
   const allShapes = d.shapes.concat(d.autoShapes);
   if (!allShapes.length && !d.current) return;
-  if (data.dom.bounds.width !== data.dom.bounds.height) return;
+  if (state.dom.bounds.width !== state.dom.bounds.height) return;
   const usedBrushes = computeUsedBrushes(d, allShapes, d.current as Shape | undefined);
-  const renderedShapes = allShapes.map((s, i) => renderShape(data, false, s, i));
-  if (d.current) renderedShapes.push(renderShape(data, true, d.current as Shape, 9999));
+  const renderedShapes = allShapes.map((s, i) => renderShape(state, false, s, i));
+  if (d.current) renderedShapes.push(renderShape(state, true, d.current as Shape, 9999));
   return h('svg', { key: 'svg' }, [ defs(usedBrushes), ...renderedShapes ]);
 }
 
@@ -98,22 +98,22 @@ function orient(pos: Pos, color: Color): Pos {
   return color === 'white' ? pos : [9 - pos[0], 9 - pos[1]];
 }
 
-function renderShape(data: Data, current: boolean, shape: Shape, i: number): VNode {
+function renderShape(state: State, current: boolean, shape: Shape, i: number): VNode {
   if (shape.piece) return piece(
-    data.drawable.pieces.baseUrl,
-    orient(key2pos(shape.orig), data.orientation),
+    state.drawable.pieces.baseUrl,
+    orient(key2pos(shape.orig), state.orientation),
     shape.piece,
-    data.dom.bounds);
+    state.dom.bounds);
   else {
-    let brush = data.drawable.brushes[shape.brush];
+    let brush = state.drawable.brushes[shape.brush];
     if (shape.brushModifiers) brush = makeCustomBrush(brush, shape.brushModifiers, i);
-    const orig = orient(key2pos(shape.orig), data.orientation);
+    const orig = orient(key2pos(shape.orig), state.orientation);
     if (shape.orig && shape.dest) return arrow(
       brush,
       orig,
-      orient(key2pos(shape.dest), data.orientation),
-      current, data.dom.bounds);
-    else return circle(brush, orig, current, data.dom.bounds);
+      orient(key2pos(shape.dest), state.orientation),
+      current, state.dom.bounds);
+    else return circle(brush, orig, current, state.dom.bounds);
   }
 }
 
