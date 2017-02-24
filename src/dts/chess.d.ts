@@ -4,10 +4,7 @@ type Key = 'a0' | 'a1' | 'b1' | 'c1' | 'd1' | 'e1' | 'f1' | 'g1' | 'h1' | 'a2' |
 type Fil = 'a' | 'b' | 'c' | 'd' | 'e' | 'f' | 'g' | 'h';
 type Rank = 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8;
 type FEN = string;
-interface Pos {
-  0: number;
-  1: number;
-}
+type Pos = [number, number];
 interface Piece {
   role: Role;
   color: Color;
@@ -19,15 +16,11 @@ interface Drop {
 interface Pieces {
   [key: string]: Piece;
 }
-interface KeyPair {
-  0: Key;
-  1: Key;
-  [i: number]: Key
-}
-interface NumberPair {
-  0: number;
-  1: number;
-}
+
+type KeyPair = [Key, Key];
+
+type NumberPair = [number, number];
+
 interface Dests {
   [key: string]: Key[]
 }
