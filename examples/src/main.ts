@@ -5,6 +5,7 @@ import { VNode } from 'snabbdom/vnode'
 import klass from 'snabbdom/modules/class';
 import attributes from 'snabbdom/modules/attributes';
 import listeners from 'snabbdom/modules/eventlisteners';
+import * as page from 'page'
 
 import * as basics from './basics'
 import * as play from './play'
@@ -18,18 +19,10 @@ export function run(element: Element) {
     play.initial
   ];
 
-  let example: Example = examples[0],
-  vnode: VNode;
+  let example: Example, vnode: VNode;
 
   function redraw() {
-    vnode = patch(vnode, render());
-  }
-
-  vnode = patch(element, render());
-
-  function setExample(ex: Example) {
-    example = ex;
-    redraw();
+    vnode = patch(vnode || element, render());
   }
 
   function runExample(vnode: VNode) {
@@ -40,12 +33,12 @@ export function run(element: Element) {
 
   function render() {
     return h('div#chessground-examples', [
-      h('menu', examples.map(ex => {
+      h('menu', examples.map((ex, id) => {
         return h('a', {
           class: {
             active: example.name === ex.name
           },
-          on: { click: [setExample, ex] }
+          on: { click: () => page(`/${id}`) }
         }, ex.name);
       })),
       h('section', [
@@ -59,4 +52,11 @@ export function run(element: Element) {
       ])
     ]);
   }
+
+  page({ click: false, popstate: false, dispatch: false, hashbang: true });
+  page('/:id', ctx => {
+    example = examples[parseInt(ctx.params.id) || 0];
+    redraw();
+  });
+  page(location.hash.slice(2) || '/0');
 }
