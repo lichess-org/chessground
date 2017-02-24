@@ -7,7 +7,7 @@ const gutil = require("gulp-util");
 const uglify = require('gulp-uglify');
 const buffer = require('vinyl-buffer');
 
-const destination = './';
+const destination = './dist';
 
 function onError(error) {
   return gutil.log(gutil.colors.red(error.message));
