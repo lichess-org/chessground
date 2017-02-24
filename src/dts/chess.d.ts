@@ -46,6 +46,12 @@ interface Exploding {
   keys: Key[];
 }
 
+interface MoveMetadata {
+  premove: boolean;
+  ctrlKey?: boolean;
+  holdTime?: number;
+}
+
 interface Window {
   [key: string]: any
 }

@@ -145,11 +145,12 @@ export function userMove(state: State, orig: Key, dest: Key): boolean {
     if (baseUserMove(state, orig, dest)) {
       const holdTime = hold.stop();
       unselect(state);
-      callUserFunction(state.movable.events.after, orig, dest, {
+      const metadata: MoveMetadata = {
         premove: false,
         ctrlKey: state.stats.ctrlKey,
         holdTime: holdTime
-      });
+      };
+      callUserFunction(state.movable.events.after, orig, dest, metadata);
       return true;
     }
   } else if (canPremove(state, orig, dest)) {
@@ -278,9 +279,8 @@ export function playPremove(state: State): boolean {
   let success = false;
   if (canMove(state, orig, dest)) {
     if (baseUserMove(state, orig, dest)) {
-      callUserFunction(state.movable.events.after, orig, dest, {
-        premove: true
-      });
+      const metadata: MoveMetadata = { premove: true };
+      callUserFunction(state.movable.events.after, orig, dest, metadata);
       success = true;
     }
   }

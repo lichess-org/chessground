@@ -37,7 +37,7 @@ interface State {
     dropped?: KeyPair; // last dropped [orig; dest]; not to be animated
     showDests: boolean; // whether to add the move-dest class on squares
     events: {
-      after?: (orig: Key, dest: Key, metadata: any) => void; // called after the move has been played
+      after?: (orig: Key, dest: Key, metadata: MoveMetadata) => void; // called after the move has been played
       afterNewPiece?: (role: Role, pos: Pos) => void; // called after a new piece is dropped on the board
     };
     rookCastle: boolean // castle by moving the king to the rook
