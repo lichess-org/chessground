@@ -134,5 +134,6 @@ module.exports = {
   requestAnimationFrame: (window.requestAnimationFrame || window.setTimeout).bind(window),
   isLeftButton: isLeftButton,
   isRightButton: isRightButton,
+  isRightClick: isRightClick,
   memo: memo
 };

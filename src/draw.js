@@ -19,7 +19,7 @@ function start(data, e) {
     orig: orig,
     epos: position,
     bounds: bounds,
-    brush: brushes[(e.shiftKey & util.isRightButton(e)) + (e.altKey ? 2 : 0)]
+    brush: brushes[(e.shiftKey & util.isRightClick(e)) + (e.altKey ? 2 : 0)]
   };
   processDraw(data);
 }
