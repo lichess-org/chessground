@@ -268,10 +268,6 @@ function bindEvents(ctrl, el, context) {
 }
 
 function renderBoard(ctrl) {
-  ctrl.pointerSelected = function pointerSelected() {
-    return !ctrl.sparePieceSelected || ctrl.sparePieceSelected === 'pointer';
-  };
-
   var d = ctrl.data;
   return {
     tag: 'div',

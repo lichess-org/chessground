@@ -40,6 +40,10 @@ module.exports = function(cfg) {
 
   this.playPredrop = anim(board.playPredrop, this.data);
 
+  this.pointerSelected = function pointerSelected() {
+    return !this.sparePieceSelected || this.sparePieceSelected === 'pointer';
+  };
+
   this.cancelPremove = anim(board.unsetPremove, this.data, true);
 
   this.cancelPredrop = anim(board.unsetPredrop, this.data, true);
