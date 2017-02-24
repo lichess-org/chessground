@@ -160,7 +160,7 @@ function renderContent(d: State): VNode[] {
   animation = d.animation.current,
   nodes: VNode[] = renderSquares(d, ctx),
   fadings = animation && animation.plan.fadings,
-  draggable = d.draggable.current;
+  drag = d.draggable.current;
   let i: any;
 
   if (fadings) for (i in fadings) nodes.push(renderFading(fadings[i], ctx));
@@ -180,11 +180,12 @@ function renderContent(d: State): VNode[] {
     }
     // the hack to drag new pieces on the board (editor and crazyhouse)
     // is to put it on a0 then set it as being dragged
-    if (draggable && draggable.newPiece) nodes.push(renderPiece(d, 'a0', ctx));
+    if (drag && drag.newPiece) nodes.push(renderPiece(d, 'a0', ctx));
   }
 
-  if (draggable && d.draggable.showGhost && !draggable.newPiece) {
-    nodes.push(renderGhost(draggable.orig, d.pieces[draggable.orig], ctx));
+  if (drag && d.draggable.showGhost && !drag.newPiece) {
+    i = d.pieces[drag.orig];
+    if (i) nodes.push(renderGhost(drag.orig, i, ctx));
   }
 
   if (d.drawable.enabled) {
