@@ -11,6 +11,8 @@ interface Ctx {
 
 type Classes = Record<string, boolean>;
 
+const cgBoardClasses = {'cg-board': true};
+
 export default function(d: State): VNode {
   return h('div', {
     class: {
@@ -20,11 +22,7 @@ export default function(d: State): VNode {
       'manipulable': !d.viewOnly
     }
   }, [
-    h('div', {
-      class: {
-        'cg-board': true
-      }
-    }, renderContent(d))
+    h('div', { class: cgBoardClasses }, renderContent(d))
   ]);
 };
 
@@ -48,7 +46,7 @@ function renderPiece(d: State, key: Key, ctx: Ctx): VNode {
 
   return h(pieceTag, {
     key: 'p' + key,
-    class: pieceClasses(d.pieces[key]),
+    class: classes,
     style: { [ctx.transformProp]: util.translate(translate) },
     // attrs: d.pieceKey ? {'data-key': key } : undefined
     });
@@ -175,24 +173,25 @@ function renderContent(d: State): VNode[] {
     //   if (d.pieces[keys[i]] && !d.items(util.key2pos(keys[i]), keys[i]))
     //   children.push(renderPiece(d, keys[i], ctx));
     // }
-    } else {
-      for (i = 0; i < 64; i++) {
-        if (d.pieces[keys[i]]) nodes.push(renderPiece(d, keys[i], ctx));
-      }
-      // the hack to drag new pieces on the board (editor and crazyhouse)
-      // is to put it on a0 then set it as being dragged
-      if (draggable && draggable.newPiece) nodes.push(renderPiece(d, 'a0', ctx));
     }
+  else {
+    for (i = 0; i < 64; ++i) {
+      if (d.pieces[keys[i]]) nodes.push(renderPiece(d, keys[i], ctx));
+    }
+    // the hack to drag new pieces on the board (editor and crazyhouse)
+    // is to put it on a0 then set it as being dragged
+    if (draggable && draggable.newPiece) nodes.push(renderPiece(d, 'a0', ctx));
+  }
 
-    if (draggable && d.draggable.showGhost && !draggable.newPiece) {
-      nodes.push(renderGhost(draggable.orig, d.pieces[draggable.orig], ctx));
-    }
+  if (draggable && d.draggable.showGhost && !draggable.newPiece) {
+    nodes.push(renderGhost(draggable.orig, d.pieces[draggable.orig], ctx));
+  }
 
-    if (d.drawable.enabled) {
-      let node = svg(d);
-      if (node) nodes.push(node);
-    }
-    return nodes;
+  if (d.drawable.enabled) {
+    let node = svg(d);
+    if (node) nodes.push(node);
+  }
+  return nodes;
 }
 
 const pieceTag = 'piece';
