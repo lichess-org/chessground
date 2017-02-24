@@ -42,7 +42,11 @@ function move(data, e) {
     data.drawable.current.epos = util.eventPosition(e);
 }
 
-function end(data, e) {
+function end(data, e, ctrl) {
+  if (!ctrl.pointerSelected()) {
+    return;
+  }
+
   var drawable = data.drawable;
   var orig = drawable.current.orig;
   var dest = drawable.current.dest;
