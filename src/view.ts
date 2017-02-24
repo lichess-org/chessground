@@ -9,17 +9,24 @@ interface Ctx {
   readonly transformProp: string;
 }
 
-type Classes = Record<string, boolean>
+type Classes = Record<string, boolean>;
 
-  const pieceTag = 'piece';
-const squareTag = 'square';
-
-function pieceClasses(p: Piece): Classes {
-  return {
-    [p.role]: true,
-    [p.color]: true
-  };
-}
+export default function(d: Data): VNode {
+  return h('div', {
+    class: {
+      'cg-board-wrap': true,
+      ['orientation-' + d.orientation]: true,
+      'view-only': d.viewOnly,
+      'manipulable': !d.viewOnly
+    }
+  }, [
+    h('div', {
+      class: {
+        'cg-board': true
+      }
+    }, renderContent(d))
+  ]);
+};
 
 function renderPiece(d: Data, key: Key, ctx: Ctx): VNode {
 
@@ -44,7 +51,7 @@ function renderPiece(d: Data, key: Key, ctx: Ctx): VNode {
     class: pieceClasses(d.pieces[key]),
     style: { [ctx.transformProp]: util.translate(translate) },
     // attrs: d.pieceKey ? {'data-key': key } : undefined
-  });
+    });
 }
 
 function renderSquare(key: Key, classes: Classes, ctx: Ctx): VNode {
@@ -67,7 +74,7 @@ function renderGhost(key: Key, piece: Piece, ctx: Ctx): VNode {
   classes['ghost'] = true;
   return h(pieceTag, {
     key: 'g' + key,
-    classes: classes,
+    class: classes,
     style: { [ctx.transformProp]: util.translate(posToTranslate(util.key2pos(key), ctx)) }
   });
 }
@@ -77,7 +84,7 @@ function renderFading(fading: AnimFading, ctx: Ctx): VNode {
   classes['fading'] = true;
   return h(pieceTag, {
     key: 'f' + util.pos2key(fading.pos),
-    classes: classes,
+    class: classes,
     style: {
       [ctx.transformProp]: util.translate(posToTranslate(fading.pos, ctx)),
       opacity: fading.opacity
@@ -128,15 +135,17 @@ function renderSquares(d: Data, ctx: Ctx): VNode[] {
 
   const nodes: VNode[] = [];
 
-  if (d.items) return nodes;
-  // for (i = 0; i < 64; i++) {
-  //   var key = util.allKeys[i];
-  //   var square = squares[key];
-  //   var item = d.items(util.key2pos(key), key);
-  //   if (square || item) {
-  //     var sq = renderSquare(key, square ? square.join(' ') + (item ? ' has-item' : '') : 'has-item', ctx);
-  //     if (item) sq.children = [item];
-  //     dom.push(sq);
+  // if (d.items) {
+  //   let key: Key, square: SquareClasses | undefined, item: Item;
+  //   for (i = 0; i < 64; i++) {
+  //     key = util.allKeys[i];
+  //     square = squares[key];
+  //     item = d.items(util.key2pos(key), key);
+  //     if (square || item) {
+  //       var sq = renderSquare(key, square ? square.join(' ') + (item ? ' has-item' : '') : 'has-item', ctx);
+  //       if (item) sq.children = [item];
+  //       dom.push(sq);
+  //     }
   //   }
   // }
 
@@ -186,19 +195,12 @@ function renderContent(d: Data): VNode[] {
     return nodes;
 }
 
-export default function(d: Data): VNode {
-  return h('div', {
-    class: {
-      'cg-board-wrap': true,
-      ['orientation-' + d.orientation]: true,
-      'view-only': d.viewOnly,
-      'manipulable': !d.viewOnly
-    }
-  }, [
-    h('div', {
-      class: {
-        'cg-board': true
-      }
-    }, renderContent(d))
-  ]);
-};
+const pieceTag = 'piece';
+const squareTag = 'square';
+
+function pieceClasses(p: Piece): Classes {
+  return {
+    [p.role]: true,
+    [p.color]: true
+  };
+}

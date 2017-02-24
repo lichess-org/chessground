@@ -59,11 +59,8 @@ function piece(baseUrl: string, pos: Pos, piece: ShapePiece, bounds: ClientRect)
   const size = bounds.width / 8 * (piece.scale || 1);
   const name = piece.color[0] + (piece.role === 'knight' ? 'n' : piece.role[0]).toUpperCase();
   return h('image', {
-    class: {
-      [piece.color]: true,
-      [piece.role]: true
-    },
     attrs: {
+      class: `${piece.color} ${piece.role}`, // can't use classes because IE
       x: o[0] - size / 2,
       y: o[1] - size / 2,
       width: size,
