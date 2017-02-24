@@ -109,12 +109,8 @@ function computePlan(prev: MiniState, current: State): AnimPlan {
   };
 }
 
-function roundBy(n: number, by: number): number {
-  return Math.round(n * by) / by;
-}
-
 function go(state: State): void {
-  if (!state.animation.current || !state.animation.current.start) return; // animation was canceled
+  if (!state.animation.current) return; // animation was canceled
   const rest = 1 - (new Date().getTime() - state.animation.current.start) / state.animation.current.duration;
   if (rest <= 0) {
     state.animation.current = undefined;
@@ -176,4 +172,7 @@ function isObjectEmpty(o: any): boolean {
 // https://gist.github.com/gre/1650294
 function easing(t: number): number {
   return t < 0.5 ? 4 * t * t * t : (t - 1) * (2 * t - 2) * (2 * t - 2) + 1;
+}
+function roundBy(n: number, by: number): number {
+  return Math.round(n * by) / by;
 }
