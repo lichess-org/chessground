@@ -1,7 +1,7 @@
 import { State } from './state'
 import * as util from './util'
 
-export default function(s: State, bounds: ClientRect): [HTMLElement, HTMLElement, HTMLElement] {
+export default function(s: State, bounds: ClientRect): [HTMLElement, HTMLElement, HTMLElement | undefined] {
 
   const wrap = document.createElement('div');
   const manipClass = s.viewOnly ? 'view-only' : 'manipulable';
@@ -17,8 +17,11 @@ export default function(s: State, bounds: ClientRect): [HTMLElement, HTMLElement
     wrap.appendChild(renderCoords(util.files, 'files' + orientClass));
   }
 
-  const over = renderOverEl(s.browser, bounds);
-  wrap.appendChild(over);
+  let over: HTMLElement | undefined;
+  if (s.movable.showDests || s.premovable.showDests) {
+    over = renderOverEl(s.browser, bounds);
+    wrap.appendChild(over);
+  }
 
   return [wrap, board, over];
 }

@@ -89,7 +89,7 @@ function processDrag(s: State): void {
           cur.element.style[s.browser.transformProp] = util.translate(translation);
 
           // move over element
-          if (cur.over && cur.over !== cur.overPrev) {
+          if (s.dom.overEl && cur.over && cur.over !== cur.overPrev) {
             const dests = s.movable.dests;
             if (!dests || !dests[cur.orig] || util.containsX(dests[cur.orig], cur.over)) {
               const squareWidth = s.dom.bounds.width / 8,
@@ -155,7 +155,7 @@ export function end(s: State, e: TouchEvent): void {
     board.unselect(s);
   else if (!s.selectable.enabled) board.unselect(s);
 
-  s.dom.overEl.style[s.browser.transformProp] = util.translateAway;
+  if (s.dom.overEl) s.dom.overEl.style[s.browser.transformProp] = util.translateAway;
 
   s.draggable.current = undefined;
   util.raf(s.dom.redraw);

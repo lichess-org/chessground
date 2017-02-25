@@ -35,7 +35,7 @@ interface Browser {
 }
 interface Dom {
   boardEl: HTMLElement;
-  overEl: HTMLElement;
+  overEl?: HTMLElement;
   bounds: ClientRect;
   redraw: () => void;
 }
