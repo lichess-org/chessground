@@ -102,7 +102,7 @@ export default function(s: State): void {
   for (let j = 0, jlen = piecesKeys.length; j < jlen; ++j) {
     k = piecesKeys[j];
     p = pieces[k];
-    pieceClass = p.role + p.color;
+    pieceClass = p.color + p.role;
     anim = anims[k];
     if (!samePieces[k]) {
       mvdset = movedPieces[pieceClass];
@@ -167,7 +167,7 @@ function renderSquareDom(key: Key, className: string, translation: NumberPair, t
 function renderPieceDom(piece: Piece, key: Key, asWhite: boolean, bounds: ClientRect, anim: AnimVector | undefined, transform: string): LolNode {
 
   const p = document.createElement('piece') as LolNode;
-  p.className = `${piece.role} ${piece.color}`;
+  p.className = `${piece.color} ${piece.role}`;
   p.cgRole = piece.role;
   p.cgColor = piece.color;
   p.cgKey = key;
