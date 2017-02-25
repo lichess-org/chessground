@@ -3,8 +3,6 @@ import * as board from './board'
 import * as util from './util'
 import * as draw from './draw'
 
-let originTarget: EventTarget | undefined;
-
 function computeSquareBounds(s: State, key: Key) {
   const pos = util.key2pos(key), bounds = s.dom.bounds;
   if (s.orientation !== 'white') {
@@ -24,7 +22,6 @@ export function start(s: State, e: MouchEvent): void {
   if (e.touches && e.touches.length > 1) return; // support one finger touch only
   e.stopPropagation();
   e.preventDefault();
-  originTarget = e.target;
   const previouslySelected = s.selected;
   const position = util.eventPosition(e);
   const orig = board.getKeyAtDomPos(s, position);
@@ -43,7 +40,6 @@ export function start(s: State, e: MouchEvent): void {
   if (piece && element && stillSelected && board.isDraggable(s, orig)) {
     const squareBounds = computeSquareBounds(s, orig);
     s.draggable.current = {
-      previouslySelected: previouslySelected,
       orig: orig,
       origPos: util.key2pos(orig),
       piece: piece,
@@ -55,7 +51,9 @@ export function start(s: State, e: MouchEvent): void {
         position[1] - (squareBounds.top + squareBounds.height / 2)
       ] : [0, 0],
       started: s.draggable.autoDistance && s.stats.dragged,
-      element: element
+      element: element,
+      previouslySelected: previouslySelected,
+      originTarget: e.target
     };
     element.cgDragging = true;
     element.classList.add('dragging');
@@ -106,7 +104,7 @@ export function end(s: State, e: TouchEvent): void {
   if (!cur && (!s.editable.enabled || s.editable.selected === 'pointer')) return;
   // comparing with the origin target is an easy way to test that the end event
   // has the same touch origin
-  if (e.type === 'touchend' && originTarget !== e.target && cur && !cur.newPiece) {
+  if (e.type === 'touchend' && cur && cur.originTarget !== e.target && !cur.newPiece) {
     s.draggable.current = undefined;
     return;
   }

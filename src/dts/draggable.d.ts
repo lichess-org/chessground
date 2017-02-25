@@ -13,4 +13,5 @@ interface DragCurrent {
   element: LolNode;
   newPiece?: boolean;
   previouslySelected?: Key;
+  originTarget: EventTarget;
 }
