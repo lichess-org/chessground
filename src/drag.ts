@@ -89,7 +89,7 @@ function processDrag(s: State): void {
           cur.element.style[s.browser.transformProp] = util.translate(translation);
 
           // move over element
-          if (s.dom.overEl && cur.over && cur.over !== cur.overPrev) {
+          if (s.dom.elements.over && cur.over && cur.over !== cur.overPrev) {
             const dests = s.movable.dests;
             if (!dests || util.containsX((dests[cur.orig] || []), cur.over)) {
               const squareWidth = s.dom.bounds.width / 8,
@@ -99,9 +99,9 @@ function processDrag(s: State): void {
                 (asWhite ? pos[0] - 1 : 8 - pos[0]) * squareWidth,
                 (asWhite ? 8 - pos[1] : pos[1] - 1) * squareWidth
               ];
-              s.dom.overEl.style[s.browser.transformProp] = util.translate(vector);
+              s.dom.elements.over.style[s.browser.transformProp] = util.translate(vector);
             } else {
-              s.dom.overEl.style[s.browser.transformProp] = util.translateAway;
+              s.dom.elements.over.style[s.browser.transformProp] = util.translateAway;
             }
             cur.overPrev = cur.over;
           }
@@ -155,7 +155,7 @@ export function end(s: State, e: TouchEvent): void {
     board.unselect(s);
   else if (!s.selectable.enabled) board.unselect(s);
 
-  if (s.dom.overEl) s.dom.overEl.style[s.browser.transformProp] = util.translateAway;
+  if (s.dom.elements.over) s.dom.elements.over.style[s.browser.transformProp] = util.translateAway;
 
   s.draggable.current = undefined;
   util.raf(s.dom.redraw);
@@ -169,7 +169,7 @@ export function cancel(s: State): void {
 }
 
 function pieceElementByKey(s: State, key: Key): LolNode | undefined {
-  let el = s.dom.boardEl.firstChild as LolNode;
+  let el = s.dom.elements.board.firstChild as LolNode;
   while (el) {
     if (el.cgKey === key && el.tagName === 'PIECE') return el;
     el = el.nextSibling;

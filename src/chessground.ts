@@ -23,12 +23,11 @@ export function Chessground(container: HTMLElement, config?: Config): Api {
 
   function redrawAll() {
     const bounds = state.dom ? state.dom.bounds : container.getBoundingClientRect();
-    const [wrapEl, boardEl, overEl] = renderWrap(state, bounds);
+    const [wrapEl, elements] = renderWrap(state, bounds);
     container.innerHTML = '';
     container.appendChild(wrapEl);
     state.dom = {
-      boardEl: boardEl,
-      overEl: overEl,
+      elements: elements,
       bounds: bounds,
       redraw() { render(state); }
     };

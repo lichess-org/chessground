@@ -39,7 +39,7 @@ export default function(s: State): void {
   mvd: LolNode | undefined;
 
   // walk over all board dom elements, apply animations and flag moved pieces
-  el = s.dom.boardEl.firstChild as LolNode;
+  el = s.dom.elements.board.firstChild as LolNode;
   while (el) {
     k = el.cgKey;
     squareClassAtKey = squares[k];
@@ -123,7 +123,7 @@ export default function(s: State): void {
       // new: assume the new piece is not being dragged
       // might be a bad idea
       else {
-        s.dom.boardEl.appendChild(
+        s.dom.elements.board.appendChild(
           renderPieceDom(p, k, asWhite, bounds, anim, transform)
         );
       }
@@ -142,7 +142,7 @@ export default function(s: State): void {
         mvd.style[transform] = translate(translation);
       }
       else {
-        s.dom.boardEl.appendChild(renderSquareDom(sk as Key, squares[sk], translation, transform));
+        s.dom.elements.board.appendChild(renderSquareDom(sk as Key, squares[sk], translation, transform));
       }
     }
   }
@@ -153,7 +153,7 @@ export default function(s: State): void {
 }
 
 function removeNodes(s: State, nodes: LolNode[]): void {
-  for (let i in nodes) s.dom.boardEl.removeChild(nodes[i]);
+  for (let i in nodes) s.dom.elements.board.removeChild(nodes[i]);
 }
 
 function renderSquareDom(key: Key, className: string, translation: NumberPair, transform: string): LolNode {

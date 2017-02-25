@@ -33,9 +33,13 @@ interface Browser {
   transformProp: string;
   isTrident?: boolean;
 }
+interface Elements {
+  board: HTMLElement;
+  over?: HTMLElement;
+  ghost?: HTMLElement;
+}
 interface Dom {
-  boardEl: HTMLElement;
-  overEl?: HTMLElement;
+  elements: Elements,
   bounds: ClientRect;
   redraw: () => void;
 }

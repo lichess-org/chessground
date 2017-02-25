@@ -44,7 +44,7 @@ export default function(d: State): void {
     onend = end;
   }
 
-  startEvents.forEach(ev => d.dom.boardEl.addEventListener(ev, onstart));
+  startEvents.forEach(ev => d.dom.elements.board.addEventListener(ev, onstart));
 
   moveEvents.forEach(ev => document.addEventListener(ev, onmove));
 
@@ -59,7 +59,7 @@ export default function(d: State): void {
     }
     return true;
   };
-  d.dom.boardEl.addEventListener('contextmenu', onContextMenu);
+  d.dom.elements.board.addEventListener('contextmenu', onContextMenu);
 }
 
 function startDragOrDraw(d: State): MouchBind {
@@ -85,7 +85,7 @@ function bindResize(d: State): void {
   if (!d.resizable) return;
 
   function recomputeBounds() {
-    d.dom.bounds = d.dom.boardEl.getBoundingClientRect();
+    d.dom.bounds = d.dom.elements.board.getBoundingClientRect();
     d.dom.redraw();
   }
 
