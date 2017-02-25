@@ -104,7 +104,10 @@ function computePlan(prev: MiniState, current: State): AnimPlan {
 
 function step(state: State): void {
   const cur = state.animation.current;
-  if (!cur) return; // animation was canceled
+  if (!cur) { // animation was canceled :(
+    state.dom.redraw();
+    return;
+  }
   const rest = 1 - (new Date().getTime() - cur.start) / cur.duration;
   if (rest <= 0) {
     state.animation.current = undefined;
