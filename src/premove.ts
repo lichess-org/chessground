@@ -7,7 +7,7 @@ function diff(a: number, b:number):number {
 }
 
 function pawn(color: Color): Mobility {
-  return (x1, x2, y1, y2) => diff(x1, x2) < 2 && (
+  return (x1, y1, x2, y2) => diff(x1, x2) < 2 && (
     color === 'white' ? (
       // allow 2 squares from 1 and 8, for horde
       y2 === y1 + 1 || (y1 <= 2 && y2 === (y1 + 2) && x1 === x2)
@@ -17,26 +17,26 @@ function pawn(color: Color): Mobility {
   );
 }
 
-const knight: Mobility = (x1, x2, y1, y2) => {
+const knight: Mobility = (x1, y1, x2, y2) => {
   const xd = diff(x1, x2);
   const yd = diff(y1, y2);
   return (xd === 1 && yd === 2) || (xd === 2 && yd === 1);
 }
 
-const bishop: Mobility = (x1, x2, y1, y2) => {
+const bishop: Mobility = (x1, y1, x2, y2) => {
   return diff(x1, x2) === diff(y1, y2);
 }
 
-const rook: Mobility = (x1, x2, y1, y2) => {
+const rook: Mobility = (x1, y1, x2, y2) => {
   return x1 === x2 || y1 === y2;
 }
 
-const queen: Mobility = (x1, x2, y1, y2) => {
+const queen: Mobility = (x1, y1, x2, y2) => {
   return bishop(x1, y1, x2, y2) || rook(x1, y1, x2, y2);
 }
 
 function king(color: Color, rookFiles: number[], canCastle: boolean): Mobility {
-  return (x1, x2, y1, y2)  => (
+  return (x1, y1, x2, y2)  => (
     diff(x1, x2) < 2 && diff(y1, y2) < 2
   ) || (
     canCastle && y1 === y2 && y1 === (color === 'white' ? 1 : 8) && (
@@ -54,8 +54,8 @@ function rookFilesOf(pieces: Pieces, color: Color) {
 }
 
 export default function(pieces: Pieces, key: Key, canCastle: boolean): Key[] {
-  const piece = pieces[key];
-  const pos = util.key2pos(key);
+  const piece = pieces[key],
+  pos = util.key2pos(key);
   let mobility: Mobility;
   switch (piece.role) {
     case 'pawn':
