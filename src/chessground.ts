@@ -18,8 +18,7 @@ export function Chessground(container: HTMLElement, config?: Config): Api {
   configure(state, config || {});
 
   state.browser = {
-    transformProp: util.computeTransformProp(),
-    isTrident: util.computeIsTrident()
+    transformProp: util.computeTransformProp()
   };
 
   function redrawAll() {

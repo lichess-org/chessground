@@ -1,9 +1,10 @@
 import { State } from './state'
 import { h } from 'snabbdom'
 import { VNode } from 'snabbdom/vnode'
-import { key2pos } from './util'
+import { key2pos, computeIsTrident } from './util'
 
 export default function(state: State): VNode | undefined {
+  if (state.browser.isTrident === undefined) state.browser.isTrident = computeIsTrident();
   const d = state.drawable;
   const allShapes = d.shapes.concat(d.autoShapes);
   if (!allShapes.length && !d.current) return;
@@ -61,7 +62,7 @@ function piece(baseUrl: string, pos: Pos, piece: ShapePiece, bounds: ClientRect)
   const name = piece.color[0] + (piece.role === 'knight' ? 'n' : piece.role[0]).toUpperCase();
   return h('image', {
     attrs: {
-      class: `${piece.color} ${piece.role}`, // can't use classes because IE
+      className: `${piece.color} ${piece.role}`, // can't use classes because IE
       x: o[0] - size / 2,
       y: o[1] - size / 2,
       width: size,

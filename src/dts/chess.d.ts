@@ -31,7 +31,7 @@ interface MaterialDiff {
 
 interface Browser {
   transformProp: string;
-  isTrident: boolean;
+  isTrident?: boolean;
 }
 interface Dom {
   boardEl: HTMLElement;
