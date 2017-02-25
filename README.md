@@ -63,9 +63,9 @@ var ground = Chessground(document.body, config);
 
 ## Documentation
 
-- [Config documented types](https://github.com/ornicar/chessground/tree/master/src/dts/config.d.ts)
-- [Config default values](https://github.com/ornicar/chessground/tree/master/src/defaults.ts)
-- [API documented type signatures](https://github.com/ornicar/chessground/tree/master/src/dts/api.d.ts)
+- [Config documented types](https://github.com/ornicar/chessground/tree/master/src/config.ts)
+- [Config default values](https://github.com/ornicar/chessground/tree/master/src/state.ts)
+- [API documented type signatures](https://github.com/ornicar/chessground/tree/master/src/api.ts)
 
 ## Developers
 
