@@ -5,29 +5,90 @@ export function createElement(tagName: string): SVGElement {
   return document.createElementNS('http://www.w3.org/2000/svg', tagName);
 }
 
-export default function(state: State, el: SVGElement): void {
+interface ShapeC {
+  shape: Shape;
+  current: boolean;
+  hash: string;
+}
 
-  el.innerHTML = '';
+export default function(state: State, root: SVGElement): void {
 
   if (state.browser.isTrident === undefined) state.browser.isTrident = computeIsTrident();
 
-  const d = state.drawable, allShapes = d.shapes.concat(d.autoShapes);
+  const d = state.drawable,
+  allShapes: ShapeC[] = d.shapes.concat(d.autoShapes).map(s => {
+    return {
+      shape: s,
+      current: false,
+      hash: shapeHash(s, false)
+    };
+  });
 
-  if (!allShapes.length && !d.current) return;
+  if (!allShapes.length) return;
+  if (d.current) allShapes.push({
+    shape: d.current as Shape,
+    current: true,
+    hash: shapeHash(d.current, true)
+  });
 
-  const usedBrushes: Brush[] = computeUsedBrushes(d, allShapes, d.current as Shape | undefined);
+  const usedBrushes: Brush[] = computeUsedBrushes(d, allShapes),
+  hashesInDom: {[hash: string]: boolean} = {};
 
-  const renderedShapes: SVGElement[] = allShapes.map((s, i) => renderShape(state, false, s, i));
-  // if (d.current) renderedShapes.push(renderShape(state, true, d.current as Shape, 9999));
+  allShapes.forEach(sc => { hashesInDom[sc.hash] = false; });
 
-  console.log(renderedShapes);
+  let mustInsertDefs = usedBrushes.length > 0,
+  el = root.firstChild as LolNode,
+  toDelete: SVGElement[] = [],
+  elHash;
 
-  el.appendChild(renderDefs(usedBrushes));
+  while(el) {
+    if (el.tagName === 'DEFS') {
+      if (mustInsertDefs) {
+        root.replaceChild(renderDefs(usedBrushes), el);
+        mustInsertDefs = false;
+      }
+      else toDelete.push(el);
+    } else {
+      elHash = el.getAttribute('cgHash');
+      if (hashesInDom.hasOwnProperty(elHash)) hashesInDom[elHash] = true;
+      else toDelete.push(el);
+    }
+    el = el.nextSibling;
+  }
 
-  for (let i in renderedShapes) el.appendChild(renderedShapes[i]);
+  toDelete.forEach(el => root.removeChild(el));
+
+  if (mustInsertDefs) root.appendChild(renderDefs(usedBrushes));
+
+  allShapes.forEach(sc => {
+    if (!hashesInDom[sc.hash]) {
+      el = renderShape(state, sc, 9876);
+      el.setAttribute('cgHash', sc.hash);
+      root.appendChild(el);
+    }
+  });
+
+  // root.appendChild(renderDefs(usedBrushes));
+
+  // for (let i in renderedShapes) root.appendChild(renderedShapes[i]);
+  }
+
+function shapeHash({orig, dest, brush, piece, brushModifiers}: Shape, current: boolean): string {
+  return ['cgs', current, orig, dest, brush,
+    piece && pieceHash(piece),
+    brushModifiers && brushModifiersHash(brushModifiers)
+  ].filter(x => x).join('');
 }
 
-function renderShape(state: State, current: boolean, shape: Shape, i: number): SVGElement {
+function pieceHash(piece: ShapePiece): string {
+  return [piece.color, piece.role, piece.scale].filter(x => x).join('');
+}
+
+function brushModifiersHash(m: BrushModifiers): string {
+  return [m.color, m.opacity, m.lineWidth].filter(x => x).join('');
+}
+
+function renderShape(state: State, {shape, current}: ShapeC, i: number): SVGElement {
   if (shape.piece) return renderPiece(
     state.drawable.pieces.baseUrl,
     orient(key2pos(shape.orig), state.orientation),
@@ -139,13 +200,11 @@ function makeCustomBrush(base: Brush, modifiers: BrushModifiers, i: number): Bru
   };
 }
 
-function computeUsedBrushes(d: Drawable, drawn: Shape[], current?: Shape): Brush[] {
-  const brushes = [],
-  keys = [],
-  shapes = (current && current.dest) ? drawn.concat(current) : drawn;
+function computeUsedBrushes(d: Drawable, shapes: ShapeC[]): Brush[] {
+  const brushes = [], keys = [];
   let i: any, shape: Shape, brushKey: string;
   for (i in shapes) {
-    shape = shapes[i];
+    shape = shapes[i].shape;
     if (!shape.dest) continue;
     brushKey = shape.brush;
     if (shape.brushModifiers)
