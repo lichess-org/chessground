@@ -13,8 +13,6 @@ import * as util from './util';
 
 export function Chessground(container: HTMLElement, config?: Config): Api {
 
-  const bounds = container.getBoundingClientRect();
-
   const state = defaults() as State;
 
   configure(state, config || {});
@@ -24,22 +22,23 @@ export function Chessground(container: HTMLElement, config?: Config): Api {
     isTrident: util.computeIsTrident()
   };
 
-  const [wrapEl, boardEl, overEl] = renderWrap(state, bounds);
-  container.innerHTML = '';
-  container.appendChild(wrapEl);
+  function redrawAll() {
+    const bounds = state.dom ? state.dom.bounds : container.getBoundingClientRect();
+    const [wrapEl, boardEl, overEl] = renderWrap(state, bounds);
+    container.innerHTML = '';
+    container.appendChild(wrapEl);
+    state.dom = {
+      boardEl: boardEl,
+      overEl: overEl,
+      bounds: bounds,
+      redraw() { render(state); }
+    };
+    state.dom.redraw();
+    bindEvents(state);
+  }
+  redrawAll();
 
-  state.dom = {
-    boardEl: boardEl,
-    overEl: overEl,
-    bounds: bounds,
-    redraw() { render(state); }
-  };
-
-  render(state);
-
-  const api = start(state);
-
-  bindEvents(state);
+  const api = start(state, redrawAll);
 
   return api;
 };

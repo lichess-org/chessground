@@ -68,12 +68,14 @@ export interface Api {
 }
 
 // see API types and documentations in dts/api.d.ts
-export function start(state: State): Api {
+export function start(state: State, redrawAll: () => void): Api {
 
   return {
 
     set(config) {
+      const orientPrev = state.orientation;
       anim(state => configure(state, config), state);
+      if (state.orientation !== orientPrev) redrawAll();
     },
 
     state,
@@ -83,7 +85,8 @@ export function start(state: State): Api {
     getMaterialDiff: () => board.getMaterialDiff(state),
 
     toggleOrientation() {
-      anim(board.toggleOrientation, state);
+      board.toggleOrientation(state);
+      redrawAll();
     },
 
     setPieces(pieces) {
