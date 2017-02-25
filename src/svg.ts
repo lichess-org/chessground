@@ -11,9 +11,11 @@ interface ShapeC {
   hash: string;
 }
 
+let isTrident: boolean | undefined;
+
 export default function(state: State, root: SVGElement): void {
 
-  if (state.browser.isTrident === undefined) state.browser.isTrident = computeIsTrident();
+  if (isTrident === undefined) isTrident = computeIsTrident();
 
   const d = state.drawable,
   allShapes: ShapeC[] = d.shapes.concat(d.autoShapes).map(s => {
@@ -24,7 +26,6 @@ export default function(state: State, root: SVGElement): void {
     };
   });
 
-  if (!allShapes.length) return;
   if (d.current) allShapes.push({
     shape: d.current as Shape,
     current: true,
@@ -50,16 +51,21 @@ export default function(state: State, root: SVGElement): void {
       else toDelete.push(el);
     } else {
       elHash = el.getAttribute('cgHash');
+      // found a shape element that's here to stay
       if (hashesInDom.hasOwnProperty(elHash)) hashesInDom[elHash] = true;
+      // or delete it
       else toDelete.push(el);
     }
     el = el.nextSibling;
   }
 
+  // remove old shapes and defs
   toDelete.forEach(el => root.removeChild(el));
 
+  // insert new defs
   if (mustInsertDefs) root.appendChild(renderDefs(usedBrushes));
 
+  // insert shapes that are not yet in dom
   allShapes.forEach(sc => {
     if (!hashesInDom[sc.hash]) {
       el = renderShape(state, sc, 9876);
@@ -67,14 +73,10 @@ export default function(state: State, root: SVGElement): void {
       root.appendChild(el);
     }
   });
-
-  // root.appendChild(renderDefs(usedBrushes));
-
-  // for (let i in renderedShapes) root.appendChild(renderedShapes[i]);
-  }
+}
 
 function shapeHash({orig, dest, brush, piece, brushModifiers}: Shape, current: boolean): string {
-  return ['cgs', current, orig, dest, brush,
+  return [current, orig, dest, brush,
     piece && pieceHash(piece),
     brushModifiers && brushModifiersHash(brushModifiers)
   ].filter(x => x).join('');
@@ -100,7 +102,6 @@ function renderShape(state: State, {shape, current}: ShapeC, i: number): SVGElem
     const orig = orient(key2pos(shape.orig), state.orientation);
     if (shape.orig && shape.dest) return renderArrow(
       state.dom,
-      state.browser,
       brush,
       orig,
       orient(key2pos(shape.dest), state.orientation),
@@ -124,8 +125,8 @@ function renderCircle(brush: Brush, pos: Pos, current: boolean, bounds: ClientRe
   });
 }
 
-function renderArrow(dom: Dom, browser: Browser, brush: Brush, orig: Pos, dest: Pos, current: boolean): SVGElement {
-  const m = arrowMargin(dom, browser, current),
+function renderArrow(dom: Dom, brush: Brush, orig: Pos, dest: Pos, current: boolean): SVGElement {
+  const m = arrowMargin(dom, current),
   a = pos2px(orig, dom.bounds),
   b = pos2px(dest, dom.bounds),
   dx = b[0] - a[0],
@@ -137,7 +138,7 @@ function renderArrow(dom: Dom, browser: Browser, brush: Brush, orig: Pos, dest: 
     stroke: brush.color,
     'stroke-width': lineWidth(brush, current, dom.bounds),
     'stroke-linecap': 'round',
-    'marker-end': browser.isTrident ? undefined : 'url(#arrowhead-' + brush.key + ')',
+    'marker-end': isTrident ? undefined : 'url(#arrowhead-' + brush.key + ')',
     opacity: opacity(brush, current),
     x1: a[0],
     y1: a[1],
@@ -229,8 +230,8 @@ function opacity(brush: Brush, current: boolean): number {
   return (brush.opacity || 1) * (current ? 0.9 : 1);
 }
 
-function arrowMargin(dom: Dom, browser: Browser, current: boolean): number {
-  return browser.isTrident ? 0 : ((current ? 10 : 20) / 512 * dom.bounds.width);
+function arrowMargin(dom: Dom, current: boolean): number {
+  return isTrident ? 0 : ((current ? 10 : 20) / 512 * dom.bounds.width);
 }
 
 function pos2px(pos: Pos, bounds: ClientRect): NumberPair {
