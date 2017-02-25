@@ -19,13 +19,13 @@ export default function(s: State, bounds: ClientRect): [HTMLElement, Elements] {
 
   let over: HTMLElement | undefined;
   if (s.movable.showDests || s.premovable.showDests) {
-    over = renderAway(s.browser, bounds, 'over');
+    over = renderAway(s.browser, bounds, 'div', 'over');
     wrap.appendChild(over);
   }
 
   let ghost: HTMLElement | undefined;
   if (s.draggable.showGhost) {
-    ghost = renderAway(s.browser, bounds, 'ghost');
+    ghost = renderAway(s.browser, bounds, 'piece', 'ghost');
     wrap.appendChild(ghost);
   }
 
@@ -36,9 +36,9 @@ export default function(s: State, bounds: ClientRect): [HTMLElement, Elements] {
   }];
 }
 
-function renderAway(browser: Browser, bounds: ClientRect, className: string): HTMLElement {
+function renderAway(browser: Browser, bounds: ClientRect, tagName: string, className: string): HTMLElement {
   const squareSize = bounds.width / 8;
-  const el = document.createElement('div');
+  const el = document.createElement(tagName);
   el.className = className;
   el.style.width = squareSize + 'px';
   el.style.height = squareSize + 'px';

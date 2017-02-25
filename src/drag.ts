@@ -57,6 +57,12 @@ export function start(s: State, e: MouchEvent): void {
     };
     element.cgDragging = true;
     element.classList.add('dragging');
+    // place ghost
+    const ghost = s.dom.elements.ghost;
+    if (ghost) {
+      ghost.className = `ghost ${piece.color} ${piece.role}`;
+      ghost.style[s.browser.transformProp] = element.style[s.browser.transformProp];
+    }
   } else {
     if (hadPremove) board.unsetPremove(s);
     if (hadPredrop) board.unsetPredrop(s);
@@ -155,7 +161,13 @@ export function end(s: State, e: TouchEvent): void {
     board.unselect(s);
   else if (!s.selectable.enabled) board.unselect(s);
 
+  // remove over
   if (s.dom.elements.over) s.dom.elements.over.style[s.browser.transformProp] = util.translateAway;
+
+  // remove ghost
+  if (s.dom.elements.ghost) {
+    s.dom.elements.ghost.style[s.browser.transformProp] = util.translateAway;
+  }
 
   s.draggable.current = undefined;
   util.raf(s.dom.redraw);
