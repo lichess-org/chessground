@@ -164,62 +164,60 @@ function renderSquareDom(key: Key, className: string, translation: NumberPair, t
   return s;
 }
 
-function renderPieceDom(
-  piece: Piece, key: Key, asWhite: boolean, bounds: ClientRect,
-  anim: AnimVector | undefined, transform: string): LolNode {
+function renderPieceDom(piece: Piece, key: Key, asWhite: boolean, bounds: ClientRect, anim: AnimVector | undefined, transform: string): LolNode {
 
-    const p = document.createElement('piece') as LolNode;
-    p.className = `${piece.role} ${piece.color}`;
-    p.cgRole = piece.role;
-    p.cgColor = piece.color;
-    p.cgKey = key;
+  const p = document.createElement('piece') as LolNode;
+  p.className = `${piece.role} ${piece.color}`;
+  p.cgRole = piece.role;
+  p.cgColor = piece.color;
+  p.cgKey = key;
 
-    const translation = posToTranslate(key2pos(key), asWhite, bounds);
-    if (anim) {
-      p.cgAnimating = true;
-      translation[0] += anim[1][0];
-      translation[1] += anim[1][1];
-    }
-    p.style[transform] = translate(translation);
-    return p;
+  const translation = posToTranslate(key2pos(key), asWhite, bounds);
+  if (anim) {
+    p.cgAnimating = true;
+    translation[0] += anim[1][0];
+    translation[1] += anim[1][1];
   }
+  p.style[transform] = translate(translation);
+  return p;
+}
 
-  function computeSquareClasses(s: State): SquareClasses {
-    const squares: SquareClasses = {};
-    let i: any, k: Key;
-    if (s.lastMove && s.highlight.lastMove) for (i in s.lastMove) {
-      addSquare(squares, s.lastMove[i], 'last-move');
-    }
-    if (s.check && s.highlight.check) addSquare(squares, s.check, 'check');
-    if (s.selected) {
-      addSquare(squares, s.selected, 'selected');
-      const over = s.draggable.current && s.draggable.current.over,
-      dests = s.movable.dests && s.movable.dests[s.selected];
-      if (dests) for (i in dests) {
-        k = dests[i];
-        if (s.movable.showDests) addSquare(squares, k, 'move-dest');
-        if (k === over) addSquare(squares, k, 'drag-over');
-        else if (s.movable.showDests && s.pieces[k]) addSquare(squares, k, 'oc');
-      }
-      const pDests = s.premovable.dests;
-      if (pDests) for (i in pDests) {
-        k = pDests[i];
-        if (s.movable.showDests) addSquare(squares, k, 'premove-dest');
-        if (k === over) addSquare(squares, k, 'drag-over');
-        else if (s.movable.showDests && s.pieces[k]) addSquare(squares, k, 'oc');
-      }
-    }
-    const premove = s.premovable.current;
-    if (premove) for (i in premove) addSquare(squares, premove[i], 'current-premove');
-    else if (s.predroppable.current) addSquare(squares, s.predroppable.current.key, 'current-premove');
-
-    let o = s.exploding;
-    if (o) for (i in o.keys) addSquare(squares, o.keys[i], 'exploding' + o.stage);
-
-    return squares;
+function computeSquareClasses(s: State): SquareClasses {
+  const squares: SquareClasses = {};
+  let i: any, k: Key;
+  if (s.lastMove && s.highlight.lastMove) for (i in s.lastMove) {
+    addSquare(squares, s.lastMove[i], 'last-move');
   }
-
-  function addSquare(squares: SquareClasses, key: Key, klass: string): void {
-    if (squares[key]) squares[key] += ' ' + klass;
-    else squares[key] = klass;
+  if (s.check && s.highlight.check) addSquare(squares, s.check, 'check');
+  if (s.selected) {
+    addSquare(squares, s.selected, 'selected');
+    const over = s.draggable.current && s.draggable.current.over,
+    dests = s.movable.dests && s.movable.dests[s.selected];
+    if (dests) for (i in dests) {
+      k = dests[i];
+      if (s.movable.showDests) addSquare(squares, k, 'move-dest');
+      if (k === over) addSquare(squares, k, 'drag-over');
+      else if (s.movable.showDests && s.pieces[k]) addSquare(squares, k, 'oc');
+    }
+    const pDests = s.premovable.dests;
+    if (pDests) for (i in pDests) {
+      k = pDests[i];
+      if (s.movable.showDests) addSquare(squares, k, 'premove-dest');
+      if (k === over) addSquare(squares, k, 'drag-over');
+      else if (s.movable.showDests && s.pieces[k]) addSquare(squares, k, 'oc');
+    }
   }
+  const premove = s.premovable.current;
+  if (premove) for (i in premove) addSquare(squares, premove[i], 'current-premove');
+  else if (s.predroppable.current) addSquare(squares, s.predroppable.current.key, 'current-premove');
+
+  let o = s.exploding;
+  if (o) for (i in o.keys) addSquare(squares, o.keys[i], 'exploding' + o.stage);
+
+  return squares;
+}
+
+function addSquare(squares: SquareClasses, key: Key, klass: string): void {
+  if (squares[key]) squares[key] += ' ' + klass;
+  else squares[key] = klass;
+}
