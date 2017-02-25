@@ -90,14 +90,19 @@ function processDrag(s: State): void {
 
           // move over element
           if (cur.over && cur.over !== cur.overPrev) {
-            const squareWidth = s.dom.bounds.width / 8,
-            pos = util.key2pos(cur.over),
-            asWhite = s.orientation === 'white',
-            vector: NumberPair = [
-              (asWhite ? pos[0] - 1 : 8 - pos[0]) * squareWidth,
-              (asWhite ? 8 - pos[1] : pos[1] - 1) * squareWidth
-            ];
-            s.dom.overEl.style[s.browser.transformProp] = util.translate(vector);
+            const dests = s.movable.dests;
+            if (!dests || !dests[cur.orig] || util.containsX(dests[cur.orig], cur.over)) {
+              const squareWidth = s.dom.bounds.width / 8,
+              pos = util.key2pos(cur.over),
+              asWhite = s.orientation === 'white',
+              vector: NumberPair = [
+                (asWhite ? pos[0] - 1 : 8 - pos[0]) * squareWidth,
+                (asWhite ? 8 - pos[1] : pos[1] - 1) * squareWidth
+              ];
+              s.dom.overEl.style[s.browser.transformProp] = util.translate(vector);
+            } else {
+              s.dom.overEl.style[s.browser.transformProp] = util.translateAway;
+            }
             cur.overPrev = cur.over;
           }
         }
