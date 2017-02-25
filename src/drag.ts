@@ -22,11 +22,11 @@ export function start(s: State, e: MouchEvent): void {
   if (e.touches && e.touches.length > 1) return; // support one finger touch only
   e.stopPropagation();
   e.preventDefault();
-  const previouslySelected = s.selected;
   const position = util.eventPosition(e);
   const orig = board.getKeyAtDomPos(s, position);
   if (!orig) return;
   const piece = s.pieces[orig];
+  const previouslySelected = s.selected;
   if (!previouslySelected && (
     s.drawable.eraseOnClick || (!piece || piece.color !== s.turnColor)
   )) draw.clear(s);
@@ -61,6 +61,7 @@ export function start(s: State, e: MouchEvent): void {
     if (hadPremove) board.unsetPremove(s);
     if (hadPredrop) board.unsetPredrop(s);
   }
+  s.dom.redraw();
   processDrag(s);
 }
 
