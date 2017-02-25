@@ -120,6 +120,7 @@ function end(data, e, ctrl) {
   if (!pointerIsSelected) {
     if (ctrl.sparePieceSelected === 'trash') {
       delete data.pieces[dest];
+      data.events.change();
       data.renderRAF();
     } else if (e.type === 'mousedown' || ctrl.lastSquareDropped !== dest) {
       var selectedParts = ctrl.sparePieceSelected.split(' ');
@@ -135,6 +136,7 @@ function end(data, e, ctrl) {
           destPiece.color === newPiece.color && destPiece.role === newPiece.role
       ) {
         delete data.pieces[dest];
+        data.events.change();
         data.renderRAF();
       } else {
         data.pieces.drop = newPiece;
