@@ -1,13 +1,12 @@
 {
   "name": "chessground",
-  "version": "6.0.2",
+  "version": "6.0.3",
   "description": "lichess.org Chess UI",
   "main": "chessground.js",
   "typings": "chessground.d.ts",
   "directories": {
   },
   "dependencies": {
-    "snabbdom": "^0.6.4"
   },
   "devDependencies": {
     "browserify": "^14.1.0",
@@ -36,8 +35,7 @@
     "lichess.org",
     "chessboard",
     "UI",
-    "typescript",
-    "snabbdom"
+    "typescript"
   ],
   "author": "Thibault Duplessis (https://github.com/ornicar)",
   "license": "GPL-3.0",
