@@ -53,7 +53,7 @@ function computePlan(prev: MiniState, current: State): AnimPlan {
   height = current.dom.bounds.height / 8,
   anims: AnimVectors = {},
   animedOrigs: Key[] = [],
-  fadings: AnimFading[] = [],
+  fadings: AnimFadings = {},
   missings: AnimPiece[] = [],
   news: AnimPiece[] = [],
   invert = prev.orientation !== current.orientation,
@@ -97,11 +97,7 @@ function computePlan(prev: MiniState, current: State): AnimPlan {
       !util.containsX(animedOrigs, p.key) &&
       !(current.items ? current.items(p.pos, p.key) : false)
     )
-    fadings.push({
-      pos: p.pos,
-      piece: p.piece,
-      opacity: 1
-    });
+    fadings[p.key] = p.piece;
   });
 
   return {
@@ -122,9 +118,6 @@ function go(state: State): void {
     for (i in state.animation.current.plan.anims) {
       const cfg = state.animation.current.plan.anims[i];
       cfg[1] = [roundBy(cfg[0][0] * ease, 10), roundBy(cfg[0][1] * ease, 10)];
-    }
-    for (i in state.animation.current.plan.fadings) {
-      state.animation.current.plan.fadings[i].opacity = roundBy(ease, 100);
     }
     state.dom.redraw();
     util.raf(() => go(state));

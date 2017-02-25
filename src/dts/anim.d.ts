@@ -9,13 +9,17 @@ interface AnimVectors {
   [key: string]: AnimVector
 }
 
-interface AnimFading {
-  pos: Pos;
-  opacity: number
-  piece: Piece
+interface AnimFadings {
+  [key: string]: Piece
 }
 
 interface AnimPlan {
   anims: AnimVectors;
-  fadings: AnimFading[];
+  fadings: AnimFadings;
+}
+
+interface AnimCurrent {
+  start: Timestamp;
+  duration: Milliseconds;
+  plan: AnimPlan;
 }
