@@ -4,6 +4,12 @@
 
 It targets modern browsers, as well as mobile development using Cordova.
 
+### Warning
+
+The master branch currently contains the alpha v6 version.
+
+For stability, use v4.
+
 ### Demos
 
 - [Chess TV](http://lichess.org/tv)
@@ -18,8 +24,8 @@ It targets modern browsers, as well as mobile development using Cordova.
 Chessground is designed to fulfill all lichess.org web and mobile apps needs, so it is pretty featureful.
 
 - [Typed](https://github.com/ornicar/chessground/tree/master/src/dts) with typescript
-- Fast. Uses virtual DOM; runs smoothly even on elder mobile phones
-- Small footprint: 12K gzipped (35K unzipped) including dependencies
+- Fast. Uses a custom DOM diff algorithm to reduce DOM writes to the absolute minimum
+- Small footprint: 12K gzipped (35K unzipped). No dependencies.
 - Standalone, or composable as a [snabbdom](https://github.com/snabbdom/snabbdom) node
 - Entirely configurable and reconfigurable at any time
 - Styling with CSS only: board and pieces can be changed by simply switching a class
@@ -40,10 +46,6 @@ Chessground is designed to fulfill all lichess.org web and mobile apps needs, so
 - Import and export positions in FEN notation
 - User callbacks
 - No chess logic inside: can be used for chess variations
-
-### Dependencies
-
-- [snabbdom](https://github.com/snabbdom/snabbdom) - a minimalist virtual DOM library
 
 ## Installation
 
