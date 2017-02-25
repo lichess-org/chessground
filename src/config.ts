@@ -75,7 +75,16 @@ export interface Config {
     select?: (key: Key) => void // called when a square is selected
   };
   items?: (pos: Pos, key: Key) => any | undefined; // items on the board { render: key -> vdom }
-  // drawable: Drawable,
+  drawable?: {
+    enabled?: boolean;
+    eraseOnClick?: boolean;
+    shapes?: Shape[];
+    autoShapes?: Shape[];
+    brushes?: Brush[];
+    pieces?: {
+      baseUrl?: string;
+    }
+  },
   editable?: {
     enabled?: boolean;
     selected?: Piece | 'pointer' | 'trash';

@@ -1,5 +1,6 @@
 import { State } from './state'
 import * as util from './util'
+import { createElement as createSVG } from './svg'
 
 export default function(s: State, bounds: ClientRect): [HTMLElement, Elements] {
 
@@ -10,6 +11,12 @@ export default function(s: State, bounds: ClientRect): [HTMLElement, Elements] {
   const board = document.createElement('div');
   board.className = 'cg-board';
   wrap.appendChild(board);
+
+  let svg: SVGElement | undefined;
+  if (s.drawable.enabled) {
+    svg = createSVG('svg');
+    wrap.appendChild(svg);
+  }
 
   if (s.coordinates) {
     const orientClass = s.orientation === 'black' ? ' black' : '';
@@ -32,7 +39,8 @@ export default function(s: State, bounds: ClientRect): [HTMLElement, Elements] {
   return [wrap, {
     board: board,
     over: over,
-    ghost: ghost
+    ghost: ghost,
+    svg: svg
   }];
 }
 

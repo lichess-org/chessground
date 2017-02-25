@@ -37,6 +37,7 @@ interface Elements {
   board: HTMLElement;
   over?: HTMLElement;
   ghost?: HTMLElement;
+  svg?: SVGElement;
 }
 interface Dom {
   elements: Elements,

@@ -5,7 +5,7 @@ interface Shape {
   dest?: Key;
   brush: string;
   brushModifiers?: BrushModifiers;
-  piece?: ShapePiece
+  piece?: ShapePiece;
 }
 
 interface ShapePiece {

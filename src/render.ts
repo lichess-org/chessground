@@ -54,6 +54,11 @@ export default function(s: State): void {
         el.style[transform] = translate(posToTranslate(key2pos(k), asWhite, bounds));
         el.cgDragging = false;
       }
+      // remove fading class if it still remains
+      if (!fading && el.cgFading) {
+        el.cgFading = false;
+        el.classList.remove('fading');
+      }
       // there is now a piece at this dom key
       if (pieceAtKey) {
         // continue animation if already animating and same piece
@@ -75,7 +80,8 @@ export default function(s: State): void {
         // different piece: flag as moved unless it is a fading piece
         else {
           if (fading && elPieceClass === pieceClassOf(fading)) {
-            el.classList.add('captured'); // todo - add only once
+            el.classList.add('fading');
+            el.cgFading = true;
           } else {
             if (movedPieces[elPieceClass]) movedPieces[elPieceClass].push(el);
             else movedPieces[elPieceClass] = [el];

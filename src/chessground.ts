@@ -9,6 +9,7 @@ import { State, defaults } from './state'
 import renderWrap from './wrap';
 import bindEvents from './events'
 import render from './render';
+import svg from './svg';
 import * as util from './util';
 
 export function Chessground(container: HTMLElement, config?: Config): Api {
@@ -29,7 +30,10 @@ export function Chessground(container: HTMLElement, config?: Config): Api {
     state.dom = {
       elements: elements,
       bounds: bounds,
-      redraw() { render(state); }
+      redraw() {
+        render(state);
+        if (elements.svg) svg(state, elements.svg);
+      }
     };
     state.dom.redraw();
     bindEvents(state);
