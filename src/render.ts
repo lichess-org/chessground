@@ -142,12 +142,9 @@ export default function(s: State): void {
       mvdset = movedSquares[squares[sk]];
       mvd = mvdset && mvdset.pop();
       translation = posToTranslate(key2pos(sk as Key), asWhite, bounds);
-      if (mvd) {
-        mvd.cgKey = sk;
-        mvd.style[transform] = translate(translation);
-      }
+      if (mvd) mvd.style[transform] = translate(translation);
       else {
-        s.dom.elements.board.appendChild(renderSquareDom(sk as Key, squares[sk], translation, transform));
+        s.dom.elements.board.appendChild(renderSquareDom(squares[sk], translation, transform));
       }
     }
   }
@@ -161,10 +158,9 @@ function removeNodes(s: State, nodes: LolNode[]): void {
   for (let i in nodes) s.dom.elements.board.removeChild(nodes[i]);
 }
 
-function renderSquareDom(key: Key, className: string, translation: NumberPair, transform: string): LolNode {
-  const s = document.createElement('square') as LolNode;
+function renderSquareDom(className: string, translation: NumberPair, transform: string): HTMLElement {
+  const s = document.createElement('square');
   s.className = className;
-  s.cgKey = key;
   s.style[transform] = translate(translation);
   return s;
 }

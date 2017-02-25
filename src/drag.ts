@@ -185,7 +185,7 @@ function removeDragElements(s: State) {
 function pieceElementByKey(s: State, key: Key): LolNode | undefined {
   let el = s.dom.elements.board.firstChild as LolNode;
   while (el) {
-    if (el.cgKey === key && el.tagName === 'PIECE') return el;
+    if (el.cgKey === key) return el;
     el = el.nextSibling;
   }
   return undefined;
