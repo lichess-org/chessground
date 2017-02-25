@@ -29,8 +29,13 @@ interface MaterialDiff {
   black: { [role: string]: number }
 }
 
+interface Browser {
+  transformProp: string;
+  isTrident: boolean;
+}
 interface Dom {
-  element: HTMLElement;
+  boardEl: HTMLElement;
+  overEl: HTMLElement;
   bounds: ClientRect;
   redraw: () => void;
 }
@@ -49,6 +54,8 @@ type WindowEvent = 'onscroll' | 'onresize';
 
 type MouchEvent = MouseEvent & TouchEvent;
 type LolNode = any; // HTML Node but with custom props
+
+interface CSSStyleDeclaration { [key: string]: any; }
 
 type Redraw = () => void;
 type Timestamp = number;

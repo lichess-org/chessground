@@ -1,5 +1,5 @@
 import { State } from './state'
-import { key2pos, translate, posToTranslate, transformProp } from './util'
+import { key2pos, translate, posToTranslate } from './util'
 
 type PieceClass = string;
 
@@ -25,7 +25,7 @@ export default function(s: State): void {
   movedPieces: MovedPieces = {},
   movedSquares: MovedSquares = {},
   piecesKeys: Key[] = Object.keys(pieces) as Key[],
-  transform: string = transformProp();
+  transform: string = s.browser.transformProp;
   let k: Key,
   p: Piece | undefined,
   el: LolNode,
@@ -39,7 +39,7 @@ export default function(s: State): void {
   mvd: LolNode | undefined;
 
   // walk over all board dom elements, apply animations and flag moved pieces
-  el = s.dom.element.firstChild as LolNode;
+  el = s.dom.boardEl.firstChild as LolNode;
   while (el) {
     k = el.cgKey;
     squareClassAtKey = squares[k];
@@ -123,7 +123,7 @@ export default function(s: State): void {
       // new: assume the new piece is not being dragged
       // might be a bad idea
       else {
-        s.dom.element.appendChild(
+        s.dom.boardEl.appendChild(
           renderPieceDom(p, k, asWhite, bounds, anim, transform)
         );
       }
@@ -142,7 +142,7 @@ export default function(s: State): void {
         mvd.style[transform] = translate(translation);
       }
       else {
-        s.dom.element.appendChild(renderSquareDom(sk as Key, squares[sk], translation, transform));
+        s.dom.boardEl.appendChild(renderSquareDom(sk as Key, squares[sk], translation, transform));
       }
     }
   }
@@ -153,7 +153,7 @@ export default function(s: State): void {
 }
 
 function removeNodes(s: State, nodes: LolNode[]): void {
-  for (let i in nodes) s.dom.element.removeChild(nodes[i]);
+  for (let i in nodes) s.dom.boardEl.removeChild(nodes[i]);
 }
 
 function renderSquareDom(key: Key, className: string, translation: NumberPair, transform: string): LolNode {
@@ -191,20 +191,22 @@ function computeSquareClasses(s: State): SquareClasses {
   if (s.check && s.highlight.check) addSquare(squares, s.check, 'check');
   if (s.selected) {
     addSquare(squares, s.selected, 'selected');
-    const over = s.draggable.current && s.draggable.current.over,
-    dests = s.movable.dests && s.movable.dests[s.selected];
-    if (dests) for (i in dests) {
-      k = dests[i];
-      if (s.movable.showDests) addSquare(squares, k, 'move-dest');
-      if (k === over) addSquare(squares, k, 'drag-over');
-      else if (s.movable.showDests && s.pieces[k]) addSquare(squares, k, 'oc');
-    }
-    const pDests = s.premovable.dests;
-    if (pDests) for (i in pDests) {
-      k = pDests[i];
-      if (s.movable.showDests) addSquare(squares, k, 'premove-dest');
-      if (k === over) addSquare(squares, k, 'drag-over');
-      else if (s.movable.showDests && s.pieces[k]) addSquare(squares, k, 'oc');
+    if (s.movable.showDests) { // not sure that block is needed!
+      const over = s.draggable.current && s.draggable.current.over,
+      dests = s.movable.dests && s.movable.dests[s.selected];
+      if (dests) for (i in dests) {
+        k = dests[i];
+        addSquare(squares, k, 'move-dest');
+        if (k === over) addSquare(squares, k, 'drag-over');
+        else if (s.pieces[k]) addSquare(squares, k, 'oc');
+      }
+      const pDests = s.premovable.dests;
+      if (pDests) for (i in pDests) {
+        k = pDests[i];
+        addSquare(squares, k, 'premove-dest');
+        if (k === over) addSquare(squares, k, 'drag-over');
+        else if (s.pieces[k]) addSquare(squares, k, 'oc');
+      }
     }
   }
   const premove = s.premovable.current;

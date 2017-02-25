@@ -1,7 +1,7 @@
 import { State } from './state'
 import { h } from 'snabbdom'
 import { VNode } from 'snabbdom/vnode'
-import { key2pos, isTrident } from './util'
+import { key2pos } from './util'
 
 export default function(state: State): VNode | undefined {
   const d = state.drawable;
@@ -31,10 +31,10 @@ function circle(brush: Brush, pos: Pos, current: boolean, bounds: ClientRect): V
   });
 }
 
-function arrow(brush: Brush, orig: Pos, dest: Pos, current: boolean, bounds: ClientRect): VNode {
-  const m = arrowMargin(current, bounds),
-  a = pos2px(orig, bounds),
-  b = pos2px(dest, bounds),
+function arrow(dom: Dom, browser: Browser, brush: Brush, orig: Pos, dest: Pos, current: boolean): VNode {
+  const m = arrowMargin(dom, browser, current),
+  a = pos2px(orig, dom.bounds),
+  b = pos2px(dest, dom.bounds),
   dx = b[0] - a[0],
   dy = b[1] - a[1],
   angle = Math.atan2(dy, dx),
@@ -43,9 +43,9 @@ function arrow(brush: Brush, orig: Pos, dest: Pos, current: boolean, bounds: Cli
   return h('line', {
     attrs: {
       stroke: brush.color,
-      'stroke-width': lineWidth(brush, current, bounds),
+      'stroke-width': lineWidth(brush, current, dom.bounds),
       'stroke-linecap': 'round',
-      'marker-end': isTrident() ? null : 'url(#arrowhead-' + brush.key + ')',
+      'marker-end': browser.isTrident ? undefined : 'url(#arrowhead-' + brush.key + ')',
       opacity: opacity(brush, current),
       x1: a[0],
       y1: a[1],
@@ -110,10 +110,12 @@ function renderShape(state: State, current: boolean, shape: Shape, i: number): V
     if (shape.brushModifiers) brush = makeCustomBrush(brush, shape.brushModifiers, i);
     const orig = orient(key2pos(shape.orig), state.orientation);
     if (shape.orig && shape.dest) return arrow(
+      state.dom,
+      state.browser,
       brush,
       orig,
       orient(key2pos(shape.dest), state.orientation),
-      current, state.dom.bounds);
+      current);
     else return circle(brush, orig, current, state.dom.bounds);
   }
 }
@@ -158,8 +160,8 @@ function opacity(brush: Brush, current: boolean): number {
   return (brush.opacity || 1) * (current ? 0.9 : 1);
 }
 
-function arrowMargin(current: boolean, bounds: ClientRect): number {
-  return isTrident() ? 0 : ((current ? 10 : 20) / 512 * bounds.width);
+function arrowMargin(dom: Dom, browser: Browser, current: boolean): number {
+  return browser.isTrident ? 0 : ((current ? 10 : 20) / 512 * dom.bounds.width);
 }
 
 function pos2px(pos: Pos, bounds: ClientRect): NumberPair {

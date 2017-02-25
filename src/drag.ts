@@ -61,7 +61,7 @@ export function start(s: State, e: MouchEvent): void {
     if (hadPremove) board.unsetPremove(s);
     if (hadPredrop) board.unsetPredrop(s);
   }
-  s.dom.redraw();
+  util.raf(s.dom.redraw);
   processDrag(s);
 }
 
@@ -81,11 +81,25 @@ function processDrag(s: State): void {
             cur.epos[1] - cur.rel[1]
           ];
           cur.over = board.getKeyAtDomPos(s, cur.epos);
+
           // move piece
           var translation = util.posToTranslate(cur.origPos, s.orientation === 'white', s.dom.bounds);
           translation[0] += cur.pos[0] + cur.dec[0];
           translation[1] += cur.pos[1] + cur.dec[1];
-          cur.element.style[util.transformProp()] = util.translate(translation);
+          cur.element.style[s.browser.transformProp] = util.translate(translation);
+
+          // move over element
+          if (cur.over && cur.over !== cur.overPrev) {
+            const squareWidth = s.dom.bounds.width / 8,
+            pos = util.key2pos(cur.over),
+            asWhite = s.orientation === 'white',
+            vector: NumberPair = [
+              (asWhite ? pos[0] - 1 : 8 - pos[0]) * squareWidth,
+              (asWhite ? 8 - pos[1] : pos[1] - 1) * squareWidth
+            ];
+            s.dom.overEl.style[s.browser.transformProp] = util.translate(vector);
+            cur.overPrev = cur.over;
+          }
         }
       }
       processDrag(s);
@@ -117,7 +131,7 @@ export function end(s: State, e: TouchEvent): void {
     if (s.editable.enabled && s.editable.selected !== 'pointer') {
       if (s.editable.selected === 'trash') {
         delete s.pieces[dest];
-        s.dom.redraw();
+        util.raf(s.dom.redraw);
       } else {
         // where pieces to be dropped live. Fix me.
         const key = 'a0';
@@ -135,8 +149,11 @@ export function end(s: State, e: TouchEvent): void {
   if (cur && cur.orig === cur.previouslySelected && (cur.orig === dest || !dest))
     board.unselect(s);
   else if (!s.selectable.enabled) board.unselect(s);
+
+  s.dom.overEl.style[s.browser.transformProp] = util.translateAway;
+
   s.draggable.current = undefined;
-  s.dom.redraw();
+  util.raf(s.dom.redraw);
 }
 
 export function cancel(s: State): void {
@@ -147,7 +164,7 @@ export function cancel(s: State): void {
 }
 
 function pieceElementByKey(s: State, key: Key): LolNode | undefined {
-  let el = s.dom.element.firstChild as LolNode;
+  let el = s.dom.boardEl.firstChild as LolNode;
   while (el) {
     if (el.cgKey === key && el.tagName === 'PIECE') return el;
     el = el.nextSibling;

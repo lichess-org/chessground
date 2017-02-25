@@ -19,7 +19,6 @@ export interface Config {
   highlight?: {
     lastMove?: boolean; // add last-move class to squares
     check?: boolean; // add check class to squares
-    dragOver?: boolean // add drag-over class to square when dragging over it
   };
   animation?: {
     enabled?: boolean;

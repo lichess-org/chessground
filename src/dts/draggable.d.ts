@@ -9,6 +9,7 @@ interface DragCurrent {
   pos: NumberPair; // relative current position
   dec: NumberPair; // piece center decay
   over?: Key; // square being moused over
+  overPrev?: Key; // square previously moused over
   started: boolean; // whether the drag has started; as per the distance setting
   element: LolNode;
   newPiece?: boolean;

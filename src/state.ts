@@ -17,7 +17,6 @@ export interface State {
   highlight: {
     lastMove: boolean; // add last-move class to squares
     check: boolean; // add check class to squares
-    dragOver: boolean // add drag-over class to square when dragging over it
   };
   animation: {
     enabled: boolean;
@@ -91,6 +90,7 @@ export interface State {
     selected: Piece | 'pointer' | 'trash';
   }
   exploding?: Exploding;
+  browser: Browser,
   dom: Dom
 }
 
@@ -107,8 +107,7 @@ export function defaults(): Partial<State> {
     pieceKey: false,
     highlight: {
       lastMove: true,
-      check: true,
-      dragOver: true
+      check: true
     },
     animation: {
       enabled: true,

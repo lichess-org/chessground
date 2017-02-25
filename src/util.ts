@@ -50,28 +50,17 @@ export function distance(pos1: Pos, pos2: Pos): number {
   return Math.sqrt(Math.pow(pos1[0] - pos2[0], 2) + Math.pow(pos1[1] - pos2[1], 2));
 }
 
-// this must be cached because of the access to document.body.style
-let cachedTransformProp: string;
-
-function computeTransformProp() {
-  return 'transform' in document.body.style ?
-  'transform' : 'webkitTransform' in document.body.style ?
-  'webkitTransform' : 'mozTransform' in document.body.style ?
-  'mozTransform' : 'oTransform' in document.body.style ?
+export function computeTransformProp() {
+  const s = document.body.style;
+  return 'transform' in s ?
+  'transform' : 'webkitTransform' in s ?
+  'webkitTransform' : 'mozTransform' in s ?
+  'mozTransform' : 'oTransform' in s ?
   'oTransform' : 'msTransform';
 }
 
-export function transformProp(): string {
-  if (!cachedTransformProp) cachedTransformProp = computeTransformProp();
-  return cachedTransformProp;
-}
-
-let cachedIsTrident: boolean;
-
-export function isTrident(): boolean {
-  if (cachedIsTrident === undefined)
-    cachedIsTrident = window.navigator.userAgent.indexOf('Trident/') > -1;
-  return cachedIsTrident;
+export function computeIsTrident(): boolean {
+  return window.navigator.userAgent.indexOf('Trident/') > -1;
 }
 
 export function posToTranslate(pos: Pos, asWhite: boolean, bounds: ClientRect): NumberPair {
@@ -84,6 +73,8 @@ export function posToTranslate(pos: Pos, asWhite: boolean, bounds: ClientRect): 
 export function translate(pos: Pos): string {
   return 'translate(' + pos[0] + 'px,' + pos[1] + 'px)';
 }
+
+export const translateAway: string = translate([-99999, -99999]);
 
 export function eventPosition(e: any): NumberPair {
   if (e.clientX || e.clientX === 0) return [e.clientX, e.clientY];
