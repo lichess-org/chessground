@@ -40,7 +40,6 @@ export function start(s: State, e: MouchEvent): void {
   board.selectSquare(s, orig);
   const stillSelected = s.selected === orig;
   const element = pieceElementByKey(s, orig);
-  console.log(orig, piece, element, stillSelected);
   if (piece && element && stillSelected && board.isDraggable(s, orig)) {
     const squareBounds = computeSquareBounds(s, orig);
     s.draggable.current = {
@@ -59,6 +58,7 @@ export function start(s: State, e: MouchEvent): void {
       element: element
     };
     element.cgDragging = true;
+    element.classList.add('dragging');
   } else {
     if (hadPremove) board.unsetPremove(s);
     if (hadPredrop) board.unsetPredrop(s);
