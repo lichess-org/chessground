@@ -74,9 +74,7 @@ export function start(state: State, redrawAll: () => void): Api {
   return {
 
     set(config) {
-      const orientPrev = state.orientation;
       anim(state => configure(state, config), state);
-      if (state.orientation !== orientPrev) redrawAll();
     },
 
     state,
