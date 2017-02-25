@@ -191,21 +191,16 @@ function computeSquareClasses(s: State): SquareClasses {
   if (s.check && s.highlight.check) addSquare(squares, s.check, 'check');
   if (s.selected) {
     addSquare(squares, s.selected, 'selected');
-    if (s.movable.showDests) { // not sure that block is needed!
-      const over = s.draggable.current && s.draggable.current.over,
-      dests = s.movable.dests && s.movable.dests[s.selected];
+    if (s.movable.showDests) {
+      const dests = s.movable.dests && s.movable.dests[s.selected];
       if (dests) for (i in dests) {
         k = dests[i];
-        addSquare(squares, k, 'move-dest');
-        if (k === over) addSquare(squares, k, 'drag-over');
-        else if (s.pieces[k]) addSquare(squares, k, 'oc');
+        addSquare(squares, k, 'move-dest' + (s.pieces[k] ? ' oc' : ''));
       }
       const pDests = s.premovable.dests;
       if (pDests) for (i in pDests) {
         k = pDests[i];
-        addSquare(squares, k, 'premove-dest');
-        if (k === over) addSquare(squares, k, 'drag-over');
-        else if (s.pieces[k]) addSquare(squares, k, 'oc');
+        addSquare(squares, k, 'premove-dest' + (s.pieces[k] ? ' oc' : ''));
       }
     }
   }
