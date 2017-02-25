@@ -56,7 +56,7 @@ export default function(s: State): void {
       }
       // there is now a piece at this dom key
       if (pieceAtKey) {
-        // continue animation if already animating and same color
+        // continue animation if already animating and same piece
         // (otherwise it could animate a captured piece)
         if (anim && el.cgAnimating && elPieceClass === pieceClassOf(pieceAtKey)) {
           translation = posToTranslate(key2pos(k), asWhite, bounds);
@@ -164,7 +164,6 @@ function renderSquareDom(key: Key, className: string, translation: NumberPair, t
 }
 
 function renderPieceDom(piece: Piece, key: Key, asWhite: boolean, bounds: ClientRect, anim: AnimVector | undefined, transform: string): LolNode {
-  console.log('render piece', key, piece);
 
   const p = document.createElement('piece') as LolNode;
   const pieceClass = pieceClassOf(piece);

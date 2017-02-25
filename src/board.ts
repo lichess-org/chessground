@@ -136,6 +136,7 @@ function baseUserMove(state: State, orig: Key, dest: Key): boolean {
   if (result) {
     state.movable.dests = undefined;
     state.turnColor = opposite(state.turnColor);
+    state.animation.current = undefined;
   }
   return result;
 }
