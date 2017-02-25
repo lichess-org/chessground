@@ -163,13 +163,7 @@ export function end(s: State, e: TouchEvent): void {
     board.unselect(s);
   else if (!s.selectable.enabled) board.unselect(s);
 
-  // remove over
-  if (s.dom.elements.over) s.dom.elements.over.style[s.browser.transformProp] = util.translateAway;
-
-  // remove ghost
-  if (s.dom.elements.ghost) {
-    s.dom.elements.ghost.style[s.browser.transformProp] = util.translateAway;
-  }
+  removeDragElements(s);
 
   s.draggable.current = undefined;
   util.raf(s.dom.redraw);
@@ -179,7 +173,13 @@ export function cancel(s: State): void {
   if (s.draggable.current) {
     s.draggable.current = undefined;
     board.unselect(s);
+    removeDragElements(s);
   }
+}
+
+function removeDragElements(s: State) {
+  if (s.dom.elements.over) s.dom.elements.over.style[s.browser.transformProp] = util.translateAway;
+  if (s.dom.elements.ghost) s.dom.elements.ghost.style[s.browser.transformProp] = util.translateAway;
 }
 
 function pieceElementByKey(s: State, key: Key): LolNode | undefined {
