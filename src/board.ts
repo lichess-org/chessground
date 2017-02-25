@@ -26,7 +26,6 @@ export function setPieces(state: State, pieces: Pieces): void {
     if (pieces[key]) state.pieces[key] = pieces[key];
     else delete state.pieces[key];
   }
-  state.movable.dropped = undefined;
 }
 
 export function setCheck(state: State, color: Color | boolean): void {
@@ -113,7 +112,6 @@ export function baseMove(state: State, orig: Key, dest: Key): boolean {
   state.check = undefined;
   tryAutoCastle(state, orig, dest);
   callUserFunction(state.events.change);
-  state.movable.dropped = undefined;
   return true;
 }
 
@@ -127,7 +125,6 @@ export function baseNewPiece(state: State, piece: Piece, key: Key, force?: boole
   state.lastMove = [key, key];
   state.check = undefined;
   callUserFunction(state.events.change);
-  state.movable.dropped = undefined;
   state.movable.dests = undefined;
   state.turnColor = opposite(state.turnColor);
   return true;
@@ -172,7 +169,6 @@ export function dropNewPiece(state: State, orig: Key, dest: Key, force?: boolean
     const piece = state.pieces[orig];
     delete state.pieces[orig];
     baseNewPiece(state, piece, dest, force);
-    state.movable.dropped = undefined;
     callUserFunction(state.movable.events.afterNewPiece, piece.role, dest, {
       predrop: false
     });

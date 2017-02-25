@@ -102,9 +102,6 @@ export function configure(state: State, config: Config) {
 
   if (configCheck !== undefined) setCheck(state, configCheck);
 
-  // forget about the last dropped piece
-  state.movable.dropped = undefined;
-
   // fix move/premove dests
   if (state.selected) setSelected(state, state.selected);
 

@@ -123,7 +123,6 @@ export function end(state: State, e: TouchEvent): void {
     } else if (cur && cur.started) {
       if (cur.newPiece) board.dropNewPiece(state, cur.orig, dest);
       else {
-        if (cur.orig !== dest) state.movable.dropped = [cur.orig, dest];
         state.stats.ctrlKey = e.ctrlKey;
         if (board.userMove(state, cur.orig, dest)) state.stats.dragged = true;
       }

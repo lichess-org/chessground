@@ -58,28 +58,25 @@ function computePlan(prev: MiniState, current: State): AnimPlan {
   news: AnimPiece[] = [],
   invert = prev.orientation !== current.orientation,
   prePieces: AnimPieces = {},
-  white = current.orientation === 'white',
-  dropped = current.movable.dropped;
+  white = current.orientation === 'white';
   let curP: Piece, preP: AnimPiece, i: any, key: Key, orig: Pos, dest: Pos, vector: NumberPair;
   for (i in prev.pieces) {
     prePieces[i] = makePiece(i as Key, prev.pieces[i], invert);
   }
   for (i = 0; i < util.allKeys.length; i++) {
     key = util.allKeys[i];
-    if (!dropped || key !== dropped[1]) {
-      curP = current.pieces[key];
-      preP = prePieces[key];
-      if (curP) {
-        if (preP) {
-          if (!samePiece(curP, preP.piece)) {
-            missings.push(preP);
-            news.push(makePiece(key, curP, false));
-          }
-        } else
-        news.push(makePiece(key, curP, false));
-      } else if (preP)
-      missings.push(preP);
-    }
+    curP = current.pieces[key];
+    preP = prePieces[key];
+    if (curP) {
+      if (preP) {
+        if (!samePiece(curP, preP.piece)) {
+          missings.push(preP);
+          news.push(makePiece(key, curP, false));
+        }
+      } else
+      news.push(makePiece(key, curP, false));
+    } else if (preP)
+    missings.push(preP);
   }
   news.forEach(newP => {
     preP = closer(newP, missings.filter(p => samePiece(newP.piece, p.piece)));
@@ -93,7 +90,6 @@ function computePlan(prev: MiniState, current: State): AnimPlan {
   });
   missings.forEach(p => {
     if (
-      (!dropped || p.key !== dropped[0]) &&
       !util.containsX(animedOrigs, p.key) &&
       !(current.items ? current.items(p.pos, p.key) : false)
     )
