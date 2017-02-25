@@ -12,10 +12,9 @@ interface ShapeC {
 }
 
 let isTrident: boolean | undefined;
+let fullHashPrev: string = '';
 
 export default function(state: State, root: SVGElement): void {
-
-  if (isTrident === undefined) isTrident = computeIsTrident();
 
   const d = state.drawable,
   allShapes: ShapeC[] = d.shapes.concat(d.autoShapes).map(s => {
@@ -31,6 +30,12 @@ export default function(state: State, root: SVGElement): void {
     current: true,
     hash: shapeHash(d.current, true)
   });
+
+  const fullHash = allShapes.map(sc => sc.hash).join('');
+  if (fullHash === fullHashPrev) return;
+  fullHashPrev = fullHash;
+
+  if (isTrident === undefined) isTrident = computeIsTrident();
 
   const usedBrushes: Brush[] = computeUsedBrushes(d, allShapes),
   hashesInDom: {[hash: string]: boolean} = {};
