@@ -46,6 +46,7 @@ interface Drawable {
 interface DrawableCurrent {
   orig: Key; // orig key of drawing
   dest?: Key; // square being moused over, if != orig
+  destPrev?: Key; // square previously moused over
   pos: NumberPair; // relative current position
   brush: string; // brush name for shape
 }

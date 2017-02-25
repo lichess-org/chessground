@@ -20,7 +20,7 @@ export function start(state: State, e: MouchEvent): void {
   if (!orig) return;
   state.drawable.current = {
     orig: orig,
-    dest: undefined,
+    dest: orig, // will immediately be set to undefined by processDraw, triggering redraw
     pos: position,
     brush: eventBrush(e)
   };
@@ -32,10 +32,12 @@ export function processDraw(state: State): void {
     const cur = state.drawable.current;
     if (cur) {
       const dest = board.getKeyAtDomPos(state, cur.pos);
-      if (cur.orig === dest) cur.dest = undefined;
-      else cur.dest = dest;
+      const newDest = (cur.orig === dest) ? undefined : dest;
+      if (newDest !== cur.dest) {
+        cur.dest = newDest;
+        state.dom.redraw();
+      }
     }
-    state.dom.redraw();
     if (cur) processDraw(state);
   });
 }
