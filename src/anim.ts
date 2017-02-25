@@ -102,21 +102,22 @@ function computePlan(prev: MiniState, current: State): AnimPlan {
   };
 }
 
-function go(state: State): void {
-  if (!state.animation.current) return; // animation was canceled
-  const rest = 1 - (new Date().getTime() - state.animation.current.start) / state.animation.current.duration;
+function step(state: State): void {
+  const cur = state.animation.current;
+  if (!cur) return; // animation was canceled
+  const rest = 1 - (new Date().getTime() - cur.start) / cur.duration;
   if (rest <= 0) {
     state.animation.current = undefined;
     state.dom.redraw();
   } else {
     let i: any;
     const ease = easing(rest);
-    for (i in state.animation.current.plan.anims) {
-      const cfg = state.animation.current.plan.anims[i];
+    for (i in cur.plan.anims) {
+      const cfg = cur.plan.anims[i];
       cfg[1] = [roundBy(cfg[0][0] * ease, 10), roundBy(cfg[0][1] * ease, 10)];
     }
     state.dom.redraw();
-    util.raf(() => go(state));
+    util.raf(() => step(state));
   }
 }
 
@@ -143,7 +144,7 @@ function animate<A>(mutation: Mutation<A>, state: State): A {
         duration: state.animation.duration,
         plan: plan
       };
-      if (!alreadyRunning) go(state);
+      if (!alreadyRunning) step(state);
     } else {
       // don't animate, just render right away
       state.dom.redraw();

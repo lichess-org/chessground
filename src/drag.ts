@@ -5,13 +5,9 @@ import * as draw from './draw'
 
 let originTarget: EventTarget | undefined;
 
-function hashPiece(piece?: Piece): string {
-  return piece ? piece.color + piece.role : '';
-}
-
-function computeSquareBounds(state: State, key: Key) {
-  const pos = util.key2pos(key), bounds = state.dom.bounds;
-  if (state.orientation !== 'white') {
+function computeSquareBounds(s: State, key: Key) {
+  const pos = util.key2pos(key), bounds = s.dom.bounds;
+  if (s.orientation !== 'white') {
     pos[0] = 9 - pos[0];
     pos[1] = 9 - pos[1];
   }
@@ -23,120 +19,139 @@ function computeSquareBounds(state: State, key: Key) {
   };
 }
 
-export function start(state: State, e: MouchEvent): void {
+export function start(s: State, e: MouchEvent): void {
   if (e.button !== undefined && e.button !== 0) return; // only touch or left click
   if (e.touches && e.touches.length > 1) return; // support one finger touch only
   e.stopPropagation();
   e.preventDefault();
   originTarget = e.target;
-  const previouslySelected = state.selected;
+  const previouslySelected = s.selected;
   const position = util.eventPosition(e);
-  const orig = board.getKeyAtDomPos(state, position);
+  const orig = board.getKeyAtDomPos(s, position);
   if (!orig) return;
-  const piece = state.pieces[orig];
+  const piece = s.pieces[orig];
   if (!previouslySelected && (
-    state.drawable.eraseOnClick || (!piece || piece.color !== state.turnColor)
-  )) draw.clear(state);
-  if (state.viewOnly) return;
-  const hadPremove = !!state.premovable.current;
-  const hadPredrop = !!state.predroppable.current;
-  state.stats.ctrlKey = e.ctrlKey;
-  board.selectSquare(state, orig);
-  const stillSelected = state.selected === orig;
-  if (piece && stillSelected && board.isDraggable(state, orig)) {
-    const squareBounds = computeSquareBounds(state, orig);
-    state.draggable.current = {
+    s.drawable.eraseOnClick || (!piece || piece.color !== s.turnColor)
+  )) draw.clear(s);
+  if (s.viewOnly) return;
+  const hadPremove = !!s.premovable.current;
+  const hadPredrop = !!s.predroppable.current;
+  s.stats.ctrlKey = e.ctrlKey;
+  board.selectSquare(s, orig);
+  const stillSelected = s.selected === orig;
+  const element = pieceElementByKey(s, orig);
+  console.log(orig, piece, element, stillSelected);
+  if (piece && element && stillSelected && board.isDraggable(s, orig)) {
+    const squareBounds = computeSquareBounds(s, orig);
+    s.draggable.current = {
       previouslySelected: previouslySelected,
       orig: orig,
-      pieceHash: hashPiece(piece),
+      origPos: util.key2pos(orig),
+      piece: piece,
       rel: position,
       epos: position,
       pos: [0, 0],
-      dec: state.draggable.centerPiece ? [
+      dec: s.draggable.centerPiece ? [
         position[0] - (squareBounds.left + squareBounds.width / 2),
         position[1] - (squareBounds.top + squareBounds.height / 2)
       ] : [0, 0],
-      started: state.draggable.autoDistance && state.stats.dragged
+      started: s.draggable.autoDistance && s.stats.dragged,
+      element: element
     };
+    element.cgDragging = true;
   } else {
-    if (hadPremove) board.unsetPremove(state);
-    if (hadPredrop) board.unsetPredrop(state);
+    if (hadPremove) board.unsetPremove(s);
+    if (hadPredrop) board.unsetPredrop(s);
   }
-  processDrag(state);
+  processDrag(s);
 }
 
-function processDrag(state: State): void {
+function processDrag(s: State): void {
   util.raf(() => {
-    const cur = state.draggable.current;
+    const cur = s.draggable.current;
     if (cur) {
       // cancel animations while dragging
-      if (state.animation.current && state.animation.current.plan.anims[cur.orig])
-      state.animation.current = undefined;
+      if (s.animation.current && s.animation.current.plan.anims[cur.orig]) s.animation.current = undefined;
       // if moving piece is gone, cancel
-      if (hashPiece(state.pieces[cur.orig]) !== cur.pieceHash) cancel(state);
+      if (s.pieces[cur.orig] !== cur.piece) cancel(s);
       else {
-        if (!cur.started && util.distance(cur.epos, cur.rel) >= state.draggable.distance)
-        cur.started = true;
+        if (!cur.started && util.distance(cur.epos, cur.rel) >= s.draggable.distance) cur.started = true;
         if (cur.started) {
           cur.pos = [
             cur.epos[0] - cur.rel[0],
             cur.epos[1] - cur.rel[1]
           ];
-          cur.over = board.getKeyAtDomPos(state, cur.epos);
+          cur.over = board.getKeyAtDomPos(s, cur.epos);
+          // move piece
+          var translation = util.posToTranslate(cur.origPos, s.orientation === 'white', s.dom.bounds);
+          translation[0] += cur.pos[0] + cur.dec[0];
+          translation[1] += cur.pos[1] + cur.dec[1];
+          cur.element.style[util.transformProp()] = util.translate(translation);
         }
       }
+      processDrag(s);
     }
-    state.dom.redraw();
-    if (cur) processDrag(state);
   });
 }
 
-export function move(state: State, e: TouchEvent): void {
-  if (e.touches && e.touches.length > 1) return; // support one finger touch only
-  if (state.draggable.current) state.draggable.current.epos = util.eventPosition(e);
+export function move(s: State, e: TouchEvent): void {
+  // support one finger touch only
+  if (s.draggable.current && (!e.touches || e.touches.length < 2)) {
+    s.draggable.current.epos = util.eventPosition(e);
+  }
 }
 
-export function end(state: State, e: TouchEvent): void {
-  const cur = state.draggable.current;
-  if (!cur && (!state.editable.enabled || state.editable.selected === 'pointer')) return;
+export function end(s: State, e: TouchEvent): void {
+  const cur = s.draggable.current;
+  if (!cur && (!s.editable.enabled || s.editable.selected === 'pointer')) return;
   // comparing with the origin target is an easy way to test that the end event
   // has the same touch origin
   if (e.type === 'touchend' && originTarget !== e.target && cur && !cur.newPiece) {
-    state.draggable.current = undefined;
+    s.draggable.current = undefined;
     return;
   }
-  board.unsetPremove(state);
-  board.unsetPredrop(state);
+  board.unsetPremove(s);
+  board.unsetPredrop(s);
   const eventPos: NumberPair = util.eventPosition(e);
-  const dest = board.getKeyAtDomPos(state, eventPos);
+  const dest = board.getKeyAtDomPos(s, eventPos);
   if (dest) {
-    if (state.editable.enabled && state.editable.selected !== 'pointer') {
-      if (state.editable.selected === 'trash') {
-        delete state.pieces[dest];
-        state.dom.redraw();
+    if (s.editable.enabled && s.editable.selected !== 'pointer') {
+      if (s.editable.selected === 'trash') {
+        delete s.pieces[dest];
+        s.dom.redraw();
       } else {
         // where pieces to be dropped live. Fix me.
         const key = 'a0';
-        state.pieces[key] = state.editable.selected as Piece;
-        board.dropNewPiece(state, key, dest, true);
+        s.pieces[key] = s.editable.selected as Piece;
+        board.dropNewPiece(s, key, dest, true);
       }
     } else if (cur && cur.started) {
-      if (cur.newPiece) board.dropNewPiece(state, cur.orig, dest);
+      if (cur.newPiece) board.dropNewPiece(s, cur.orig, dest);
       else {
-        state.stats.ctrlKey = e.ctrlKey;
-        if (board.userMove(state, cur.orig, dest)) state.stats.dragged = true;
+        s.stats.ctrlKey = e.ctrlKey;
+        if (board.userMove(s, cur.orig, dest)) s.stats.dragged = true;
       }
     }
   }
   if (cur && cur.orig === cur.previouslySelected && (cur.orig === dest || !dest))
-    board.unselect(state);
-  else if (!state.selectable.enabled) board.unselect(state);
-  state.draggable.current = undefined;
+    board.unselect(s);
+  else if (!s.selectable.enabled) board.unselect(s);
+  s.draggable.current = undefined;
+  s.dom.redraw();
 }
 
-export function cancel(state: State): void {
-  if (state.draggable.current) {
-    state.draggable.current = undefined;
-    board.unselect(state);
+export function cancel(s: State): void {
+  if (s.draggable.current) {
+    s.draggable.current = undefined;
+    board.unselect(s);
   }
+}
+
+function pieceElementByKey(s: State, key: Key): LolNode | undefined {
+  let el = s.dom.element.firstChild as LolNode;
+  while (el) {
+    if (el.cgKey === key && el.tagName === 'PIECE') return el;
+    el = el.nextSibling;
+  }
+  return undefined;
 }

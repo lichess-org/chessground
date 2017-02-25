@@ -11,12 +11,12 @@
     "declaration": true,
     "noImplicitAny": true,
     "strictNullChecks": true,
-    "noUnusedLocals": false,
+    "noUnusedLocals": true,
     "noEmitOnError": false,
     "alwaysStrict": true,
     "noImplicitReturns": true,
     "noImplicitThis": true,
-    "noUnusedParameters": false,
+    "noUnusedParameters": true,
     "target": "es5"
   }
 }

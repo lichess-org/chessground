@@ -1,17 +1,21 @@
 import { State } from './state'
 import { ranks, files } from './util'
 
-export default function(d: State): [HTMLElement, HTMLElement] {
+export default function(s: State): [HTMLElement, HTMLElement] {
 
   const wrap = document.createElement('div');
-  const manipClass = d.viewOnly ? 'view-only' : 'manipulable';
-  wrap.className = `cg-board-wrap orientation-${d.orientation} ${manipClass}`;
+  const manipClass = s.viewOnly ? 'view-only' : 'manipulable';
+  wrap.className = `cg-board-wrap orientation-${s.orientation} ${manipClass}`;
 
   const board = document.createElement('div');
   board.className = 'cg-board';
   wrap.appendChild(board);
 
-  wrap.appendChild(renderAllCoords(d.orientation));
+  if (s.coordinates) {
+    const orientClass = s.orientation === 'black' ? ' black' : '';
+    wrap.appendChild(renderCoords(ranks, 'ranks' + orientClass));
+    wrap.appendChild(renderCoords(files, 'files' + orientClass));
+  }
 
   return [wrap, board];
 }
@@ -26,12 +30,4 @@ function renderCoords(elems: any[], klass: string): HTMLElement {
     el.appendChild(f);
   }
   return el;
-}
-
-function renderAllCoords(orientation: Color): DocumentFragment {
-  const all = document.createDocumentFragment();
-  const orientClass = orientation === 'black' ? ' black' : '';
-  all.appendChild(renderCoords(ranks, 'ranks' + orientClass));
-  all.appendChild(renderCoords(files, 'files' + orientClass));
-  return all;
 }

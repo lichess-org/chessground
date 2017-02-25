@@ -1,8 +1,7 @@
 import { State } from './state'
-import * as util from './util'
+import { key2pos, translate, posToTranslate, transformProp } from './util'
 
-type PieceId = string;
-type LolNode = any; // HTML Node but with custom props
+type PieceClass = string;
 
 interface SamePieces { [key: string]: boolean }
 // interface SameSquares { [key: string]: boolean }
@@ -23,13 +22,13 @@ export default function(s: State): void {
   samePieces: SamePieces = {},
   movedPieces: MovedPieces = {},
   piecesKeys: Key[] = Object.keys(pieces) as Key[],
-  transform: string = util.transformProp();
+  transform: string = transformProp();
   let k: Key,
   p: Piece | undefined,
   el: LolNode,
   pieceAtKey: Piece | undefined,
-  pieceId: PieceId,
-  translate: NumberPair,
+  pieceClass: PieceClass,
+  translation: NumberPair,
   anim: AnimVector | undefined,
   fading: Piece | undefined,
   mvdset: LolNode[],
@@ -40,14 +39,14 @@ export default function(s: State): void {
   while (el) {
     k = el.cgKey;
     pieceAtKey = pieces[k];
-    pieceId = el.cgRole + el.cgColor;
+    pieceClass = el.cgRole + el.cgColor;
     anim = anims[k];
     fading = fadings[k];
     if (el.tagName === 'PIECE') {
       // if piece not being dragged anymore, remove dragging style
       if (el.cgDragging && (!curDrag || curDrag.orig !== k)) {
         el.classList.remove('dragging');
-        el.style[transform] = util.translate(posToTranslate(util.key2pos(k), asWhite, bounds));
+        el.style[transform] = translate(posToTranslate(key2pos(k), asWhite, bounds));
         el.cgDragging = false;
       }
       // there is now a piece at this dom key
@@ -55,13 +54,13 @@ export default function(s: State): void {
         // continue animation if already animating and same color
         // (otherwise it could animate a captured piece)
         if (anim && el.cgAnimating && el.cgColor === pieceAtKey.color) {
-          translate = posToTranslate(util.key2pos(k), asWhite, bounds);
-          translate[0] += anim[1][0];
-          translate[1] += anim[1][1];
-          el.style[transform] = util.translate(translate);
+          translation = posToTranslate(key2pos(k), asWhite, bounds);
+          translation[0] += anim[1][0];
+          translation[1] += anim[1][1];
+          el.style[transform] = translate(translation);
         } else if (el.cgAnimating) {
-          translate = posToTranslate(util.key2pos(k), asWhite, bounds);
-          el.style[transform] = util.translate(translate);
+          translation = posToTranslate(key2pos(k), asWhite, bounds);
+          el.style[transform] = translate(translation);
           el.cgAnimating = false;
         }
         // same piece: flag as same
@@ -73,15 +72,15 @@ export default function(s: State): void {
           if (fading && fading.role === el.cgRole && fading.color === el.cgColor) {
             el.classList.add('captured'); // todo - add only once
           } else {
-            if (movedPieces[pieceId]) movedPieces[pieceId].push(el);
-            else movedPieces[pieceId] = [el];
+            if (movedPieces[pieceClass]) movedPieces[pieceClass].push(el);
+            else movedPieces[pieceClass] = [el];
           }
         }
       }
       // no piece: flag as moved
       else {
-        if (movedPieces[pieceId]) movedPieces[pieceId].push(el);
-        else movedPieces[pieceId] = [el];
+        if (movedPieces[pieceClass]) movedPieces[pieceClass].push(el);
+        else movedPieces[pieceClass] = [el];
       }
     }
     // else if (el.tagName === 'SQUARE') {
@@ -103,22 +102,22 @@ export default function(s: State): void {
   for (let j = 0, jlen = piecesKeys.length; j < jlen; ++j) {
     k = piecesKeys[j];
     p = pieces[k];
-    pieceId = p.role + p.color;
+    pieceClass = p.role + p.color;
     anim = anims[k];
     if (!samePieces[k]) {
-      mvdset = movedPieces[pieceId];
+      mvdset = movedPieces[pieceClass];
       mvd = mvdset && mvdset.pop();
       // a same piece was moved
       if (mvd) {
         // apply dom changes
         mvd.cgKey = k;
-        translate = posToTranslate(util.key2pos(k), asWhite, bounds);
+        translation = posToTranslate(key2pos(k), asWhite, bounds);
         if (anim) {
           mvd.cgAnimating = true;
-          translate[0] += anim[1][0];
-          translate[1] += anim[1][1];
+          translation[0] += anim[1][0];
+          translation[1] += anim[1][1];
         }
-        mvd.style[transform] = util.translate(translate);
+        mvd.style[transform] = translate(translation);
       }
       // no piece in moved obj: insert the new piece
       // new: assume the new piece is not being dragged
@@ -142,13 +141,13 @@ function renderPieceDom(
   p.cgColor = piece.color;
   p.cgKey = key;
 
-  const translate = posToTranslate(util.key2pos(key), asWhite, bounds);
+  const translation = posToTranslate(key2pos(key), asWhite, bounds);
   if (anim) {
     p.cgAnimating = true;
-    translate[0] += anim[1][0];
-    translate[1] += anim[1][1];
+    translation[0] += anim[1][0];
+    translation[1] += anim[1][1];
   }
-  p.style[transform] = util.translate(translate);
+  p.style[transform] = translate(translation);
   return p;
 }
 
@@ -191,10 +190,3 @@ function renderPieceDom(
 //   if (squares[key]) squares[key] += ' ' + klass;
 //   else squares[key] = klass;
 // }
-
-function posToTranslate(pos: Pos, asWhite: boolean, bounds: ClientRect): NumberPair {
-  return [
-    (asWhite ? pos[0] - 1 : 8 - pos[0]) * bounds.width / 8,
-    (asWhite ? 8 - pos[1] : pos[1] - 1) * bounds.height / 8
-  ];
-}

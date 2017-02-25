@@ -48,6 +48,7 @@ interface MoveMetadata {
 type WindowEvent = 'onscroll' | 'onresize';
 
 type MouchEvent = MouseEvent & TouchEvent;
+type LolNode = any; // HTML Node but with custom props
 
 type Redraw = () => void;
 type Timestamp = number;

@@ -74,6 +74,13 @@ export function isTrident(): boolean {
   return cachedIsTrident;
 }
 
+export function posToTranslate(pos: Pos, asWhite: boolean, bounds: ClientRect): NumberPair {
+  return [
+    (asWhite ? pos[0] - 1 : 8 - pos[0]) * bounds.width / 8,
+    (asWhite ? 8 - pos[1] : pos[1] - 1) * bounds.height / 8
+  ];
+}
+
 export function translate(pos: Pos): string {
   return 'translate(' + pos[0] + 'px,' + pos[1] + 'px)';
 }

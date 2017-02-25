@@ -17,6 +17,7 @@ export function Chessground(container: HTMLElement, config?: Config): Api {
   configure(state, config || {});
 
   const [wrapEl, boardEl] = renderWrap(state);
+  container.innerHTML = '';
   container.appendChild(wrapEl);
 
   state.dom = {
