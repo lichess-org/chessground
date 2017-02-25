@@ -42,8 +42,8 @@ export function opposite(color: Color): Color {
   return color === 'white' ? 'black' : 'white';
 }
 
-export function containsX<X>(xs: X[], x: X): boolean {
-  return xs && xs.indexOf(x) !== -1;
+export function containsX<X>(xs: X[] | undefined, x: X): boolean {
+  return xs ? xs.indexOf(x) !== -1 : false;
 }
 
 export function distance(pos1: Pos, pos2: Pos): number {

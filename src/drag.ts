@@ -97,7 +97,9 @@ function processDrag(s: State): void {
           // move over element
           if (s.dom.elements.over && cur.over && cur.over !== cur.overPrev) {
             const dests = s.movable.dests;
-            if (!dests || util.containsX((dests[cur.orig] || []), cur.over)) {
+            if (s.movable.free ||
+              util.containsX(dests && dests[cur.orig], cur.over) ||
+              util.containsX(s.premovable.dests, cur.over)) {
               const squareWidth = s.dom.bounds.width / 8,
               pos = util.key2pos(cur.over),
               asWhite = s.orientation === 'white',
