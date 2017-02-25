@@ -105,6 +105,7 @@ export function baseMove(state: State, orig: Key, dest: Key): boolean {
     state.pieces[dest] &&
     state.pieces[dest].color !== state.pieces[orig].color
   ) ? state.pieces[dest] : undefined;
+  if (dest == state.selected) unselect(state);
   callUserFunction(state.events.move, orig, dest, captured);
   state.pieces[dest] = state.pieces[orig];
   delete state.pieces[orig];
