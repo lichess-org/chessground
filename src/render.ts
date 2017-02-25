@@ -31,7 +31,7 @@ export default function(s: State): void {
   el: LolNode,
   squareClassAtKey: string | undefined,
   pieceAtKey: Piece | undefined,
-  pieceClass: PieceClass,
+  elPieceClass: PieceClass,
   translation: NumberPair,
   anim: AnimVector | undefined,
   fading: Piece | undefined,
@@ -44,10 +44,10 @@ export default function(s: State): void {
     k = el.cgKey;
     squareClassAtKey = squares[k];
     pieceAtKey = pieces[k];
-    pieceClass = el.cgRole + el.cgColor;
     anim = anims[k];
     fading = fadings[k];
     if (el.tagName === 'PIECE') {
+      elPieceClass = el.cgPiece;
       // if piece not being dragged anymore, remove dragging style
       if (el.cgDragging && (!curDrag || curDrag.orig !== k)) {
         el.classList.remove('dragging');
@@ -58,7 +58,7 @@ export default function(s: State): void {
       if (pieceAtKey) {
         // continue animation if already animating and same color
         // (otherwise it could animate a captured piece)
-        if (anim && el.cgAnimating && el.cgColor === pieceAtKey.color) {
+        if (anim && el.cgAnimating && elPieceClass === pieceClassOf(pieceAtKey)) {
           translation = posToTranslate(key2pos(k), asWhite, bounds);
           translation[0] += anim[1][0];
           translation[1] += anim[1][1];
@@ -69,23 +69,23 @@ export default function(s: State): void {
           el.cgAnimating = false;
         }
         // same piece: flag as same
-        if (el.cgColor === pieceAtKey.color && el.cgRole === pieceAtKey.role) {
+        if (elPieceClass === pieceClassOf(pieceAtKey)) {
           samePieces[k] = true;
         }
         // different piece: flag as moved unless it is a fading piece
         else {
-          if (fading && fading.role === el.cgRole && fading.color === el.cgColor) {
+          if (fading && elPieceClass === pieceClassOf(fading)) {
             el.classList.add('captured'); // todo - add only once
           } else {
-            if (movedPieces[pieceClass]) movedPieces[pieceClass].push(el);
-            else movedPieces[pieceClass] = [el];
+            if (movedPieces[elPieceClass]) movedPieces[elPieceClass].push(el);
+            else movedPieces[elPieceClass] = [el];
           }
         }
       }
       // no piece: flag as moved
       else {
-        if (movedPieces[pieceClass]) movedPieces[pieceClass].push(el);
-        else movedPieces[pieceClass] = [el];
+        if (movedPieces[elPieceClass]) movedPieces[elPieceClass].push(el);
+        else movedPieces[elPieceClass] = [el];
       }
     }
     else if (el.tagName === 'SQUARE') {
@@ -102,10 +102,9 @@ export default function(s: State): void {
   for (let j = 0, jlen = piecesKeys.length; j < jlen; ++j) {
     k = piecesKeys[j];
     p = pieces[k];
-    pieceClass = p.color + p.role;
     anim = anims[k];
     if (!samePieces[k]) {
-      mvdset = movedPieces[pieceClass];
+      mvdset = movedPieces[pieceClassOf(p)];
       mvd = mvdset && mvdset.pop();
       // a same piece was moved
       if (mvd) {
@@ -165,11 +164,12 @@ function renderSquareDom(key: Key, className: string, translation: NumberPair, t
 }
 
 function renderPieceDom(piece: Piece, key: Key, asWhite: boolean, bounds: ClientRect, anim: AnimVector | undefined, transform: string): LolNode {
+  console.log('render piece', key, piece);
 
   const p = document.createElement('piece') as LolNode;
-  p.className = `${piece.color} ${piece.role}`;
-  p.cgRole = piece.role;
-  p.cgColor = piece.color;
+  const pieceClass = pieceClassOf(piece);
+  p.className = pieceClass;
+  p.cgPiece = pieceClass;
   p.cgKey = key;
 
   const translation = posToTranslate(key2pos(key), asWhite, bounds);
@@ -180,6 +180,10 @@ function renderPieceDom(piece: Piece, key: Key, asWhite: boolean, bounds: Client
   }
   p.style[transform] = translate(translation);
   return p;
+}
+
+function pieceClassOf(piece: Piece): string {
+  return `${piece.color} ${piece.role}`;
 }
 
 function computeSquareClasses(s: State): SquareClasses {
