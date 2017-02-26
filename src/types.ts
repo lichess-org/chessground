@@ -41,7 +41,7 @@ export interface Elements {
 export interface Dom {
   elements: Elements,
   bounds: ClientRect;
-  redraw: () => void;
+  redraw: (withSvg?: boolean) => void;
 }
 export interface Exploding {
   stage: number;

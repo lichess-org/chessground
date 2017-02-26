@@ -144,7 +144,7 @@ function step(state: State): void {
       const cfg = cur.plan.anims[i];
       cfg[1] = [roundBy(cfg[0][0] * ease, 10), roundBy(cfg[0][1] * ease, 10)];
     }
-    state.dom.redraw();
+    state.dom.redraw(false); // optimisation: don't render SVG changes during animations
     util.raf(() => step(state));
   }
 }

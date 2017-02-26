@@ -28,9 +28,9 @@ export function Chessground(container: HTMLElement, config?: Config): Api {
     state.dom = {
       elements: elements,
       bounds: bounds,
-      redraw() {
+      redraw(withSvg: boolean = true) {
         render(state);
-        if (elements.svg) svg(state, elements.svg);
+        if (withSvg && elements.svg) svg(state, elements.svg);
       }
     };
     state.dom.redraw();
