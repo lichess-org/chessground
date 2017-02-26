@@ -31,8 +31,7 @@ export default function(s: State): void {
   transform = s.browser.transform;
   let k: cg.Key,
   p: cg.Piece | undefined,
-  anyEl: cg.PieceNode | cg.SquareNode,
-  pEl: cg.PieceNode,
+  el: cg.PieceNode | cg.SquareNode,
   squareClassAtKey: string | undefined,
   pieceAtKey: cg.Piece | undefined,
   elPieceClass: PieceClass,
@@ -45,40 +44,39 @@ export default function(s: State): void {
   sMvd: cg.SquareNode | undefined;
 
   // walk over all board dom elements, apply animations and flag moved pieces
-  anyEl = s.dom.elements.board.firstChild as cg.PieceNode | cg.SquareNode;
-  while (anyEl) {
-    k = anyEl.cgKey;
+  el = s.dom.elements.board.firstChild as cg.PieceNode | cg.SquareNode;
+  while (el) {
+    k = el.cgKey;
     squareClassAtKey = squares[k];
     pieceAtKey = pieces[k];
     anim = anims[k];
     fading = fadings[k];
-    if (anyEl.tagName === 'PIECE') {
-      pEl = anyEl as cg.PieceNode;
-      elPieceClass = pEl.cgPiece;
+    if (isPieceNode(el)) {
+      elPieceClass = el.cgPiece;
       // if piece not being dragged anymore, remove dragging style
-      if (pEl.cgDragging && (!curDrag || curDrag.orig !== k)) {
-        pEl.classList.remove('dragging');
-        transform(pEl, translate(posToTranslate(key2pos(k), asWhite, bounds)));
-        pEl.cgDragging = false;
+      if (el.cgDragging && (!curDrag || curDrag.orig !== k)) {
+        el.classList.remove('dragging');
+        transform(el, translate(posToTranslate(key2pos(k), asWhite, bounds)));
+        el.cgDragging = false;
       }
       // remove fading class if it still remains
-      if (!fading && pEl.cgFading) {
-        pEl.cgFading = false;
-        pEl.classList.remove('fading');
+      if (!fading && el.cgFading) {
+        el.cgFading = false;
+        el.classList.remove('fading');
       }
       // there is now a piece at this dom key
       if (pieceAtKey) {
         // continue animation if already animating and same piece
         // (otherwise it could animate a captured piece)
-        if (anim && pEl.cgAnimating && elPieceClass === pieceClassOf(pieceAtKey)) {
+        if (anim && el.cgAnimating && elPieceClass === pieceClassOf(pieceAtKey)) {
           translation = posToTranslate(key2pos(k), asWhite, bounds);
           translation[0] += anim[1][0];
           translation[1] += anim[1][1];
-          transform(pEl, translate(translation));
-        } else if (pEl.cgAnimating) {
+          transform(el, translate(translation));
+        } else if (el.cgAnimating) {
           translation = posToTranslate(key2pos(k), asWhite, bounds);
-          transform(pEl, translate(translation));
-          pEl.cgAnimating = false;
+          transform(el, translate(translation));
+          el.cgAnimating = false;
         }
         // same piece: flag as same
         if (elPieceClass === pieceClassOf(pieceAtKey)) {
@@ -87,27 +85,27 @@ export default function(s: State): void {
         // different piece: flag as moved unless it is a fading piece
         else {
           if (fading && elPieceClass === pieceClassOf(fading)) {
-            pEl.classList.add('fading');
-            pEl.cgFading = true;
+            el.classList.add('fading');
+            el.cgFading = true;
           } else {
-            if (movedPieces[elPieceClass]) movedPieces[elPieceClass].push(pEl);
-            else movedPieces[elPieceClass] = [pEl];
+            if (movedPieces[elPieceClass]) movedPieces[elPieceClass].push(el);
+            else movedPieces[elPieceClass] = [el];
           }
         }
       }
       // no piece: flag as moved
       else {
-        if (movedPieces[elPieceClass]) movedPieces[elPieceClass].push(pEl);
-        else movedPieces[elPieceClass] = [pEl];
+        if (movedPieces[elPieceClass]) movedPieces[elPieceClass].push(el);
+        else movedPieces[elPieceClass] = [el];
       }
     }
-    else if (anyEl.tagName === 'SQUARE') {
-      const cn = anyEl.className;
+    else if (isSquareNode(el)) {
+      const cn = el.className;
       if (squareClassAtKey === cn) sameSquares[k] = true;
-      else if (movedSquares[cn]) movedSquares[cn].push(anyEl);
-      else movedSquares[cn] = [anyEl];
+      else if (movedSquares[cn]) movedSquares[cn].push(el);
+      else movedSquares[cn] = [el];
     }
-    anyEl = anyEl.nextSibling as cg.PieceNode | cg.SquareNode;
+    el = el.nextSibling as cg.PieceNode | cg.SquareNode;
   }
 
   // walk over all pieces in current set, apply dom changes to moved pieces
@@ -162,6 +160,13 @@ export default function(s: State): void {
   // remove any element that remains in the moved sets
   for (let i in movedPieces) removeNodes(s, movedPieces[i]);
   for (let i in movedSquares) removeNodes(s, movedSquares[i]);
+}
+
+function isPieceNode(el: cg.PieceNode | cg.SquareNode): el is cg.PieceNode {
+  return el.tagName === 'PIECE';
+}
+function isSquareNode(el: cg.PieceNode | cg.SquareNode): el is cg.SquareNode {
+  return el.tagName === 'SQUARE';
 }
 
 function removeNodes(s: State, nodes: HTMLElement[]): void {
