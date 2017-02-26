@@ -65,7 +65,8 @@ export function start(s: State, e: cg.MouchEvent): void {
     const ghost = s.dom.elements.ghost;
     if (ghost) {
       ghost.className = `ghost ${piece.color} ${piece.role}`;
-      ghost.style.setProperty(s.browser.transformProp, element.style.getPropertyValue(s.browser.transformProp));
+      const translation = util.posToTranslate(util.key2pos(orig), s.orientation === 'white', s.dom.bounds);
+      s.browser.transform(ghost, util.translate(translation));
     }
   } else {
     if (hadPremove) board.unsetPremove(s);
@@ -96,10 +97,11 @@ function processDrag(s: State): void {
           var translation = util.posToTranslate(cur.origPos, s.orientation === 'white', s.dom.bounds);
           translation[0] += cur.pos[0] + cur.dec[0];
           translation[1] += cur.pos[1] + cur.dec[1];
-          cur.element.style.setProperty(s.browser.transformProp, util.translate(translation));
+          s.browser.transform(cur.element, util.translate(translation));
 
           // move over element
-          if (s.dom.elements.over && cur.over && cur.over !== cur.overPrev) {
+          const overEl = s.dom.elements.over;
+          if (overEl && cur.over && cur.over !== cur.overPrev) {
             const dests = s.movable.dests;
             if (s.movable.free ||
               util.containsX(dests && dests[cur.orig], cur.over) ||
@@ -111,9 +113,9 @@ function processDrag(s: State): void {
                 (asWhite ? pos[0] - 1 : 8 - pos[0]) * squareWidth,
                 (asWhite ? 8 - pos[1] : pos[1] - 1) * squareWidth
               ];
-              s.dom.elements.over.style.setProperty(s.browser.transformProp, util.translate(vector));
+              s.browser.transform(overEl, util.translate(vector));
             } else {
-              s.dom.elements.over.style.setProperty(s.browser.transformProp, util.translateAway);
+              s.browser.transform(overEl, util.translateAway);
             }
             cur.overPrev = cur.over;
           }
@@ -183,8 +185,8 @@ export function cancel(s: State): void {
 
 function removeDragElements(s: State) {
   const e = s.dom.elements;
-  if (e.over) e.over.style.setProperty(s.browser.transformProp, util.translateAway);
-  if (e.ghost) e.ghost.style.setProperty(s.browser.transformProp, util.translateAway);
+  if (e.over) s.browser.transform(e.over, util.translateAway);
+  if (e.ghost) s.browser.transform(e.ghost, util.translateAway);
 }
 
 function computeSquareBounds(s: State, key: cg.Key) {

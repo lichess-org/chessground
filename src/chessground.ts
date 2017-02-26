@@ -15,7 +15,7 @@ export function Chessground(container: HTMLElement, config?: Config): Api {
   configure(state, config || {});
 
   state.browser = {
-    transformProp: util.computeTransformProp()
+    transform: util.transformFunction()
   };
 
   function redrawAll() {

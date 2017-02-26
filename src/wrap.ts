@@ -52,7 +52,7 @@ function renderAway(browser: Browser, bounds: ClientRect, tagName: string, class
   el.className = className;
   el.style.width = squareSize + 'px';
   el.style.height = squareSize + 'px';
-  el.style.setProperty(browser.transformProp, translateAway);
+  browser.transform(el, translateAway);
   return el;
 }
 

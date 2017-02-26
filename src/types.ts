@@ -30,7 +30,7 @@ export interface MaterialDiff {
 }
 
 export interface Browser {
-  transformProp: string;
+  transform: Transform;
 }
 export interface Elements {
   board: HTMLElement;
@@ -72,7 +72,7 @@ export interface PieceNode extends KeyedNode {
 }
 export interface SquareNode extends KeyedNode { }
 
-export interface CSSStyleDeclaration { [key: string]: any; }
+export type Transform = (el: HTMLElement, value: string) => void
 
 export type Redraw = () => void;
 export type Timestamp = number;

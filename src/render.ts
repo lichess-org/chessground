@@ -28,7 +28,7 @@ export default function(s: State): void {
   movedPieces: MovedPieces = {},
   movedSquares: MovedSquares = {},
   piecesKeys: cg.Key[] = Object.keys(pieces) as cg.Key[],
-  transform: string = s.browser.transformProp;
+  transform = s.browser.transform;
   let k: cg.Key,
   p: cg.Piece | undefined,
   anyEl: cg.PieceNode | cg.SquareNode,
@@ -58,7 +58,7 @@ export default function(s: State): void {
       // if piece not being dragged anymore, remove dragging style
       if (pEl.cgDragging && (!curDrag || curDrag.orig !== k)) {
         pEl.classList.remove('dragging');
-        pEl.style.setProperty(transform, translate(posToTranslate(key2pos(k), asWhite, bounds)));
+        transform(pEl, translate(posToTranslate(key2pos(k), asWhite, bounds)));
         pEl.cgDragging = false;
       }
       // remove fading class if it still remains
@@ -74,10 +74,10 @@ export default function(s: State): void {
           translation = posToTranslate(key2pos(k), asWhite, bounds);
           translation[0] += anim[1][0];
           translation[1] += anim[1][1];
-          pEl.style.setProperty(transform, translate(translation));
+          transform(pEl, translate(translation));
         } else if (pEl.cgAnimating) {
           translation = posToTranslate(key2pos(k), asWhite, bounds);
-          pEl.style.setProperty(transform, translate(translation));
+          transform(pEl, translate(translation));
           pEl.cgAnimating = false;
         }
         // same piece: flag as same
@@ -129,7 +129,7 @@ export default function(s: State): void {
           translation[0] += anim[1][0];
           translation[1] += anim[1][1];
         }
-        pMvd.style.setProperty(transform, translate(translation));
+        transform(pMvd, translate(translation));
       }
       // no piece in moved obj: insert the new piece
       // new: assume the new piece is not being dragged
@@ -151,7 +151,7 @@ export default function(s: State): void {
       translation = posToTranslate(key2pos(sk as cg.Key), asWhite, bounds);
       if (sMvd) {
         sMvd.cgKey = sk as cg.Key;
-        sMvd.style.setProperty(transform, translate(translation));
+        transform(sMvd, translate(translation));
       }
       else {
         s.dom.elements.board.appendChild(renderSquareDom(sk as cg.Key, squares[sk], translation, transform));
@@ -168,15 +168,15 @@ function removeNodes(s: State, nodes: HTMLElement[]): void {
   for (let i in nodes) s.dom.elements.board.removeChild(nodes[i]);
 }
 
-function renderSquareDom(key: cg.Key, className: string, translation: cg.NumberPair, transform: string): cg.SquareNode {
+function renderSquareDom(key: cg.Key, className: string, translation: cg.NumberPair, transform: cg.Transform): cg.SquareNode {
   const s = document.createElement('square') as cg.SquareNode;
   s.className = className;
   s.cgKey = key;
-  s.style.setProperty(transform, translate(translation));
+  transform(s, translate(translation));
   return s;
 }
 
-function renderPieceDom(piece: cg.Piece, key: cg.Key, asWhite: boolean, bounds: ClientRect, anim: AnimVector | undefined, transform: string): cg.PieceNode {
+function renderPieceDom(piece: cg.Piece, key: cg.Key, asWhite: boolean, bounds: ClientRect, anim: AnimVector | undefined, transform: cg.Transform): cg.PieceNode {
 
   const p = document.createElement('piece') as cg.PieceNode;
   const pieceClass = pieceClassOf(piece);
@@ -190,7 +190,7 @@ function renderPieceDom(piece: cg.Piece, key: cg.Key, asWhite: boolean, bounds: 
     translation[0] += anim[1][0];
     translation[1] += anim[1][1];
   }
-  p.style.setProperty(transform, translate(translation));
+  transform(p, translate(translation));
   return p;
 }
 

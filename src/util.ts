@@ -50,13 +50,14 @@ export function distance(pos1: cg.Pos, pos2: cg.Pos): number {
   return Math.sqrt(Math.pow(pos1[0] - pos2[0], 2) + Math.pow(pos1[1] - pos2[1], 2));
 }
 
-export function computeTransformProp() {
+export function transformFunction(): cg.Transform {
   const s = document.body.style;
-  return 'transform' in s ?
+  const prop = 'transform' in s ?
   'transform' : 'webkitTransform' in s ?
   'webkitTransform' : 'mozTransform' in s ?
   'mozTransform' : 'oTransform' in s ?
   'oTransform' : 'msTransform';
+  return (el, value) => el.style.setProperty(prop, value);
 }
 
 export function computeIsTrident(): boolean {
