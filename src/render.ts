@@ -8,7 +8,7 @@ type PieceName = string; // `$color $role`
 
 interface SamePieces { [key: string]: boolean }
 interface SameSquares { [key: string]: boolean }
-interface MovedPieces { [className: string]: cg.PieceNode[] }
+interface MovedPieces { [pieceName: string]: cg.PieceNode[] }
 interface MovedSquares { [className: string]: cg.SquareNode[] }
 interface SquareClasses { [key: string]: string }
 
