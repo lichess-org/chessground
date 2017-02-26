@@ -18,6 +18,7 @@ interface SquareClasses { [key: string]: string }
 export default function(s: State): void {
   const asWhite: boolean = s.orientation === 'white',
   bounds: ClientRect = s.dom.bounds,
+  boardEl: HTMLElement = s.dom.elements.board,
   pieces: cg.Pieces = s.pieces,
   curAnim: AnimCurrent | undefined = s.animation.current,
   anims: AnimVectors = curAnim ? curAnim.plan.anims : {},
@@ -45,7 +46,7 @@ export default function(s: State): void {
   sMvd: cg.SquareNode | undefined;
 
   // walk over all board dom elements, apply animations and flag moved pieces
-  el = s.dom.elements.board.firstChild as cg.PieceNode | cg.SquareNode;
+  el = boardEl.firstChild as cg.PieceNode | cg.SquareNode;
   while (el) {
     k = el.cgKey;
     squareClassAtKey = squares[k];
@@ -109,6 +110,25 @@ export default function(s: State): void {
     el = el.nextSibling as cg.PieceNode | cg.SquareNode;
   }
 
+  // walk over all squares in current set, apply dom changes to moved squares
+  // or append new squares
+  for (let sk in squares) {
+    if (!sameSquares[sk]) {
+      sMvdset = movedSquares[squares[sk]];
+      sMvd = sMvdset && sMvdset.pop();
+      translation = posToTranslate(key2pos(sk as cg.Key), asWhite, bounds);
+      if (sMvd) {
+        sMvd.cgKey = sk as cg.Key;
+        transform(sMvd, translate(translation));
+      }
+      else {
+        boardEl.insertBefore(
+          renderSquareDom(sk as cg.Key, squares[sk], translation, transform),
+          boardEl.firstChild);
+      }
+    }
+  }
+
   // walk over all pieces in current set, apply dom changes to moved pieces
   // or append new pieces
   for (let j in piecesKeys) {
@@ -136,24 +156,7 @@ export default function(s: State): void {
       // new: assume the new piece is not being dragged
       // might be a bad idea
       else {
-        s.dom.elements.board.appendChild(renderPieceDom(s, p, k, asWhite, anim));
-      }
-    }
-  }
-
-  // walk over all squares in current set, apply dom changes to moved squares
-  // or append new squares
-  for (let sk in squares) {
-    if (!sameSquares[sk]) {
-      sMvdset = movedSquares[squares[sk]];
-      sMvd = sMvdset && sMvdset.pop();
-      translation = posToTranslate(key2pos(sk as cg.Key), asWhite, bounds);
-      if (sMvd) {
-        sMvd.cgKey = sk as cg.Key;
-        transform(sMvd, translate(translation));
-      }
-      else {
-        s.dom.elements.board.appendChild(renderSquareDom(sk as cg.Key, squares[sk], translation, transform));
+        boardEl.appendChild(renderPieceDom(s, p, k, asWhite, anim));
       }
     }
   }
