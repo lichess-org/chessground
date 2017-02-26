@@ -212,10 +212,10 @@ function orient(pos: cg.Pos, color: cg.Color): cg.Pos {
 function makeCustomBrush(base: DrawBrush, modifiers: DrawModifiers): DrawBrush {
   const brush: Partial<DrawBrush> = {
     color: base.color,
-    opacity: base.opacity,
-    lineWidth: modifiers.lineWidth || base.lineWidth
+    opacity: Math.round(base.opacity * 10) / 10,
+    lineWidth: Math.round(modifiers.lineWidth || base.lineWidth)
   };
-  brush.key = [brush.color, brush.opacity, brush.lineWidth].join('');
+  brush.key = [base.key, modifiers.lineWidth].filter(x => x).join('');
   return brush as DrawBrush;
 }
 
