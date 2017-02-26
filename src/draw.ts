@@ -7,7 +7,7 @@ export interface DrawShape {
   orig: cg.Key;
   dest?: cg.Key;
   brush: string;
-  brushModifiers?: DrawBrushModifiers;
+  modifiers?: DrawModifiers;
   piece?: DrawShapePiece;
 }
 
@@ -24,9 +24,11 @@ export interface DrawBrush {
   lineWidth: number
 }
 
-export interface DrawBrushModifiers {
-  color?: string;
-  opacity?: number;
+export interface DrawBrushes {
+  [name: string]: DrawBrush;
+}
+
+export interface DrawModifiers {
   lineWidth?: number;
 }
 
@@ -37,9 +39,7 @@ export interface Drawable {
   shapes: DrawShape[]; // user shapes
   autoShapes: DrawShape[]; // computer shapes
   current?: DrawCurrent;
-  brushes: {
-    [name: string]: DrawBrush
-  };
+  brushes: DrawBrushes;
   // drawable SVG pieces; used for crazyhouse drop
   pieces: {
     baseUrl: string

@@ -17,6 +17,7 @@ export default function(s: State, bounds: ClientRect): [HTMLElement, Elements] {
   let svg: SVGElement | undefined;
   if (s.drawable.enabled) {
     svg = createSVG('svg');
+    svg.appendChild(createSVG('defs'));
     wrap.appendChild(svg);
   }
 
