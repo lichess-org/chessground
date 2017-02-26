@@ -194,7 +194,7 @@ function removeDragElements(s: State) {
 
 function computeSquareBounds(key: cg.Key, asWhite: boolean, bounds: ClientRect) {
   const pos = util.key2pos(key);
-  if (asWhite) {
+  if (!asWhite) {
     pos[0] = 9 - pos[0];
     pos[1] = 9 - pos[1];
   }
