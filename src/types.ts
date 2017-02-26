@@ -62,7 +62,7 @@ export type WindowEvent = 'onscroll' | 'onresize';
 export type MouchEvent = MouseEvent & TouchEvent;
 
 export interface KeyedNode extends HTMLElement {
-  cgKey?: Key;
+  cgKey: Key;
 }
 export interface PieceNode extends KeyedNode {
   cgPiece: string;

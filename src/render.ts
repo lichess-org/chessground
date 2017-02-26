@@ -47,7 +47,7 @@ export default function(s: State): void {
   // walk over all board dom elements, apply animations and flag moved pieces
   anyEl = s.dom.elements.board.firstChild as cg.PieceNode | cg.SquareNode;
   while (anyEl) {
-    k = anyEl.cgKey as cg.Key;
+    k = anyEl.cgKey;
     squareClassAtKey = squares[k];
     pieceAtKey = pieces[k];
     anim = anims[k];
