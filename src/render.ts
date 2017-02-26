@@ -49,7 +49,7 @@ export default function(s: State): void {
     pieceAtKey = pieces[k];
     anim = anims[k];
     fading = fadings[k];
-    if (el.tagName === 'PIECE') {
+    if (el.tagName === 'PIECE' && el.tagName === 'PIECE') {
       elPieceClass = el.cgPiece;
       // if piece not being dragged anymore, remove dragging style
       if (el.cgDragging && (!curDrag || curDrag.orig !== k)) {
@@ -145,9 +145,12 @@ export default function(s: State): void {
       mvdset = movedSquares[squares[sk]];
       mvd = mvdset && mvdset.pop();
       translation = posToTranslate(key2pos(sk as cg.Key), asWhite, bounds);
-      if (mvd) mvd.style[transform] = translate(translation);
+      if (mvd) {
+        mvd.cgKey = sk;
+        mvd.style[transform] = translate(translation);
+      }
       else {
-        s.dom.elements.board.appendChild(renderSquareDom(squares[sk], translation, transform));
+        s.dom.elements.board.appendChild(renderSquareDom(sk as cg.Key, squares[sk], translation, transform));
       }
     }
   }
@@ -161,9 +164,10 @@ function removeNodes(s: State, nodes: cg.LolNode[]): void {
   for (let i in nodes) s.dom.elements.board.removeChild(nodes[i]);
 }
 
-function renderSquareDom(className: string, translation: cg.NumberPair, transform: string): HTMLElement {
-  const s = document.createElement('square');
+function renderSquareDom(key: cg.Key, className: string, translation: cg.NumberPair, transform: string): cg.LolNode {
+  const s = document.createElement('square') as cg.LolNode;
   s.className = className;
+  s.cgKey = key;
   s.style.setProperty(transform, translate(translation));
   return s;
 }
