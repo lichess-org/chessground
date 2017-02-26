@@ -15,7 +15,7 @@ export interface DragCurrent {
   over?: cg.Key; // square being moused over
   overPrev?: cg.Key; // square previously moused over
   started: boolean; // whether the drag has started; as per the distance setting
-  element: cg.LolNode;
+  element: cg.PieceNode;
   newPiece?: boolean;
   previouslySelected?: cg.Key;
   originTarget: EventTarget;
@@ -96,7 +96,7 @@ function processDrag(s: State): void {
           var translation = util.posToTranslate(cur.origPos, s.orientation === 'white', s.dom.bounds);
           translation[0] += cur.pos[0] + cur.dec[0];
           translation[1] += cur.pos[1] + cur.dec[1];
-          cur.element.style[s.browser.transformProp] = util.translate(translation);
+          cur.element.style.setProperty(s.browser.transformProp, util.translate(translation));
 
           // move over element
           if (s.dom.elements.over && cur.over && cur.over !== cur.overPrev) {
@@ -201,11 +201,11 @@ function computeSquareBounds(s: State, key: cg.Key) {
   };
 }
 
-function pieceElementByKey(s: State, key: cg.Key): cg.LolNode | undefined {
-  let el = s.dom.elements.board.firstChild as cg.LolNode;
+function pieceElementByKey(s: State, key: cg.Key): cg.PieceNode | undefined {
+  let el = s.dom.elements.board.firstChild as cg.PieceNode;
   while (el) {
-    if (el.cgKey === key) return el;
-    el = el.nextSibling;
+    if (el.cgKey === key && el.tagName === 'PIECE') return el;
+    el = el.nextSibling as cg.PieceNode;
   }
   return undefined;
 }

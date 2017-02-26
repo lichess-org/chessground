@@ -47,9 +47,9 @@ export default function(state: State, root: SVGElement): void {
   allShapes.forEach(sc => { hashesInDom[sc.hash] = false; });
 
   let needsDefs = usedBrushes.length > 0,
-  el = root.firstChild as cg.LolNode,
+  el = root.firstChild as SVGElement,
   toDelete: SVGElement[] = [],
-  elHash;
+  elHash: Hash;
 
   while(el) {
     if (el.tagName === 'DEFS') {
@@ -58,13 +58,13 @@ export default function(state: State, root: SVGElement): void {
         needsDefs = false;
       }
     } else {
-      elHash = el.getAttribute('cgHash');
+      elHash = el.getAttribute('cgHash') as Hash;
       // found a shape element that's here to stay
       if (hashesInDom.hasOwnProperty(elHash)) hashesInDom[elHash] = true;
       // or delete it
       else toDelete.push(el);
     }
-    el = el.nextSibling;
+    el = el.nextSibling as SVGElement;
   }
 
   // remove old shapes and defs

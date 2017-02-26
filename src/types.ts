@@ -60,7 +60,17 @@ export interface SetPremoveMetadata {
 export type WindowEvent = 'onscroll' | 'onresize';
 
 export type MouchEvent = MouseEvent & TouchEvent;
-export type LolNode = any; // HTML Node but with custom props
+
+export interface KeyedNode extends HTMLElement {
+  cgKey?: Key;
+}
+export interface PieceNode extends KeyedNode {
+  cgPiece: string;
+  cgAnimating?: boolean;
+  cgFading?: boolean;
+  cgDragging?: boolean;
+}
+export interface SquareNode extends KeyedNode { }
 
 export interface CSSStyleDeclaration { [key: string]: any; }
 

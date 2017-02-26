@@ -8,8 +8,8 @@ type PieceClass = string;
 
 interface SamePieces { [key: string]: boolean }
 interface SameSquares { [key: string]: boolean }
-interface MovedPieces { [className: string]: cg.LolNode }
-interface MovedSquares { [className: string]: cg.LolNode }
+interface MovedPieces { [className: string]: cg.PieceNode[] }
+interface MovedSquares { [className: string]: cg.SquareNode[] }
 interface SquareClasses { [key: string]: string }
 
 // ported from https://github.com/veloce/lichobile/blob/master/src/js/chessground/view.js
@@ -31,50 +31,54 @@ export default function(s: State): void {
   transform: string = s.browser.transformProp;
   let k: cg.Key,
   p: cg.Piece | undefined,
-  el: cg.LolNode,
+  anyEl: cg.PieceNode | cg.SquareNode,
+  pEl: cg.PieceNode,
   squareClassAtKey: string | undefined,
   pieceAtKey: cg.Piece | undefined,
   elPieceClass: PieceClass,
   translation: cg.NumberPair,
   anim: AnimVector | undefined,
   fading: cg.Piece | undefined,
-  mvdset: cg.LolNode[],
-  mvd: cg.LolNode | undefined;
+  pMvdset: cg.PieceNode[],
+  pMvd: cg.PieceNode | undefined,
+  sMvdset: cg.SquareNode[],
+  sMvd: cg.SquareNode | undefined;
 
   // walk over all board dom elements, apply animations and flag moved pieces
-  el = s.dom.elements.board.firstChild as cg.LolNode;
-  while (el) {
-    k = el.cgKey;
+  anyEl = s.dom.elements.board.firstChild as cg.PieceNode | cg.SquareNode;
+  while (anyEl) {
+    k = anyEl.cgKey as cg.Key;
     squareClassAtKey = squares[k];
     pieceAtKey = pieces[k];
     anim = anims[k];
     fading = fadings[k];
-    if (el.tagName === 'PIECE' && el.tagName === 'PIECE') {
-      elPieceClass = el.cgPiece;
+    if (anyEl.tagName === 'PIECE') {
+      pEl = anyEl as cg.PieceNode;
+      elPieceClass = pEl.cgPiece;
       // if piece not being dragged anymore, remove dragging style
-      if (el.cgDragging && (!curDrag || curDrag.orig !== k)) {
-        el.classList.remove('dragging');
-        el.style[transform] = translate(posToTranslate(key2pos(k), asWhite, bounds));
-        el.cgDragging = false;
+      if (pEl.cgDragging && (!curDrag || curDrag.orig !== k)) {
+        pEl.classList.remove('dragging');
+        pEl.style.setProperty(transform, translate(posToTranslate(key2pos(k), asWhite, bounds)));
+        pEl.cgDragging = false;
       }
       // remove fading class if it still remains
-      if (!fading && el.cgFading) {
-        el.cgFading = false;
-        el.classList.remove('fading');
+      if (!fading && pEl.cgFading) {
+        pEl.cgFading = false;
+        pEl.classList.remove('fading');
       }
       // there is now a piece at this dom key
       if (pieceAtKey) {
         // continue animation if already animating and same piece
         // (otherwise it could animate a captured piece)
-        if (anim && el.cgAnimating && elPieceClass === pieceClassOf(pieceAtKey)) {
+        if (anim && pEl.cgAnimating && elPieceClass === pieceClassOf(pieceAtKey)) {
           translation = posToTranslate(key2pos(k), asWhite, bounds);
           translation[0] += anim[1][0];
           translation[1] += anim[1][1];
-          el.style[transform] = translate(translation);
-        } else if (el.cgAnimating) {
+          pEl.style.setProperty(transform, translate(translation));
+        } else if (pEl.cgAnimating) {
           translation = posToTranslate(key2pos(k), asWhite, bounds);
-          el.style[transform] = translate(translation);
-          el.cgAnimating = false;
+          pEl.style.setProperty(transform, translate(translation));
+          pEl.cgAnimating = false;
         }
         // same piece: flag as same
         if (elPieceClass === pieceClassOf(pieceAtKey)) {
@@ -83,49 +87,49 @@ export default function(s: State): void {
         // different piece: flag as moved unless it is a fading piece
         else {
           if (fading && elPieceClass === pieceClassOf(fading)) {
-            el.classList.add('fading');
-            el.cgFading = true;
+            pEl.classList.add('fading');
+            pEl.cgFading = true;
           } else {
-            if (movedPieces[elPieceClass]) movedPieces[elPieceClass].push(el);
-            else movedPieces[elPieceClass] = [el];
+            if (movedPieces[elPieceClass]) movedPieces[elPieceClass].push(pEl);
+            else movedPieces[elPieceClass] = [pEl];
           }
         }
       }
       // no piece: flag as moved
       else {
-        if (movedPieces[elPieceClass]) movedPieces[elPieceClass].push(el);
-        else movedPieces[elPieceClass] = [el];
+        if (movedPieces[elPieceClass]) movedPieces[elPieceClass].push(pEl);
+        else movedPieces[elPieceClass] = [pEl];
       }
     }
-    else if (el.tagName === 'SQUARE') {
-      const cn = el.className;
+    else if (anyEl.tagName === 'SQUARE') {
+      const cn = anyEl.className;
       if (squareClassAtKey === cn) sameSquares[k] = true;
-      else if (movedSquares[cn]) movedSquares[cn].push(el);
-      else movedSquares[cn] = [el];
+      else if (movedSquares[cn]) movedSquares[cn].push(anyEl);
+      else movedSquares[cn] = [anyEl];
     }
-    el = el.nextSibling;
+    anyEl = anyEl.nextSibling as cg.PieceNode | cg.SquareNode;
   }
 
   // walk over all pieces in current set, apply dom changes to moved pieces
   // or append new pieces
-  for (let j = 0, jlen = piecesKeys.length; j < jlen; ++j) {
+  for (let j in piecesKeys) {
     k = piecesKeys[j];
     p = pieces[k];
     anim = anims[k];
     if (!samePieces[k]) {
-      mvdset = movedPieces[pieceClassOf(p)];
-      mvd = mvdset && mvdset.pop();
+      pMvdset = movedPieces[pieceClassOf(p)];
+      pMvd = pMvdset && pMvdset.pop();
       // a same piece was moved
-      if (mvd) {
+      if (pMvd) {
         // apply dom changes
-        mvd.cgKey = k;
+        pMvd.cgKey = k;
         translation = posToTranslate(key2pos(k), asWhite, bounds);
         if (anim) {
-          mvd.cgAnimating = true;
+          pMvd.cgAnimating = true;
           translation[0] += anim[1][0];
           translation[1] += anim[1][1];
         }
-        mvd.style[transform] = translate(translation);
+        pMvd.style.setProperty(transform, translate(translation));
       }
       // no piece in moved obj: insert the new piece
       // new: assume the new piece is not being dragged
@@ -142,12 +146,12 @@ export default function(s: State): void {
   // or append new squares
   for (let sk in squares) {
     if (!sameSquares[sk]) {
-      mvdset = movedSquares[squares[sk]];
-      mvd = mvdset && mvdset.pop();
+      sMvdset = movedSquares[squares[sk]];
+      sMvd = sMvdset && sMvdset.pop();
       translation = posToTranslate(key2pos(sk as cg.Key), asWhite, bounds);
-      if (mvd) {
-        mvd.cgKey = sk;
-        mvd.style[transform] = translate(translation);
+      if (sMvd) {
+        sMvd.cgKey = sk as cg.Key;
+        sMvd.style.setProperty(transform, translate(translation));
       }
       else {
         s.dom.elements.board.appendChild(renderSquareDom(sk as cg.Key, squares[sk], translation, transform));
@@ -160,21 +164,21 @@ export default function(s: State): void {
   for (let i in movedSquares) removeNodes(s, movedSquares[i]);
 }
 
-function removeNodes(s: State, nodes: cg.LolNode[]): void {
+function removeNodes(s: State, nodes: HTMLElement[]): void {
   for (let i in nodes) s.dom.elements.board.removeChild(nodes[i]);
 }
 
-function renderSquareDom(key: cg.Key, className: string, translation: cg.NumberPair, transform: string): cg.LolNode {
-  const s = document.createElement('square') as cg.LolNode;
+function renderSquareDom(key: cg.Key, className: string, translation: cg.NumberPair, transform: string): cg.SquareNode {
+  const s = document.createElement('square') as cg.SquareNode;
   s.className = className;
   s.cgKey = key;
   s.style.setProperty(transform, translate(translation));
   return s;
 }
 
-function renderPieceDom(piece: cg.Piece, key: cg.Key, asWhite: boolean, bounds: ClientRect, anim: AnimVector | undefined, transform: string): cg.LolNode {
+function renderPieceDom(piece: cg.Piece, key: cg.Key, asWhite: boolean, bounds: ClientRect, anim: AnimVector | undefined, transform: string): cg.PieceNode {
 
-  const p = document.createElement('piece') as cg.LolNode;
+  const p = document.createElement('piece') as cg.PieceNode;
   const pieceClass = pieceClassOf(piece);
   p.className = pieceClass;
   p.cgPiece = pieceClass;
@@ -186,7 +190,7 @@ function renderPieceDom(piece: cg.Piece, key: cg.Key, asWhite: boolean, bounds: 
     translation[0] += anim[1][0];
     translation[1] += anim[1][1];
   }
-  p.style[transform] = translate(translation);
+  p.style.setProperty(transform, translate(translation));
   return p;
 }
 
