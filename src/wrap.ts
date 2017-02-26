@@ -1,7 +1,8 @@
 import { State } from './state'
-import * as util from './util'
+import { translateAway } from './util'
+import { files, ranks } from './types'
 import { createElement as createSVG } from './svg'
-import { Elements, Browser } from './types.d'
+import { Elements, Browser } from './types'
 
 export default function(s: State, bounds: ClientRect): [HTMLElement, Elements] {
 
@@ -21,8 +22,8 @@ export default function(s: State, bounds: ClientRect): [HTMLElement, Elements] {
 
   if (s.coordinates) {
     const orientClass = s.orientation === 'black' ? ' black' : '';
-    wrap.appendChild(renderCoords(util.ranks, 'ranks' + orientClass));
-    wrap.appendChild(renderCoords(util.files, 'files' + orientClass));
+    wrap.appendChild(renderCoords(ranks, 'ranks' + orientClass));
+    wrap.appendChild(renderCoords(files, 'files' + orientClass));
   }
 
   let over: HTMLElement | undefined;
@@ -51,7 +52,7 @@ function renderAway(browser: Browser, bounds: ClientRect, tagName: string, class
   el.className = className;
   el.style.width = squareSize + 'px';
   el.style.height = squareSize + 'px';
-  el.style.setProperty(browser.transformProp, util.translateAway);
+  el.style.setProperty(browser.transformProp, translateAway);
   return el;
 }
 

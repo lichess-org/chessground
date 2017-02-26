@@ -1,7 +1,7 @@
 import { State } from './state'
 import { key2pos, computeIsTrident } from './util'
 import { Drawable, DrawShape, DrawShapePiece, DrawBrush, DrawBrushModifiers } from './draw'
-import * as cg from './types.d'
+import * as cg from './types'
 
 export function createElement(tagName: string): SVGElement {
   return document.createElementNS('http://www.w3.org/2000/svg', tagName);

@@ -2,7 +2,7 @@ import * as fen from './fen'
 import { AnimCurrent } from './anim'
 import { DragCurrent } from './drag'
 import { Drawable } from './draw'
-import * as cg from './types.d';
+import * as cg from './types';
 
 export interface State {
   pieces: cg.Pieces;

@@ -2,7 +2,7 @@ import { State } from './state'
 import { pos2key, key2pos, opposite, containsX } from './util'
 import premove from './premove'
 import * as hold from './hold'
-import * as cg from './types.d'
+import * as cg from './types'
 
 type Callback = (...args: any[]) => void;
 

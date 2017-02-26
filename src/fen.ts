@@ -1,5 +1,5 @@
-import { pos2key, ranks, invRanks } from './util'
-import * as cg from './types.d'
+import { pos2key, invRanks } from './util'
+import * as cg from './types'
 
 export const initial: cg.FEN = 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR';
 
@@ -37,7 +37,7 @@ export function write(pieces: cg.Pieces): cg.FEN {
   return [8, 7, 6, 5, 4, 3, 2].reduce(
     (str: string, nb: any) => str.replace(new RegExp(Array(nb + 1).join('1'), 'g'), nb),
     invRanks.map(y => {
-      return ranks.map(x => {
+      return cg.ranks.map(x => {
         piece = pieces[pos2key([x, y])];
         if (piece) {
           letter = letters[piece.role];

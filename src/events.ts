@@ -2,7 +2,7 @@ import { State } from './state'
 import * as drag from './drag'
 import * as draw from './draw'
 import { isLeftButton, isRightButton } from './util'
-import * as cg from './types.d'
+import * as cg from './types'
 
 const startEvents = ['touchstart', 'mousedown'];
 const moveEvents = ['touchmove', 'mousemove'];

@@ -1,7 +1,5 @@
-import * as cg from './types.d';
+import * as cg from './types';
 
-export const files: cg.File[] = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h'];
-export const ranks: cg.Rank[] = [1, 2, 3, 4, 5, 6, 7, 8];
 export const invRanks: cg.Rank[] = [8, 7, 6, 5, 4, 3, 2, 1];
 export const fileNumbers: { [file: string]: number } = {
   a: 1,
@@ -15,7 +13,7 @@ export const fileNumbers: { [file: string]: number } = {
 };
 
 export function pos2key(pos: cg.Pos): cg.Key {
-  return files[pos[0] - 1] + pos[1] as cg.Key;
+  return cg.files[pos[0] - 1] + pos[1] as cg.Key;
 }
 
 export function key2pos(key: cg.Key): cg.Pos {
@@ -23,7 +21,7 @@ export function key2pos(key: cg.Key): cg.Pos {
 }
 
 export function invertKey(key: cg.Key) {
-  return files[8 - fileNumbers[key[0]]] + (9 - parseInt(key[1])) as cg.Key;
+  return cg.files[8 - fileNumbers[key[0]]] + (9 - parseInt(key[1])) as cg.Key;
 }
 
 export const allPos: cg.Pos[] = [];

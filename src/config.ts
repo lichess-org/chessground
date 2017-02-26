@@ -2,7 +2,7 @@ import { State } from './state'
 import { setCheck, setSelected } from './board'
 import { read as fenRead } from './fen'
 import { DrawShape, DrawBrush } from './draw'
-import * as cg from './types.d'
+import * as cg from './types'
 
 export interface Config {
   fen?: cg.FEN; // chess position in Forsyth notation

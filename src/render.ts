@@ -2,7 +2,7 @@ import { State } from './state'
 import { key2pos, translate, posToTranslate } from './util'
 import { AnimCurrent, AnimVectors, AnimVector, AnimFadings } from './anim'
 import { DragCurrent } from './drag'
-import * as cg from './types.d'
+import * as cg from './types'
 
 type PieceClass = string;
 

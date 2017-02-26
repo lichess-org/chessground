@@ -1,5 +1,5 @@
 import * as util from './util'
-import * as cg from './types.d'
+import * as cg from './types'
 
 type Mobility = (x1:number, y1:number, x2:number, y2:number) => boolean;
 

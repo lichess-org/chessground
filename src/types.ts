@@ -67,3 +67,6 @@ export interface CSSStyleDeclaration { [key: string]: any; }
 export type Redraw = () => void;
 export type Timestamp = number;
 export type Milliseconds = number;
+
+export const files: File[] = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h'];
+export const ranks: Rank[] = [1, 2, 3, 4, 5, 6, 7, 8];

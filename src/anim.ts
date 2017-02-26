@@ -1,6 +1,6 @@
 import { State } from './state'
 import * as util from './util'
-import * as cg from './types.d'
+import * as cg from './types'
 
 export type Mutation<A> = (state: State) => A;
 

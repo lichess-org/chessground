@@ -1,7 +1,7 @@
 import { State } from './state'
 import { cancelMove, getKeyAtDomPos } from './board'
 import { eventPosition, raf, isRightButton } from './util'
-import * as cg from './types.d'
+import * as cg from './types'
 
 export interface DrawShape {
   orig: cg.Key;
