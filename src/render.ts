@@ -4,7 +4,7 @@ import { AnimCurrent, AnimVectors, AnimVector, AnimFadings } from './anim'
 import { DragCurrent } from './drag'
 import * as cg from './types'
 
-type PieceClass = string;
+type PieceName = string; // `$color $role`
 
 interface SamePieces { [key: string]: boolean }
 interface SameSquares { [key: string]: boolean }
@@ -34,7 +34,7 @@ export default function(s: State): void {
   el: cg.PieceNode | cg.SquareNode,
   squareClassAtKey: string | undefined,
   pieceAtKey: cg.Piece | undefined,
-  elPieceClass: PieceClass,
+  elPieceName: PieceName,
   translation: cg.NumberPair,
   anim: AnimVector | undefined,
   fading: cg.Piece | undefined,
@@ -52,7 +52,7 @@ export default function(s: State): void {
     anim = anims[k];
     fading = fadings[k];
     if (isPieceNode(el)) {
-      elPieceClass = el.cgPiece;
+      elPieceName = el.cgPiece;
       // if piece not being dragged anymore, remove dragging style
       if (el.cgDragging && (!curDrag || curDrag.orig !== k)) {
         el.classList.remove('dragging');
@@ -68,7 +68,7 @@ export default function(s: State): void {
       if (pieceAtKey) {
         // continue animation if already animating and same piece
         // (otherwise it could animate a captured piece)
-        if (anim && el.cgAnimating && elPieceClass === pieceClassOf(pieceAtKey)) {
+        if (anim && el.cgAnimating && elPieceName === pieceNameOf(pieceAtKey)) {
           translation = posToTranslate(key2pos(k), asWhite, bounds);
           translation[0] += anim[1][0];
           translation[1] += anim[1][1];
@@ -79,24 +79,24 @@ export default function(s: State): void {
           el.cgAnimating = false;
         }
         // same piece: flag as same
-        if (elPieceClass === pieceClassOf(pieceAtKey)) {
+        if (elPieceName === pieceNameOf(pieceAtKey)) {
           samePieces[k] = true;
         }
         // different piece: flag as moved unless it is a fading piece
         else {
-          if (fading && elPieceClass === pieceClassOf(fading)) {
+          if (fading && elPieceName === pieceNameOf(fading)) {
             el.classList.add('fading');
             el.cgFading = true;
           } else {
-            if (movedPieces[elPieceClass]) movedPieces[elPieceClass].push(el);
-            else movedPieces[elPieceClass] = [el];
+            if (movedPieces[elPieceName]) movedPieces[elPieceName].push(el);
+            else movedPieces[elPieceName] = [el];
           }
         }
       }
       // no piece: flag as moved
       else {
-        if (movedPieces[elPieceClass]) movedPieces[elPieceClass].push(el);
-        else movedPieces[elPieceClass] = [el];
+        if (movedPieces[elPieceName]) movedPieces[elPieceName].push(el);
+        else movedPieces[elPieceName] = [el];
       }
     }
     else if (isSquareNode(el)) {
@@ -115,7 +115,7 @@ export default function(s: State): void {
     p = pieces[k];
     anim = anims[k];
     if (!samePieces[k]) {
-      pMvdset = movedPieces[pieceClassOf(p)];
+      pMvdset = movedPieces[pieceNameOf(p)];
       pMvd = pMvdset && pMvdset.pop();
       // a same piece was moved
       if (pMvd) {
@@ -184,9 +184,9 @@ function renderSquareDom(key: cg.Key, className: string, translation: cg.NumberP
 function renderPieceDom(piece: cg.Piece, key: cg.Key, asWhite: boolean, bounds: ClientRect, anim: AnimVector | undefined, transform: cg.Transform): cg.PieceNode {
 
   const p = document.createElement('piece') as cg.PieceNode;
-  const pieceClass = pieceClassOf(piece);
-  p.className = pieceClass;
-  p.cgPiece = pieceClass;
+  const pieceName = pieceNameOf(piece);
+  p.className = pieceName;
+  p.cgPiece = pieceName;
   p.cgKey = key;
 
   const translation = posToTranslate(key2pos(key), asWhite, bounds);
@@ -199,7 +199,7 @@ function renderPieceDom(piece: cg.Piece, key: cg.Key, asWhite: boolean, bounds: 
   return p;
 }
 
-function pieceClassOf(piece: cg.Piece): string {
+function pieceNameOf(piece: cg.Piece): string {
   return `${piece.color} ${piece.role}`;
 }
 
