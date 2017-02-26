@@ -67,10 +67,13 @@ export interface Api {
 
   // programmatically draw auto shapes
   setAutoShapes(shapes: DrawShape[]): void;
+
+  // only useful when CSS changes the board width/height ratio (for 3D)
+  redrawAll: cg.Redraw;
 }
 
 // see API types and documentations in dts/api.d.ts
-export function start(state: State, redrawAll: () => void): Api {
+export function start(state: State, redrawAll: cg.Redraw): Api {
 
   return {
 
@@ -140,6 +143,8 @@ export function start(state: State, redrawAll: () => void): Api {
 
     setShapes(shapes: DrawShape[]) {
       anim(state => state.drawable.shapes = shapes, state);
-    }
+    },
+
+    redrawAll
   };
 }

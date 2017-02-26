@@ -19,7 +19,9 @@ export function Chessground(container: HTMLElement, config?: Config): Api {
   };
 
   function redrawAll() {
-    const bounds = state.dom ? state.dom.bounds : container.getBoundingClientRect();
+    // compute bounds from existing board element if possible
+    // this allows non-square boards from CSS to be handled (for 3D)
+    const bounds = (state.dom ? state.dom.elements.board : container).getBoundingClientRect();
     const [wrapEl, elements] = renderWrap(state, bounds);
     container.innerHTML = '';
     container.appendChild(wrapEl);
