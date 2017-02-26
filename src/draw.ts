@@ -62,7 +62,7 @@ export function start(state: State, e: cg.MouchEvent): void {
   e.preventDefault();
   cancelMove(state);
   const position = eventPosition(e);
-  const orig = getKeyAtDomPos(state, position);
+  const orig = getKeyAtDomPos(position, state.orientation === 'white', state.dom.bounds());
   if (!orig) return;
   state.drawable.current = {
     orig: orig,
@@ -77,7 +77,7 @@ export function processDraw(state: State): void {
   raf(() => {
     const cur = state.drawable.current;
     if (cur) {
-      const dest = getKeyAtDomPos(state, cur.pos);
+      const dest = getKeyAtDomPos(cur.pos, state.orientation === 'white', state.dom.bounds());
       const newDest = (cur.orig === dest) ? undefined : dest;
       if (newDest !== cur.dest) {
         cur.dest = newDest;

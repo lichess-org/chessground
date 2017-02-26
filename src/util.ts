@@ -38,6 +38,16 @@ for (y = 8; y > 0; --y) {
   }
 }
 
+export function memo<A>(f: () => A): cg.Memo<A> {
+  let v: A | undefined;
+  const ret: any = () => {
+    if (v === undefined) v = f();
+    return v;
+  };
+  ret.clear = () => { v = undefined; }
+  return ret;
+}
+
 export function opposite(color: cg.Color): cg.Color {
   return color === 'white' ? 'black' : 'white';
 }

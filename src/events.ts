@@ -1,7 +1,7 @@
 import { State } from './state'
 import * as drag from './drag'
 import * as draw from './draw'
-import { isLeftButton, isRightButton } from './util'
+import { isLeftButton, isRightButton, raf } from './util'
 import * as cg from './types'
 
 const startEvents = ['touchstart', 'mousedown'];
@@ -12,29 +12,30 @@ type MouchBind = (e: cg.MouchEvent) => void;
 type StateMouchBind = (d: State, e: cg.MouchEvent) => void;
 
 // returns the unbind function
-export default function(d: State): void {
+export default function(s: State, firstTime: boolean): void {
 
-  const start: MouchBind = startDragOrDraw(d);
-  const move: MouchBind = dragOrDraw(d, drag.move, draw.move);
-  const end: MouchBind = dragOrDraw(d, drag.end, draw.end);
+  const boardEl = s.dom.elements.board;
+  const start: MouchBind = startDragOrDraw(s);
+  const move: MouchBind = dragOrDraw(s, drag.move, draw.move);
+  const end: MouchBind = dragOrDraw(s, drag.end, draw.end);
 
   let onstart: MouchBind, onmove: MouchBind, onend: MouchBind;
 
-  if (d.editable.enabled) {
+  if (s.editable.enabled) {
 
     onstart = e => {
-      if (d.editable.selected === 'pointer') {
+      if (s.editable.selected === 'pointer') {
         if (e.type !== 'mousemove') start(e);
       }
       else if (e.type !== 'mousemove' || isLeftButton(e)) end(e);
     };
 
     onmove = e => {
-      if (d.editable.selected === 'pointer') move(e);
+      if (s.editable.selected === 'pointer') move(e);
     };
 
     onend = e => {
-      if (d.editable.selected === 'pointer') end(e);
+      if (s.editable.selected === 'pointer') end(e);
     };
 
     startEvents.push('mousemove');
@@ -45,58 +46,48 @@ export default function(d: State): void {
     onend = end;
   }
 
-  startEvents.forEach(ev => d.dom.elements.board.addEventListener(ev, onstart));
+  startEvents.forEach(ev => boardEl.addEventListener(ev, onstart));
 
-  moveEvents.forEach(ev => document.addEventListener(ev, onmove));
-
-  endEvents.forEach(ev => document.addEventListener(ev, onend));
-
-  bindResize(d);
-
-  const onContextMenu: MouchBind = e => {
-    if (d.disableContextMenu || d.drawable.enabled) {
+  if (s.disableContextMenu || s.drawable.enabled) {
+    boardEl.addEventListener('contextmenu', e => {
       e.preventDefault();
       return false;
-    }
-    return true;
-  };
-  d.dom.elements.board.addEventListener('contextmenu', onContextMenu);
-}
-
-function startDragOrDraw(d: State): MouchBind {
-  return e => {
-    if (isRightButton(e) && d.draggable.current) {
-      if (d.draggable.current.newPiece) delete d.pieces[d.draggable.current.orig];
-      d.draggable.current = undefined;
-      d.selected = undefined;
-    } else if ((e.shiftKey || isRightButton(e)) && d.drawable.enabled) draw.start(d, e);
-    else drag.start(d, e);
-  };
-}
-
-function dragOrDraw(d: State, withDrag: StateMouchBind, withDraw: StateMouchBind): MouchBind {
-  return e => {
-    if ((e.shiftKey || isRightButton(e)) && d.drawable.enabled) withDraw(d, e);
-    else if (!d.viewOnly) withDrag(d, e);
-  };
-}
-
-function bindResize(d: State): void {
-
-  if (!d.resizable) return;
-
-  function recomputeBounds() {
-    d.dom.bounds = d.dom.elements.board.getBoundingClientRect();
-    d.dom.redraw();
+    });
   }
 
-  ['onscroll', 'onresize'].forEach((n: cg.WindowEvent) => {
-    const prev = window[n];
-    window[n] = e => {
-      prev && prev.apply(window, e);
-      recomputeBounds();
-    };
-  });
+  if (firstTime) {
+    if (!s.viewOnly) {
+      moveEvents.forEach(ev => document.addEventListener(ev, onmove));
+      endEvents.forEach(ev => document.addEventListener(ev, onend));
+    }
+    if (s.resizable) document.body.addEventListener('chessground.resize', function() {
+      s.dom.bounds.clear();
+      raf(s.dom.redraw);
+    }, false);
+    ['onscroll', 'onresize'].forEach((n: cg.WindowEvent) => {
+      const prev = window[n];
+      window[n] = e => {
+        prev && prev.apply(window, e);
+        s.dom.bounds.clear();
+      };
+    });
+  }
+}
 
-  document.body.addEventListener('chessground.resize', recomputeBounds, false);
+function startDragOrDraw(s: State): MouchBind {
+  return e => {
+    if (isRightButton(e) && s.draggable.current) {
+      if (s.draggable.current.newPiece) delete s.pieces[s.draggable.current.orig];
+      s.draggable.current = undefined;
+      s.selected = undefined;
+    } else if ((e.shiftKey || isRightButton(e)) && s.drawable.enabled) draw.start(s, e);
+    else drag.start(s, e);
+  };
+}
+
+function dragOrDraw(s: State, withDrag: StateMouchBind, withDraw: StateMouchBind): MouchBind {
+  return e => {
+    if ((e.shiftKey || isRightButton(e)) && s.drawable.enabled) withDraw(s, e);
+    else if (!s.viewOnly) withDrag(s, e);
+  };
 }

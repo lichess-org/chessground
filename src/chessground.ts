@@ -18,11 +18,12 @@ export function Chessground(container: HTMLElement, config?: Config): Api {
     transform: util.transformFunction()
   };
 
+  let firstDraw = true;
   function redrawAll() {
     // compute bounds from existing board element if possible
     // this allows non-square boards from CSS to be handled (for 3D)
-    const bounds = (state.dom ? state.dom.elements.board : container).getBoundingClientRect();
-    const [wrapEl, elements] = renderWrap(state, bounds);
+    const bounds = util.memo(() => (state.dom ? state.dom.elements.board : container).getBoundingClientRect());
+    const [wrapEl, elements] = renderWrap(state, bounds());
     container.innerHTML = '';
     container.appendChild(wrapEl);
     state.dom = {
@@ -34,7 +35,8 @@ export function Chessground(container: HTMLElement, config?: Config): Api {
       }
     };
     state.dom.redraw();
-    bindEvents(state);
+    bindEvents(state, firstDraw);
+    firstDraw = false;
   }
   redrawAll();
 

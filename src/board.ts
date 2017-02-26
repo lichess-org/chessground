@@ -321,11 +321,11 @@ export function stop(state: State): void {
   cancelMove(state);
 }
 
-export function getKeyAtDomPos(state: State, pos: cg.NumberPair): cg.Key | undefined {
-  let file = Math.ceil(8 * ((pos[0] - state.dom.bounds.left) / state.dom.bounds.width));
-  file = state.orientation === 'white' ? file : 9 - file;
-  let rank = Math.ceil(8 - (8 * ((pos[1] - state.dom.bounds.top) / state.dom.bounds.height)));
-  rank = state.orientation === 'white' ? rank : 9 - rank;
+export function getKeyAtDomPos(pos: cg.NumberPair, asWhite: boolean, bounds: ClientRect): cg.Key | undefined {
+  let file = Math.ceil(8 * ((pos[0] - bounds.left) / bounds.width));
+  if (!asWhite) file = 9 - file;
+  let rank = Math.ceil(8 - (8 * ((pos[1] - bounds.top) / bounds.height)));
+  if (!asWhite) rank = 9 - rank;
   return (file > 0 && file < 9 && rank > 0 && rank < 9) ? pos2key([file, rank]) : undefined;
 }
 

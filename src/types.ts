@@ -40,7 +40,7 @@ export interface Elements {
 }
 export interface Dom {
   elements: Elements,
-  bounds: ClientRect;
+  bounds: Memo<ClientRect>;
   redraw: (withSvg?: boolean) => void;
 }
 export interface Exploding {
@@ -71,6 +71,8 @@ export interface PieceNode extends KeyedNode {
   cgDragging?: boolean;
 }
 export interface SquareNode extends KeyedNode { }
+
+export interface Memo<A> { (): A; clear: () => void; }
 
 export type Transform = (el: HTMLElement, value: string) => void
 

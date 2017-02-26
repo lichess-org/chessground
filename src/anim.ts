@@ -74,8 +74,9 @@ function closer(piece: AnimPiece, pieces: AnimPiece[]): AnimPiece {
 }
 
 function computePlan(prev: MiniState, current: State): AnimPlan {
-  const width = current.dom.bounds.width / 8,
-  height = current.dom.bounds.height / 8,
+  const bounds = current.dom.bounds(),
+  width = bounds.width / 8,
+  height = bounds.height / 8,
   anims: AnimVectors = {},
   animedOrigs: cg.Key[] = [],
   fadings: AnimFadings = {},

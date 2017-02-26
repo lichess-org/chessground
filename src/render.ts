@@ -17,7 +17,7 @@ interface SquareClasses { [key: string]: string }
 // in case of bugs, blame @veloce
 export default function(s: State): void {
   const asWhite: boolean = s.orientation === 'white',
-  bounds: ClientRect = s.dom.bounds,
+  bounds: ClientRect = s.dom.bounds(),
   boardEl: HTMLElement = s.dom.elements.board,
   pieces: cg.Pieces = s.pieces,
   curAnim: AnimCurrent | undefined = s.animation.current,
@@ -156,7 +156,7 @@ export default function(s: State): void {
       // new: assume the new piece is not being dragged
       // might be a bad idea
       else {
-        boardEl.appendChild(renderPieceDom(s, p, k, asWhite, anim));
+        boardEl.appendChild(renderPieceDom(s, p, k, asWhite, anim, bounds));
       }
     }
   }
@@ -185,7 +185,7 @@ function renderSquareDom(key: cg.Key, className: string, translation: cg.NumberP
   return s;
 }
 
-function renderPieceDom(s: State, piece: cg.Piece, key: cg.Key, asWhite: boolean, anim: AnimVector | undefined): cg.PieceNode {
+function renderPieceDom(s: State, piece: cg.Piece, key: cg.Key, asWhite: boolean, anim: AnimVector | undefined, bounds: ClientRect): cg.PieceNode {
 
   const p = document.createElement('piece') as cg.PieceNode,
   pieceName = pieceNameOf(piece),
@@ -195,7 +195,7 @@ function renderPieceDom(s: State, piece: cg.Piece, key: cg.Key, asWhite: boolean
   p.cgPiece = pieceName;
   p.cgKey = key;
 
-  const translation = posToTranslate(pos, asWhite, s.dom.bounds);
+  const translation = posToTranslate(pos, asWhite, bounds);
   if (anim) {
     p.cgAnimating = true;
     translation[0] += anim[1][0];
