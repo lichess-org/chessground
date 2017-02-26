@@ -81,51 +81,51 @@ export function start(s: State, e: cg.MouchEvent): void {
 function processDrag(s: State): void {
   util.raf(() => {
     const cur = s.draggable.current;
-    if (cur) {
-      // cancel animations while dragging
-      if (s.animation.current && s.animation.current.plan.anims[cur.orig]) s.animation.current = undefined;
-      // if moving piece is gone, cancel
-      if (s.pieces[cur.orig] !== cur.piece) cancel(s);
-      else {
-        if (!cur.started && util.distance(cur.epos, cur.rel) >= s.draggable.distance) cur.started = true;
-        if (cur.started) {
-          const asWhite = s.orientation === 'white',
-          bounds = s.dom.bounds();
-          cur.pos = [
-            cur.epos[0] - cur.rel[0],
-            cur.epos[1] - cur.rel[1]
-          ];
-          cur.over = board.getKeyAtDomPos(cur.epos, asWhite, bounds);
+    if (!cur) return;
+    // cancel animations while dragging
+    if (s.animation.current && s.animation.current.plan.anims[cur.orig]) s.animation.current = undefined;
+    // if moving piece is gone, cancel
+    if (s.pieces[cur.orig] !== cur.piece) cancel(s);
+    else {
+      if (!cur.started && util.distance(cur.epos, cur.rel) >= s.draggable.distance) cur.started = true;
+      if (cur.started) {
+        const asWhite = s.orientation === 'white',
+        bounds = s.dom.bounds();
+        cur.pos = [
+          cur.epos[0] - cur.rel[0],
+          cur.epos[1] - cur.rel[1]
+        ];
+        cur.over = board.getKeyAtDomPos(cur.epos, asWhite, bounds);
 
-          // move piece
-          const translation = util.posToTranslate(cur.origPos, s.orientation === 'white', bounds);
-          translation[0] += cur.pos[0] + cur.dec[0];
-          translation[1] += cur.pos[1] + cur.dec[1];
-          s.browser.transform(cur.element, util.translate(translation));
+        // move piece
+        const translation = util.posToTranslate(cur.origPos, asWhite, bounds);
+        translation[0] += cur.pos[0] + cur.dec[0];
+        translation[1] += cur.pos[1] + cur.dec[1];
+        console.log(cur);
+        s.browser.transform(cur.element, util.translate(translation));
 
-          // move over element
-          const overEl = s.dom.elements.over;
-          if (overEl && cur.over && cur.over !== cur.overPrev) {
-            const dests = s.movable.dests;
-            if (s.movable.free ||
-              util.containsX(dests && dests[cur.orig], cur.over) ||
-              util.containsX(s.premovable.dests, cur.over)) {
-              const squareWidth = bounds.width / 8,
-              pos = util.key2pos(cur.over),
-              vector: cg.NumberPair = [
-                (asWhite ? pos[0] - 1 : 8 - pos[0]) * squareWidth,
-                (asWhite ? 8 - pos[1] : pos[1] - 1) * squareWidth
-              ];
-              s.browser.transform(overEl, util.translate(vector));
-            } else {
-              s.browser.transform(overEl, util.translateAway);
-            }
-            cur.overPrev = cur.over;
+        // move over element
+        const overEl = s.dom.elements.over;
+        if (overEl && cur.over && cur.over !== cur.overPrev) {
+          const dests = s.movable.dests;
+          if (s.movable.free ||
+            util.containsX(dests && dests[cur.orig], cur.over) ||
+            util.containsX(s.premovable.dests, cur.over)) {
+            const squareWidth = bounds.width / 8,
+            pos = util.key2pos(cur.over),
+            vector: cg.NumberPair = [
+              (asWhite ? pos[0] - 1 : 8 - pos[0]) * squareWidth,
+              (asWhite ? 8 - pos[1] : pos[1] - 1) * squareWidth
+            ];
+            s.browser.transform(overEl, util.translate(vector));
+          } else {
+            s.browser.transform(overEl, util.translateAway);
           }
+          cur.overPrev = cur.over;
         }
       }
-      processDrag(s);
     }
+    processDrag(s);
   });
 }
 
