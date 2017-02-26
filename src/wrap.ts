@@ -28,13 +28,13 @@ export default function(s: State, bounds: ClientRect): [HTMLElement, Elements] {
   }
 
   let over: HTMLElement | undefined;
-  if (s.movable.showDests || s.premovable.showDests) {
+  if (!s.viewOnly && (s.movable.showDests || s.premovable.showDests)) {
     over = renderAway(s.browser, bounds, 'div', 'over');
     wrap.appendChild(over);
   }
 
   let ghost: HTMLElement | undefined;
-  if (s.draggable.showGhost) {
+  if (!s.viewOnly && s.draggable.showGhost) {
     ghost = renderAway(s.browser, bounds, 'piece', 'ghost');
     wrap.appendChild(ghost);
   }
