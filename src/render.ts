@@ -4,7 +4,8 @@ import { AnimCurrent, AnimVectors, AnimVector, AnimFadings } from './anim'
 import { DragCurrent } from './drag'
 import * as cg from './types'
 
-type PieceName = string; // `$color $role`
+// `$color $role`
+type PieceName = string;
 
 interface SamePieces { [key: string]: boolean }
 interface SameSquares { [key: string]: boolean }
@@ -121,7 +122,9 @@ export default function(s: State): void {
       if (pMvd) {
         // apply dom changes
         pMvd.cgKey = k;
-        translation = posToTranslate(key2pos(k), asWhite, bounds);
+        const pos = key2pos(k);
+        if (s.addPieceZIndex) pMvd.style.zIndex = posZIndex(pos, asWhite);
+        translation = posToTranslate(pos, asWhite, bounds);
         if (anim) {
           pMvd.cgAnimating = true;
           translation[0] += anim[1][0];
@@ -133,9 +136,7 @@ export default function(s: State): void {
       // new: assume the new piece is not being dragged
       // might be a bad idea
       else {
-        s.dom.elements.board.appendChild(
-          renderPieceDom(p, k, asWhite, bounds, anim, transform)
-        );
+        s.dom.elements.board.appendChild(renderPieceDom(s, p, k, asWhite, anim));
       }
     }
   }
@@ -181,22 +182,33 @@ function renderSquareDom(key: cg.Key, className: string, translation: cg.NumberP
   return s;
 }
 
-function renderPieceDom(piece: cg.Piece, key: cg.Key, asWhite: boolean, bounds: ClientRect, anim: AnimVector | undefined, transform: cg.Transform): cg.PieceNode {
+function renderPieceDom(s: State, piece: cg.Piece, key: cg.Key, asWhite: boolean, anim: AnimVector | undefined): cg.PieceNode {
 
-  const p = document.createElement('piece') as cg.PieceNode;
-  const pieceName = pieceNameOf(piece);
+  const p = document.createElement('piece') as cg.PieceNode,
+  pieceName = pieceNameOf(piece),
+  pos = key2pos(key);
+
   p.className = pieceName;
   p.cgPiece = pieceName;
   p.cgKey = key;
 
-  const translation = posToTranslate(key2pos(key), asWhite, bounds);
+  const translation = posToTranslate(pos, asWhite, s.dom.bounds);
   if (anim) {
     p.cgAnimating = true;
     translation[0] += anim[1][0];
     translation[1] += anim[1][1];
   }
-  transform(p, translate(translation));
+  s.browser.transform(p, translate(translation));
+
+  if (s.addPieceZIndex) p.style.zIndex = posZIndex(pos, asWhite);
+
   return p;
+}
+
+function posZIndex(pos: cg.Pos, asWhite: boolean): string {
+  let z = 2 + (pos[1] - 1) * 8 + (8 - pos[0]);
+  if (asWhite) z = 67 - z;
+  return z + '';
 }
 
 function pieceNameOf(piece: cg.Piece): string {
