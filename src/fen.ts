@@ -1,17 +1,18 @@
 import { pos2key, ranks, invRanks } from './util'
+import * as cg from './types.d'
 
-export const initial: FEN = 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR';
+export const initial: cg.FEN = 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR';
 
-const roles: { [letter: string]: Role } = { p: 'pawn', r: 'rook', n: 'knight', b: 'bishop', q: 'queen', k: 'king' };
+const roles: { [letter: string]: cg.Role } = { p: 'pawn', r: 'rook', n: 'knight', b: 'bishop', q: 'queen', k: 'king' };
 
 const letters = { pawn: 'p', rook: 'r', knight: 'n', bishop: 'b', queen: 'q', king: 'k' };
 
 const flagsRegex = / .+$/;
 const zhRegex = /~/g;
 
-export function read(fen: FEN): Pieces {
+export function read(fen: cg.FEN): cg.Pieces {
   if (fen === 'start') fen = initial;
-  let pieces: Pieces = {}, x: number, nb: number, role: Role;
+  let pieces: cg.Pieces = {}, x: number, nb: number, role: cg.Role;
   fen.replace(flagsRegex, '').replace(zhRegex, '').split('/').forEach((row, y) => {
     x = 0;
     row.split('').forEach(v => {
@@ -19,10 +20,10 @@ export function read(fen: FEN): Pieces {
       if (nb) x += nb;
       else {
         ++x;
-        role = v.toLowerCase() as Role;
+        role = v.toLowerCase() as cg.Role;
         pieces[pos2key([x, 8 - y])] = {
           role: roles[role],
-          color: (v === role ? 'black' : 'white') as Color
+          color: (v === role ? 'black' : 'white') as cg.Color
         };
       }
     });
@@ -31,8 +32,8 @@ export function read(fen: FEN): Pieces {
   return pieces;
 }
 
-export function write(pieces: Pieces): FEN {
-  let piece: Piece, letter: string;
+export function write(pieces: cg.Pieces): cg.FEN {
+  let piece: cg.Piece, letter: string;
   return [8, 7, 6, 5, 4, 3, 2].reduce(
     (str: string, nb: any) => str.replace(new RegExp(Array(nb + 1).join('1'), 'g'), nb),
     invRanks.map(y => {

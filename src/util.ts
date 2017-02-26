@@ -1,6 +1,8 @@
-export const files: Fil[] = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h'];
-export const ranks: Rank[] = [1, 2, 3, 4, 5, 6, 7, 8];
-export const invRanks: Rank[] = [8, 7, 6, 5, 4, 3, 2, 1];
+import * as cg from './types.d';
+
+export const files: cg.File[] = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h'];
+export const ranks: cg.Rank[] = [1, 2, 3, 4, 5, 6, 7, 8];
+export const invRanks: cg.Rank[] = [8, 7, 6, 5, 4, 3, 2, 1];
 export const fileNumbers: { [file: string]: number } = {
   a: 1,
   b: 2,
@@ -12,22 +14,22 @@ export const fileNumbers: { [file: string]: number } = {
   h: 8
 };
 
-export function pos2key(pos: Pos): Key {
-  return files[pos[0] - 1] + pos[1] as Key;
+export function pos2key(pos: cg.Pos): cg.Key {
+  return files[pos[0] - 1] + pos[1] as cg.Key;
 }
 
-export function key2pos(key: Key): Pos {
-  return [fileNumbers[key[0]] as number, parseInt(key[1]) as number] as Pos;
+export function key2pos(key: cg.Key): cg.Pos {
+  return [fileNumbers[key[0]] as number, parseInt(key[1]) as number] as cg.Pos;
 }
 
-export function invertKey(key: Key) {
-  return files[8 - fileNumbers[key[0]]] + (9 - parseInt(key[1])) as Key;
+export function invertKey(key: cg.Key) {
+  return files[8 - fileNumbers[key[0]]] + (9 - parseInt(key[1])) as cg.Key;
 }
 
-export const allPos: Pos[] = [];
-export const allKeys: Key[] = [];
-export const invKeys: Key[] = [];
-let pos: Pos, key: Key, x: number, y: number;
+export const allPos: cg.Pos[] = [];
+export const allKeys: cg.Key[] = [];
+export const invKeys: cg.Key[] = [];
+let pos: cg.Pos, key: cg.Key, x: number, y: number;
 for (y = 8; y > 0; --y) {
   for (x = 1; x < 9; ++x) {
     pos = [x, y];
@@ -38,7 +40,7 @@ for (y = 8; y > 0; --y) {
   }
 }
 
-export function opposite(color: Color): Color {
+export function opposite(color: cg.Color): cg.Color {
   return color === 'white' ? 'black' : 'white';
 }
 
@@ -46,7 +48,7 @@ export function containsX<X>(xs: X[] | undefined, x: X): boolean {
   return xs ? xs.indexOf(x) !== -1 : false;
 }
 
-export function distance(pos1: Pos, pos2: Pos): number {
+export function distance(pos1: cg.Pos, pos2: cg.Pos): number {
   return Math.sqrt(Math.pow(pos1[0] - pos2[0], 2) + Math.pow(pos1[1] - pos2[1], 2));
 }
 
@@ -63,20 +65,20 @@ export function computeIsTrident(): boolean {
   return window.navigator.userAgent.indexOf('Trident/') > -1;
 }
 
-export function posToTranslate(pos: Pos, asWhite: boolean, bounds: ClientRect): NumberPair {
+export function posToTranslate(pos: cg.Pos, asWhite: boolean, bounds: ClientRect): cg.NumberPair {
   return [
     (asWhite ? pos[0] - 1 : 8 - pos[0]) * bounds.width / 8,
     (asWhite ? 8 - pos[1] : pos[1] - 1) * bounds.height / 8
   ];
 }
 
-export function translate(pos: Pos): string {
+export function translate(pos: cg.Pos): string {
   return 'translate(' + pos[0] + 'px,' + pos[1] + 'px)';
 }
 
 export const translateAway: string = translate([-99999, -99999]);
 
-export function eventPosition(e: any): NumberPair {
+export function eventPosition(e: any): cg.NumberPair {
   if (e.clientX || e.clientX === 0) return [e.clientX, e.clientY];
   if (e.touches && e.targetTouches[0]) return [e.targetTouches[0].clientX, e.targetTouches[0].clientY];
   throw 'Cannot find position of event ' + e;

@@ -1,22 +1,68 @@
 import { State } from './state'
-import * as board from './board'
-import * as util from './util'
+import { cancelMove, getKeyAtDomPos } from './board'
+import { eventPosition, raf, isRightButton } from './util'
+import * as cg from './types.d'
+
+export interface DrawShape {
+  orig: cg.Key;
+  dest?: cg.Key;
+  brush: string;
+  brushModifiers?: DrawBrushModifiers;
+  piece?: DrawShapePiece;
+}
+
+export interface DrawShapePiece {
+  role: cg.Role;
+  color: cg.Color;
+  scale?: number;
+}
+
+export interface DrawBrush {
+  key: string;
+  color: string;
+  opacity: number;
+  lineWidth: number
+}
+
+export interface DrawBrushModifiers {
+  color?: string;
+  opacity?: number;
+  lineWidth?: number;
+}
+
+export interface Drawable {
+  enabled: boolean; // allows SVG drawings
+  eraseOnClick: boolean;
+  onChange?: (shapes: DrawShape[]) => void;
+  shapes: DrawShape[]; // user shapes
+  autoShapes: DrawShape[]; // computer shapes
+  current?: DrawCurrent;
+  brushes: {
+    [name: string]: DrawBrush
+  };
+  // drawable SVG pieces; used for crazyhouse drop
+  pieces: {
+    baseUrl: string
+  }
+}
+
+export interface DrawCurrent {
+  orig: cg.Key; // orig key of drawing
+  dest?: cg.Key; // square being moused over, if != orig
+  destPrev?: cg.Key; // square previously moused over
+  pos: cg.NumberPair; // relative current position
+  brush: string; // brush name for shape
+}
 
 const brushes = ['green', 'red', 'blue', 'yellow'];
 
-function eventBrush(e: MouchEvent): string {
-  const a: number = e.shiftKey && util.isRightButton(e) ? 1 : 0;
-  const b: number = e.altKey ? 2 : 0;
-  return brushes[a + b];
-}
-
-export function start(state: State, e: MouchEvent): void {
+export function start(state: State, e: cg.MouchEvent): void {
   if (e.touches && e.touches.length > 1) return; // support one finger touch only
   e.stopPropagation();
   e.preventDefault();
-  board.cancelMove(state);
-  const position = util.eventPosition(e);
-  const orig = board.getKeyAtDomPos(state, position);
+  cancelMove(state);
+  const position = eventPosition(e);
+  const orig = getKeyAtDomPos(state, position);
   if (!orig) return;
   state.drawable.current = {
     orig: orig,
@@ -28,10 +74,10 @@ export function start(state: State, e: MouchEvent): void {
 }
 
 export function processDraw(state: State): void {
-  util.raf(() => {
+  raf(() => {
     const cur = state.drawable.current;
     if (cur) {
-      const dest = board.getKeyAtDomPos(state, cur.pos);
+      const dest = getKeyAtDomPos(state, cur.pos);
       const newDest = (cur.orig === dest) ? undefined : dest;
       if (newDest !== cur.dest) {
         cur.dest = newDest;
@@ -42,8 +88,8 @@ export function processDraw(state: State): void {
   });
 }
 
-export function move(state: State, e: MouchEvent): void {
-  if (state.drawable.current) state.drawable.current.pos = util.eventPosition(e);
+export function move(state: State, e: cg.MouchEvent): void {
+  if (state.drawable.current) state.drawable.current.pos = eventPosition(e);
 }
 
 export function end(state: State): void {
@@ -67,13 +113,19 @@ export function clear(state: State): void {
   }
 }
 
+function eventBrush(e: cg.MouchEvent): string {
+  const a: number = e.shiftKey && isRightButton(e) ? 1 : 0;
+  const b: number = e.altKey ? 2 : 0;
+  return brushes[a + b];
+}
+
 function not<A>(f: (a: A) => boolean): (a: A) => boolean {
   return (x: A) => !f(x);
 }
 
-function addCircle(drawable: Drawable, cur: DrawableCurrent): void {
+function addCircle(drawable: Drawable, cur: DrawCurrent): void {
   const orig = cur.orig;
-  const sameCircle = (s: Shape) => s.orig === orig && !s.dest;
+  const sameCircle = (s: DrawShape) => s.orig === orig && !s.dest;
   const similar = drawable.shapes.filter(sameCircle)[0];
   if (similar) drawable.shapes = drawable.shapes.filter(not(sameCircle));
   if (!similar || similar.brush !== cur.brush) drawable.shapes.push({
@@ -83,9 +135,9 @@ function addCircle(drawable: Drawable, cur: DrawableCurrent): void {
   onChange(drawable);
 }
 
-function addLine(drawable: Drawable, cur: DrawableCurrent, dest: Key): void {
+function addLine(drawable: Drawable, cur: DrawCurrent, dest: cg.Key): void {
   const orig = cur.orig;
-  const sameLine = (s: Shape) => {
+  const sameLine = (s: DrawShape) => {
     return !!s.dest && ((s.orig === orig && s.dest === dest) || (s.dest === orig && s.orig === dest));
   };
   const exists = drawable.shapes.filter(sameLine).length > 0;

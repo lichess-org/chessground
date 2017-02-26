@@ -2,13 +2,14 @@ import { State } from './state'
 import * as drag from './drag'
 import * as draw from './draw'
 import { isLeftButton, isRightButton } from './util'
+import * as cg from './types.d'
 
 const startEvents = ['touchstart', 'mousedown'];
 const moveEvents = ['touchmove', 'mousemove'];
 const endEvents = ['touchend', 'mouseup'];
 
-type MouchBind = (e: MouchEvent) => void;
-type StateMouchBind = (d: State, e: MouchEvent) => void;
+type MouchBind = (e: cg.MouchEvent) => void;
+type StateMouchBind = (d: State, e: cg.MouchEvent) => void;
 
 // returns the unbind function
 export default function(d: State): void {
@@ -89,7 +90,7 @@ function bindResize(d: State): void {
     d.dom.redraw();
   }
 
-  ['onscroll', 'onresize'].forEach((n: WindowEvent) => {
+  ['onscroll', 'onresize'].forEach((n: cg.WindowEvent) => {
     const prev = window[n];
     window[n] = e => {
       prev && prev.apply(window, e);

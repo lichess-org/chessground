@@ -1,4 +1,5 @@
 import { State } from './state'
+import { Key } from './types.d'
 
 export default function(state: State, keys: Key[]): void {
   state.exploding = {

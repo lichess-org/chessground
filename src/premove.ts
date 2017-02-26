@@ -1,4 +1,5 @@
 import * as util from './util'
+import * as cg from './types.d'
 
 type Mobility = (x1:number, y1:number, x2:number, y2:number) => boolean;
 
@@ -6,7 +7,7 @@ function diff(a: number, b:number):number {
   return Math.abs(a - b);
 }
 
-function pawn(color: Color): Mobility {
+function pawn(color: cg.Color): Mobility {
   return (x1, y1, x2, y2) => diff(x1, x2) < 2 && (
     color === 'white' ? (
       // allow 2 squares from 1 and 8, for horde
@@ -35,7 +36,7 @@ const queen: Mobility = (x1, y1, x2, y2) => {
   return bishop(x1, y1, x2, y2) || rook(x1, y1, x2, y2);
 }
 
-function king(color: Color, rookFiles: number[], canCastle: boolean): Mobility {
+function king(color: cg.Color, rookFiles: number[], canCastle: boolean): Mobility {
   return (x1, y1, x2, y2)  => (
     diff(x1, x2) < 2 && diff(y1, y2) < 2
   ) || (
@@ -45,15 +46,15 @@ function king(color: Color, rookFiles: number[], canCastle: boolean): Mobility {
   );
 }
 
-function rookFilesOf(pieces: Pieces, color: Color) {
-  let piece: Piece;
+function rookFilesOf(pieces: cg.Pieces, color: cg.Color) {
+  let piece: cg.Piece;
   return Object.keys(pieces).filter(key => {
     piece = pieces[key];
     return piece && piece.color === color && piece.role === 'rook';
-  }).map((key: Key) => util.key2pos(key)[0]);
+  }).map((key: cg.Key) => util.key2pos(key)[0]);
 }
 
-export default function(pieces: Pieces, key: Key, canCastle: boolean): Key[] {
+export default function(pieces: cg.Pieces, key: cg.Key, canCastle: boolean): cg.Key[] {
   const piece = pieces[key],
   pos = util.key2pos(key);
   let mobility: Mobility;

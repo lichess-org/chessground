@@ -1,6 +1,7 @@
 import { State } from './state'
 import * as util from './util'
 import { createElement as createSVG } from './svg'
+import { Elements, Browser } from './types.d'
 
 export default function(s: State, bounds: ClientRect): [HTMLElement, Elements] {
 
@@ -50,7 +51,7 @@ function renderAway(browser: Browser, bounds: ClientRect, tagName: string, class
   el.className = className;
   el.style.width = squareSize + 'px';
   el.style.height = squareSize + 'px';
-  el.style[browser.transformProp] = util.translateAway;
+  el.style.setProperty(browser.transformProp, util.translateAway);
   return el;
 }
 

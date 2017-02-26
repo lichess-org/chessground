@@ -1,4 +1,3 @@
-/// <reference path="dts/index.d.ts" />
 import { State } from './state'
 import * as board from './board'
 import { raf } from './util'
@@ -6,7 +5,9 @@ import { write as fenWrite } from './fen'
 import { Config, configure } from './config'
 import { anim, render } from './anim'
 import { cancel as dragCancel } from './drag'
+import { DrawShape } from './draw'
 import explosion from './explosion'
+import * as cg from './types.d'
 
 export interface Api {
 
@@ -19,22 +20,22 @@ export interface Api {
 
   // get the position as a FEN string (only contains pieces, no flags)
   // e.g. rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR
-  getFen(): FEN;
+  getFen(): cg.FEN;
 
   // change the view angle
   toggleOrientation(): void;
 
   // perform a move programmatically
-  move(orig: Key, dest: Key): void;
+  move(orig: cg.Key, dest: cg.Key): void;
 
   // add and/or remove arbitrary pieces on the board
-  setPieces(pieces: Pieces): void;
+  setPieces(pieces: cg.Pieces): void;
 
   // click a square programmatically
-  selectSquare(key: Key): void;
+  selectSquare(key: cg.Key): void;
 
   // put a new piece on the board
-  newPiece(piece: Piece, key: Key): void;
+  newPiece(piece: cg.Piece, key: cg.Key): void;
 
   // play the current premove, if any
   playPremove(): void;
@@ -43,7 +44,7 @@ export interface Api {
   cancelPremove(): void;
 
   // play the current predrop, if any
-  playPredrop(validate: (drop: Drop) => boolean): void;
+  playPredrop(validate: (drop: cg.Drop) => boolean): void;
 
   // cancel the current predrop, if any
   cancelPredrop(): void;
@@ -56,16 +57,16 @@ export interface Api {
 
   // get the material difference between white and black
   // {white: {pawn: 3 queen: 1}, black: {bishop: 2}}
-  getMaterialDiff(): MaterialDiff;
+  getMaterialDiff(): cg.MaterialDiff;
 
   // make squares explode (atomic chess)
-  explode(keys: Key[]): void;
+  explode(keys: cg.Key[]): void;
 
   // programmatically draw user shapes
-  setShapes(shapes: Shape[]): void;
+  setShapes(shapes: DrawShape[]): void;
 
   // programmatically draw auto shapes
-  setAutoShapes(shapes: Shape[]): void;
+  setAutoShapes(shapes: DrawShape[]): void;
 }
 
 // see API types and documentations in dts/api.d.ts
@@ -129,15 +130,15 @@ export function start(state: State, redrawAll: () => void): Api {
       render(state => { board.stop(state); dragCancel(state); }, state);
     },
 
-    explode(keys: Key[]) {
+    explode(keys: cg.Key[]) {
       explosion(state, keys);
     },
 
-    setAutoShapes(shapes: Shape[]) {
+    setAutoShapes(shapes: DrawShape[]) {
       anim(state => state.drawable.autoShapes = shapes, state);
     },
 
-    setShapes(shapes: Shape[]) {
+    setShapes(shapes: DrawShape[]) {
       anim(state => state.drawable.shapes = shapes, state);
     }
   };

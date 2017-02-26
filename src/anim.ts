@@ -1,7 +1,32 @@
 import { State } from './state'
 import * as util from './util'
+import * as cg from './types.d'
 
 export type Mutation<A> = (state: State) => A;
+
+export interface AnimVector {
+  0: cg.NumberPair; // animation goal
+  1: cg.NumberPair; // animation current status
+}
+
+export interface AnimVectors {
+  [key: string]: AnimVector
+}
+
+export interface AnimFadings {
+  [key: string]: cg.Piece
+}
+
+export interface AnimPlan {
+  anims: AnimVectors;
+  fadings: AnimFadings;
+}
+
+export interface AnimCurrent {
+  start: cg.Timestamp;
+  duration: cg.Milliseconds;
+  plan: AnimPlan;
+}
 
 // transformation is a function
 // accepts board state and any number of arguments,
@@ -17,19 +42,19 @@ export function render<A>(mutation: Mutation<A>, state: State): A {
 }
 
 interface MiniState {
-  orientation: Color;
-  pieces: Pieces;
+  orientation: cg.Color;
+  pieces: cg.Pieces;
 }
 interface AnimPiece {
-  key: Key;
-  pos: Pos;
-  piece: Piece;
+  key: cg.Key;
+  pos: cg.Pos;
+  piece: cg.Piece;
 }
 interface AnimPieces {
   [key: string]: AnimPiece
 }
 
-function makePiece(k: Key, piece: Piece, invert: boolean): AnimPiece {
+function makePiece(k: cg.Key, piece: cg.Piece, invert: boolean): AnimPiece {
   const key = invert ? util.invertKey(k) : k;
   return {
     key: key,
@@ -38,7 +63,7 @@ function makePiece(k: Key, piece: Piece, invert: boolean): AnimPiece {
   };
 }
 
-function samePiece(p1: Piece, p2: Piece): boolean {
+function samePiece(p1: cg.Piece, p2: cg.Piece): boolean {
   return p1.role === p2.role && p1.color === p2.color;
 }
 
@@ -52,16 +77,16 @@ function computePlan(prev: MiniState, current: State): AnimPlan {
   const width = current.dom.bounds.width / 8,
   height = current.dom.bounds.height / 8,
   anims: AnimVectors = {},
-  animedOrigs: Key[] = [],
+  animedOrigs: cg.Key[] = [],
   fadings: AnimFadings = {},
   missings: AnimPiece[] = [],
   news: AnimPiece[] = [],
   invert = prev.orientation !== current.orientation,
   prePieces: AnimPieces = {},
   white = current.orientation === 'white';
-  let curP: Piece, preP: AnimPiece, i: any, key: Key, orig: Pos, dest: Pos, vector: NumberPair;
+  let curP: cg.Piece, preP: AnimPiece, i: any, key: cg.Key, orig: cg.Pos, dest: cg.Pos, vector: cg.NumberPair;
   for (i in prev.pieces) {
-    prePieces[i] = makePiece(i as Key, prev.pieces[i], invert);
+    prePieces[i] = makePiece(i as cg.Key, prev.pieces[i], invert);
   }
   for (i = 0; i < util.allKeys.length; i++) {
     key = util.allKeys[i];
@@ -128,7 +153,7 @@ function animate<A>(mutation: Mutation<A>, state: State): A {
   // clone state before mutating it
   const prev: MiniState = {
     orientation: state.orientation,
-    pieces: {} as Pieces
+    pieces: {} as cg.Pieces
   };
   // clone pieces
   for (let key in state.pieces) {

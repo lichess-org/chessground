@@ -1,23 +1,27 @@
 import { State } from './state'
 import * as board from './board'
 import * as util from './util'
-import * as draw from './draw'
+import { clear as drawClear } from './draw'
+import * as cg from './types.d'
 
-function computeSquareBounds(s: State, key: Key) {
-  const pos = util.key2pos(key), bounds = s.dom.bounds;
-  if (s.orientation !== 'white') {
-    pos[0] = 9 - pos[0];
-    pos[1] = 9 - pos[1];
-  }
-  return {
-    left: bounds.left + bounds.width * (pos[0] - 1) / 8,
-    top: bounds.top + bounds.height * (8 - pos[1]) / 8,
-    width: bounds.width / 8,
-    height: bounds.height / 8
-  };
+export interface DragCurrent {
+  orig: cg.Key; // orig key of dragging piece
+  origPos: cg.Pos;
+  piece: cg.Piece;
+  rel: cg.NumberPair; // x; y of the piece at original position
+  epos: cg.NumberPair; // initial event position
+  pos: cg.NumberPair; // relative current position
+  dec: cg.NumberPair; // piece center decay
+  over?: cg.Key; // square being moused over
+  overPrev?: cg.Key; // square previously moused over
+  started: boolean; // whether the drag has started; as per the distance setting
+  element: cg.LolNode;
+  newPiece?: boolean;
+  previouslySelected?: cg.Key;
+  originTarget: EventTarget;
 }
 
-export function start(s: State, e: MouchEvent): void {
+export function start(s: State, e: cg.MouchEvent): void {
   if (e.button !== undefined && e.button !== 0) return; // only touch or left click
   if (e.touches && e.touches.length > 1) return; // support one finger touch only
   e.stopPropagation();
@@ -29,7 +33,7 @@ export function start(s: State, e: MouchEvent): void {
   const previouslySelected = s.selected;
   if (!previouslySelected && (
     s.drawable.eraseOnClick || (!piece || piece.color !== s.turnColor)
-  )) draw.clear(s);
+  )) drawClear(s);
   if (s.viewOnly) return;
   const hadPremove = !!s.premovable.current;
   const hadPredrop = !!s.predroppable.current;
@@ -61,7 +65,7 @@ export function start(s: State, e: MouchEvent): void {
     const ghost = s.dom.elements.ghost;
     if (ghost) {
       ghost.className = `ghost ${piece.color} ${piece.role}`;
-      ghost.style[s.browser.transformProp] = element.style[s.browser.transformProp];
+      ghost.style.setProperty(s.browser.transformProp, element.style.getProperty(s.browser.transformProp));
     }
   } else {
     if (hadPremove) board.unsetPremove(s);
@@ -103,13 +107,13 @@ function processDrag(s: State): void {
               const squareWidth = s.dom.bounds.width / 8,
               pos = util.key2pos(cur.over),
               asWhite = s.orientation === 'white',
-              vector: NumberPair = [
+              vector: cg.NumberPair = [
                 (asWhite ? pos[0] - 1 : 8 - pos[0]) * squareWidth,
                 (asWhite ? 8 - pos[1] : pos[1] - 1) * squareWidth
               ];
-              s.dom.elements.over.style[s.browser.transformProp] = util.translate(vector);
+              s.dom.elements.over.style.setProperty(s.browser.transformProp, util.translate(vector));
             } else {
-              s.dom.elements.over.style[s.browser.transformProp] = util.translateAway;
+              s.dom.elements.over.style.setProperty(s.browser.transformProp, util.translateAway);
             }
             cur.overPrev = cur.over;
           }
@@ -138,7 +142,7 @@ export function end(s: State, e: TouchEvent): void {
   }
   board.unsetPremove(s);
   board.unsetPredrop(s);
-  const eventPos: NumberPair = util.eventPosition(e);
+  const eventPos: cg.NumberPair = util.eventPosition(e);
   const dest = board.getKeyAtDomPos(s, eventPos);
   if (dest) {
     if (s.editable.enabled && s.editable.selected !== 'pointer') {
@@ -148,7 +152,7 @@ export function end(s: State, e: TouchEvent): void {
       } else {
         // where pieces to be dropped live. Fix me.
         const key = 'a0';
-        s.pieces[key] = s.editable.selected as Piece;
+        s.pieces[key] = s.editable.selected as cg.Piece;
         board.dropNewPiece(s, key, dest, true);
       }
     } else if (cur && cur.started) {
@@ -178,12 +182,27 @@ export function cancel(s: State): void {
 }
 
 function removeDragElements(s: State) {
-  if (s.dom.elements.over) s.dom.elements.over.style[s.browser.transformProp] = util.translateAway;
-  if (s.dom.elements.ghost) s.dom.elements.ghost.style[s.browser.transformProp] = util.translateAway;
+  const e = s.dom.elements;
+  if (e.over) e.over.style.setProperty(s.browser.transformProp, util.translateAway);
+  if (e.ghost) e.ghost.style.setProperty(s.browser.transformProp, util.translateAway);
 }
 
-function pieceElementByKey(s: State, key: Key): LolNode | undefined {
-  let el = s.dom.elements.board.firstChild as LolNode;
+function computeSquareBounds(s: State, key: cg.Key) {
+  const pos = util.key2pos(key), bounds = s.dom.bounds;
+  if (s.orientation !== 'white') {
+    pos[0] = 9 - pos[0];
+    pos[1] = 9 - pos[1];
+  }
+  return {
+    left: bounds.left + bounds.width * (pos[0] - 1) / 8,
+    top: bounds.top + bounds.height * (8 - pos[1]) / 8,
+    width: bounds.width / 8,
+    height: bounds.height / 8
+  };
+}
+
+function pieceElementByKey(s: State, key: cg.Key): cg.LolNode | undefined {
+  let el = s.dom.elements.board.firstChild as cg.LolNode;
   while (el) {
     if (el.cgKey === key) return el;
     el = el.nextSibling;

@@ -2,6 +2,7 @@ import { State } from './state'
 import { pos2key, key2pos, opposite, containsX } from './util'
 import premove from './premove'
 import * as hold from './hold'
+import * as cg from './types.d'
 
 type Callback = (...args: any[]) => void;
 
@@ -21,24 +22,24 @@ export function reset(state: State): void {
   unsetPredrop(state);
 }
 
-export function setPieces(state: State, pieces: Pieces): void {
+export function setPieces(state: State, pieces: cg.Pieces): void {
   for (let key in pieces) {
     if (pieces[key]) state.pieces[key] = pieces[key];
     else delete state.pieces[key];
   }
 }
 
-export function setCheck(state: State, color: Color | boolean): void {
+export function setCheck(state: State, color: cg.Color | boolean): void {
   if (color === true) color = state.turnColor;
   if (!color) state.check = undefined;
   else for (let k in state.pieces) {
     if (state.pieces[k].role === 'king' && state.pieces[k].color === color) {
-      state.check = k as Key;
+      state.check = k as cg.Key;
     }
   }
 }
 
-function setPremove(state: State, orig: Key, dest: Key, meta: any): void {
+function setPremove(state: State, orig: cg.Key, dest: cg.Key, meta: cg.SetPremoveMetadata): void {
   unsetPredrop(state);
   state.premovable.current = [orig, dest];
   callUserFunction(state.premovable.events.set, orig, dest, meta);
@@ -51,7 +52,7 @@ export function unsetPremove(state: State): void {
   }
 }
 
-function setPredrop(state: State, role: Role, key: Key): void {
+function setPredrop(state: State, role: cg.Role, key: cg.Key): void {
   unsetPremove(state);
   state.predroppable.current = {
     role: role,
@@ -68,7 +69,7 @@ export function unsetPredrop(state: State): void {
   }
 }
 
-function tryAutoCastle(state: State, orig: Key, dest: Key): void {
+function tryAutoCastle(state: State, orig: cg.Key, dest: cg.Key): void {
   if (!state.autoCastle) return;
   const king = state.pieces[dest];
   if (king.role !== 'king') return;
@@ -99,9 +100,9 @@ function tryAutoCastle(state: State, orig: Key, dest: Key): void {
   };
 }
 
-export function baseMove(state: State, orig: Key, dest: Key): boolean {
+export function baseMove(state: State, orig: cg.Key, dest: cg.Key): boolean {
   if (orig === dest || !state.pieces[orig]) return false;
-  const captured: Piece | undefined = (
+  const captured: cg.Piece | undefined = (
     state.pieces[dest] &&
     state.pieces[dest].color !== state.pieces[orig].color
   ) ? state.pieces[dest] : undefined;
@@ -116,7 +117,7 @@ export function baseMove(state: State, orig: Key, dest: Key): boolean {
   return true;
 }
 
-export function baseNewPiece(state: State, piece: Piece, key: Key, force?: boolean): boolean {
+export function baseNewPiece(state: State, piece: cg.Piece, key: cg.Key, force?: boolean): boolean {
   if (state.pieces[key]) {
     if (force) delete state.pieces[key];
     else return false;
@@ -131,7 +132,7 @@ export function baseNewPiece(state: State, piece: Piece, key: Key, force?: boole
   return true;
 }
 
-function baseUserMove(state: State, orig: Key, dest: Key): boolean {
+function baseUserMove(state: State, orig: cg.Key, dest: cg.Key): boolean {
   const result = baseMove(state, orig, dest);
   if (result) {
     state.movable.dests = undefined;
@@ -141,12 +142,12 @@ function baseUserMove(state: State, orig: Key, dest: Key): boolean {
   return result;
 }
 
-export function userMove(state: State, orig: Key, dest: Key): boolean {
+export function userMove(state: State, orig: cg.Key, dest: cg.Key): boolean {
   if (canMove(state, orig, dest)) {
     if (baseUserMove(state, orig, dest)) {
       const holdTime = hold.stop();
       unselect(state);
-      const metadata: MoveMetadata = {
+      const metadata: cg.MoveMetadata = {
         premove: false,
         ctrlKey: state.stats.ctrlKey,
         holdTime: holdTime
@@ -166,7 +167,7 @@ export function userMove(state: State, orig: Key, dest: Key): boolean {
   return false;
 }
 
-export function dropNewPiece(state: State, orig: Key, dest: Key, force?: boolean): void {
+export function dropNewPiece(state: State, orig: cg.Key, dest: cg.Key, force?: boolean): void {
   if (canDrop(state, orig, dest) || force) {
     const piece = state.pieces[orig];
     delete state.pieces[orig];
@@ -184,7 +185,7 @@ export function dropNewPiece(state: State, orig: Key, dest: Key, force?: boolean
   unselect(state);
 }
 
-export function selectSquare(state: State, key: Key, force?: boolean): void {
+export function selectSquare(state: State, key: cg.Key, force?: boolean): void {
   if (state.selected) {
     if (state.selected === key && !state.draggable.enabled) {
       unselect(state);
@@ -199,7 +200,7 @@ export function selectSquare(state: State, key: Key, force?: boolean): void {
   if (key) callUserFunction(state.events.select, key);
 }
 
-export function setSelected(state: State, key: Key): void {
+export function setSelected(state: State, key: cg.Key): void {
   state.selected = key;
   if (isPremovable(state, key)) {
     state.premovable.dests = premove(state.pieces, key, state.premovable.castle);
@@ -213,7 +214,7 @@ export function unselect(state: State): void {
   hold.cancel();
 }
 
-function isMovable(state: State, orig: Key): boolean {
+function isMovable(state: State, orig: cg.Key): boolean {
   const piece = state.pieces[orig];
   return piece && (
     state.movable.color === 'both' || (
@@ -222,13 +223,13 @@ function isMovable(state: State, orig: Key): boolean {
     ));
 }
 
-function canMove(state: State, orig: Key, dest: Key): boolean {
+function canMove(state: State, orig: cg.Key, dest: cg.Key): boolean {
   return orig !== dest && isMovable(state, orig) && (
     state.movable.free || (!!state.movable.dests && containsX(state.movable.dests[orig], dest))
   );
 }
 
-function canDrop(state: State, orig: Key, dest: Key): boolean {
+function canDrop(state: State, orig: cg.Key, dest: cg.Key): boolean {
   const piece = state.pieces[orig];
   return piece && dest && (orig === dest || !state.pieces[dest]) && (
     state.movable.color === 'both' || (
@@ -238,20 +239,20 @@ function canDrop(state: State, orig: Key, dest: Key): boolean {
 }
 
 
-function isPremovable(state: State, orig: Key): boolean {
+function isPremovable(state: State, orig: cg.Key): boolean {
   const piece = state.pieces[orig];
   return piece && state.premovable.enabled &&
   state.movable.color === piece.color &&
     state.turnColor !== piece.color;
 }
 
-function canPremove(state: State, orig: Key, dest: Key): boolean {
+function canPremove(state: State, orig: cg.Key, dest: cg.Key): boolean {
   return orig !== dest &&
   isPremovable(state, orig) &&
   containsX(premove(state.pieces, orig, state.premovable.castle), dest);
 }
 
-function canPredrop(state: State, orig: Key, dest: Key): boolean {
+function canPredrop(state: State, orig: cg.Key, dest: cg.Key): boolean {
   const piece = state.pieces[orig];
   return piece && dest &&
   (!state.pieces[dest] || state.pieces[dest].color !== state.movable.color) &&
@@ -261,7 +262,7 @@ function canPredrop(state: State, orig: Key, dest: Key): boolean {
     state.turnColor !== piece.color;
 }
 
-export function isDraggable(state: State, orig: Key): boolean {
+export function isDraggable(state: State, orig: cg.Key): boolean {
   const piece = state.pieces[orig];
   return piece && state.draggable.enabled && (
     state.movable.color === 'both' || (
@@ -279,7 +280,7 @@ export function playPremove(state: State): boolean {
   let success = false;
   if (canMove(state, orig, dest)) {
     if (baseUserMove(state, orig, dest)) {
-      const metadata: MoveMetadata = { premove: true };
+      const metadata: cg.MoveMetadata = { premove: true };
       callUserFunction(state.movable.events.after, orig, dest, metadata);
       success = true;
     }
@@ -288,14 +289,14 @@ export function playPremove(state: State): boolean {
   return success;
 }
 
-export function playPredrop(state: State, validate: (drop: Drop) => boolean): boolean {
+export function playPredrop(state: State, validate: (drop: cg.Drop) => boolean): boolean {
   let drop = state.predroppable.current,
   success = false;
   if (!drop) return false;
   if (validate(drop)) {
     const piece = {
       role: drop.role,
-      color: state.movable.color as Color
+      color: state.movable.color as cg.Color
     };
     if (baseNewPiece(state, piece, drop.key)) {
       callUserFunction(state.movable.events.afterNewPiece, drop.role, drop.key, {
@@ -320,7 +321,7 @@ export function stop(state: State): void {
   cancelMove(state);
 }
 
-export function getKeyAtDomPos(state: State, pos: NumberPair): Key | undefined {
+export function getKeyAtDomPos(state: State, pos: cg.NumberPair): cg.Key | undefined {
   let file = Math.ceil(8 * ((pos[0] - state.dom.bounds.left) / state.dom.bounds.width));
   file = state.orientation === 'white' ? file : 9 - file;
   let rank = Math.ceil(8 - (8 * ((pos[1] - state.dom.bounds.top) / state.dom.bounds.height)));
@@ -329,7 +330,7 @@ export function getKeyAtDomPos(state: State, pos: NumberPair): Key | undefined {
 }
 
 // {white: {pawn: 3 queen: 1}, black: {bishop: 2}}
-export function getMaterialDiff(state: State): MaterialDiff {
+export function getMaterialDiff(state: State): cg.MaterialDiff {
   let counts = {
     king: 0,
     queen: 0,
@@ -337,12 +338,12 @@ export function getMaterialDiff(state: State): MaterialDiff {
     bishop: 0,
     knight: 0,
     pawn: 0
-  }, p: Piece, role: Role, c: number;
+  }, p: cg.Piece, role: cg.Role, c: number;
   for (let k in state.pieces) {
     p = state.pieces[k];
-    counts[p.role] += ((p.color === 'white') ? 1 : -1);
+    counts[p.role] += (p.color === 'white' ? 1 : -1);
   }
-  let diff: MaterialDiff = {
+  let diff: cg.MaterialDiff = {
     white: {},
     black: {}
   };

@@ -1,7 +1,3 @@
-/// <reference path="./dts/anim.d.ts" />
-/// <reference path="./dts/chess.d.ts" />
-/// <reference path="./dts/drawable.d.ts" />
-
 import { Api, start } from './api'
 import { Config, configure } from './config'
 import { State, defaults } from './state'
