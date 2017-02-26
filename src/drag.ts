@@ -65,7 +65,7 @@ export function start(s: State, e: cg.MouchEvent): void {
     const ghost = s.dom.elements.ghost;
     if (ghost) {
       ghost.className = `ghost ${piece.color} ${piece.role}`;
-      ghost.style.setProperty(s.browser.transformProp, element.style.getProperty(s.browser.transformProp));
+      ghost.style.setProperty(s.browser.transformProp, element.style.getPropertyValue(s.browser.transformProp));
     }
   } else {
     if (hadPremove) board.unsetPremove(s);
