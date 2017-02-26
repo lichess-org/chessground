@@ -101,7 +101,6 @@ function processDrag(s: State): void {
         const translation = util.posToTranslate(cur.origPos, asWhite, bounds);
         translation[0] += cur.pos[0] + cur.dec[0];
         translation[1] += cur.pos[1] + cur.dec[1];
-        console.log(cur);
         s.browser.transform(cur.element, util.translate(translation));
 
         // move over element
