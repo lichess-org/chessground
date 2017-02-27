@@ -20,7 +20,6 @@ export const invertKey = (k: cg.Key) => cg.files[8 - fileNumbers[k[0]]] + (9 - p
 
 export const allPos: cg.Pos[] = [];
 export const allKeys: cg.Key[] = [];
-export const invKeys: cg.Key[] = [];
 let pos: cg.Pos, key: cg.Key, x: number, y: number;
 for (y = 8; y > 0; --y) {
   for (x = 1; x < 9; ++x) {
@@ -28,7 +27,6 @@ for (y = 8; y > 0; --y) {
     key = pos2key(pos);
     allPos.push(pos);
     allKeys.push(key);
-    invKeys.unshift(key);
   }
 }
 
