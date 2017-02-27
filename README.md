@@ -69,7 +69,21 @@ var ground = Chessground(document.body, config);
 
 ## Developers
 
+First of all, of course:
+
 ```
 npm i
-gulp
+```
+
+To build the node module:
+```
+tsc -watch
+```
+
+To build the standalone:
+
+```
+gulp dev  // build once
+gulp      // build and watch
+gulp prod // build minified
 ```
