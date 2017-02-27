@@ -35,7 +35,7 @@ export function Chessground(container: HTMLElement, config?: Config): Api {
       }
     };
     state.dom.redraw();
-    bindEvents(state, firstDraw);
+    bindEvents(state, firstDraw, redrawAll);
     firstDraw = false;
   }
   redrawAll();

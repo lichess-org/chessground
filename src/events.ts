@@ -12,7 +12,7 @@ type MouchBind = (e: cg.MouchEvent) => void;
 type StateMouchBind = (d: State, e: cg.MouchEvent) => void;
 
 // returns the unbind function
-export default function(s: State, firstTime: boolean): void {
+export default function(s: State, firstTime: boolean, redrawAll: cg.Redraw): void {
 
   const boardEl = s.dom.elements.board;
   const start: MouchBind = startDragOrDraw(s);
@@ -62,7 +62,7 @@ export default function(s: State, firstTime: boolean): void {
     }
     if (s.resizable) document.body.addEventListener('chessground.resize', function() {
       s.dom.bounds.clear();
-      raf(s.dom.redraw);
+      raf(redrawAll);
     }, false);
     ['onscroll', 'onresize'].forEach((n: cg.WindowEvent) => {
       const prev = window[n];
