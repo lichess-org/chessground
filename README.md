@@ -25,8 +25,7 @@ Chessground is designed to fulfill all lichess.org web and mobile apps needs, so
 
 - [Typed](https://github.com/ornicar/chessground/tree/master/src/dts) with typescript
 - Fast. Uses a custom DOM diff algorithm to reduce DOM writes to the absolute minimum
-- Small footprint: 12K gzipped (35K unzipped). No dependencies.
-- Standalone, or composable as a [snabbdom](https://github.com/snabbdom/snabbdom) node
+- Small footprint: 10K gzipped (31K unzipped). No dependencies.
 - Entirely configurable and reconfigurable at any time
 - Styling with CSS only: board and pieces can be changed by simply switching a class
 - Fluid layout: board can be resized at any time
@@ -56,7 +55,7 @@ npm install --save chessground
 ### Usage
 
 ```js
-var Chessground = require("chessground");
+var Chessground = require("chessground").Chessground;
 
 var ground = Chessground(document.body, config);
 ```
@@ -66,6 +65,7 @@ var ground = Chessground(document.body, config);
 - [Config documented types](https://github.com/ornicar/chessground/tree/master/src/config.ts)
 - [Config default values](https://github.com/ornicar/chessground/tree/master/src/state.ts)
 - [API documented type signatures](https://github.com/ornicar/chessground/tree/master/src/api.ts)
+- [examples repo](https://github.com/ornicar/chessground-examples/tree/master/src/units)
 
 ## Developers
 
