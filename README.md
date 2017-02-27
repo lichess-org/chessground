@@ -23,9 +23,10 @@ For stability, use v4.
 
 Chessground is designed to fulfill all lichess.org web and mobile apps needs, so it is pretty featureful.
 
-- [Typed](https://github.com/ornicar/chessground/tree/master/src/dts) with typescript
+- Well typed with typescript
 - Fast. Uses a custom DOM diff algorithm to reduce DOM writes to the absolute minimum
 - Small footprint: 10K gzipped (31K unzipped). No dependencies.
+- SVG drawing of circles and arrows on the board
 - Entirely configurable and reconfigurable at any time
 - Styling with CSS only: board and pieces can be changed by simply switching a class
 - Fluid layout: board can be resized at any time
@@ -41,7 +42,6 @@ Chessground is designed to fulfill all lichess.org web and mobile apps needs, so
 - Premove by click or drag
 - Animation of pieces: moving and fading away
 - Display last move, check, move destinations, and premove destinations
-- SVG drawing of circles and arrows on the board
 - Import and export positions in FEN notation
 - User callbacks
 - No chess logic inside: can be used for chess variations
@@ -65,7 +65,7 @@ var ground = Chessground(document.body, config);
 - [Config documented types](https://github.com/ornicar/chessground/tree/master/src/config.ts)
 - [Config default values](https://github.com/ornicar/chessground/tree/master/src/state.ts)
 - [API documented type signatures](https://github.com/ornicar/chessground/tree/master/src/api.ts)
-- [examples repo](https://github.com/ornicar/chessground-examples/tree/master/src/units)
+- [Examples repo](https://github.com/ornicar/chessground-examples/tree/master/src/units)
 
 ## Developers
 
