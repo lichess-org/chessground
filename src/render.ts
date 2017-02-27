@@ -1,5 +1,5 @@
 import { State } from './state'
-import { key2pos, translate, posToTranslate } from './util'
+import { key2pos, translate, posToTranslate, createEl } from './util'
 import { AnimCurrent, AnimVectors, AnimVector, AnimFadings } from './anim'
 import { DragCurrent } from './drag'
 import * as cg from './types'
@@ -178,8 +178,7 @@ function removeNodes(s: State, nodes: HTMLElement[]): void {
 }
 
 function renderSquareDom(key: cg.Key, className: string, translation: cg.NumberPair, transform: cg.Transform): cg.SquareNode {
-  const s = document.createElement('square') as cg.SquareNode;
-  s.className = className;
+  const s = createEl('square', className) as cg.SquareNode;
   s.cgKey = key;
   transform(s, translate(translation));
   return s;
@@ -187,11 +186,10 @@ function renderSquareDom(key: cg.Key, className: string, translation: cg.NumberP
 
 function renderPieceDom(s: State, piece: cg.Piece, key: cg.Key, asWhite: boolean, anim: AnimVector | undefined, bounds: ClientRect): cg.PieceNode {
 
-  const p = document.createElement('piece') as cg.PieceNode,
-  pieceName = pieceNameOf(piece),
+  const pieceName = pieceNameOf(piece),
+  p = createEl('piece', pieceName) as cg.PieceNode,
   pos = key2pos(key);
 
-  p.className = pieceName;
   p.cgPiece = pieceName;
   p.cgKey = key;
 

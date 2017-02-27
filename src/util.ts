@@ -12,17 +12,11 @@ export const fileNumbers: { [file: string]: number } = {
   h: 8
 };
 
-export function pos2key(pos: cg.Pos): cg.Key {
-  return cg.files[pos[0] - 1] + pos[1] as cg.Key;
-}
+export const pos2key = (pos: cg.Pos) => cg.files[pos[0] - 1] + pos[1] as cg.Key;
 
-export function key2pos(key: cg.Key): cg.Pos {
-  return [fileNumbers[key[0]] as number, parseInt(key[1]) as number] as cg.Pos;
-}
+export const key2pos = (k: cg.Key) => [fileNumbers[k[0]] as number, parseInt(k[1]) as number] as cg.Pos;
 
-export function invertKey(key: cg.Key) {
-  return cg.files[8 - fileNumbers[key[0]]] + (9 - parseInt(key[1])) as cg.Key;
-}
+export const invertKey = (k: cg.Key) => cg.files[8 - fileNumbers[k[0]]] + (9 - parseInt(k[1])) as cg.Key;
 
 export const allPos: cg.Pos[] = [];
 export const allKeys: cg.Key[] = [];
@@ -45,60 +39,57 @@ export function memo<A>(f: () => A): cg.Memo<A> {
     return v;
   };
   ret.clear = () => { v = undefined; }
-  return ret;
+    return ret;
 }
 
-export function opposite(color: cg.Color): cg.Color {
-  return color === 'white' ? 'black' : 'white';
-}
+export const opposite = (c: cg.Color) => c === 'white' ? 'black' : 'white';
 
 export function containsX<X>(xs: X[] | undefined, x: X): boolean {
   return xs ? xs.indexOf(x) !== -1 : false;
 }
 
-export function distance(pos1: cg.Pos, pos2: cg.Pos): number {
+export const distance: (pos1: cg.Pos, pos2: cg.Pos) => number = (pos1, pos2) => {
   return Math.sqrt(Math.pow(pos1[0] - pos2[0], 2) + Math.pow(pos1[1] - pos2[1], 2));
 }
 
-export function transformFunction(): cg.Transform {
+export const transformFunction: () => cg.Transform = () => {
   const s = document.body.style;
   const prop = 'transform' in s ?
-  'transform' : 'webkitTransform' in s ?
-  'webkitTransform' : 'mozTransform' in s ?
-  'mozTransform' : 'oTransform' in s ?
-  'oTransform' : 'msTransform';
+    'transform' : 'webkitTransform' in s ?
+    'webkitTransform' : 'mozTransform' in s ?
+    'mozTransform' : 'oTransform' in s ?
+    'oTransform' : 'msTransform';
   return (el, value) => el.style.setProperty(prop, value);
 }
 
-export function computeIsTrident(): boolean {
-  return window.navigator.userAgent.indexOf('Trident/') > -1;
-}
+export const computeIsTrident = () => window.navigator.userAgent.indexOf('Trident/') > -1;
 
-export function posToTranslate(pos: cg.Pos, asWhite: boolean, bounds: ClientRect): cg.NumberPair {
+export const posToTranslate: (pos: cg.Pos, asWhite: boolean, bounds: ClientRect) => cg.NumberPair =
+(pos, asWhite, bounds) => {
   return [
     (asWhite ? pos[0] - 1 : 8 - pos[0]) * bounds.width / 8,
     (asWhite ? 8 - pos[1] : pos[1] - 1) * bounds.height / 8
   ];
 }
 
-export function translate(pos: cg.Pos): string {
-  return 'translate(' + pos[0] + 'px,' + pos[1] + 'px)';
-}
+export const translate = (pos: cg.Pos) => 'translate(' + pos[0] + 'px,' + pos[1] + 'px)';
 
 export const translateAway: string = translate([-99999, -99999]);
 
-export function eventPosition(e: any): cg.NumberPair {
+export const eventPosition: (e: cg.MouchEvent) => cg.NumberPair = e => {
   if (e.clientX || e.clientX === 0) return [e.clientX, e.clientY];
   if (e.touches && e.targetTouches[0]) return [e.targetTouches[0].clientX, e.targetTouches[0].clientY];
   throw 'Cannot find position of event ' + e;
 }
 
-export function isLeftButton(e: MouseEvent): boolean {
-  return e.buttons === 1 || e.button === 1;
-}
+export const isLeftButton = (e: MouseEvent) => e.buttons === 1 || e.button === 1;
 
-export function isRightButton(e: MouseEvent): boolean {
-  return e.buttons === 2 || e.button === 2;
+export const isRightButton = (e: MouseEvent) => e.buttons === 2 || e.button === 2;
+
+export const createEl = (tagName: string, className?: string) => {
+  const el = document.createElement(tagName);
+  if (className) el.className = className;
+  return el;
 }
 
 export const raf = (window.requestAnimationFrame || window.setTimeout).bind(window);

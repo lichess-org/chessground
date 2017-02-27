@@ -1,17 +1,16 @@
 import { State } from './state'
-import { translateAway } from './util'
+import { translateAway, createEl } from './util'
 import { files, ranks } from './types'
 import { createElement as createSVG } from './svg'
 import { Elements, Browser } from './types'
 
 export default function(s: State, bounds: ClientRect): [HTMLElement, Elements] {
 
-  const wrap = document.createElement('div');
-  const manipClass = s.viewOnly ? 'view-only' : 'manipulable';
-  wrap.className = `cg-board-wrap orientation-${s.orientation} ${manipClass}`;
+  let wrapClass = `cg-board-wrap orientation-${s.orientation}`;
+  if (!s.viewOnly) wrapClass += ' manipulable';
+  const wrap = createEl('div', wrapClass);
 
-  const board = document.createElement('div');
-  board.className = 'cg-board';
+  const board = createEl('div', 'cg-board');
   wrap.appendChild(board);
 
   let svg: SVGElement | undefined;
@@ -49,20 +48,18 @@ export default function(s: State, bounds: ClientRect): [HTMLElement, Elements] {
 
 function renderAway(browser: Browser, bounds: ClientRect, tagName: string, className: string): HTMLElement {
   const squareSize = bounds.width / 8;
-  const el = document.createElement(tagName);
-  el.className = className;
+  const el = createEl(tagName, className);
   el.style.width = squareSize + 'px';
   el.style.height = squareSize + 'px';
   browser.transform(el, translateAway);
   return el;
 }
 
-function renderCoords(elems: any[], klass: string): HTMLElement {
-  const el = document.createElement('coords');
-  el.className = klass;
+function renderCoords(elems: any[], className: string): HTMLElement {
+  const el = createEl('coords', className);
   let f: HTMLElement;
   for (let i in elems) {
-    f = document.createElement('coord');
+    f = createEl('coord');
     f.textContent = elems[i];
     el.appendChild(f);
   }

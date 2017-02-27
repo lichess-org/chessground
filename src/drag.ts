@@ -128,14 +128,14 @@ function processDrag(s: State): void {
   });
 }
 
-export function move(s: State, e: TouchEvent): void {
+export function move(s: State, e: cg.MouchEvent): void {
   // support one finger touch only
   if (s.draggable.current && (!e.touches || e.touches.length < 2)) {
     s.draggable.current.epos = util.eventPosition(e);
   }
 }
 
-export function end(s: State, e: TouchEvent): void {
+export function end(s: State, e: cg.MouchEvent): void {
   const cur = s.draggable.current;
   if (!cur && (!s.editable.enabled || s.editable.selected === 'pointer')) return;
   // comparing with the origin target is an easy way to test that the end event
