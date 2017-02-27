@@ -1,12 +1,8 @@
 import { State } from './state'
 import * as drag from './drag'
 import * as draw from './draw'
-import { isLeftButton, isRightButton, raf } from './util'
+import { isRightButton, raf } from './util'
 import * as cg from './types'
-
-const startEvents = ['touchstart', 'mousedown'];
-const moveEvents = ['touchmove', 'mousemove'];
-const endEvents = ['touchend', 'mouseup'];
 
 type MouchBind = (e: cg.MouchEvent) => void;
 type StateMouchBind = (d: State, e: cg.MouchEvent) => void;
@@ -15,38 +11,13 @@ type StateMouchBind = (d: State, e: cg.MouchEvent) => void;
 export default function(s: State, firstTime: boolean, redrawAll: cg.Redraw): void {
 
   const boardEl = s.dom.elements.board;
-  const start: MouchBind = startDragOrDraw(s);
-  const move: MouchBind = dragOrDraw(s, drag.move, draw.move);
-  const end: MouchBind = dragOrDraw(s, drag.end, draw.end);
+  const onstart: MouchBind = startDragOrDraw(s);
+  const onmove: MouchBind = dragOrDraw(s, drag.move, draw.move);
+  const onend: MouchBind = dragOrDraw(s, drag.end, draw.end);
 
-  let onstart: MouchBind, onmove: MouchBind, onend: MouchBind;
-
-  if (s.editable.enabled) {
-
-    onstart = e => {
-      if (s.editable.selected === 'pointer') {
-        if (e.type !== 'mousemove') start(e);
-      }
-      else if (e.type !== 'mousemove' || isLeftButton(e)) end(e);
-    };
-
-    onmove = e => {
-      if (s.editable.selected === 'pointer') move(e);
-    };
-
-    onend = e => {
-      if (s.editable.selected === 'pointer') end(e);
-    };
-
-    startEvents.push('mousemove');
-
-  } else {
-    onstart = start;
-    onmove = move;
-    onend = end;
+  if (!s.viewOnly) {
+    ['touchstart', 'mousedown'].forEach(ev => boardEl.addEventListener(ev, onstart));
   }
-
-  startEvents.forEach(ev => boardEl.addEventListener(ev, onstart));
 
   if (s.disableContextMenu || s.drawable.enabled) {
     boardEl.addEventListener('contextmenu', e => {
@@ -57,8 +28,8 @@ export default function(s: State, firstTime: boolean, redrawAll: cg.Redraw): voi
 
   if (firstTime) {
     if (!s.viewOnly) {
-      moveEvents.forEach(ev => document.addEventListener(ev, onmove));
-      endEvents.forEach(ev => document.addEventListener(ev, onend));
+      ['touchmove', 'mousemove'].forEach(ev => document.addEventListener(ev, onmove));
+      ['touchend', 'mouseup'].forEach(ev => document.addEventListener(ev, onend));
     }
     if (s.resizable) document.body.addEventListener('chessground.resize', function() {
       s.dom.bounds.clear();

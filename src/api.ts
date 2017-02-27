@@ -68,6 +68,9 @@ export interface Api {
   // programmatically draw auto shapes
   setAutoShapes(shapes: DrawShape[]): void;
 
+  // square name at this DOM position (like "e4")
+  getKeyAtDomPos(pos: cg.NumberPair): cg.Key | undefined;
+
   // only useful when CSS changes the board width/height ratio (for 3D)
   redrawAll: cg.Redraw;
 }
@@ -143,6 +146,10 @@ export function start(state: State, redrawAll: cg.Redraw): Api {
 
     setShapes(shapes: DrawShape[]) {
       anim(state => state.drawable.shapes = shapes, state);
+    },
+
+    getKeyAtDomPos(pos) {
+      return board.getKeyAtDomPos(pos, state.orientation === 'white', state.dom.bounds());
     },
 
     redrawAll

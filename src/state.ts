@@ -89,10 +89,6 @@ export interface State {
   };
   items?: (pos: cg.Pos, key: cg.Key) => any | undefined; // items on the board { render: key -> vdom }
   drawable: Drawable,
-  editable: {
-    enabled: boolean;
-    selected: cg.Piece | 'pointer' | 'trash';
-  }
   exploding?: cg.Exploding;
   browser: cg.Browser,
   dom: cg.Dom
@@ -168,10 +164,6 @@ export function defaults(): Partial<State> {
       pieces: {
         baseUrl: 'https://lichess1.org/assets/piece/cburnett/'
       }
-    },
-    editable: {
-      enabled: false,
-      selected: 'pointer'
     }
   };
 }

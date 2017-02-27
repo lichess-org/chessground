@@ -24,7 +24,6 @@ export interface DragCurrent {
 export function start(s: State, e: cg.MouchEvent): void {
   if (e.button !== undefined && e.button !== 0) return; // only touch or left click
   if (e.touches && e.touches.length > 1) return; // support one finger touch only
-  e.stopPropagation();
   e.preventDefault();
   const asWhite = s.orientation === 'white',
   bounds = s.dom.bounds(),
@@ -137,7 +136,7 @@ export function move(s: State, e: cg.MouchEvent): void {
 
 export function end(s: State, e: cg.MouchEvent): void {
   const cur = s.draggable.current;
-  if (!cur && (!s.editable.enabled || s.editable.selected === 'pointer')) return;
+  if (!cur) return;
   // comparing with the origin target is an easy way to test that the end event
   // has the same touch origin
   if (e.type === 'touchend' && cur && cur.originTarget !== e.target && !cur.newPiece) {
@@ -148,23 +147,11 @@ export function end(s: State, e: cg.MouchEvent): void {
   board.unsetPredrop(s);
   const eventPos: cg.NumberPair = util.eventPosition(e);
   const dest = board.getKeyAtDomPos(eventPos, s.orientation === 'white', s.dom.bounds());
-  if (dest) {
-    if (s.editable.enabled && s.editable.selected !== 'pointer') {
-      if (s.editable.selected === 'trash') {
-        delete s.pieces[dest];
-        util.raf(s.dom.redraw);
-      } else {
-        // where pieces to be dropped live. Fix me.
-        const key = 'a0';
-        s.pieces[key] = s.editable.selected as cg.Piece;
-        board.dropNewPiece(s, key, dest, true);
-      }
-    } else if (cur && cur.started) {
-      if (cur.newPiece) board.dropNewPiece(s, cur.orig, dest);
-      else {
-        s.stats.ctrlKey = e.ctrlKey;
-        if (board.userMove(s, cur.orig, dest)) s.stats.dragged = true;
-      }
+  if (dest && cur.started) {
+    if (cur.newPiece) board.dropNewPiece(s, cur.orig, dest);
+    else {
+      s.stats.ctrlKey = e.ctrlKey;
+      if (board.userMove(s, cur.orig, dest)) s.stats.dragged = true;
     }
   }
   if (cur && cur.orig === cur.previouslySelected && (cur.orig === dest || !dest))

@@ -86,10 +86,6 @@ export interface Config {
     pieces?: {
       baseUrl?: string;
     }
-  },
-  editable?: {
-    enabled?: boolean;
-    selected?: cg.Piece | 'pointer' | 'trash';
   }
 }
 
