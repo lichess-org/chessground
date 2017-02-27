@@ -89,7 +89,7 @@ function computePlan(prev: MiniState, current: State): AnimPlan {
   for (i in prev.pieces) {
     prePieces[i] = makePiece(i as cg.Key, prev.pieces[i], invert);
   }
-  for (i = 0; i < util.allKeys.length; i++) {
+  for (i in util.allKeys) {
     key = util.allKeys[i];
     curP = current.pieces[key];
     preP = prePieces[key];
@@ -99,10 +99,8 @@ function computePlan(prev: MiniState, current: State): AnimPlan {
           missings.push(preP);
           news.push(makePiece(key, curP, false));
         }
-      } else
-      news.push(makePiece(key, curP, false));
-    } else if (preP)
-    missings.push(preP);
+      } else news.push(makePiece(key, curP, false));
+    } else if (preP) missings.push(preP);
   }
   news.forEach(newP => {
     preP = closer(newP, missings.filter(p => samePiece(newP.piece, p.piece)));
