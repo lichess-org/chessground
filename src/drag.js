@@ -120,6 +120,7 @@ function end(data, e, ctrl) {
   if (!pointerIsSelected) {
     if (ctrl.sparePieceSelected === 'trash') {
       delete data.pieces[dest];
+      data.events.change();
       data.renderRAF();
     } else {
       var selectedParts = ctrl.sparePieceSelected.split(' ');
