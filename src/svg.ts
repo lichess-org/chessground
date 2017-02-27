@@ -76,6 +76,7 @@ function syncShapes(state: State, shapes: Shape[], brushes: DrawBrushes, root: S
   hashesInDom: {[hash: string]: boolean} = {},
   toRemove: SVGElement[] = [];
   shapes.forEach(sc => { hashesInDom[sc.hash] = false; });
+  if (bounds.width !== bounds.height) return;
   let el: SVGElement = defsEl.nextSibling as SVGElement, elHash: Hash;
   while(el) {
     elHash = el.getAttribute('cgHash') as Hash;
