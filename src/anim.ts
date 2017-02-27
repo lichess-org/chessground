@@ -63,10 +63,6 @@ function makePiece(k: cg.Key, piece: cg.Piece, invert: boolean): AnimPiece {
   };
 }
 
-function samePiece(p1: cg.Piece, p2: cg.Piece): boolean {
-  return p1.role === p2.role && p1.color === p2.color;
-}
-
 function closer(piece: AnimPiece, pieces: AnimPiece[]): AnimPiece {
   return pieces.sort((p1, p2) => {
     return util.distance(piece.pos, p1.pos) - util.distance(piece.pos, p2.pos);
@@ -95,7 +91,7 @@ function computePlan(prev: MiniState, current: State): AnimPlan {
     preP = prePieces[key];
     if (curP) {
       if (preP) {
-        if (!samePiece(curP, preP.piece)) {
+        if (!util.samePiece(curP, preP.piece)) {
           missings.push(preP);
           news.push(makePiece(key, curP, false));
         }
@@ -103,7 +99,7 @@ function computePlan(prev: MiniState, current: State): AnimPlan {
     } else if (preP) missings.push(preP);
   }
   news.forEach(newP => {
-    preP = closer(newP, missings.filter(p => samePiece(newP.piece, p.piece)));
+    preP = closer(newP, missings.filter(p => util.samePiece(newP.piece, p.piece)));
     if (preP) {
       orig = white ? preP.pos : newP.pos;
       dest = white ? newP.pos : preP.pos;

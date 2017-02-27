@@ -84,7 +84,8 @@ function processDrag(s: State): void {
     // cancel animations while dragging
     if (s.animation.current && s.animation.current.plan.anims[cur.orig]) s.animation.current = undefined;
     // if moving piece is gone, cancel
-    if (s.pieces[cur.orig] !== cur.piece) cancel(s);
+    const origPiece = s.pieces[cur.orig];
+    if (!origPiece || !util.samePiece(origPiece, cur.piece)) cancel(s);
     else {
       if (!cur.started && util.distance(cur.epos, cur.rel) >= s.draggable.distance) cur.started = true;
       if (cur.started) {

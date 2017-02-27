@@ -50,6 +50,9 @@ export const distance: (pos1: cg.Pos, pos2: cg.Pos) => number = (pos1, pos2) => 
   return Math.sqrt(Math.pow(pos1[0] - pos2[0], 2) + Math.pow(pos1[1] - pos2[1], 2));
 }
 
+export const samePiece: (p1: cg.Piece, p2: cg.Piece) => boolean = (p1, p2) =>
+  p1.role === p2.role && p1.color === p2.color;
+
 export const transformFunction: () => cg.Transform = () => {
   const s = document.body.style;
   const prop = 'transform' in s ?
