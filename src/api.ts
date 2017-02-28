@@ -103,7 +103,7 @@ export function start(state: State, redrawAll: cg.Redraw): Api {
     },
 
     selectSquare(key) {
-      render(state => board.selectSquare(state, key), state);
+      if (key || state.selected) render(state => board.selectSquare(state, key), state);
     },
 
     move(orig, dest) {
