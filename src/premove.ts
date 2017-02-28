@@ -54,7 +54,7 @@ function rookFilesOf(pieces: cg.Pieces, color: cg.Color) {
   }).map((key: cg.Key) => util.key2pos(key)[0]);
 }
 
-export default function(pieces: cg.Pieces, key: cg.Key, canCastle: boolean): cg.Key[] {
+export default function premove(pieces: cg.Pieces, key: cg.Key, canCastle: boolean): cg.Key[] {
   const piece = pieces[key],
   pos = util.key2pos(key);
   let mobility: Mobility;

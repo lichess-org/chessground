@@ -22,7 +22,7 @@ type Hash = string;
 let isTrident: boolean | undefined;
 let fullHashPrev: Hash = '';
 
-export default function(state: State, root: SVGElement): void {
+export default function svg(state: State, root: SVGElement): void {
 
   const d = state.drawable,
   defsEl = root.firstChild as SVGElement,

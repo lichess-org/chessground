@@ -4,7 +4,7 @@ import { files, ranks } from './types'
 import { createElement as createSVG } from './svg'
 import { Elements, Browser } from './types'
 
-export default function(element: HTMLElement, s: State, bounds: ClientRect): Elements {
+export default function wrap(element: HTMLElement, s: State, bounds: ClientRect): Elements {
 
   element.innerHTML = '';
 

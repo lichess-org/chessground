@@ -8,7 +8,7 @@ type MouchBind = (e: cg.MouchEvent) => void;
 type StateMouchBind = (d: State, e: cg.MouchEvent) => void;
 
 // returns the unbind function
-export default function(s: State, firstTime: boolean, redrawAll: cg.Redraw): void {
+export default function events(s: State, firstTime: boolean, redrawAll: cg.Redraw): void {
 
   const boardEl = s.dom.elements.board;
   const onstart: MouchBind = startDragOrDraw(s);

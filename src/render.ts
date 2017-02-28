@@ -15,7 +15,7 @@ interface SquareClasses { [key: string]: string }
 
 // ported from https://github.com/veloce/lichobile/blob/master/src/js/chessground/view.js
 // in case of bugs, blame @veloce
-export default function(s: State): void {
+export default function render(s: State): void {
   const asWhite: boolean = s.orientation === 'white',
   bounds: ClientRect = s.dom.bounds(),
   boardEl: HTMLElement = s.dom.elements.board,
