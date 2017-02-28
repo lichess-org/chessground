@@ -1,5 +1,7 @@
 import * as cg from './types';
 
+export const colors: cg.Color[] = ['white', 'black'];
+
 export const invRanks: cg.Rank[] = [8, 7, 6, 5, 4, 3, 2, 1];
 export const fileNumbers: { [file: string]: number } = {
   a: 1,

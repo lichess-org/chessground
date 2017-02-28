@@ -1,49 +1,54 @@
 import { State } from './state'
-import { translateAway, createEl } from './util'
+import { colors, translateAway, createEl } from './util'
 import { files, ranks } from './types'
 import { createElement as createSVG } from './svg'
 import { Elements, Browser } from './types'
 
-export default function(s: State, bounds: ClientRect): [HTMLElement, Elements] {
+export default function(element: HTMLElement, s: State, bounds: ClientRect): Elements {
 
-  let wrapClass = `cg-board-wrap orientation-${s.orientation}`;
-  if (!s.viewOnly) wrapClass += ' manipulable';
-  const wrap = createEl('div', wrapClass);
+  element.innerHTML = '';
+
+  element.classList.add('cg-board-wrap');
+  colors.forEach(c => {
+    element.classList.toggle('orientation-' + c, s.orientation === c);
+  });
+  element.classList.toggle('manipulable', !s.viewOnly);
 
   const board = createEl('div', 'cg-board');
-  wrap.appendChild(board);
+
+  element.appendChild(board);
 
   let svg: SVGElement | undefined;
   if (s.drawable.enabled) {
     svg = createSVG('svg');
     svg.appendChild(createSVG('defs'));
-    wrap.appendChild(svg);
+    element.appendChild(svg);
   }
 
   if (s.coordinates) {
     const orientClass = s.orientation === 'black' ? ' black' : '';
-    wrap.appendChild(renderCoords(ranks, 'ranks' + orientClass));
-    wrap.appendChild(renderCoords(files, 'files' + orientClass));
+    element.appendChild(renderCoords(ranks, 'ranks' + orientClass));
+    element.appendChild(renderCoords(files, 'files' + orientClass));
   }
 
   let over: HTMLElement | undefined;
   if (!s.viewOnly && (s.movable.showDests || s.premovable.showDests)) {
     over = renderAway(s.browser, bounds, 'div', 'over');
-    wrap.appendChild(over);
+    element.appendChild(over);
   }
 
   let ghost: HTMLElement | undefined;
   if (!s.viewOnly && s.draggable.showGhost) {
     ghost = renderAway(s.browser, bounds, 'piece', 'ghost');
-    wrap.appendChild(ghost);
+    element.appendChild(ghost);
   }
 
-  return [wrap, {
+  return {
     board: board,
     over: over,
     ghost: ghost,
     svg: svg
-  }];
+  };
 }
 
 function renderAway(browser: Browser, bounds: ClientRect, tagName: string, className: string): HTMLElement {
