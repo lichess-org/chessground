@@ -15,7 +15,7 @@ export interface DragCurrent {
   over?: cg.Key; // square being moused over
   overPrev?: cg.Key; // square previously moused over
   started: boolean; // whether the drag has started; as per the distance setting
-  element: cg.PieceNode;
+  element: cg.PieceNode | (() => cg.PieceNode | undefined);
   newPiece?: boolean;
   previouslySelected?: cg.Key;
   originTarget: EventTarget;
@@ -77,6 +77,41 @@ export function start(s: State, e: cg.MouchEvent): void {
   processDrag(s);
 }
 
+export function dragNewPiece(s: State, piece: cg.Piece, e: cg.MouchEvent): void {
+
+  const key: cg.Key = 'a0';
+
+  s.pieces[key] = piece;
+
+  util.raf(s.dom.redraw);
+
+  const position = util.eventPosition(e),
+  asWhite = s.orientation === 'white',
+  bounds = s.dom.bounds(),
+  squareBounds = computeSquareBounds(key, asWhite, bounds),
+  coords = util.key2pos(asWhite ? key : util.invertKey(key));
+
+  const rel: cg.NumberPair = [
+    (coords[0] - 1) * squareBounds.width + bounds.left,
+    (8 - coords[1]) * squareBounds.height + bounds.top
+  ];
+
+  s.draggable.current = {
+    orig: key,
+    origPos: util.key2pos(key),
+    piece: piece,
+    rel: rel,
+    epos: position,
+    pos: [position[0] - rel[0], position[1] - rel[1]],
+    dec: [-squareBounds.width / 2, -squareBounds.height / 2],
+    started: true,
+    element: () => pieceElementByKey(s, key),
+    originTarget: e.target,
+    newPiece: true
+  };
+  processDrag(s);
+}
+
 function processDrag(s: State): void {
   util.raf(() => {
     const cur = s.draggable.current;
@@ -89,6 +124,16 @@ function processDrag(s: State): void {
     else {
       if (!cur.started && util.distance(cur.epos, cur.rel) >= s.draggable.distance) cur.started = true;
       if (cur.started) {
+
+        // support lazy elements
+        if (typeof cur.element === 'function') {
+          let found = cur.element();
+          if (!found) return;
+          cur.element = found;
+          cur.element.cgDragging = true;
+          cur.element.classList.add('dragging');
+        }
+
         const asWhite = s.orientation === 'white',
         bounds = s.dom.bounds();
         cur.pos = [
@@ -154,7 +199,7 @@ export function end(s: State, e: cg.MouchEvent): void {
       s.stats.ctrlKey = e.ctrlKey;
       if (board.userMove(s, cur.orig, dest)) s.stats.dragged = true;
     }
-  }
+  } else if (cur.newPiece) delete s.pieces[cur.orig];
   if (cur && cur.orig === cur.previouslySelected && (cur.orig === dest || !dest))
     board.unselect(s);
   else if (!s.selectable.enabled) board.unselect(s);
