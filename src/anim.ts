@@ -133,9 +133,8 @@ function step(state: State): void {
     state.animation.current = undefined;
     state.dom.redraw();
   } else {
-    let i: any;
     const ease = easing(rest);
-    for (i in cur.plan.anims) {
+    for (let i in cur.plan.anims) {
       const cfg = cur.plan.anims[i];
       cfg[1] = [roundBy(cfg[0][0] * ease, 10), roundBy(cfg[0][1] * ease, 10)];
     }
