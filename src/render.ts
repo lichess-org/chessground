@@ -75,10 +75,12 @@ export default function(s: State): void {
           translation[0] += anim[1][0];
           translation[1] += anim[1][1];
           transform(el, translate(translation));
+          el.classList.add('anim');
         } else if (el.cgAnimating) {
           translation = posToTranslate(key2pos(k), asWhite, bounds);
           transform(el, translate(translation));
           el.cgAnimating = false;
+          el.classList.remove('anim');
         }
         // same piece: flag as same
         if (elPieceName === pieceNameOf(pieceAtKey)) {
@@ -147,6 +149,7 @@ export default function(s: State): void {
         translation = posToTranslate(pos, asWhite, bounds);
         if (anim) {
           pMvd.cgAnimating = true;
+          pMvd.classList.add('anim');
           translation[0] += anim[1][0];
           translation[1] += anim[1][1];
         }
