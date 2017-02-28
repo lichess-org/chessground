@@ -1,3 +1,5 @@
-chessground.js
+dist/
+/*.js
+/*.d.ts
 node_modules
 npm-debug.log

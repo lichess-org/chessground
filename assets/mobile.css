@@ -1,9 +1,0 @@
-.cg-square.selected {
-  background: rgba(216, 85, 0, 0.3);
-}
-piece.dragging {
-  width: 200%;
-  height: 200%;
-  top: -22.5px;
-  left: -22.5px;
-}
