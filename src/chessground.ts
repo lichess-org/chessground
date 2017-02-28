@@ -5,7 +5,7 @@ import { State, defaults } from './state'
 import renderWrap from './wrap';
 import * as events from './events'
 import render from './render';
-import svg from './svg';
+import * as svg from './svg';
 import * as util from './util';
 
 export function Chessground(element: HTMLElement, config?: Config): Api {
@@ -34,10 +34,11 @@ export function Chessground(element: HTMLElement, config?: Config): Api {
       bounds: bounds,
       redraw(withSvg: boolean = true) {
         render(state);
-        if (withSvg && elements.svg) svg(state, elements.svg);
+        if (withSvg && elements.svg) svg.renderSvg(state, elements.svg);
       },
       unbind: prevUnbind
     };
+    svg.clearCache();
     state.dom.redraw();
     events.bindBoard(state);
     if (!prevUnbind) state.dom.unbind = events.bindDocument(state, redrawAll);
