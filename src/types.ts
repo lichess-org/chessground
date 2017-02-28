@@ -33,6 +33,7 @@ export interface Browser {
   transform: Transform;
 }
 export interface Elements {
+  root: HTMLElement;
   board: HTMLElement;
   over?: HTMLElement;
   ghost?: HTMLElement;
@@ -82,6 +83,7 @@ export interface Timer {
 
 export type Transform = (el: HTMLElement, value: string) => void;
 
+export type AttachTo = (el: HTMLElement) => void
 export type Redraw = () => void;
 export type Timestamp = number;
 export type Milliseconds = number;

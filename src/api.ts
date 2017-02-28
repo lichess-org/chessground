@@ -76,7 +76,7 @@ export interface Api {
 }
 
 // see API types and documentations in dts/api.d.ts
-export function start(state: State, redrawAll: cg.Redraw): Api {
+export function makeApi(state: State, redrawAll: cg.Redraw): Api {
 
   function toggleOrientation() {
     board.toggleOrientation(state);

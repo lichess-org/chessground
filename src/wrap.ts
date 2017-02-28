@@ -4,46 +4,47 @@ import { files, ranks } from './types'
 import { createElement as createSVG } from './svg'
 import { Elements, Browser } from './types'
 
-export default function wrap(element: HTMLElement, s: State, bounds: ClientRect): Elements {
+export default function wrap(root: HTMLElement, s: State, bounds: ClientRect): Elements {
 
-  element.innerHTML = '';
+  root.innerHTML = '';
 
-  element.classList.add('cg-board-wrap');
+  root.classList.add('cg-board-wrap');
   colors.forEach(c => {
-    element.classList.toggle('orientation-' + c, s.orientation === c);
+    root.classList.toggle('orientation-' + c, s.orientation === c);
   });
-  element.classList.toggle('manipulable', !s.viewOnly);
+  root.classList.toggle('manipulable', !s.viewOnly);
 
   const board = createEl('div', 'cg-board');
 
-  element.appendChild(board);
+  root.appendChild(board);
 
   let svg: SVGElement | undefined;
   if (s.drawable.enabled) {
     svg = createSVG('svg');
     svg.appendChild(createSVG('defs'));
-    element.appendChild(svg);
+    root.appendChild(svg);
   }
 
   if (s.coordinates) {
     const orientClass = s.orientation === 'black' ? ' black' : '';
-    element.appendChild(renderCoords(ranks, 'ranks' + orientClass));
-    element.appendChild(renderCoords(files, 'files' + orientClass));
+    root.appendChild(renderCoords(ranks, 'ranks' + orientClass));
+    root.appendChild(renderCoords(files, 'files' + orientClass));
   }
 
   let over: HTMLElement | undefined;
   if (!s.viewOnly && (s.movable.showDests || s.premovable.showDests)) {
     over = renderAway(s.browser, bounds, 'div', 'over');
-    element.appendChild(over);
+    root.appendChild(over);
   }
 
   let ghost: HTMLElement | undefined;
   if (!s.viewOnly && s.draggable.showGhost) {
     ghost = renderAway(s.browser, bounds, 'piece', 'ghost');
-    element.appendChild(ghost);
+    root.appendChild(ghost);
   }
 
   return {
+    root: root,
     board: board,
     over: over,
     ghost: ghost,
