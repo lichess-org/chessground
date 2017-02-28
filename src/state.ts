@@ -2,6 +2,7 @@ import * as fen from './fen'
 import { AnimCurrent } from './anim'
 import { DragCurrent } from './drag'
 import { Drawable } from './draw'
+import { timer } from './util'
 import * as cg from './types';
 
 export interface State {
@@ -91,7 +92,8 @@ export interface State {
   drawable: Drawable,
   exploding?: cg.Exploding;
   browser: cg.Browser,
-  dom: cg.Dom
+  dom: cg.Dom,
+  hold: cg.Timer
 }
 
 export function defaults(): Partial<State> {
@@ -164,6 +166,7 @@ export function defaults(): Partial<State> {
       pieces: {
         baseUrl: 'https://lichess1.org/assets/piece/cburnett/'
       }
-    }
+    },
+    hold: timer()
   };
 }
