@@ -3,7 +3,7 @@ import { Config, configure } from './config'
 import { State, defaults } from './state'
 
 import renderWrap from './wrap';
-import bindEvents from './events'
+import * as events from './events'
 import render from './render';
 import svg from './svg';
 import * as util from './util';
@@ -18,8 +18,8 @@ export function Chessground(element: HTMLElement, config?: Config): Api {
     transform: util.transformFunction()
   };
 
-  let firstDraw = true;
   function redrawAll() {
+    let prevUnbind = state.dom && state.dom.unbind;
     // first ensure the cg-board-wrap class is set
     // so bounds calculation can use the CSS width/height values
     // add that class yourself to the element before calling chessground
@@ -35,11 +35,12 @@ export function Chessground(element: HTMLElement, config?: Config): Api {
       redraw(withSvg: boolean = true) {
         render(state);
         if (withSvg && elements.svg) svg(state, elements.svg);
-      }
+      },
+      unbind: prevUnbind
     };
     state.dom.redraw();
-    bindEvents(state, firstDraw, redrawAll);
-    firstDraw = false;
+    events.bindBoard(state);
+    if (!prevUnbind) state.dom.unbind = events.bindDocument(state, redrawAll);
   }
   redrawAll();
 

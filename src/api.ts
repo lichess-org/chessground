@@ -73,6 +73,10 @@ export interface Api {
 
   // only useful when CSS changes the board width/height ratio (for 3D)
   redrawAll: cg.Redraw;
+
+  // unbinds all events
+  // (important for document-wide events like scroll and mousemove)
+  destroy: cg.Unbind
 }
 
 // see API types and documentations in dts/api.d.ts
@@ -155,6 +159,10 @@ export function start(state: State, redrawAll: cg.Redraw): Api {
       return board.getKeyAtDomPos(pos, state.orientation === 'white', state.dom.bounds());
     },
 
-    redrawAll
+    redrawAll,
+
+    destroy() {
+      state.dom.unbind && state.dom.unbind();
+    }
   };
 }

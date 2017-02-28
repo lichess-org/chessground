@@ -42,6 +42,7 @@ export interface Dom {
   elements: Elements,
   bounds: Memo<ClientRect>;
   redraw: (withSvg?: boolean) => void;
+  unbind?: Unbind;
 }
 export interface Exploding {
   stage: number;
@@ -83,6 +84,7 @@ export interface Timer {
 export type Transform = (el: HTMLElement, value: string) => void;
 
 export type Redraw = () => void;
+export type Unbind = () => void;
 export type Timestamp = number;
 export type Milliseconds = number;
 
