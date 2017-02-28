@@ -1,11 +1,4 @@
 {
-  "include": [
-    "src/*.ts"
-  ],
-  "filesGlob": [
-    "src/*.ts"
-  ],
-  "exclude": [],
   "compilerOptions": {
     "outDir": "./",
     "declaration": true,
