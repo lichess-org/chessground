@@ -4,12 +4,6 @@
 
 It targets modern browsers, as well as mobile development using Cordova.
 
-### Warning
-
-The master branch currently contains the alpha v6 version.
-
-For stability, use v4.
-
 ### Demos
 
 - [Chess TV](http://lichess.org/tv)
@@ -36,8 +30,8 @@ Chessground is designed to fulfill all lichess.org web and mobile apps needs, so
 - Move pieces by drag'n drop
   - minimum distance before drag
   - centralisation of the piece under the cursor
-  - square target element for mobile
-  - piece ghost
+  - piece ghost element
+  - square over elements
   - drop off revert or trash
 - Premove by click or drag
 - Animation of pieces: moving and fading away
@@ -66,6 +60,7 @@ var ground = Chessground(document.body, config);
 - [Config default values](https://github.com/ornicar/chessground/tree/master/src/state.ts)
 - [API documented type signatures](https://github.com/ornicar/chessground/tree/master/src/api.ts)
 - [Examples repo](https://github.com/ornicar/chessground-examples/tree/master/src/units)
+- [Base CSS](https://github.com/ornicar/chessground-examples/blob/master/assets/chessground.css)
 
 ## Developers
 
