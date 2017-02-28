@@ -14,6 +14,7 @@ export function read(fen: cg.FEN): cg.Pieces {
   if (fen === 'start') fen = initial;
   let pieces: cg.Pieces = {}, x: number, nb: number, role: cg.Role;
   fen.replace(flagsRegex, '').replace(zhRegex, '').split('/').forEach((row, y) => {
+    if (y > 7) return;
     x = 0;
     row.split('').forEach(v => {
       nb = parseInt(v);
