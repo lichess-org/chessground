@@ -40,7 +40,7 @@ export function bindDocument(s: State, redrawAll: cg.Redraw): cg.Unbind {
     s.dom.bounds.clear();
     raf(redrawAll);
   };
-  if (s.resizable) unbinds.push(unbindable(document.body,  'chessground.resize', onResize));
+  if (s.resizable) unbinds.push(unbindable(document.body, 'chessground.resize', onResize));
 
   const onScroll = () => s.dom.bounds.clear();
   unbinds.push(unbindable(window, 'scroll', onScroll, { passive: true }));
