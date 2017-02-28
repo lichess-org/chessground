@@ -74,7 +74,13 @@ export interface SquareNode extends KeyedNode { }
 
 export interface Memo<A> { (): A; clear: () => void; }
 
-export type Transform = (el: HTMLElement, value: string) => void
+export interface Timer {
+  start: () => void;
+  cancel: () => void;
+  stop: () => number;
+}
+
+export type Transform = (el: HTMLElement, value: string) => void;
 
 export type Redraw = () => void;
 export type Timestamp = number;

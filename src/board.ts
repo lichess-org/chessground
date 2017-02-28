@@ -1,7 +1,6 @@
 import { State } from './state'
 import { pos2key, key2pos, opposite, containsX } from './util'
 import premove from './premove'
-import * as hold from './hold'
 import * as cg from './types'
 
 type Callback = (...args: any[]) => void;
@@ -147,7 +146,7 @@ function baseUserMove(state: State, orig: cg.Key, dest: cg.Key): boolean {
 export function userMove(state: State, orig: cg.Key, dest: cg.Key): boolean {
   if (canMove(state, orig, dest)) {
     if (baseUserMove(state, orig, dest)) {
-      const holdTime = hold.stop();
+      const holdTime = state.hold.stop();
       unselect(state);
       const metadata: cg.MoveMetadata = {
         premove: false,
@@ -164,7 +163,7 @@ export function userMove(state: State, orig: cg.Key, dest: cg.Key): boolean {
     unselect(state);
   } else if (isMovable(state, dest) || isPremovable(state, dest)) {
     setSelected(state, dest);
-    hold.start();
+    state.hold.start();
   } else unselect(state);
   return false;
 }
@@ -191,13 +190,13 @@ export function selectSquare(state: State, key: cg.Key, force?: boolean): void {
   if (state.selected) {
     if (state.selected === key && !state.draggable.enabled) {
       unselect(state);
-      hold.cancel();
+      state.hold.cancel();
     } else if ((state.selectable.enabled || force) && state.selected !== key) {
       if (userMove(state, state.selected, key)) state.stats.dragged = false;
-    } else hold.start();
+    } else state.hold.start();
   } else if (isMovable(state, key) || isPremovable(state, key)) {
     setSelected(state, key);
-    hold.start();
+    state.hold.start();
   }
   if (key) callUserFunction(state.events.select, key);
 }
@@ -213,7 +212,7 @@ export function setSelected(state: State, key: cg.Key): void {
 export function unselect(state: State): void {
   state.selected = undefined;
   state.premovable.dests = undefined;
-  hold.cancel();
+  state.hold.cancel();
 }
 
 function isMovable(state: State, orig: cg.Key): boolean {

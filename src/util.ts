@@ -40,6 +40,20 @@ export function memo<A>(f: () => A): cg.Memo<A> {
     return ret;
 }
 
+export const timer: () => cg.Timer = () => {
+  let startAt: Date | undefined;
+  return {
+    start() { startAt = new Date(); },
+    cancel() { startAt = undefined; },
+    stop() {
+      if (!startAt) return 0;
+      const time = new Date().getTime() - startAt.getTime();
+      startAt = undefined;
+      return time;
+    }
+  };
+}
+
 export const opposite = (c: cg.Color) => c === 'white' ? 'black' : 'white';
 
 export function containsX<X>(xs: X[] | undefined, x: X): boolean {
