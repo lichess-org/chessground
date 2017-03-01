@@ -148,11 +148,11 @@ export function start(state: State, redrawAll: cg.Redraw): Api {
     },
 
     setAutoShapes(shapes: DrawShape[]) {
-      anim(state => state.drawable.autoShapes = shapes, state);
+      render(state => state.drawable.autoShapes = shapes, state);
     },
 
     setShapes(shapes: DrawShape[]) {
-      anim(state => state.drawable.shapes = shapes, state);
+      render(state => state.drawable.shapes = shapes, state);
     },
 
     getKeyAtDomPos(pos) {
