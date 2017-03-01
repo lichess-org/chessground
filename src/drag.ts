@@ -3,6 +3,7 @@ import * as board from './board'
 import * as util from './util'
 import { clear as drawClear } from './draw'
 import * as cg from './types'
+import { anim } from './anim'
 
 export interface DragCurrent {
   orig: cg.Key; // orig key of dragging piece
@@ -39,7 +40,11 @@ export function start(s: State, e: cg.MouchEvent): void {
   const hadPremove = !!s.premovable.current;
   const hadPredrop = !!s.predroppable.current;
   s.stats.ctrlKey = e.ctrlKey;
-  board.selectSquare(s, orig);
+  if (s.selected && board.canMove(s, s.selected, orig)) {
+    anim(state => board.selectSquare(state, orig), s);
+  } else {
+    board.selectSquare(s, orig);
+  }
   const stillSelected = s.selected === orig;
   const element = pieceElementByKey(s, orig);
   if (piece && element && stillSelected && board.isDraggable(s, orig)) {
@@ -69,12 +74,12 @@ export function start(s: State, e: cg.MouchEvent): void {
       const translation = util.posToTranslate(util.key2pos(orig), asWhite, bounds);
       s.browser.transform(ghost, util.translate(translation));
     }
+    processDrag(s);
   } else {
     if (hadPremove) board.unsetPremove(s);
     if (hadPredrop) board.unsetPredrop(s);
   }
   s.dom.redraw();
-  processDrag(s);
 }
 
 export function dragNewPiece(s: State, piece: cg.Piece, e: cg.MouchEvent): void {

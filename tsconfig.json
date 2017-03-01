@@ -13,6 +13,7 @@
     "strictNullChecks": true,
     "noUnusedLocals": true,
     "noEmitOnError": false,
+    "removeComments": true,
     "alwaysStrict": true,
     "noImplicitReturns": true,
     "noImplicitThis": true,
