@@ -81,10 +81,10 @@ export function processDraw(state: State): void {
       const newDest = (cur.orig === dest) ? undefined : dest;
       if (newDest !== cur.dest) {
         cur.dest = newDest;
-        state.dom.redraw();
+        state.dom.redrawNow();
       }
+      processDraw(state);
     }
-    if (cur) processDraw(state);
   });
 }
 

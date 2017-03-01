@@ -41,7 +41,8 @@ export interface Elements {
 export interface Dom {
   elements: Elements,
   bounds: Memo<ClientRect>;
-  redraw: (withSvg?: boolean) => void;
+  redraw: () => void;
+  redrawNow: (skipSvg?: boolean) => void;
   unbind?: Unbind;
 }
 export interface Exploding {

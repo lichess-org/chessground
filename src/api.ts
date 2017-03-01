@@ -1,6 +1,5 @@
 import { State } from './state'
 import * as board from './board'
-import { raf } from './util'
 import { write as fenWrite } from './fen'
 import { Config, configure } from './config'
 import { anim, render } from './anim'
@@ -120,7 +119,7 @@ export function start(state: State, redrawAll: cg.Redraw): Api {
 
     playPremove() {
       // if the premove couldn't be played, redraw to clear it up
-      if (state.premovable.current && !anim(board.playPremove, state)) raf(state.dom.redraw);
+      if (state.premovable.current && !anim(board.playPremove, state)) state.dom.redraw();
     },
 
     playPredrop(validate) {

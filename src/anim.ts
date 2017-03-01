@@ -119,20 +119,20 @@ function computePlan(prevPieces: cg.Pieces, current: State): AnimPlan {
 function step(state: State): void {
   const cur = state.animation.current;
   if (!cur) { // animation was canceled :(
-    state.dom.redraw();
+    state.dom.redrawNow();
     return;
   }
   const rest = 1 - (new Date().getTime() - cur.start) / cur.duration;
   if (rest <= 0) {
     state.animation.current = undefined;
-    state.dom.redraw();
+    state.dom.redrawNow();
   } else {
     const ease = easing(rest);
     for (let i in cur.plan.anims) {
       const cfg = cur.plan.anims[i];
       cfg[1] = [roundBy(cfg[0][0] * ease, 10), roundBy(cfg[0][1] * ease, 10)];
     }
-    state.dom.redraw(false); // optimisation: don't render SVG changes during animations
+    state.dom.redrawNow(true); // optimisation: don't render SVG changes during animations
     util.raf(() => step(state));
   }
 }

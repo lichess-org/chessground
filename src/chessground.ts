@@ -29,13 +29,15 @@ export function Chessground(element: HTMLElement, config?: Config): Api {
     // this allows non-square boards from CSS to be handled (for 3D)
     const bounds = util.memo(() => (state.dom ? state.dom.elements.board : element).getBoundingClientRect());
     const elements = renderWrap(element, state, bounds());
+    const redrawNow = (skipSvg: boolean) => {
+      render(state);
+      if (!skipSvg && elements.svg) svg.renderSvg(state, elements.svg);
+    };
     state.dom = {
       elements: elements,
       bounds: bounds,
-      redraw(withSvg: boolean = true) {
-        render(state);
-        if (withSvg && elements.svg) svg.renderSvg(state, elements.svg);
-      },
+      redraw: debounceRedraw(redrawNow),
+      redrawNow: redrawNow,
       unbind: prevUnbind
     };
     svg.clearCache();
@@ -49,3 +51,15 @@ export function Chessground(element: HTMLElement, config?: Config): Api {
 
   return api;
 };
+
+function debounceRedraw(redrawNow: (skipSvg?: boolean) => void): () => void {
+  let redrawing = false;
+  return () => {
+    if (redrawing) return;
+    redrawing = true;
+    util.raf(() => {
+      redrawNow();
+      redrawing = false;
+    });
+  };
+}

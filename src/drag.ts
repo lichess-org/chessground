@@ -73,7 +73,7 @@ export function start(s: State, e: cg.MouchEvent): void {
     if (hadPremove) board.unsetPremove(s);
     if (hadPredrop) board.unsetPredrop(s);
   }
-  util.raf(s.dom.redraw);
+  s.dom.redraw();
   processDrag(s);
 }
 
@@ -83,7 +83,7 @@ export function dragNewPiece(s: State, piece: cg.Piece, e: cg.MouchEvent): void 
 
   s.pieces[key] = piece;
 
-  util.raf(s.dom.redraw);
+  s.dom.redraw();
 
   const position = util.eventPosition(e),
   asWhite = s.orientation === 'white',
@@ -207,7 +207,7 @@ export function end(s: State, e: cg.MouchEvent): void {
   removeDragElements(s);
 
   s.draggable.current = undefined;
-  util.raf(s.dom.redraw);
+  s.dom.redraw();
 }
 
 export function cancel(s: State): void {
