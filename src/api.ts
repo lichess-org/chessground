@@ -54,10 +54,6 @@ export interface Api {
   // cancel current move and prevent further ones
   stop(): void;
 
-  // get the material difference between white and black
-  // {white: {pawn: 3 queen: 1}, black: {bishop: 2}}
-  getMaterialDiff(): cg.MaterialDiff;
-
   // make squares explode (atomic chess)
   explode(keys: cg.Key[]): void;
 
@@ -96,8 +92,6 @@ export function start(state: State, redrawAll: cg.Redraw): Api {
     state,
 
     getFen: () => fenWrite(state.pieces),
-
-    getMaterialDiff: () => board.getMaterialDiff(state),
 
     toggleOrientation,
 
