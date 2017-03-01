@@ -112,7 +112,7 @@ export function configure(state: State, config: Config) {
   if (state.selected) setSelected(state, state.selected);
 
   // no need for such short animations
-  if (!state.animation.duration || state.animation.duration < 40) state.animation.enabled = false;
+  if (!state.animation.duration || state.animation.duration < 100) state.animation.enabled = false;
 
   if (!state.movable.rookCastle && state.movable.dests) {
     const rank = state.movable.color === 'white' ? 1 : 8;

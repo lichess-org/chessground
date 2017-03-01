@@ -125,7 +125,7 @@ export function baseNewPiece(state: State, piece: cg.Piece, key: cg.Key, force?:
   }
   callUserFunction(state.events.dropNewPiece, piece, key);
   state.pieces[key] = piece;
-  state.lastMove = [key, key];
+  state.lastMove = [key];
   state.check = undefined;
   callUserFunction(state.events.change);
   state.movable.dests = undefined;

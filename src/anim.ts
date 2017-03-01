@@ -148,22 +148,17 @@ function animate<A>(mutation: Mutation<A>, state: State): A {
     };
   }
   const result = mutation(state);
-  if (state.animation.enabled) {
-    const plan = computePlan(prevPieces, state);
-    if (!isObjectEmpty(plan.anims) || !isObjectEmpty(plan.fadings)) {
-      const alreadyRunning = state.animation.current && state.animation.current.start;
-      state.animation.current = {
-        start: new Date().getTime(),
-        duration: state.animation.duration,
-        plan: plan
-      };
-      if (!alreadyRunning) step(state);
-    } else {
-      // don't animate, just render right away
-      state.dom.redraw();
-    }
+  const plan = computePlan(prevPieces, state);
+  if (!isObjectEmpty(plan.anims) || !isObjectEmpty(plan.fadings)) {
+    const alreadyRunning = state.animation.current && state.animation.current.start;
+    state.animation.current = {
+      start: new Date().getTime(),
+      duration: state.animation.duration,
+      plan: plan
+    };
+    if (!alreadyRunning) step(state);
   } else {
-    // animations are now disabled
+    // don't animate, just render right away
     state.dom.redraw();
   }
   return result;
