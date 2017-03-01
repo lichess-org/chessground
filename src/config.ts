@@ -94,10 +94,6 @@ export function configure(state: State, config: Config) {
   // don't merge destinations. Just override.
   if (config.movable && config.movable.dests) state.movable.dests = undefined;
 
-  let configCheck: cg.Color | boolean | undefined = config.check;
-
-  delete config.check;
-
   merge(state, config);
 
   // if a fen was provided, replace the pieces
@@ -106,7 +102,9 @@ export function configure(state: State, config: Config) {
     state.drawable.shapes = [];
   }
 
-  if (configCheck !== undefined) setCheck(state, configCheck);
+  // apply config values that could be undefined yet meaningful
+  if (config.hasOwnProperty('lastMove') && !config.lastMove) state.lastMove = undefined;
+  if (config.hasOwnProperty('check')) setCheck(state, config.check || false);
 
   // fix move/premove dests
   if (state.selected) setSelected(state, state.selected);
