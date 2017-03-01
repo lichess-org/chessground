@@ -211,10 +211,13 @@ export function end(s: State, e: cg.MouchEvent): void {
 }
 
 export function cancel(s: State): void {
-  if (s.draggable.current) {
+  const cur = s.draggable.current;
+  if (cur) {
+    if (cur.newPiece) delete s.pieces[cur.orig];
     s.draggable.current = undefined;
     board.unselect(s);
     removeDragElements(s);
+    s.dom.redraw();
   }
 }
 

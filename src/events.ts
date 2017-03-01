@@ -56,11 +56,8 @@ function unbindable(el: EventTarget, eventName: string, callback: MouchBind, opt
 
 function startDragOrDraw(s: State): MouchBind {
   return e => {
-    if (isRightButton(e) && s.draggable.current) {
-      if (s.draggable.current.newPiece) delete s.pieces[s.draggable.current.orig];
-      s.draggable.current = undefined;
-      s.selected = undefined;
-    } else if ((e.shiftKey || isRightButton(e)) && s.drawable.enabled) draw.start(s, e);
+    if (isRightButton(e) && s.draggable.current) drag.cancel(s);
+    else if ((e.shiftKey || isRightButton(e)) && s.drawable.enabled) draw.start(s, e);
     else drag.start(s, e);
   };
 }
