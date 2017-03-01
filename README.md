@@ -39,7 +39,7 @@ Chessground is designed to fulfill all lichess.org web and mobile apps needs, so
 - Display last move, check, move destinations, and premove destinations
 - Import and export positions in FEN notation
 - User callbacks
-- No chess logic inside: can be used for chess variations
+- No chess logic inside: can be used for [chess variants](https://lichess.org/variant)
 
 ## Installation
 
