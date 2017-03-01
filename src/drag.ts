@@ -160,11 +160,10 @@ function processDrag(s: State): void {
           if (s.movable.free ||
             util.containsX(dests && dests[cur.orig], cur.over) ||
             util.containsX(s.premovable.dests, cur.over)) {
-            const squareWidth = bounds.width / 8,
-            pos = util.key2pos(cur.over),
+            const pos = util.key2pos(cur.over),
             vector: cg.NumberPair = [
-              (asWhite ? pos[0] - 1 : 8 - pos[0]) * squareWidth,
-              (asWhite ? 8 - pos[1] : pos[1] - 1) * squareWidth
+              (asWhite ? pos[0] - 1 : 8 - pos[0]) * bounds.width / 8,
+              (asWhite ? 8 - pos[1] : pos[1] - 1) * bounds.height / 8
             ];
             s.browser.transform(overEl, util.translate(vector));
           } else {
