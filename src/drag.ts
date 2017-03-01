@@ -29,7 +29,7 @@ export function start(s: State, e: cg.MouchEvent): void {
   e.preventDefault();
   const asWhite = s.orientation === 'white',
   bounds = s.dom.bounds(),
-  position = util.eventPosition(e),
+  position = util.eventPosition(e) as cg.NumberPair,
   orig = board.getKeyAtDomPos(position, asWhite, bounds);
   if (!orig) return;
   const piece = s.pieces[orig];
@@ -91,7 +91,7 @@ export function dragNewPiece(s: State, piece: cg.Piece, e: cg.MouchEvent, force?
 
   s.dom.redraw();
 
-  const position = util.eventPosition(e),
+  const position = util.eventPosition(e) as cg.NumberPair,
   asWhite = s.orientation === 'white',
   bounds = s.dom.bounds(),
   squareBounds = computeSquareBounds(key, asWhite, bounds),
@@ -182,7 +182,7 @@ function processDrag(s: State): void {
 export function move(s: State, e: cg.MouchEvent): void {
   // support one finger touch only
   if (s.draggable.current && (!e.touches || e.touches.length < 2)) {
-    s.draggable.current.epos = util.eventPosition(e);
+    s.draggable.current.epos = util.eventPosition(e) as cg.NumberPair;
   }
 }
 
@@ -197,7 +197,7 @@ export function end(s: State, e: cg.MouchEvent): void {
   }
   board.unsetPremove(s);
   board.unsetPredrop(s);
-  const eventPos: cg.NumberPair = util.eventPosition(e);
+  const eventPos: cg.NumberPair = util.eventPosition(e) || cur.epos;
   const dest = board.getKeyAtDomPos(eventPos, s.orientation === 'white', s.dom.bounds());
   if (dest && cur.started) {
     if (cur.newPiece) board.dropNewPiece(s, cur.orig, dest, cur.force);
