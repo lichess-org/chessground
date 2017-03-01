@@ -17,7 +17,8 @@ export interface DragCurrent {
   overPrev?: cg.Key; // square previously moused over
   started: boolean; // whether the drag has started; as per the distance setting
   element: cg.PieceNode | (() => cg.PieceNode | undefined);
-  newPiece?: boolean;
+  newPiece?: boolean; // it it a new piece from outside the board
+  force?: boolean; // can the new piece replace an existing one (editor)
   previouslySelected?: cg.Key;
   originTarget: EventTarget;
 }
@@ -82,7 +83,7 @@ export function start(s: State, e: cg.MouchEvent): void {
   s.dom.redraw();
 }
 
-export function dragNewPiece(s: State, piece: cg.Piece, e: cg.MouchEvent): void {
+export function dragNewPiece(s: State, piece: cg.Piece, e: cg.MouchEvent, force?: boolean): void {
 
   const key: cg.Key = 'a0';
 
@@ -112,7 +113,8 @@ export function dragNewPiece(s: State, piece: cg.Piece, e: cg.MouchEvent): void 
     started: true,
     element: () => pieceElementByKey(s, key),
     originTarget: e.target,
-    newPiece: true
+    newPiece: true,
+    force: force || false
   };
   processDrag(s);
 }
@@ -198,7 +200,7 @@ export function end(s: State, e: cg.MouchEvent): void {
   const eventPos: cg.NumberPair = util.eventPosition(e);
   const dest = board.getKeyAtDomPos(eventPos, s.orientation === 'white', s.dom.bounds());
   if (dest && cur.started) {
-    if (cur.newPiece) board.dropNewPiece(s, cur.orig, dest);
+    if (cur.newPiece) board.dropNewPiece(s, cur.orig, dest, cur.force);
     else {
       s.stats.ctrlKey = e.ctrlKey;
       if (board.userMove(s, cur.orig, dest)) s.stats.dragged = true;
