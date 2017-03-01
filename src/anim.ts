@@ -41,10 +41,6 @@ export function render<A>(mutation: Mutation<A>, state: State): A {
   return result;
 }
 
-interface MiniState {
-  orientation: cg.Color;
-  pieces: cg.Pieces;
-}
 interface AnimPiece {
   key: cg.Key;
   pos: cg.Pos;
@@ -54,8 +50,7 @@ interface AnimPieces {
   [key: string]: AnimPiece
 }
 
-function makePiece(k: cg.Key, piece: cg.Piece, invert: boolean): AnimPiece {
-  const key = invert ? util.invertKey(k) : k;
+function makePiece(key: cg.Key, piece: cg.Piece): AnimPiece {
   return {
     key: key,
     pos: util.key2pos(key),
@@ -69,7 +64,7 @@ function closer(piece: AnimPiece, pieces: AnimPiece[]): AnimPiece {
   })[0];
 }
 
-function computePlan(prev: MiniState, current: State): AnimPlan {
+function computePlan(prevPieces: cg.Pieces, current: State): AnimPlan {
   const bounds = current.dom.bounds(),
   width = bounds.width / 8,
   height = bounds.height / 8,
@@ -78,12 +73,11 @@ function computePlan(prev: MiniState, current: State): AnimPlan {
   fadings: AnimFadings = {},
   missings: AnimPiece[] = [],
   news: AnimPiece[] = [],
-  invert = prev.orientation !== current.orientation,
   prePieces: AnimPieces = {},
   white = current.orientation === 'white';
   let curP: cg.Piece, preP: AnimPiece, i: any, key: cg.Key, orig: cg.Pos, dest: cg.Pos, vector: cg.NumberPair;
-  for (i in prev.pieces) {
-    prePieces[i] = makePiece(i as cg.Key, prev.pieces[i], invert);
+  for (i in prevPieces) {
+    prePieces[i] = makePiece(i as cg.Key, prevPieces[i]);
   }
   for (i in util.allKeys) {
     key = util.allKeys[i];
@@ -93,9 +87,9 @@ function computePlan(prev: MiniState, current: State): AnimPlan {
       if (preP) {
         if (!util.samePiece(curP, preP.piece)) {
           missings.push(preP);
-          news.push(makePiece(key, curP, false));
+          news.push(makePiece(key, curP));
         }
-      } else news.push(makePiece(key, curP, false));
+      } else news.push(makePiece(key, curP));
     } else if (preP) missings.push(preP);
   }
   news.forEach(newP => {
@@ -145,20 +139,17 @@ function step(state: State): void {
 
 function animate<A>(mutation: Mutation<A>, state: State): A {
   // clone state before mutating it
-  const prev: MiniState = {
-    orientation: state.orientation,
-    pieces: {} as cg.Pieces
-  };
+  const prevPieces: cg.Pieces = {};
   // clone pieces
   for (let key in state.pieces) {
-    prev.pieces[key] = {
+    prevPieces[key] = {
       role: state.pieces[key].role,
       color: state.pieces[key].color
     };
   }
   const result = mutation(state);
   if (state.animation.enabled) {
-    const plan = computePlan(prev, state);
+    const plan = computePlan(prevPieces, state);
     if (!isObjectEmpty(plan.anims) || !isObjectEmpty(plan.fadings)) {
       const alreadyRunning = state.animation.current && state.animation.current.start;
       state.animation.current = {
