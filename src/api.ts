@@ -91,7 +91,7 @@ export function start(state: State, redrawAll: cg.Redraw): Api {
 
     set(config) {
       if (config.orientation && config.orientation !== state.orientation) toggleOrientation();
-      anim(state => configure(state, config), state);
+      (config.fen ? anim : render)(state => configure(state, config), state);
     },
 
     state,
