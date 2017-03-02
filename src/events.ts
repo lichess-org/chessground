@@ -1,7 +1,7 @@
 import { State } from './state'
 import * as drag from './drag'
 import * as draw from './draw'
-import { isRightButton, isRightClick, raf } from './util'
+import { isRightClick, raf } from './util'
 import * as cg from './types'
 
 type MouchBind = (e: cg.MouchEvent) => void;
@@ -56,7 +56,7 @@ function unbindable(el: EventTarget, eventName: string, callback: MouchBind, opt
 
 function startDragOrDraw(s: State): MouchBind {
   return e => {
-    if (isRightButton(e) && s.draggable.current) drag.cancel(s);
+    if (isRightClick(e) && s.draggable.current) drag.cancel(s);
     else if ((e.shiftKey || isRightClick(e)) && s.drawable.enabled) draw.start(s, e);
     else drag.start(s, e);
   };
