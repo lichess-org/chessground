@@ -32,7 +32,6 @@ export interface Config {
     dests?: {
       [key: string]: cg.Key[]
     }; // valid moves. {"a2" ["a3" "a4"] "b1" ["a3" "c3"]}
-    dropOff?: 'revert' | 'trash'; // when a piece is dropped outside the board. "revert" | "trash"
     showDests?: boolean; // whether to add the move-dest class on squares
     events?: {
       after?: (orig: cg.Key, dest: cg.Key, metadata: cg.MoveMetadata) => void; // called after the move has been played
