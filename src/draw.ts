@@ -1,6 +1,6 @@
 import { State } from './state'
 import { cancelMove, getKeyAtDomPos } from './board'
-import { eventPosition, raf, isRightClick } from './util'
+import { eventPosition, raf, isRightButton } from './util'
 import * as cg from './types'
 
 export interface DrawShape {
@@ -114,7 +114,7 @@ export function clear(state: State): void {
 }
 
 function eventBrush(e: cg.MouchEvent): string {
-  const a: number = e.shiftKey && isRightClick(e) ? 1 : 0;
+  const a: number = e.shiftKey && isRightButton(e) ? 1 : 0;
   const b: number = e.altKey ? 2 : 0;
   return brushes[a + b];
 }
