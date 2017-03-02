@@ -97,12 +97,14 @@ export function end(state: State): void {
   if (!cur) return;
   if (cur.dest) addLine(state.drawable, cur, cur.dest);
   else addCircle(state.drawable, cur);
-  state.drawable.current = undefined;
-  state.dom.redraw();
+  cancel(state);
 }
 
 export function cancel(state: State): void {
-  if (state.drawable.current) state.drawable.current = undefined;
+  if (state.drawable.current) {
+    state.drawable.current = undefined;
+    state.dom.redraw();
+  }
 }
 
 export function clear(state: State): void {
