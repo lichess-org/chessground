@@ -3,22 +3,12 @@ import * as cg from './types';
 export const colors: cg.Color[] = ['white', 'black'];
 
 export const invRanks: cg.Rank[] = [8, 7, 6, 5, 4, 3, 2, 1];
-export const fileNumbers: { [file: string]: number } = {
-  a: 1,
-  b: 2,
-  c: 3,
-  d: 4,
-  e: 5,
-  f: 6,
-  g: 7,
-  h: 8
-};
 
-export const pos2key = (pos: cg.Pos) => cg.files[pos[0] - 1] + pos[1] as cg.Key;
+export const pos2key = (pos: cg.Pos) => String.fromCharCode(96 + pos[0], 48 + pos[1]) as cg.Key;
 
-export const key2pos = (k: cg.Key) => [fileNumbers[k[0]] as number, parseInt(k[1]) as number] as cg.Pos;
+export const key2pos = (k: cg.Key) => [k.charCodeAt(0) - 96, k.charCodeAt(1) - 48] as cg.Pos;
 
-export const invertKey = (k: cg.Key) => cg.files[8 - fileNumbers[k[0]]] + (9 - parseInt(k[1])) as cg.Key;
+export const invertKey = (k: cg.Key) => String.fromCharCode(201 - k.charCodeAt(0), 105 - k.charCodeAt(1)) as cg.Key;
 
 export const allPos: cg.Pos[] = [];
 export const allKeys: cg.Key[] = [];
