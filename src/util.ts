@@ -69,6 +69,10 @@ export const distance: (pos1: cg.Pos, pos2: cg.Pos) => number = (pos1, pos2) => 
 export const samePiece: (p1: cg.Piece, p2: cg.Piece) => boolean = (p1, p2) =>
   p1.role === p2.role && p1.color === p2.color;
 
+interface CSSStyleDeclaration {
+  [key: string]: any;
+}
+
 export const transformFunction: () => cg.Transform = () => {
   const s = document.body.style;
   const prop = 'transform' in s ?
@@ -76,7 +80,9 @@ export const transformFunction: () => cg.Transform = () => {
     'webkitTransform' : 'mozTransform' in s ?
     'mozTransform' : 'oTransform' in s ?
     'oTransform' : 'msTransform';
-  return (el, value) => el.style.setProperty(prop, value);
+  return (el, value) => {
+    (el.style as CSSStyleDeclaration)[prop] = value;
+  };
 }
 
 export const computeIsTrident = () => window.navigator.userAgent.indexOf('Trident/') > -1;
