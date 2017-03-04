@@ -70,13 +70,13 @@ export function unsetPredrop(state: State): void {
   }
 }
 
-function tryAutoCastle(state: State, orig: cg.Key, dest: cg.Key): void {
-  if (!state.autoCastle) return;
-  const king = state.pieces[dest];
-  if (king.role !== 'king') return;
+function tryAutoCastle(state: State, orig: cg.Key, dest: cg.Key): boolean {
+  if (!state.autoCastle) return false;
+  const king = state.pieces[orig];
+  if (king.role !== 'king') return false;
   const origPos = key2pos(orig);
-  if (origPos[0] !== 5) return;
-  if (origPos[1] !== 1 && origPos[1] !== 8) return;
+  if (origPos[0] !== 5) return false;
+  if (origPos[1] !== 1 && origPos[1] !== 8) return false;
   const destPos = key2pos(dest);
   let oldRookPos, newRookPos, newKingPos;
   if (destPos[0] === 7 || destPos[0] === 8) {
@@ -87,18 +87,17 @@ function tryAutoCastle(state: State, orig: cg.Key, dest: cg.Key): void {
     oldRookPos = pos2key([1, origPos[1]]);
     newRookPos = pos2key([4, origPos[1]]);
     newKingPos = pos2key([3, origPos[1]]);
-  } else return;
+  } else return false;
+
+  const rook = state.pieces[oldRookPos];
+  if (rook.role !== 'rook') return false;
+
   delete state.pieces[orig];
-  delete state.pieces[dest];
   delete state.pieces[oldRookPos];
-  state.pieces[newKingPos] = {
-    role: 'king',
-    color: king.color
-  };
-  state.pieces[newRookPos] = {
-    role: 'rook',
-    color: king.color
-  };
+
+  state.pieces[newKingPos] = king
+  state.pieces[newRookPos] = rook;
+  return true;
 }
 
 export function baseMove(state: State, orig: cg.Key, dest: cg.Key): boolean {
@@ -109,11 +108,12 @@ export function baseMove(state: State, orig: cg.Key, dest: cg.Key): boolean {
   ) ? state.pieces[dest] : undefined;
   if (dest == state.selected) unselect(state);
   callUserFunction(state.events.move, orig, dest, captured);
-  state.pieces[dest] = state.pieces[orig];
-  delete state.pieces[orig];
+  if (!tryAutoCastle(state, orig, dest)) {
+    state.pieces[dest] = state.pieces[orig];
+    delete state.pieces[orig];
+  }
   state.lastMove = [orig, dest];
   state.check = undefined;
-  tryAutoCastle(state, orig, dest);
   callUserFunction(state.events.change);
   return true;
 }
@@ -297,8 +297,9 @@ export function playPredrop(state: State, validate: (drop: cg.Drop) => boolean):
   if (validate(drop)) {
     const piece = {
       role: drop.role,
-      color: state.movable.color as cg.Color
-    };
+      color: state.movable.color,
+      promoted: false
+    } as cg.Piece;
     if (baseNewPiece(state, piece, drop.key)) {
       callUserFunction(state.movable.events.afterNewPiece, drop.role, drop.key, {
         predrop: true
