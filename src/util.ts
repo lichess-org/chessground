@@ -3,34 +3,14 @@ import * as cg from './types';
 export const colors: cg.Color[] = ['white', 'black'];
 
 export const invRanks: cg.Rank[] = [8, 7, 6, 5, 4, 3, 2, 1];
-export const fileNumbers: { [file: string]: number } = {
-  a: 1,
-  b: 2,
-  c: 3,
-  d: 4,
-  e: 5,
-  f: 6,
-  g: 7,
-  h: 8
-};
 
-export const pos2key = (pos: cg.Pos) => cg.files[pos[0] - 1] + pos[1] as cg.Key;
+export const allKeys: cg.Key[] = Array.prototype.concat(...cg.files.map(c => cg.ranks.map(r => c+r)));
 
-export const key2pos = (k: cg.Key) => [fileNumbers[k[0]] as number, parseInt(k[1]) as number] as cg.Pos;
+export const pos2key = (pos: cg.Pos) => allKeys[8 * pos[0] + pos[1] - 9];
 
-export const invertKey = (k: cg.Key) => cg.files[8 - fileNumbers[k[0]]] + (9 - parseInt(k[1])) as cg.Key;
+export const key2pos = (k: cg.Key) => [k.charCodeAt(0) - 96, k.charCodeAt(1) - 48] as cg.Pos;
 
-export const allPos: cg.Pos[] = [];
-export const allKeys: cg.Key[] = [];
-let pos: cg.Pos, key: cg.Key, x: number, y: number;
-for (y = 8; y > 0; --y) {
-  for (x = 1; x < 9; ++x) {
-    pos = [x, y];
-    key = pos2key(pos);
-    allPos.push(pos);
-    allKeys.push(key);
-  }
-}
+export const invertKey = (k: cg.Key) => allKeys[888 - 8 * k.charCodeAt(0) - k.charCodeAt(1)];
 
 export function memo<A>(f: () => A): cg.Memo<A> {
   let v: A | undefined;

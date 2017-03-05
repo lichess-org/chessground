@@ -75,12 +75,11 @@ function computePlan(prevPieces: cg.Pieces, current: State): AnimPlan {
   news: AnimPiece[] = [],
   prePieces: AnimPieces = {},
   white = current.orientation === 'white';
-  let curP: cg.Piece, preP: AnimPiece, i: any, key: cg.Key, orig: cg.Pos, dest: cg.Pos, vector: cg.NumberPair;
+  let curP: cg.Piece, preP: AnimPiece, i: any, orig: cg.Pos, dest: cg.Pos, vector: cg.NumberPair;
   for (i in prevPieces) {
     prePieces[i] = makePiece(i as cg.Key, prevPieces[i]);
   }
-  for (i in util.allKeys) {
-    key = util.allKeys[i];
+  for (const key of util.allKeys) {
     curP = current.pieces[key];
     preP = prePieces[key];
     if (curP) {
