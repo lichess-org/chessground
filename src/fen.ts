@@ -35,15 +35,12 @@ export function read(fen: cg.FEN): cg.Pieces {
 
 export function write(pieces: cg.Pieces): cg.FEN {
   let piece: cg.Piece, letter: string;
-  return [8, 7, 6, 5, 4, 3, 2].reduce(
-    (str: string, nb: any) => str.replace(new RegExp(Array(nb + 1).join('1'), 'g'), nb),
-    invRanks.map(y => {
-      return cg.ranks.map(x => {
-        piece = pieces[pos2key([x, y])];
-        if (piece) {
-          letter = letters[piece.role];
-          return piece.color === 'white' ? letter.toUpperCase() : letter;
-        } else return '1';
-      }).join('');
-    }).join('/'));
+  return invRanks.map(y => cg.ranks.map(x => {
+      piece = pieces[pos2key([x, y])];
+      if (piece) {
+        letter = letters[piece.role];
+        return piece.color === 'white' ? letter.toUpperCase() : letter;
+      } else return '1';
+    }).join('')
+  ).join('/').replace(/1{2,}/g, s => s.length.toString());
 }
