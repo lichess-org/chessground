@@ -139,14 +139,8 @@ function step(state: State): void {
 
 function animate<A>(mutation: Mutation<A>, state: State): A {
   // clone state before mutating it
-  const prevPieces: cg.Pieces = {};
-  // clone pieces
-  for (let key in state.pieces) {
-    prevPieces[key] = {
-      role: state.pieces[key].role,
-      color: state.pieces[key].color
-    };
-  }
+  const prevPieces: cg.Pieces = {...state.pieces};
+
   const result = mutation(state);
   const plan = computePlan(prevPieces, state);
   if (!isObjectEmpty(plan.anims) || !isObjectEmpty(plan.fadings)) {
