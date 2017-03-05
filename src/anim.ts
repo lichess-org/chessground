@@ -79,7 +79,7 @@ function computePlan(prevPieces: cg.Pieces, current: State): AnimPlan {
   for (i in prevPieces) {
     prePieces[i] = makePiece(i as cg.Key, prevPieces[i]);
   }
-  for (i in util.allKeys) {
+  for (const i of util.allKeys) {
     key = util.allKeys[i];
     curP = current.pieces[key];
     preP = prePieces[key];

@@ -12,7 +12,7 @@ export const key2pos = (k: cg.Key) => [k.charCodeAt(0) - 96, k.charCodeAt(1) - 4
 
 export const invertKey = (k: cg.Key) => allKeys[888 - 8 * k.charCodeAt(0) - k.charCodeAt(1)];
 
-export const allPos: cg.Pos[] = allKeys.map(key2Pos);
+export const allPos: cg.Pos[] = allKeys.map(key2pos);
 
 export function memo<A>(f: () => A): cg.Memo<A> {
   let v: A | undefined;
