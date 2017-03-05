@@ -78,7 +78,7 @@ export default function premove(pieces: cg.Pieces, key: cg.Key, canCastle: boole
       mobility = king(piece.color, rookFilesOf(pieces, piece.color), canCastle);
       break;
   }
-  return util.allPos.filter(pos2 => {
+  return util.allPos().filter(pos2 => {
     return (pos[0] !== pos2[0] || pos[1] !== pos2[1]) && mobility(pos[0], pos[1], pos2[0], pos2[1]);
   }).map(util.pos2key);
 };

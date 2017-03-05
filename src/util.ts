@@ -4,15 +4,13 @@ export const colors: cg.Color[] = ['white', 'black'];
 
 export const invRanks: cg.Rank[] = [8, 7, 6, 5, 4, 3, 2, 1];
 
-export const allKeys: cg.Key[] = [].concat(...cg.files.map(c => cg.ranks.map(r => c+r)));
+export const allKeys: cg.Key[] = Array.prototype.concat(...cg.files.map(c => cg.ranks.map(r => c+r)));
 
 export const pos2key = (pos: cg.Pos) => allKeys[8 * pos[0] + pos[1] - 9];
 
 export const key2pos = (k: cg.Key) => [k.charCodeAt(0) - 96, k.charCodeAt(1) - 48] as cg.Pos;
 
 export const invertKey = (k: cg.Key) => allKeys[888 - 8 * k.charCodeAt(0) - k.charCodeAt(1)];
-
-export const allPos: cg.Pos[] = allKeys.map(key2pos);
 
 export function memo<A>(f: () => A): cg.Memo<A> {
   let v: A | undefined;
@@ -23,6 +21,8 @@ export function memo<A>(f: () => A): cg.Memo<A> {
   ret.clear = () => { v = undefined; }
     return ret;
 }
+
+export const allPos: () => cg.Pos[] = memo(() => allKeys.map(key2pos));
 
 export const timer: () => cg.Timer = () => {
   let startAt: Date | undefined;
