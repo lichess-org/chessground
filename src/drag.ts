@@ -94,12 +94,11 @@ export function dragNewPiece(s: State, piece: cg.Piece, e: cg.MouchEvent, force?
   const position = util.eventPosition(e) as cg.NumberPair,
   asWhite = s.orientation === 'white',
   bounds = s.dom.bounds(),
-  squareBounds = computeSquareBounds(key, asWhite, bounds),
-  coords = util.key2pos(asWhite ? key : util.invertKey(key));
+  squareBounds = computeSquareBounds(key, asWhite, bounds);
 
   const rel: cg.NumberPair = [
-    (coords[0] - 1) * squareBounds.width + bounds.left,
-    (8 - coords[1]) * squareBounds.height + bounds.top
+    (asWhite ? 0 : 7) * squareBounds.width + bounds.left,
+    (asWhite ? 8 : -1) * squareBounds.height + bounds.top
   ];
 
   s.draggable.current = {
