@@ -22,8 +22,6 @@ export function memo<A>(f: () => A): cg.Memo<A> {
     return ret;
 }
 
-export const allPos: () => cg.Pos[] = memo(() => allKeys.map(key2pos));
-
 export const timer: () => cg.Timer = () => {
   let startAt: Date | undefined;
   return {
