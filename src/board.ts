@@ -297,8 +297,7 @@ export function playPredrop(state: State, validate: (drop: cg.Drop) => boolean):
   if (validate(drop)) {
     const piece = {
       role: drop.role,
-      color: state.movable.color,
-      promoted: false
+      color: state.movable.color
     } as cg.Piece;
     if (baseNewPiece(state, piece, drop.key)) {
       callUserFunction(state.movable.events.afterNewPiece, drop.role, drop.key, {

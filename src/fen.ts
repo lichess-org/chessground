@@ -32,8 +32,7 @@ export function read(fen: cg.FEN): cg.Pieces {
           const role = c.toLowerCase();
           pieces[pos2key([col, row])] = {
             role: roles[role],
-            color: (c === role ? 'black' : 'white') as cg.Color,
-            promoted: false
+            color: (c === role ? 'black' : 'white') as cg.Color
           };
         }
     }
