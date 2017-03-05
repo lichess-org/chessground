@@ -8,6 +8,7 @@ export type Pos = [number, number];
 export interface Piece {
   role: Role;
   color: Color;
+  promoted: boolean;
 }
 export interface Drop {
   role: Role;
