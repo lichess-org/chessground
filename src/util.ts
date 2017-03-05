@@ -4,23 +4,15 @@ export const colors: cg.Color[] = ['white', 'black'];
 
 export const invRanks: cg.Rank[] = [8, 7, 6, 5, 4, 3, 2, 1];
 
-export const pos2key = (pos: cg.Pos) => String.fromCharCode(96 + pos[0], 48 + pos[1]) as cg.Key;
+export const allKeys: cg.Key[] = [].concat(...cg.files.map(c => cg.ranks.map(r => c+r)));
+
+export const pos2key = (pos: cg.Pos) => allKeys[8 * pos[0] + pos[1] - 9];
 
 export const key2pos = (k: cg.Key) => [k.charCodeAt(0) - 96, k.charCodeAt(1) - 48] as cg.Pos;
 
-export const invertKey = (k: cg.Key) => String.fromCharCode(201 - k.charCodeAt(0), 105 - k.charCodeAt(1)) as cg.Key;
+export const invertKey = (k: cg.Key) => allKeys[888 - 8 * k.charCodeAt(0) - k.charCodeAt(1)];
 
-export const allPos: cg.Pos[] = [];
-export const allKeys: cg.Key[] = [];
-let pos: cg.Pos, key: cg.Key, x: number, y: number;
-for (y = 8; y > 0; --y) {
-  for (x = 1; x < 9; ++x) {
-    pos = [x, y];
-    key = pos2key(pos);
-    allPos.push(pos);
-    allKeys.push(key);
-  }
-}
+export const allPos: cg.Pos[] = allKeys.map(key2Pos);
 
 export function memo<A>(f: () => A): cg.Memo<A> {
   let v: A | undefined;
