@@ -16,8 +16,8 @@ export function memo<A>(f: () => A): cg.Memo<A> {
     if (v === undefined) v = f();
     return v;
   };
-  ret.clear = () => { v = undefined; }
-    return ret;
+  ret.clear = () => { v = undefined; };
+  return ret;
 }
 
 export const timer: () => cg.Timer = () => {
