@@ -100,7 +100,7 @@ function tryAutoCastle(state: State, orig: cg.Key, dest: cg.Key): boolean {
   return true;
 }
 
-export function baseMove(state: State, orig: cg.Key, dest: cg.Key): boolean {
+export function baseMove(state: State, orig: cg.Key, dest: cg.Key): cg.Piece | boolean {
   if (orig === dest || !state.pieces[orig]) return false;
   const captured: cg.Piece | undefined = (
     state.pieces[dest] &&
@@ -115,7 +115,7 @@ export function baseMove(state: State, orig: cg.Key, dest: cg.Key): boolean {
   state.lastMove = [orig, dest];
   state.check = undefined;
   callUserFunction(state.events.change);
-  return true;
+  return captured || true;
 }
 
 export function baseNewPiece(state: State, piece: cg.Piece, key: cg.Key, force?: boolean): boolean {
@@ -133,7 +133,7 @@ export function baseNewPiece(state: State, piece: cg.Piece, key: cg.Key, force?:
   return true;
 }
 
-function baseUserMove(state: State, orig: cg.Key, dest: cg.Key): boolean {
+function baseUserMove(state: State, orig: cg.Key, dest: cg.Key): cg.Piece | boolean {
   const result = baseMove(state, orig, dest);
   if (result) {
     state.movable.dests = undefined;
@@ -145,7 +145,8 @@ function baseUserMove(state: State, orig: cg.Key, dest: cg.Key): boolean {
 
 export function userMove(state: State, orig: cg.Key, dest: cg.Key): boolean {
   if (canMove(state, orig, dest)) {
-    if (baseUserMove(state, orig, dest)) {
+    const result = baseUserMove(state, orig, dest);
+    if (result) {
       const holdTime = state.hold.stop();
       unselect(state);
       const metadata: cg.MoveMetadata = {
@@ -153,6 +154,7 @@ export function userMove(state: State, orig: cg.Key, dest: cg.Key): boolean {
         ctrlKey: state.stats.ctrlKey,
         holdTime: holdTime
       };
+      if (result !== true) metadata.captured = result;
       callUserFunction(state.movable.events.after, orig, dest, metadata);
       return true;
     }
