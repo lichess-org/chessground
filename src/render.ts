@@ -114,7 +114,7 @@ export default function render(s: State): void {
 
   // walk over all squares in current set, apply dom changes to moved squares
   // or append new squares
-  for (let sk in squares) {
+  for (const sk in squares) {
     if (!sameSquares[sk]) {
       sMvdset = movedSquares[squares[sk]];
       sMvd = sMvdset && sMvdset.pop();
@@ -133,7 +133,7 @@ export default function render(s: State): void {
 
   // walk over all pieces in current set, apply dom changes to moved pieces
   // or append new pieces
-  for (let j in piecesKeys) {
+  for (const j in piecesKeys) {
     k = piecesKeys[j];
     p = pieces[k];
     anim = anims[k];
@@ -165,8 +165,8 @@ export default function render(s: State): void {
   }
 
   // remove any element that remains in the moved sets
-  for (let i in movedPieces) removeNodes(s, movedPieces[i]);
-  for (let i in movedSquares) removeNodes(s, movedSquares[i]);
+  for (const i in movedPieces) removeNodes(s, movedPieces[i]);
+  for (const i in movedSquares) removeNodes(s, movedSquares[i]);
 }
 
 function isPieceNode(el: cg.PieceNode | cg.SquareNode): el is cg.PieceNode {
@@ -177,7 +177,7 @@ function isSquareNode(el: cg.PieceNode | cg.SquareNode): el is cg.SquareNode {
 }
 
 function removeNodes(s: State, nodes: HTMLElement[]): void {
-  for (let i in nodes) s.dom.elements.board.removeChild(nodes[i]);
+  for (const i in nodes) s.dom.elements.board.removeChild(nodes[i]);
 }
 
 function renderSquareDom(key: cg.Key, className: string, translation: cg.NumberPair, transform: cg.Transform): cg.SquareNode {
@@ -245,7 +245,7 @@ function computeSquareClasses(s: State): SquareClasses {
   if (premove) for (i in premove) addSquare(squares, premove[i], 'current-premove');
   else if (s.predroppable.current) addSquare(squares, s.predroppable.current.key, 'current-premove');
 
-  let o = s.exploding;
+  const o = s.exploding;
   if (o) for (i in o.keys) addSquare(squares, o.keys[i], 'exploding' + o.stage);
 
   return squares;
