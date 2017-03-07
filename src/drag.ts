@@ -128,7 +128,7 @@ function processDrag(s: State): void {
     const origPiece = s.pieces[cur.orig];
     if (!origPiece || !util.samePiece(origPiece, cur.piece)) cancel(s);
     else {
-      if (!cur.started && util.distance(cur.epos, cur.rel) >= s.draggable.distance) cur.started = true;
+      if (!cur.started && util.distanceSq(cur.epos, cur.rel) >= Math.pow(s.draggable.distance, 2)) cur.started = true;
       if (cur.started) {
 
         // support lazy elements
