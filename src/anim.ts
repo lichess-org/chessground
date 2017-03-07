@@ -60,7 +60,7 @@ function makePiece(key: cg.Key, piece: cg.Piece): AnimPiece {
 
 function closer(piece: AnimPiece, pieces: AnimPiece[]): AnimPiece {
   return pieces.sort((p1, p2) => {
-    return util.distance(piece.pos, p1.pos) - util.distance(piece.pos, p2.pos);
+    return util.distanceSq(piece.pos, p1.pos) - util.distanceSq(piece.pos, p2.pos);
   })[0];
 }
 

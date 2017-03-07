@@ -40,8 +40,8 @@ export function containsX<X>(xs: X[] | undefined, x: X): boolean {
   return xs ? xs.indexOf(x) !== -1 : false;
 }
 
-export const distance: (pos1: cg.Pos, pos2: cg.Pos) => number = (pos1, pos2) => {
-  return Math.sqrt(Math.pow(pos1[0] - pos2[0], 2) + Math.pow(pos1[1] - pos2[1], 2));
+export const distanceSq: (pos1: cg.Pos, pos2: cg.Pos) => number = (pos1, pos2) => {
+  return Math.pow(pos1[0] - pos2[0], 2) + Math.pow(pos1[1] - pos2[1], 2);
 }
 
 export const samePiece: (p1: cg.Piece, p2: cg.Piece) => boolean = (p1, p2) =>
