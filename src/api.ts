@@ -159,7 +159,9 @@ export function start(state: State, redrawAll: cg.Redraw): Api {
     redrawAll,
 
     destroy() {
+      board.stop(state);
       state.dom.unbind && state.dom.unbind();
+      state.dom.destroyed = true;
     }
   };
 }

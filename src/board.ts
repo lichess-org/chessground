@@ -11,8 +11,8 @@ function callUserFunction(f: Callback | undefined, ...args: any[]): void {
 
 export function toggleOrientation(state: State): void {
   state.orientation = opposite(state.orientation);
-  state.animation.current = undefined;
-  state.draggable.current = undefined;
+  state.animation.current =
+  state.draggable.current =
   state.selected = undefined;
 }
 
@@ -319,8 +319,9 @@ export function cancelMove(state: State): void {
 }
 
 export function stop(state: State): void {
-  state.movable.color = undefined;
-  state.movable.dests = undefined;
+  state.movable.color =
+  state.movable.dests =
+  state.animation.current = undefined;
   cancelMove(state);
 }
 

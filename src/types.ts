@@ -45,6 +45,7 @@ export interface Dom {
   redraw: () => void;
   redrawNow: (skipSvg?: boolean) => void;
   unbind?: Unbind;
+  destroyed?: boolean;
 }
 export interface Exploding {
   stage: number;

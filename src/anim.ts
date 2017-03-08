@@ -118,7 +118,7 @@ function computePlan(prevPieces: cg.Pieces, current: State): AnimPlan {
 function step(state: State): void {
   const cur = state.animation.current;
   if (!cur) { // animation was canceled :(
-    state.dom.redrawNow();
+    if (!state.dom.destroyed) state.dom.redrawNow();
     return;
   }
   const rest = 1 - (new Date().getTime() - cur.start) / cur.duration;
