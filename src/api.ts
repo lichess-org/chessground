@@ -121,7 +121,7 @@ export function start(state: State, redrawAll: cg.Redraw): Api {
     },
 
     playPredrop(validate) {
-      return anim(state => board.playPredrop(state, validate), state);
+      return state.predroppable.current ? board.playPredrop(state, validate) : false;
     },
 
     cancelPremove() {
