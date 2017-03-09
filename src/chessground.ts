@@ -41,7 +41,7 @@ export function Chessground(element: HTMLElement, config?: Config): Api {
       unbind: prevUnbind
     };
     svg.clearCache();
-    state.dom.redraw();
+    redrawNow(false);
     events.bindBoard(state);
     if (!prevUnbind) state.dom.unbind = events.bindDocument(state, redrawAll);
   }
