@@ -63,6 +63,7 @@ export interface Config {
     autoDistance?: boolean; // lets chessground set distance to zero when user drags pieces
     centerPiece?: boolean; // center the piece on cursor at drag start
     showGhost?: boolean; // show ghost of piece being dragged
+    deleteOnDropOff?: boolean; // delete a piece when it is dropped off the board
   };
   selectable?: {
     // disable to enforce dragging over click-click move

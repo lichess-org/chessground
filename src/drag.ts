@@ -204,7 +204,7 @@ export function end(s: State, e: cg.MouchEvent): void {
       s.stats.ctrlKey = e.ctrlKey;
       if (board.userMove(s, cur.orig, dest)) s.stats.dragged = true;
     }
-  } else if (cur.newPiece) delete s.pieces[cur.orig];
+  } else if (cur.newPiece || s.draggable.deleteOnDropOff) delete s.pieces[cur.orig];
   if (cur && cur.orig === cur.previouslySelected && (cur.orig === dest || !dest))
     board.unselect(s);
   else if (!s.selectable.enabled) board.unselect(s);
