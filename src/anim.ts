@@ -60,7 +60,7 @@ function makePiece(key: cg.Key, piece: cg.Piece): AnimPiece {
 
 function closer(piece: AnimPiece, pieces: AnimPiece[]): AnimPiece {
   return pieces.sort((p1, p2) => {
-    return util.distance(piece.pos, p1.pos) - util.distance(piece.pos, p2.pos);
+    return util.distanceSq(piece.pos, p1.pos) - util.distanceSq(piece.pos, p2.pos);
   })[0];
 }
 
@@ -75,12 +75,11 @@ function computePlan(prevPieces: cg.Pieces, current: State): AnimPlan {
   news: AnimPiece[] = [],
   prePieces: AnimPieces = {},
   white = current.orientation === 'white';
-  let curP: cg.Piece, preP: AnimPiece, i: any, key: cg.Key, orig: cg.Pos, dest: cg.Pos, vector: cg.NumberPair;
+  let curP: cg.Piece, preP: AnimPiece, i: any, orig: cg.Pos, dest: cg.Pos, vector: cg.NumberPair;
   for (i in prevPieces) {
     prePieces[i] = makePiece(i as cg.Key, prevPieces[i]);
   }
-  for (i in util.allKeys) {
-    key = util.allKeys[i];
+  for (const key of util.allKeys) {
     curP = current.pieces[key];
     preP = prePieces[key];
     if (curP) {
@@ -119,7 +118,7 @@ function computePlan(prevPieces: cg.Pieces, current: State): AnimPlan {
 function step(state: State): void {
   const cur = state.animation.current;
   if (!cur) { // animation was canceled :(
-    state.dom.redrawNow();
+    if (!state.dom.destroyed) state.dom.redrawNow();
     return;
   }
   const rest = 1 - (new Date().getTime() - cur.start) / cur.duration;
@@ -139,14 +138,8 @@ function step(state: State): void {
 
 function animate<A>(mutation: Mutation<A>, state: State): A {
   // clone state before mutating it
-  const prevPieces: cg.Pieces = {};
-  // clone pieces
-  for (let key in state.pieces) {
-    prevPieces[key] = {
-      role: state.pieces[key].role,
-      color: state.pieces[key].color
-    };
-  }
+  const prevPieces: cg.Pieces = {...state.pieces};
+
   const result = mutation(state);
   const plan = computePlan(prevPieces, state);
   if (!isObjectEmpty(plan.anims) || !isObjectEmpty(plan.fadings)) {

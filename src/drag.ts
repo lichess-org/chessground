@@ -17,7 +17,8 @@ export interface DragCurrent {
   overPrev?: cg.Key; // square previously moused over
   started: boolean; // whether the drag has started; as per the distance setting
   element: cg.PieceNode | (() => cg.PieceNode | undefined);
-  newPiece?: boolean;
+  newPiece?: boolean; // it it a new piece from outside the board
+  force?: boolean; // can the new piece replace an existing one (editor)
   previouslySelected?: cg.Key;
   originTarget: EventTarget;
 }
@@ -28,7 +29,7 @@ export function start(s: State, e: cg.MouchEvent): void {
   e.preventDefault();
   const asWhite = s.orientation === 'white',
   bounds = s.dom.bounds(),
-  position = util.eventPosition(e),
+  position = util.eventPosition(e) as cg.NumberPair,
   orig = board.getKeyAtDomPos(position, asWhite, bounds);
   if (!orig) return;
   const piece = s.pieces[orig];
@@ -82,7 +83,7 @@ export function start(s: State, e: cg.MouchEvent): void {
   s.dom.redraw();
 }
 
-export function dragNewPiece(s: State, piece: cg.Piece, e: cg.MouchEvent): void {
+export function dragNewPiece(s: State, piece: cg.Piece, e: cg.MouchEvent, force?: boolean): void {
 
   const key: cg.Key = 'a0';
 
@@ -90,15 +91,14 @@ export function dragNewPiece(s: State, piece: cg.Piece, e: cg.MouchEvent): void 
 
   s.dom.redraw();
 
-  const position = util.eventPosition(e),
+  const position = util.eventPosition(e) as cg.NumberPair,
   asWhite = s.orientation === 'white',
   bounds = s.dom.bounds(),
-  squareBounds = computeSquareBounds(key, asWhite, bounds),
-  coords = util.key2pos(asWhite ? key : util.invertKey(key));
+  squareBounds = computeSquareBounds(key, asWhite, bounds);
 
   const rel: cg.NumberPair = [
-    (coords[0] - 1) * squareBounds.width + bounds.left,
-    (8 - coords[1]) * squareBounds.height + bounds.top
+    (asWhite ? 0 : 7) * squareBounds.width + bounds.left,
+    (asWhite ? 8 : -1) * squareBounds.height + bounds.top
   ];
 
   s.draggable.current = {
@@ -112,7 +112,8 @@ export function dragNewPiece(s: State, piece: cg.Piece, e: cg.MouchEvent): void 
     started: true,
     element: () => pieceElementByKey(s, key),
     originTarget: e.target,
-    newPiece: true
+    newPiece: true,
+    force: force || false
   };
   processDrag(s);
 }
@@ -127,7 +128,7 @@ function processDrag(s: State): void {
     const origPiece = s.pieces[cur.orig];
     if (!origPiece || !util.samePiece(origPiece, cur.piece)) cancel(s);
     else {
-      if (!cur.started && util.distance(cur.epos, cur.rel) >= s.draggable.distance) cur.started = true;
+      if (!cur.started && util.distanceSq(cur.epos, cur.rel) >= Math.pow(s.draggable.distance, 2)) cur.started = true;
       if (cur.started) {
 
         // support lazy elements
@@ -160,11 +161,10 @@ function processDrag(s: State): void {
           if (s.movable.free ||
             util.containsX(dests && dests[cur.orig], cur.over) ||
             util.containsX(s.premovable.dests, cur.over)) {
-            const squareWidth = bounds.width / 8,
-            pos = util.key2pos(cur.over),
+            const pos = util.key2pos(cur.over),
             vector: cg.NumberPair = [
-              (asWhite ? pos[0] - 1 : 8 - pos[0]) * squareWidth,
-              (asWhite ? 8 - pos[1] : pos[1] - 1) * squareWidth
+              (asWhite ? pos[0] - 1 : 8 - pos[0]) * bounds.width / 8,
+              (asWhite ? 8 - pos[1] : pos[1] - 1) * bounds.height / 8
             ];
             s.browser.transform(overEl, util.translate(vector));
           } else {
@@ -181,7 +181,7 @@ function processDrag(s: State): void {
 export function move(s: State, e: cg.MouchEvent): void {
   // support one finger touch only
   if (s.draggable.current && (!e.touches || e.touches.length < 2)) {
-    s.draggable.current.epos = util.eventPosition(e);
+    s.draggable.current.epos = util.eventPosition(e) as cg.NumberPair;
   }
 }
 
@@ -196,10 +196,10 @@ export function end(s: State, e: cg.MouchEvent): void {
   }
   board.unsetPremove(s);
   board.unsetPredrop(s);
-  const eventPos: cg.NumberPair = util.eventPosition(e);
+  const eventPos: cg.NumberPair = util.eventPosition(e) || cur.epos;
   const dest = board.getKeyAtDomPos(eventPos, s.orientation === 'white', s.dom.bounds());
   if (dest && cur.started) {
-    if (cur.newPiece) board.dropNewPiece(s, cur.orig, dest);
+    if (cur.newPiece) board.dropNewPiece(s, cur.orig, dest, cur.force);
     else {
       s.stats.ctrlKey = e.ctrlKey;
       if (board.userMove(s, cur.orig, dest)) s.stats.dragged = true;

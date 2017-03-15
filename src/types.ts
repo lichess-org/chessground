@@ -8,6 +8,7 @@ export type Pos = [number, number];
 export interface Piece {
   role: Role;
   color: Color;
+  promoted?: boolean;
 }
 export interface Drop {
   role: Role;
@@ -44,6 +45,7 @@ export interface Dom {
   redraw: () => void;
   redrawNow: (skipSvg?: boolean) => void;
   unbind?: Unbind;
+  destroyed?: boolean;
 }
 export interface Exploding {
   stage: number;
@@ -54,6 +56,7 @@ export interface MoveMetadata {
   premove: boolean;
   ctrlKey?: boolean;
   holdTime?: number;
+  captured?: Piece;
 }
 export interface SetPremoveMetadata {
   ctrlKey?: boolean;

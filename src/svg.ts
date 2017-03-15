@@ -29,7 +29,6 @@ export function clearCache() {
 export function renderSvg(state: State, root: SVGElement): void {
 
   const d = state.drawable,
-  defsEl = root.firstChild as SVGElement,
   shapes: Shape[] = d.shapes.concat(d.autoShapes).map((s: DrawShape) => {
     return {
       shape: s,
@@ -46,6 +45,8 @@ export function renderSvg(state: State, root: SVGElement): void {
   const fullHash = shapes.map(sc => sc.hash).join('');
   if (fullHash === fullHashPrev) return;
   fullHashPrev = fullHash;
+
+  const defsEl = root.firstChild as SVGElement;
 
   syncDefs(d, shapes, defsEl);
   syncShapes(state, shapes, d.brushes, root, defsEl);
@@ -80,7 +81,6 @@ function syncShapes(state: State, shapes: Shape[], brushes: DrawBrushes, root: S
   hashesInDom: {[hash: string]: boolean} = {},
   toRemove: SVGElement[] = [];
   shapes.forEach(sc => { hashesInDom[sc.hash] = false; });
-  if (bounds.width !== bounds.height) return;
   let el: SVGElement = defsEl.nextSibling as SVGElement, elHash: Hash;
   while(el) {
     elHash = el.getAttribute('cgHash') as Hash;
@@ -141,7 +141,7 @@ function renderShape(state: State, {shape, current, hash}: Shape, brushes: DrawB
 function renderCircle(brush: DrawBrush, pos: cg.Pos, current: boolean, bounds: ClientRect): SVGElement {
   const o = pos2px(pos, bounds),
   width = circleWidth(current, bounds),
-  radius = bounds.width / 16;
+  radius = (bounds.width + bounds.height) / 32;
   return setAttributes(createElement('circle'), {
     stroke: brush.color,
     'stroke-width': width,
@@ -242,6 +242,5 @@ function arrowMargin(bounds: ClientRect, current: boolean): number {
 }
 
 function pos2px(pos: cg.Pos, bounds: ClientRect): cg.NumberPair {
-  const squareSize = bounds.width / 8;
-  return [(pos[0] - 0.5) * squareSize, (8.5 - pos[1]) * squareSize];
+  return [(pos[0] - 0.5) * bounds.width / 8, (8.5 - pos[1]) * bounds.height / 8];
 }

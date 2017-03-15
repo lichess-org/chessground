@@ -2,7 +2,7 @@ import { State } from './state'
 import { colors, translateAway, createEl } from './util'
 import { files, ranks } from './types'
 import { createElement as createSVG } from './svg'
-import { Elements, Browser } from './types'
+import { Elements } from './types'
 
 export default function wrap(element: HTMLElement, s: State, bounds: ClientRect): Elements {
 
@@ -33,13 +33,17 @@ export default function wrap(element: HTMLElement, s: State, bounds: ClientRect)
 
   let over: HTMLElement | undefined;
   if (!s.viewOnly && (s.movable.showDests || s.premovable.showDests)) {
-    over = renderAway(s.browser, bounds, 'div', 'over');
+    over = createEl('div', 'over');
+    s.browser.transform(over, translateAway);
+    over.style.width = (bounds.width / 8) + 'px';
+    over.style.height = (bounds.height / 8) + 'px';
     element.appendChild(over);
   }
 
   let ghost: HTMLElement | undefined;
   if (!s.viewOnly && s.draggable.showGhost) {
-    ghost = renderAway(s.browser, bounds, 'piece', 'ghost');
+    ghost = createEl('piece', 'ghost');
+    s.browser.transform(ghost, translateAway);
     element.appendChild(ghost);
   }
 
@@ -49,15 +53,6 @@ export default function wrap(element: HTMLElement, s: State, bounds: ClientRect)
     ghost: ghost,
     svg: svg
   };
-}
-
-function renderAway(browser: Browser, bounds: ClientRect, tagName: string, className: string): HTMLElement {
-  const squareSize = bounds.width / 8;
-  const el = createEl(tagName, className);
-  el.style.width = squareSize + 'px';
-  el.style.height = squareSize + 'px';
-  browser.transform(el, translateAway);
-  return el;
 }
 
 function renderCoords(elems: any[], className: string): HTMLElement {

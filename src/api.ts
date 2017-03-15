@@ -36,14 +36,14 @@ export interface Api {
   // put a new piece on the board
   newPiece(piece: cg.Piece, key: cg.Key): void;
 
-  // play the current premove, if any
-  playPremove(): void;
+  // play the current premove, if any; returns true if premove was played
+  playPremove(): boolean;
 
   // cancel the current premove, if any
   cancelPremove(): void;
 
-  // play the current predrop, if any
-  playPredrop(validate: (drop: cg.Drop) => boolean): void;
+  // play the current predrop, if any; returns true if premove was played
+  playPredrop(validate: (drop: cg.Drop) => boolean): boolean;
 
   // cancel the current predrop, if any
   cancelPredrop(): void;
@@ -112,12 +112,21 @@ export function start(state: State, redrawAll: cg.Redraw): Api {
     },
 
     playPremove() {
-      // if the premove couldn't be played, redraw to clear it up
-      if (state.premovable.current && !anim(board.playPremove, state)) state.dom.redraw();
+      if (state.premovable.current) {
+        if (anim(board.playPremove, state)) return true;
+        // if the premove couldn't be played, redraw to clear it up
+        state.dom.redraw();
+      }
+      return false;
     },
 
     playPredrop(validate) {
-      anim(state => board.playPredrop(state, validate), state);
+      if (state.predroppable.current) {
+        const result = board.playPredrop(state, validate);
+        state.dom.redraw();
+        return result;
+      }
+      return false;
     },
 
     cancelPremove() {
@@ -155,7 +164,9 @@ export function start(state: State, redrawAll: cg.Redraw): Api {
     redrawAll,
 
     destroy() {
+      board.stop(state);
       state.dom.unbind && state.dom.unbind();
+      state.dom.destroyed = true;
     }
   };
 }

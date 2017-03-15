@@ -61,7 +61,7 @@ export function start(state: State, e: cg.MouchEvent): void {
   e.stopPropagation();
   e.preventDefault();
   cancelMove(state);
-  const position = eventPosition(e);
+  const position = eventPosition(e) as cg.NumberPair;
   const orig = getKeyAtDomPos(position, state.orientation === 'white', state.dom.bounds());
   if (!orig) return;
   state.drawable.current = {
@@ -89,7 +89,7 @@ export function processDraw(state: State): void {
 }
 
 export function move(state: State, e: cg.MouchEvent): void {
-  if (state.drawable.current) state.drawable.current.pos = eventPosition(e);
+  if (state.drawable.current) state.drawable.current.pos = eventPosition(e) as cg.NumberPair;
 }
 
 export function end(state: State): void {
@@ -97,12 +97,14 @@ export function end(state: State): void {
   if (!cur) return;
   if (cur.dest) addLine(state.drawable, cur, cur.dest);
   else addCircle(state.drawable, cur);
-  state.drawable.current = undefined;
-  state.dom.redraw();
+  cancel(state);
 }
 
 export function cancel(state: State): void {
-  if (state.drawable.current) state.drawable.current = undefined;
+  if (state.drawable.current) {
+    state.drawable.current = undefined;
+    state.dom.redraw();
+  }
 }
 
 export function clear(state: State): void {

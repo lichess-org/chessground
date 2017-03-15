@@ -27,7 +27,7 @@ export function Chessground(element: HTMLElement, config?: Config): Api {
     element.classList.add('cg-board-wrap');
     // compute bounds from existing board element if possible
     // this allows non-square boards from CSS to be handled (for 3D)
-    const bounds = util.memo(() => (state.dom ? state.dom.elements.board : element).getBoundingClientRect());
+    const bounds = util.memo(() => element.getBoundingClientRect());
     const elements = renderWrap(element, state, bounds());
     const redrawNow = (skipSvg: boolean) => {
       render(state);
@@ -41,7 +41,7 @@ export function Chessground(element: HTMLElement, config?: Config): Api {
       unbind: prevUnbind
     };
     svg.clearCache();
-    state.dom.redraw();
+    redrawNow(false);
     events.bindBoard(state);
     if (!prevUnbind) state.dom.unbind = events.bindDocument(state, redrawAll);
   }
