@@ -282,8 +282,10 @@ export function playPremove(state: State): boolean {
   const orig = move[0], dest = move[1];
   let success = false;
   if (canMove(state, orig, dest)) {
-    if (baseUserMove(state, orig, dest)) {
+    const result = baseUserMove(state, orig, dest);
+    if (result) {
       const metadata: cg.MoveMetadata = { premove: true };
+      if (result !== true) metadata.captured = result;
       callUserFunction(state.movable.events.after, orig, dest, metadata);
       success = true;
     }
