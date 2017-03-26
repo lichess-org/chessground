@@ -95,7 +95,7 @@ export function move(state: State, e: cg.MouchEvent): void {
 export function end(state: State): void {
   const cur = state.drawable.current;
   if (!cur) return;
-  if (cur.dest) addLine(state.drawable, cur, cur.dest);
+  if (cur.dest && cur.dest !== cur.orig) addLine(state.drawable, cur, cur.dest);
   else addCircle(state.drawable, cur);
   cancel(state);
 }
