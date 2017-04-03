@@ -3,9 +3,9 @@ import { pos2key, key2pos, opposite, containsX } from './util'
 import premove from './premove'
 import * as cg from './types'
 
-type Callback = (...args: any[]) => void;
+export type Callback = (...args: any[]) => void;
 
-function callUserFunction(f: Callback | undefined, ...args: any[]): void {
+export function callUserFunction(f: Callback | undefined, ...args: any[]): void {
   if (f) setTimeout(() => f(...args), 1);
 }
 
