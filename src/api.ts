@@ -3,7 +3,7 @@ import * as board from './board'
 import { write as fenWrite } from './fen'
 import { Config, configure } from './config'
 import { anim, render } from './anim'
-import { cancel as dragCancel } from './drag'
+import { cancel as dragCancel, dragNewPiece } from './drag'
 import { DrawShape } from './draw'
 import explosion from './explosion'
 import * as cg from './types'
@@ -68,6 +68,9 @@ export interface Api {
 
   // only useful when CSS changes the board width/height ratio (for 3D)
   redrawAll: cg.Redraw;
+
+  // for crazyhouse and board editors
+  dragNewPiece(piece: cg.Piece, event: cg.MouchEvent, force?: boolean): void;
 
   // unbinds all events
   // (important for document-wide events like scroll and mousemove)
@@ -162,6 +165,10 @@ export function start(state: State, redrawAll: cg.Redraw): Api {
     },
 
     redrawAll,
+
+    dragNewPiece(piece, event, force) {
+      dragNewPiece(state, piece, event, force)
+    },
 
     destroy() {
       board.stop(state);
