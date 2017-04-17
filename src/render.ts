@@ -81,7 +81,7 @@ export default function render(s: State): void {
           el.classList.remove('anim');
         }
         // same piece: flag as same
-        if (elPieceName === pieceNameOf(pieceAtKey) && !el.cgFading) {
+        if (elPieceName === pieceNameOf(pieceAtKey) && (!fading || !el.cgFading)) {
           samePieces[k] = true;
         }
         // different piece: flag as moved unless it is a fading piece
