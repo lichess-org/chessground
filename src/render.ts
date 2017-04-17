@@ -70,6 +70,7 @@ export default function render(s: State): void {
       if (pieceAtKey) {
         // continue animation if already animating and same piece
         // (otherwise it could animate a captured piece)
+        if (el.cgAnimating) console.log('continue', anim, elPieceName, pieceNameOf(pieceAtKey));
         if (anim && el.cgAnimating && elPieceName === pieceNameOf(pieceAtKey)) {
           translation = posToTranslate(key2pos(k), asWhite, bounds);
           translation[0] += anim[1][0];
