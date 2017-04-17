@@ -34,7 +34,6 @@ export default function render(s: State): void {
   let k: cg.Key,
   p: cg.Piece | undefined,
   el: cg.PieceNode | cg.SquareNode,
-  squareClassAtKey: string | undefined,
   pieceAtKey: cg.Piece | undefined,
   elPieceName: PieceName,
   translation: cg.NumberPair,
@@ -49,11 +48,10 @@ export default function render(s: State): void {
   el = boardEl.firstChild as cg.PieceNode | cg.SquareNode;
   while (el) {
     k = el.cgKey;
-    squareClassAtKey = squares[k];
-    pieceAtKey = pieces[k];
-    anim = anims[k];
-    fading = fadings[k];
     if (isPieceNode(el)) {
+      pieceAtKey = pieces[k];
+      anim = anims[k];
+      fading = fadings[k];
       elPieceName = el.cgPiece;
       // if piece not being dragged anymore, remove dragging style
       if (el.cgDragging && (!curDrag || curDrag.orig !== k)) {
@@ -83,7 +81,7 @@ export default function render(s: State): void {
           el.classList.remove('anim');
         }
         // same piece: flag as same
-        if (elPieceName === pieceNameOf(pieceAtKey)) {
+        if (elPieceName === pieceNameOf(pieceAtKey) && (!fading || !el.cgFading)) {
           samePieces[k] = true;
         }
         // different piece: flag as moved unless it is a fading piece
@@ -105,7 +103,7 @@ export default function render(s: State): void {
     }
     else if (isSquareNode(el)) {
       const cn = el.className;
-      if (squareClassAtKey === cn) sameSquares[k] = true;
+      if (squares[k] === cn) sameSquares[k] = true;
       else if (movedSquares[cn]) movedSquares[cn].push(el);
       else movedSquares[cn] = [el];
     }
@@ -144,6 +142,10 @@ export default function render(s: State): void {
       if (pMvd) {
         // apply dom changes
         pMvd.cgKey = k;
+        if (pMvd.cgFading) {
+          pMvd.classList.remove('fading');
+          pMvd.cgFading = false;
+        }
         const pos = key2pos(k);
         if (s.addPieceZIndex) pMvd.style.zIndex = posZIndex(pos, asWhite);
         translation = posToTranslate(pos, asWhite, bounds);
