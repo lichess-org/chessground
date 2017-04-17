@@ -130,7 +130,6 @@ function step(state: State): void {
     for (let i in cur.plan.anims) {
       const cfg = cur.plan.anims[i];
       cfg[1] = [roundBy(cfg[0][0] * ease, 10), roundBy(cfg[0][1] * ease, 10)];
-      console.log(cfg[0].slice(0), cfg[1].slice(0));
     }
     state.dom.redrawNow(true); // optimisation: don't render SVG changes during animations
     util.raf(() => step(state));
@@ -143,7 +142,6 @@ function animate<A>(mutation: Mutation<A>, state: State): A {
 
   const result = mutation(state);
   const plan = computePlan(prevPieces, state);
-  console.log(plan);
   if (!isObjectEmpty(plan.anims) || !isObjectEmpty(plan.fadings)) {
     const alreadyRunning = state.animation.current && state.animation.current.start;
     state.animation.current = {
