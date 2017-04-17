@@ -81,7 +81,7 @@ export default function render(s: State): void {
           el.classList.remove('anim');
         }
         // same piece: flag as same
-        if (elPieceName === pieceNameOf(pieceAtKey)) {
+        if (elPieceName === pieceNameOf(pieceAtKey) && !el.cgFading) {
           samePieces[k] = true;
         }
         // different piece: flag as moved unless it is a fading piece
@@ -142,6 +142,10 @@ export default function render(s: State): void {
       if (pMvd) {
         // apply dom changes
         pMvd.cgKey = k;
+        if (pMvd.cgFading) {
+          pMvd.classList.remove('fading');
+          pMvd.cgFading = false;
+        }
         const pos = key2pos(k);
         if (s.addPieceZIndex) pMvd.style.zIndex = posZIndex(pos, asWhite);
         translation = posToTranslate(pos, asWhite, bounds);
