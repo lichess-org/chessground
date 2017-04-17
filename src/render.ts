@@ -34,7 +34,6 @@ export default function render(s: State): void {
   let k: cg.Key,
   p: cg.Piece | undefined,
   el: cg.PieceNode | cg.SquareNode,
-  squareClassAtKey: string | undefined,
   pieceAtKey: cg.Piece | undefined,
   elPieceName: PieceName,
   translation: cg.NumberPair,
@@ -49,11 +48,10 @@ export default function render(s: State): void {
   el = boardEl.firstChild as cg.PieceNode | cg.SquareNode;
   while (el) {
     k = el.cgKey;
-    squareClassAtKey = squares[k];
-    pieceAtKey = pieces[k];
-    anim = anims[k];
-    fading = fadings[k];
     if (isPieceNode(el)) {
+      pieceAtKey = pieces[k];
+      anim = anims[k];
+      fading = fadings[k];
       elPieceName = el.cgPiece;
       // if piece not being dragged anymore, remove dragging style
       if (el.cgDragging && (!curDrag || curDrag.orig !== k)) {
@@ -70,7 +68,6 @@ export default function render(s: State): void {
       if (pieceAtKey) {
         // continue animation if already animating and same piece
         // (otherwise it could animate a captured piece)
-        if (el.cgAnimating) console.log('continue', anim, elPieceName, pieceNameOf(pieceAtKey));
         if (anim && el.cgAnimating && elPieceName === pieceNameOf(pieceAtKey)) {
           translation = posToTranslate(key2pos(k), asWhite, bounds);
           translation[0] += anim[1][0];
@@ -106,7 +103,7 @@ export default function render(s: State): void {
     }
     else if (isSquareNode(el)) {
       const cn = el.className;
-      if (squareClassAtKey === cn) sameSquares[k] = true;
+      if (squares[k] === cn) sameSquares[k] = true;
       else if (movedSquares[cn]) movedSquares[cn].push(el);
       else movedSquares[cn] = [el];
     }
