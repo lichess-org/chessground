@@ -103,8 +103,12 @@ export function configure(state: State, config: Config) {
   }
 
   // apply config values that could be undefined yet meaningful
-  if (config.hasOwnProperty('lastMove') && !config.lastMove) state.lastMove = undefined;
   if (config.hasOwnProperty('check')) setCheck(state, config.check || false);
+  if (config.hasOwnProperty('lastMove') && !config.lastMove) state.lastMove = undefined;
+  // in case of ZH drop last move, there's a single square.
+  // if the previous last move had two squares,
+  // the merge algorithm will incorrectly keep the second square.
+  else if (config.lastMove) state.lastMove = config.lastMove;
 
   // fix move/premove dests
   if (state.selected) setSelected(state, state.selected);
