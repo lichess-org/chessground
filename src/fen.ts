@@ -25,8 +25,8 @@ export function read(fen: cg.FEN): cg.Pieces {
         pieces[pos2key([col, row])].promoted = true;
         break;
       default:
-        const nb = parseInt(c);
-        if (nb) col += nb;
+        const nb = c.charCodeAt(0);
+        if (nb < 57) col += nb - 48;
         else {
           ++col;
           const role = c.toLowerCase();
