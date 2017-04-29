@@ -63,6 +63,9 @@ export interface Api {
   // programmatically draw auto shapes
   setAutoShapes(shapes: DrawShape[]): void;
 
+  // piece at this square (like "e4")
+  getPieceAtKey(key: cg.Key): cg.Piece | undefined;
+
   // square name at this DOM position (like "e4")
   getKeyAtDomPos(pos: cg.NumberPair): cg.Key | undefined;
 
@@ -158,6 +161,10 @@ export function start(state: State, redrawAll: cg.Redraw): Api {
 
     setShapes(shapes: DrawShape[]) {
       render(state => state.drawable.shapes = shapes, state);
+    },
+
+    getPieceAtKey(key) {
+      return board.getPieceAtKey(state, key);
     },
 
     getKeyAtDomPos(pos) {

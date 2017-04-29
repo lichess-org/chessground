@@ -327,6 +327,10 @@ export function stop(state: State): void {
   cancelMove(state);
 }
 
+export function getPieceAtKey(state: State, key: cg.Key): cg.Piece | undefined {
+  return state.pieces[key];
+}
+
 export function getKeyAtDomPos(pos: cg.NumberPair, asWhite: boolean, bounds: ClientRect): cg.Key | undefined {
   let file = Math.ceil(8 * ((pos[0] - bounds.left) / bounds.width));
   if (!asWhite) file = 9 - file;
