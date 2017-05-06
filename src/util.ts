@@ -84,8 +84,6 @@ export const eventPosition: (e: cg.MouchEvent) => cg.NumberPair | undefined = e 
   return undefined;
 }
 
-export const isLeftButton = (e: MouseEvent) => e.buttons === 1 || e.button === 1;
-
 export const isRightButton = (e: MouseEvent) => e.buttons === 2 || e.button === 2;
 
 export const createEl = (tagName: string, className?: string) => {
