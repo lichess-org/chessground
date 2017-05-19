@@ -28,7 +28,7 @@ export interface Api {
   move(orig: cg.Key, dest: cg.Key): void;
 
   // add and/or remove arbitrary pieces on the board
-  setPieces(pieces: cg.Pieces): void;
+  setPieces(pieces: cg.PiecesDiff): void;
 
   // click a square programmatically
   selectSquare(key: cg.Key, force?: boolean): void;
