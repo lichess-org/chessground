@@ -23,9 +23,10 @@ export function reset(state: State): void {
   unsetPredrop(state);
 }
 
-export function setPieces(state: State, pieces: cg.Pieces): void {
+export function setPieces(state: State, pieces: cg.PiecesDiff): void {
   for (let key in pieces) {
-    if (pieces[key]) state.pieces[key] = pieces[key];
+    const piece = pieces[key];
+    if (piece) state.pieces[key] = piece;
     else delete state.pieces[key];
   }
 }
