@@ -201,7 +201,7 @@ export function selectSquare(state: State, key: cg.Key, force?: boolean): void {
     setSelected(state, key);
     state.hold.start();
   }
-  if (key) callUserFunction(state.events.select, key);
+  callUserFunction(state.events.select, key);
 }
 
 export function setSelected(state: State, key: cg.Key): void {

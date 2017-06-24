@@ -31,7 +31,7 @@ export interface Api {
   setPieces(pieces: cg.PiecesDiff): void;
 
   // click a square programmatically
-  selectSquare(key: cg.Key, force?: boolean): void;
+  selectSquare(key: cg.Key | null, force?: boolean): void;
 
   // put a new piece on the board
   newPiece(piece: cg.Piece, key: cg.Key): void;
@@ -103,7 +103,11 @@ export function start(state: State, redrawAll: cg.Redraw): Api {
     },
 
     selectSquare(key, force) {
-      if (key || state.selected) anim(state => board.selectSquare(state, key, force), state);
+      if (key) anim(state => board.selectSquare(state, key, force), state);
+      else if (state.selected) {
+        board.unselect(state);
+        state.dom.redraw();
+      }
     },
 
     move(orig, dest) {
