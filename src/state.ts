@@ -85,7 +85,7 @@ export interface State {
     // called after a piece has been moved.
     // capturedPiece is undefined or like {color: 'white'; 'role': 'queen'}
     move?: (orig: cg.Key, dest: cg.Key, capturedPiece?: cg.Piece) => void;
-    dropNewPiece?: (role: cg.Role, pos: cg.Pos) => void;
+    dropNewPiece?: (piece: cg.Piece, key: cg.Key) => void;
     select?: (key: cg.Key) => void // called when a square is selected
   };
   items?: (pos: cg.Pos, key: cg.Key) => any | undefined; // items on the board { render: key -> vdom }
