@@ -35,7 +35,7 @@ export interface Config {
     showDests?: boolean; // whether to add the move-dest class on squares
     events?: {
       after?: (orig: cg.Key, dest: cg.Key, metadata: cg.MoveMetadata) => void; // called after the move has been played
-      afterNewPiece?: (role: cg.Role, pos: cg.Pos) => void; // called after a new piece is dropped on the board
+      afterNewPiece?: (role: cg.Role, key: cg.Key) => void; // called after a new piece is dropped on the board
     };
     rookCastle?: boolean // castle by moving the king to the rook
   };
@@ -73,7 +73,7 @@ export interface Config {
     // called after a piece has been moved.
     // capturedPiece is undefined or like {color: 'white'; 'role': 'queen'}
     move?: (orig: cg.Key, dest: cg.Key, capturedPiece?: cg.Piece) => void;
-    dropNewPiece?: (role: cg.Role, pos: cg.Pos) => void;
+    dropNewPiece?: (piece: cg.Piece, key: cg.Key) => void;
     select?: (key: cg.Key) => void // called when a square is selected
   };
   items?: (pos: cg.Pos, key: cg.Key) => any | undefined; // items on the board { render: key -> vdom }

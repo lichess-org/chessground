@@ -35,7 +35,7 @@ export interface State {
     showDests: boolean; // whether to add the move-dest class on squares
     events: {
       after?: (orig: cg.Key, dest: cg.Key, metadata: cg.MoveMetadata) => void; // called after the move has been played
-      afterNewPiece?: (role: cg.Role, pos: cg.Pos) => void; // called after a new piece is dropped on the board
+      afterNewPiece?: (role: cg.Role, key: cg.Key) => void; // called after a new piece is dropped on the board
     };
     rookCastle: boolean // castle by moving the king to the rook
   };
