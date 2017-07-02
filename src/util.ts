@@ -27,7 +27,7 @@ export const timer: () => cg.Timer = () => {
     cancel() { startAt = undefined; },
     stop() {
       if (!startAt) return 0;
-      const time = new Date().getTime() - startAt.getTime();
+      const time = Date.now() - startAt.getTime();
       startAt = undefined;
       return time;
     }

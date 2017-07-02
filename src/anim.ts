@@ -121,7 +121,7 @@ function step(state: State): void {
     if (!state.dom.destroyed) state.dom.redrawNow();
     return;
   }
-  const rest = 1 - (new Date().getTime() - cur.start) / cur.duration;
+  const rest = 1 - (Date.now() - cur.start) / cur.duration;
   if (rest <= 0) {
     state.animation.current = undefined;
     state.dom.redrawNow();
@@ -145,7 +145,7 @@ function animate<A>(mutation: Mutation<A>, state: State): A {
   if (!isObjectEmpty(plan.anims) || !isObjectEmpty(plan.fadings)) {
     const alreadyRunning = state.animation.current && state.animation.current.start;
     state.animation.current = {
-      start: new Date().getTime(),
+      start: Date.now(),
       duration: state.animation.duration,
       plan: plan
     };
