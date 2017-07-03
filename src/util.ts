@@ -51,27 +51,23 @@ interface CSSStyleDeclaration {
   [key: string]: any;
 }
 
-export const transformFunction: () => cg.Transform = () => {
-  const s = document.body.style;
-  const prop = 'transform' in s ?
-    'transform' : 'webkitTransform' in s ?
-    'webkitTransform' : 'mozTransform' in s ?
-    'mozTransform' : 'oTransform' in s ?
-    'oTransform' : 'msTransform';
-  return (el, value) => {
-    (el.style as CSSStyleDeclaration)[prop] = value;
-  };
-}
+const s = document.body.style;
+const prop = 'transform' in s ?
+  'transform' : 'webkitTransform' in s ?
+  'webkitTransform' : 'mozTransform' in s ?
+  'mozTransform' : 'oTransform' in s ?
+  'oTransform' : 'msTransform';
+
+export const transformFunction = (el: HTMLElement, value: string) => {
+  (el.style as CSSStyleDeclaration)[prop] = value;
+};
 
 export const computeIsTrident = () => window.navigator.userAgent.indexOf('Trident/') > -1;
 
-export const posToTranslate: (pos: cg.Pos, asWhite: boolean, bounds: ClientRect) => cg.NumberPair =
-(pos, asWhite, bounds) => {
-  return [
-    (asWhite ? pos[0] - 1 : 8 - pos[0]) * bounds.width / 8,
-    (asWhite ? 8 - pos[1] : pos[1] - 1) * bounds.height / 8
-  ];
-}
+export const posToTranslate = (pos: cg.Pos, asWhite: boolean, bounds: ClientRect): cg.NumberPair => [
+  (asWhite ? pos[0] - 1 : 8 - pos[0]) * bounds.width / 8,
+  (asWhite ? 8 - pos[1] : pos[1] - 1) * bounds.height / 8
+];
 
 export const translate = (pos: cg.Pos) => 'translate(' + pos[0] + 'px,' + pos[1] + 'px)';
 
