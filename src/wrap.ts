@@ -34,7 +34,7 @@ export default function wrap(element: HTMLElement, s: State, bounds: ClientRect)
   let over: HTMLElement | undefined;
   if (!s.viewOnly && (s.movable.showDests || s.premovable.showDests)) {
     over = createEl('div', 'over');
-    s.browser.transform(over, translateAway);
+    over.style.transform = translateAway;
     over.style.width = (bounds.width / 8) + 'px';
     over.style.height = (bounds.height / 8) + 'px';
     element.appendChild(over);
@@ -43,7 +43,7 @@ export default function wrap(element: HTMLElement, s: State, bounds: ClientRect)
   let ghost: HTMLElement | undefined;
   if (!s.viewOnly && s.draggable.showGhost) {
     ghost = createEl('piece', 'ghost');
-    s.browser.transform(ghost, translateAway);
+    ghost.style.transform = translateAway;
     element.appendChild(ghost);
   }
 

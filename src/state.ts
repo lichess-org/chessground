@@ -91,7 +91,6 @@ export interface State {
   items?: (pos: cg.Pos, key: cg.Key) => any | undefined; // items on the board { render: key -> vdom }
   drawable: Drawable,
   exploding?: cg.Exploding;
-  browser: cg.Browser,
   dom: cg.Dom,
   hold: cg.Timer
 }

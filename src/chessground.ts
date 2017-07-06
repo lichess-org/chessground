@@ -14,10 +14,6 @@ export function Chessground(element: HTMLElement, config?: Config): Api {
 
   configure(state, config || {});
 
-  state.browser = {
-    transform: util.transformFunction()
-  };
-
   function redrawAll() {
     let prevUnbind = state.dom && state.dom.unbind;
     // first ensure the cg-board-wrap class is set

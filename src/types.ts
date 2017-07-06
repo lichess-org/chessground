@@ -32,10 +32,6 @@ export interface MaterialDiff {
   white: { [role: string]: number }
   black: { [role: string]: number }
 }
-
-export interface Browser {
-  transform: Transform;
-}
 export interface Elements {
   board: HTMLElement;
   over?: HTMLElement;
@@ -87,8 +83,6 @@ export interface Timer {
   cancel: () => void;
   stop: () => number;
 }
-
-export type Transform = (el: HTMLElement, value: string) => void;
 
 export type Redraw = () => void;
 export type Unbind = () => void;

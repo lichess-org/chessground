@@ -29,8 +29,7 @@ export default function render(s: State): void {
   sameSquares: SameSquares = {},
   movedPieces: MovedPieces = {},
   movedSquares: MovedSquares = {},
-  piecesKeys: cg.Key[] = Object.keys(pieces) as cg.Key[],
-  transform = s.browser.transform;
+  piecesKeys: cg.Key[] = Object.keys(pieces) as cg.Key[];
   let k: cg.Key,
   p: cg.Piece | undefined,
   el: cg.PieceNode | cg.SquareNode,
@@ -56,7 +55,7 @@ export default function render(s: State): void {
       // if piece not being dragged anymore, remove dragging style
       if (el.cgDragging && (!curDrag || curDrag.orig !== k)) {
         el.classList.remove('dragging');
-        transform(el, translate(posToTranslate(key2pos(k), asWhite, bounds)));
+        el.style.transform = translate(posToTranslate(key2pos(k), asWhite, bounds));
         el.cgDragging = false;
       }
       // remove fading class if it still remains
@@ -72,11 +71,10 @@ export default function render(s: State): void {
           translation = posToTranslate(key2pos(k), asWhite, bounds);
           translation[0] += anim[1][0];
           translation[1] += anim[1][1];
-          transform(el, translate(translation));
+          el.style.transform = translate(translation);
           el.classList.add('anim');
         } else if (el.cgAnimating) {
-          translation = posToTranslate(key2pos(k), asWhite, bounds);
-          transform(el, translate(translation));
+          el.style.transform = translate(posToTranslate(key2pos(k), asWhite, bounds));
           el.cgAnimating = false;
           el.classList.remove('anim');
         }
@@ -119,11 +117,11 @@ export default function render(s: State): void {
       translation = posToTranslate(key2pos(sk as cg.Key), asWhite, bounds);
       if (sMvd) {
         sMvd.cgKey = sk as cg.Key;
-        transform(sMvd, translate(translation));
+        sMvd.style.transform = translate(translation);
       }
       else {
         boardEl.insertBefore(
-          renderSquareDom(sk as cg.Key, squares[sk], translation, transform),
+          renderSquareDom(sk as cg.Key, squares[sk], translation),
           boardEl.firstChild);
       }
     }
@@ -155,7 +153,7 @@ export default function render(s: State): void {
           translation[0] += anim[1][0];
           translation[1] += anim[1][1];
         }
-        transform(pMvd, translate(translation));
+        pMvd.style.transform = translate(translation);
       }
       // no piece in moved obj: insert the new piece
       // new: assume the new piece is not being dragged
@@ -182,10 +180,10 @@ function removeNodes(s: State, nodes: HTMLElement[]): void {
   for (const i in nodes) s.dom.elements.board.removeChild(nodes[i]);
 }
 
-function renderSquareDom(key: cg.Key, className: string, translation: cg.NumberPair, transform: cg.Transform): cg.SquareNode {
+function renderSquareDom(key: cg.Key, className: string, translation: cg.NumberPair): cg.SquareNode {
   const s = createEl('square', className) as cg.SquareNode;
   s.cgKey = key;
-  transform(s, translate(translation));
+  s.style.transform = translate(translation);
   return s;
 }
 
@@ -204,7 +202,7 @@ function renderPieceDom(s: State, piece: cg.Piece, key: cg.Key, asWhite: boolean
     translation[0] += anim[1][0];
     translation[1] += anim[1][1];
   }
-  s.browser.transform(p, translate(translation));
+  p.style.transform = translate(translation);
 
   if (s.addPieceZIndex) p.style.zIndex = posZIndex(pos, asWhite);
 

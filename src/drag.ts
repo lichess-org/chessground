@@ -72,8 +72,7 @@ export function start(s: State, e: cg.MouchEvent): void {
     const ghost = s.dom.elements.ghost;
     if (ghost) {
       ghost.className = `ghost ${piece.color} ${piece.role}`;
-      const translation = util.posToTranslate(util.key2pos(orig), asWhite, bounds);
-      s.browser.transform(ghost, util.translate(translation));
+      ghost.style.transform = util.translate(util.posToTranslate(util.key2pos(orig), asWhite, bounds));
     }
     processDrag(s);
   } else {
@@ -152,7 +151,7 @@ function processDrag(s: State): void {
         const translation = util.posToTranslate(cur.origPos, asWhite, bounds);
         translation[0] += cur.pos[0] + cur.dec[0];
         translation[1] += cur.pos[1] + cur.dec[1];
-        s.browser.transform(cur.element, util.translate(translation));
+        cur.element.style.transform = util.translate(translation);
 
         // move over element
         const overEl = s.dom.elements.over;
@@ -166,9 +165,9 @@ function processDrag(s: State): void {
               (asWhite ? pos[0] - 1 : 8 - pos[0]) * bounds.width / 8,
               (asWhite ? 8 - pos[1] : pos[1] - 1) * bounds.height / 8
             ];
-            s.browser.transform(overEl, util.translate(vector));
+            overEl.style.transform = util.translate(vector);
           } else {
-            s.browser.transform(overEl, util.translateAway);
+            overEl.style.transform = util.translateAway;
           }
           cur.overPrev = cur.over;
         }
@@ -234,8 +233,8 @@ export function cancel(s: State): void {
 
 function removeDragElements(s: State) {
   const e = s.dom.elements;
-  if (e.over) s.browser.transform(e.over, util.translateAway);
-  if (e.ghost) s.browser.transform(e.ghost, util.translateAway);
+  if (e.over) e.over.style.transform = util.translateAway;
+  if (e.ghost) e.ghost.style.transform = util.translateAway;
 }
 
 function computeSquareBounds(key: cg.Key, asWhite: boolean, bounds: ClientRect) {
