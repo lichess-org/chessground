@@ -1,17 +1,17 @@
 <img src="https://raw.githubusercontent.com/ornicar/chessground/master/screenshot/3d.png" width=512 height=512 alt="Chessground in 3D mode" />
 
-**Chessground** is the opensource chess UI developed for [lichess.org](http://lichess.org).
+**Chessground** is the opensource chess UI developed for [lichess.org](https://lichess.org).
 
 It targets modern browsers, as well as mobile development using Cordova.
 
 ### Demos
 
-- [Chess TV](http://lichess.org/tv)
-- [Board editor](http://lichess.org/editor)
-- [Puzzle solver](http://lichess.org/training)
-- [Analysis board](http://lichess.org/ofWXRFGy)
-- [Game preview](http://lichess.org/games)
-- [Chess Captcha](http://lichess.org/signup)
+- [Chess TV](https://lichess.org/tv)
+- [Board editor](https://lichess.org/editor)
+- [Puzzle solver](https://lichess.org/training)
+- [Analysis board](https://lichess.org/ofWXRFGy)
+- [Game preview](https://lichess.org/games)
+- [Chess Captcha](https://lichess.org/signup)
 
 ## Features
 
