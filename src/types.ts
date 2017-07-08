@@ -56,6 +56,7 @@ export interface MoveMetadata {
   ctrlKey?: boolean;
   holdTime?: number;
   captured?: Piece;
+  predrop?: boolean;
 }
 export interface SetPremoveMetadata {
   ctrlKey?: boolean;
