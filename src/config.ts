@@ -52,7 +52,7 @@ export interface Config {
   predroppable?: {
     enabled?: boolean; // allow predrops for color that can not move
     events?: {
-      set?: (role: cg.Role, key: cg.Key) => void; // called after the predrop has been set
+      set?: (role: cg.Role, key: cg.Key, metadata?: cg.SetPremoveMetadata) => void; // called after the predrop has been set
       unset?: () => void; // called after the predrop has been unset
     }
   };

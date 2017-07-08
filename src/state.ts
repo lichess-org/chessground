@@ -46,7 +46,7 @@ export interface State {
     dests?: cg.Key[]; // premove destinations for the current selection
     current?: cg.KeyPair; // keys of the current saved premove ["e2" "e4"]
     events: {
-      set?: (orig: cg.Key, dest: cg.Key) => void; // called after the premove has been set
+      set?: (orig: cg.Key, dest: cg.Key, metadata?: cg.SetPremoveMetadata) => void; // called after the premove has been set
       unset?: () => void;  // called after the premove has been unset
     }
   };
