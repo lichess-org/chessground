@@ -45,14 +45,14 @@ export interface Config {
     castle?: boolean; // whether to allow king castle premoves
     dests?: cg.Key[]; // premove destinations for the current selection
     events?: {
-      set?: (orig: cg.Key, dest: cg.Key) => void; // called after the premove has been set
+      set?: (orig: cg.Key, dest: cg.Key, metadata?: cg.SetPremoveMetadata) => void; // called after the premove has been set
       unset?: () => void;  // called after the premove has been unset
     }
   };
   predroppable?: {
     enabled?: boolean; // allow predrops for color that can not move
     events?: {
-      set?: (role: cg.Role, key: cg.Key, metadata?: cg.SetPremoveMetadata) => void; // called after the predrop has been set
+      set?: (role: cg.Role, key: cg.Key) => void; // called after the predrop has been set
       unset?: () => void; // called after the predrop has been unset
     }
   };
