@@ -28,9 +28,12 @@ export type NumberPair = [number, number];
 export interface Dests {
   [key: string]: Key[]
 }
+export interface MaterialDiffSide {
+  [role: string]: number;
+}
 export interface MaterialDiff {
-  white: { [role: string]: number }
-  black: { [role: string]: number }
+  white: MaterialDiffSide;
+  black: MaterialDiffSide;
 }
 export interface Elements {
   board: HTMLElement;
