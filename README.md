@@ -1,4 +1,4 @@
-<img src="https://raw.githubusercontent.com/ornicar/chessground/master/screenshot/3d.png" width=512 height=512 alt="Chessground in 3D mode" />
+<img src="https://raw.githubusercontent.com/ornicar/chessground/master/screenshot/twin.jpg" width="100%" alt="Chessground in 2D and 3D" />
 
 **Chessground** is the opensource chess UI developed for [lichess.org](https://lichess.org).
 
