@@ -19,7 +19,7 @@ interface SquareClasses { [key: string]: string }
 export default function render(s: State): void {
   const asWhite: boolean = s.orientation === 'white',
   posToTranslate = s.viewOnly ? util.posToTranslateRel : util.posToTranslateAbs(s.dom.bounds()),
-  translate = s.viewOnly ? util.translateRel : util.translate,
+  translate = s.viewOnly ? util.translateRel : util.translateAbs,
   boardEl: HTMLElement = s.dom.elements.board,
   pieces: cg.Pieces = s.pieces,
   curAnim: AnimCurrent | undefined = s.animation.current,
@@ -56,7 +56,7 @@ export default function render(s: State): void {
       // if piece not being dragged anymore, remove dragging style
       if (el.cgDragging && (!curDrag || curDrag.orig !== k)) {
         el.classList.remove('dragging');
-        el.style.transform = translate(posToTranslate(key2pos(k), asWhite));
+        translate(el, posToTranslate(key2pos(k), asWhite));
         el.cgDragging = false;
       }
       // remove fading class if it still remains
@@ -77,7 +77,7 @@ export default function render(s: State): void {
           el.cgAnimating = false;
           el.classList.remove('anim');
         }
-        el.style.transform = translate(posToTranslate(pos, asWhite));
+        translate(el, posToTranslate(pos, asWhite));
         // same piece: flag as same
         if (elPieceName === pieceNameOf(pieceAtKey) && (!fading || !el.cgFading)) {
           samePieces[k] = true;
@@ -117,12 +117,12 @@ export default function render(s: State): void {
       const translation = posToTranslate(key2pos(sk as cg.Key), asWhite);
       if (sMvd) {
         sMvd.cgKey = sk as cg.Key;
-        sMvd.style.transform = translate(translation);
+        translate(sMvd, translation);
       }
       else {
         const squareNode = createEl('square', squares[sk]) as cg.SquareNode;
         squareNode.cgKey = sk as cg.Key;
-        squareNode.style.transform = translate(translation);
+        translate(squareNode, translation);
         boardEl.insertBefore(squareNode, boardEl.firstChild);
       }
     }
@@ -153,7 +153,7 @@ export default function render(s: State): void {
           pos[0] += anim[1][0];
           pos[1] += anim[1][1];
         }
-        pMvd.style.transform = translate(posToTranslate(pos, asWhite));
+        translate(pMvd, posToTranslate(pos, asWhite));
       }
       // no piece in moved obj: insert the new piece
       // new: assume the new piece is not being dragged
@@ -171,7 +171,7 @@ export default function render(s: State): void {
           pos[0] += anim[1][0];
           pos[1] += anim[1][1];
         }
-        pieceNode.style.transform = translate(posToTranslate(pos, asWhite));
+        translate(pieceNode, posToTranslate(pos, asWhite));
 
         if (s.addPieceZIndex) pieceNode.style.zIndex = posZIndex(pos, asWhite);
 

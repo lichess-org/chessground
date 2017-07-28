@@ -49,32 +49,31 @@ export const samePiece: (p1: cg.Piece, p2: cg.Piece) => boolean = (p1, p2) =>
 
 export const computeIsTrident = () => window.navigator.userAgent.indexOf('Trident/') > -1;
 
-export const posToTranslate: (pos: cg.Pos, asWhite: boolean, bounds: ClientRect) => cg.NumberPair =
-(pos, asWhite, bounds) => [
-  (asWhite ? pos[0] - 1 : 8 - pos[0]) * bounds.width / 8,
-  (asWhite ? 8 - pos[1] : pos[1] - 1) * bounds.height / 8
-];
-
-const posToTranslateBase: (pos: cg.Pos, asWhite: boolean, width: number, height: number) => cg.NumberPair =
-(pos, asWhite, width, height) => [
-  (asWhite ? pos[0] - 1 : 8 - pos[0]) * width,
-  (asWhite ? 8 - pos[1] : pos[1] - 1) * height
+const posToTranslateBase: (pos: cg.Pos, asWhite: boolean, xFactor: number, yFactor: number) => cg.NumberPair =
+(pos, asWhite, xFactor, yFactor) => [
+  (asWhite ? pos[0] - 1 : 8 - pos[0]) * xFactor,
+  (asWhite ? 8 - pos[1] : pos[1] - 1) * yFactor
 ];
 
 export const posToTranslateAbs = (bounds: ClientRect) => {
-  const width = bounds.width / 8,
-  height = bounds.height / 8;
-  return (pos: cg.Pos, asWhite: boolean) => posToTranslateBase(pos, asWhite, width, height);
+  const xFactor = bounds.width / 8,
+  yFactor = bounds.height / 8;
+  return (pos: cg.Pos, asWhite: boolean) => posToTranslateBase(pos, asWhite, xFactor, yFactor);
 };
 
 export const posToTranslateRel: (pos: cg.Pos, asWhite: boolean) => cg.NumberPair =
-  (pos, asWhite) => posToTranslateBase(pos, asWhite, 100, 100);
+  (pos, asWhite) => posToTranslateBase(pos, asWhite, 12.5, 12.5);
 
-export const translate = (pos: cg.Pos) => `translate(${pos[0]}px,${pos[1]}px)`;
+export const translateAbs = (el: HTMLElement, pos: cg.Pos) => {
+  el.style.transform = `translate(${pos[0]}px,${pos[1]}px)`;
+}
 
-export const translateRel = (percents: cg.NumberPair) => `translate(${percents[0]}%,${percents[1]}%)`;
+export const translateRel = (el: HTMLElement, percents: cg.NumberPair) => {
+  el.style.left = percents[0] + '%';
+  el.style.top = percents[1] + '%';
+}
 
-export const translateAway: string = translate([-99999, -99999]);
+export const translateAway = (el: HTMLElement) => translateAbs(el, [-99999, -99999]);
 
 // touchend has no position!
 export const eventPosition: (e: cg.MouchEvent) => cg.NumberPair | undefined = e => {

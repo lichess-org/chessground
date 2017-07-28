@@ -72,7 +72,7 @@ export function start(s: State, e: cg.MouchEvent): void {
     const ghost = s.dom.elements.ghost;
     if (ghost) {
       ghost.className = `ghost ${piece.color} ${piece.role}`;
-      ghost.style.transform = util.translate(util.posToTranslate(util.key2pos(orig), asWhite, bounds));
+      util.translateAbs(ghost, util.posToTranslateAbs(bounds)(util.key2pos(orig), asWhite));
     }
     processDrag(s);
   } else {
@@ -148,10 +148,10 @@ function processDrag(s: State): void {
         cur.over = board.getKeyAtDomPos(cur.epos, asWhite, bounds);
 
         // move piece
-        const translation = util.posToTranslate(cur.origPos, asWhite, bounds);
+        const translation = util.posToTranslateAbs(bounds)(cur.origPos, asWhite);
         translation[0] += cur.pos[0] + cur.dec[0];
         translation[1] += cur.pos[1] + cur.dec[1];
-        cur.element.style.transform = util.translate(translation);
+        util.translateAbs(cur.element, translation);
 
         // move over element
         const overEl = s.dom.elements.over;
@@ -165,9 +165,9 @@ function processDrag(s: State): void {
               (asWhite ? pos[0] - 1 : 8 - pos[0]) * bounds.width / 8,
               (asWhite ? 8 - pos[1] : pos[1] - 1) * bounds.height / 8
             ];
-            overEl.style.transform = util.translate(vector);
+            util.translateAbs(overEl, vector);
           } else {
-            overEl.style.transform = util.translateAway;
+            util.translateAway(overEl);
           }
           cur.overPrev = cur.over;
         }
@@ -233,8 +233,8 @@ export function cancel(s: State): void {
 
 function removeDragElements(s: State) {
   const e = s.dom.elements;
-  if (e.over) e.over.style.transform = util.translateAway;
-  if (e.ghost) e.ghost.style.transform = util.translateAway;
+  if (e.over) util.translateAway(e.over);
+  if (e.ghost) util.translateAway(e.ghost);
 }
 
 function computeSquareBounds(key: cg.Key, asWhite: boolean, bounds: ClientRect) {
