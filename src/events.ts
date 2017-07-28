@@ -16,10 +16,7 @@ export function bindBoard(s: State): void {
   }
 
   if (s.disableContextMenu || s.drawable.enabled) {
-    boardEl.addEventListener('contextmenu', e => {
-      e.preventDefault();
-      return false;
-    });
+    boardEl.addEventListener('contextmenu', e => e.preventDefault());
   }
 }
 

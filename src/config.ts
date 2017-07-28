@@ -121,11 +121,10 @@ export function configure(state: State, config: Config) {
     const kingStartPos = 'e' + rank;
     const dests = state.movable.dests[kingStartPos];
     if (!dests || state.pieces[kingStartPos].role !== 'king') return;
-    state.movable.dests[kingStartPos] = dests.filter(d => {
-      if ((d === 'a' + rank) && dests.indexOf('c' + rank as cg.Key) !== -1) return false;
-      if ((d === 'h' + rank) && dests.indexOf('g' + rank as cg.Key) !== -1) return false;
-      return true;
-    });
+    state.movable.dests[kingStartPos] = dests.filter(d =>
+      !((d === 'a' + rank) && dests.indexOf('c' + rank as cg.Key) !== -1) &&
+        !((d === 'h' + rank) && dests.indexOf('g' + rank as cg.Key) !== -1)
+    );
   }
 };
 
