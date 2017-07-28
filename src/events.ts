@@ -26,15 +26,15 @@ export function bindBoard(s: State): void {
 // returns the unbind function
 export function bindDocument(s: State, redrawAll: cg.Redraw): cg.Unbind {
 
+  if (s.viewOnly) return () => {};
+
   const onmove: MouchBind = dragOrDraw(s, drag.move, draw.move);
   const onend: MouchBind = dragOrDraw(s, drag.end, draw.end);
 
   const unbinds: cg.Unbind[] = [];
 
-  if (!s.viewOnly) {
-    ['touchmove', 'mousemove'].forEach(ev => unbinds.push(unbindable(document, ev, onmove)));
-    ['touchend', 'mouseup'].forEach(ev => unbinds.push(unbindable(document, ev, onend)));
-  }
+  ['touchmove', 'mousemove'].forEach(ev => unbinds.push(unbindable(document, ev, onmove)));
+  ['touchend', 'mouseup'].forEach(ev => unbinds.push(unbindable(document, ev, onend)));
 
   const onResize = () => {
     s.dom.bounds.clear();
