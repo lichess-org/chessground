@@ -9,11 +9,13 @@ type StateMouchBind = (d: State, e: cg.MouchEvent) => void;
 
 export function bindBoard(s: State): void {
 
-  const boardEl = s.dom.elements.board;
+  if (s.viewOnly) return;
 
-  if (!s.viewOnly) {
-    ['touchstart', 'mousedown'].forEach(ev => boardEl.addEventListener(ev, startDragOrDraw(s)));
-  }
+  const boardEl = s.dom.elements.board,
+  onStart = startDragOrDraw(s);
+
+  boardEl.addEventListener('touchstart', onStart);
+  boardEl.addEventListener('mousedown', onStart);
 
   if (s.disableContextMenu || s.drawable.enabled) {
     boardEl.addEventListener('contextmenu', e => e.preventDefault());
