@@ -50,14 +50,29 @@ export const samePiece: (p1: cg.Piece, p2: cg.Piece) => boolean = (p1, p2) =>
 export const computeIsTrident = () => window.navigator.userAgent.indexOf('Trident/') > -1;
 
 export const posToTranslate: (pos: cg.Pos, asWhite: boolean, bounds: ClientRect) => cg.NumberPair =
-(pos, asWhite, bounds) => {
-  return [
-    (asWhite ? pos[0] - 1 : 8 - pos[0]) * bounds.width / 8,
-    (asWhite ? 8 - pos[1] : pos[1] - 1) * bounds.height / 8
-  ];
-}
+(pos, asWhite, bounds) => [
+  (asWhite ? pos[0] - 1 : 8 - pos[0]) * bounds.width / 8,
+  (asWhite ? 8 - pos[1] : pos[1] - 1) * bounds.height / 8
+];
 
-export const translate = (pos: cg.Pos) => 'translate(' + pos[0] + 'px,' + pos[1] + 'px)';
+const posToTranslateBase: (pos: cg.Pos, asWhite: boolean, width: number, height: number) => cg.NumberPair =
+(pos, asWhite, width, height) => [
+  (asWhite ? pos[0] - 1 : 8 - pos[0]) * width,
+  (asWhite ? 8 - pos[1] : pos[1] - 1) * height
+];
+
+export const posToTranslateAbs = (bounds: ClientRect) => {
+  const width = bounds.width / 8,
+  height = bounds.height / 8;
+  return (pos: cg.Pos, asWhite: boolean) => posToTranslateBase(pos, asWhite, width, height);
+};
+
+export const posToTranslateRel: (pos: cg.Pos, asWhite: boolean) => cg.NumberPair =
+  (pos, asWhite) => posToTranslateBase(pos, asWhite, 100, 100);
+
+export const translate = (pos: cg.Pos) => `translate(${pos[0]}px,${pos[1]}px)`;
+
+export const translateRel = (percents: cg.NumberPair) => `translate(${percents[0]}%,${percents[1]}%)`;
 
 export const translateAway: string = translate([-99999, -99999]);
 

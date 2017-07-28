@@ -28,9 +28,6 @@ export interface AnimCurrent {
   plan: AnimPlan;
 }
 
-// transformation is a function
-// accepts board state and any number of arguments,
-// and mutates the board.
 export function anim<A>(mutation: Mutation<A>, state: State): A {
   return state.animation.enabled ? animate(mutation, state) : render(mutation, state);
 }
@@ -65,17 +62,13 @@ function closer(piece: AnimPiece, pieces: AnimPiece[]): AnimPiece {
 }
 
 function computePlan(prevPieces: cg.Pieces, current: State): AnimPlan {
-  const bounds = current.dom.bounds(),
-  width = bounds.width / 8,
-  height = bounds.height / 8,
-  anims: AnimVectors = {},
+  const anims: AnimVectors = {},
   animedOrigs: cg.Key[] = [],
   fadings: AnimFadings = {},
   missings: AnimPiece[] = [],
   news: AnimPiece[] = [],
-  prePieces: AnimPieces = {},
-  white = current.orientation === 'white';
-  let curP: cg.Piece, preP: AnimPiece, i: any, orig: cg.Pos, dest: cg.Pos, vector: cg.NumberPair;
+  prePieces: AnimPieces = {};
+  let curP: cg.Piece, preP: AnimPiece, i: any, vector: cg.NumberPair;
   for (i in prevPieces) {
     prePieces[i] = makePiece(i as cg.Key, prevPieces[i]);
   }
@@ -94,9 +87,7 @@ function computePlan(prevPieces: cg.Pieces, current: State): AnimPlan {
   news.forEach(newP => {
     preP = closer(newP, missings.filter(p => util.samePiece(newP.piece, p.piece)));
     if (preP) {
-      orig = white ? preP.pos : newP.pos;
-      dest = white ? newP.pos : preP.pos;
-      vector = [(orig[0] - dest[0]) * width, (dest[1] - orig[1]) * height];
+      vector = [preP.pos[0] - newP.pos[0], preP.pos[1] - newP.pos[1]];
       anims[newP.key] = [vector, vector];
       animedOrigs.push(preP.key);
     }
@@ -129,7 +120,7 @@ function step(state: State): void {
     const ease = easing(rest);
     for (let i in cur.plan.anims) {
       const cfg = cur.plan.anims[i];
-      cfg[1] = [roundBy(cfg[0][0] * ease, 10), roundBy(cfg[0][1] * ease, 10)];
+      cfg[1] = [cfg[0][0] * ease, cfg[0][1] * ease];
     }
     state.dom.redrawNow(true); // optimisation: don't render SVG changes during animations
     util.raf(() => step(state));
@@ -164,7 +155,4 @@ function isObjectEmpty(o: any): boolean {
 // https://gist.github.com/gre/1650294
 function easing(t: number): number {
   return t < 0.5 ? 4 * t * t * t : (t - 1) * (2 * t - 2) * (2 * t - 2) + 1;
-}
-function roundBy(n: number, by: number): number {
-  return Math.round(n * by) / by;
 }

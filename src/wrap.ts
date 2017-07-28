@@ -4,7 +4,7 @@ import { files, ranks } from './types'
 import { createElement as createSVG } from './svg'
 import { Elements } from './types'
 
-export default function wrap(element: HTMLElement, s: State, bounds: ClientRect): Elements {
+export default function wrap(element: HTMLElement, s: State, bounds?: ClientRect): Elements {
 
   element.innerHTML = '';
 
@@ -32,7 +32,7 @@ export default function wrap(element: HTMLElement, s: State, bounds: ClientRect)
   }
 
   let over: HTMLElement | undefined;
-  if (!s.viewOnly && (s.movable.showDests || s.premovable.showDests)) {
+  if (bounds && (s.movable.showDests || s.premovable.showDests)) {
     over = createEl('div', 'over');
     over.style.transform = translateAway;
     over.style.width = (bounds.width / 8) + 'px';
@@ -41,7 +41,7 @@ export default function wrap(element: HTMLElement, s: State, bounds: ClientRect)
   }
 
   let ghost: HTMLElement | undefined;
-  if (!s.viewOnly && s.draggable.showGhost) {
+  if (bounds && s.draggable.showGhost) {
     ghost = createEl('piece', 'ghost');
     ghost.style.transform = translateAway;
     element.appendChild(ghost);

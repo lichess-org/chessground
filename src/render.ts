@@ -1,5 +1,6 @@
 import { State } from './state'
-import { key2pos, translate, posToTranslate, createEl } from './util'
+import { key2pos, createEl } from './util'
+import * as util from './util'
 import { AnimCurrent, AnimVectors, AnimVector, AnimFadings } from './anim'
 import { DragCurrent } from './drag'
 import * as cg from './types'
@@ -17,7 +18,8 @@ interface SquareClasses { [key: string]: string }
 // in case of bugs, blame @veloce
 export default function render(s: State): void {
   const asWhite: boolean = s.orientation === 'white',
-  bounds: ClientRect = s.dom.bounds(),
+  posToTranslate = s.viewOnly ? util.posToTranslateRel : util.posToTranslateAbs(s.dom.bounds()),
+  translate = s.viewOnly ? util.translateRel : util.translate,
   boardEl: HTMLElement = s.dom.elements.board,
   pieces: cg.Pieces = s.pieces,
   curAnim: AnimCurrent | undefined = s.animation.current,
@@ -35,7 +37,6 @@ export default function render(s: State): void {
   el: cg.PieceNode | cg.SquareNode,
   pieceAtKey: cg.Piece | undefined,
   elPieceName: PieceName,
-  translation: cg.NumberPair,
   anim: AnimVector | undefined,
   fading: cg.Piece | undefined,
   pMvdset: cg.PieceNode[],
@@ -55,7 +56,7 @@ export default function render(s: State): void {
       // if piece not being dragged anymore, remove dragging style
       if (el.cgDragging && (!curDrag || curDrag.orig !== k)) {
         el.classList.remove('dragging');
-        el.style.transform = translate(posToTranslate(key2pos(k), asWhite, bounds));
+        el.style.transform = translate(posToTranslate(key2pos(k), asWhite));
         el.cgDragging = false;
       }
       // remove fading class if it still remains
@@ -67,17 +68,16 @@ export default function render(s: State): void {
       if (pieceAtKey) {
         // continue animation if already animating and same piece
         // (otherwise it could animate a captured piece)
+        const pos = key2pos(k);
         if (anim && el.cgAnimating && elPieceName === pieceNameOf(pieceAtKey)) {
-          translation = posToTranslate(key2pos(k), asWhite, bounds);
-          translation[0] += anim[1][0];
-          translation[1] += anim[1][1];
-          el.style.transform = translate(translation);
+          pos[0] += anim[1][0];
+          pos[1] += anim[1][1];
           el.classList.add('anim');
         } else if (el.cgAnimating) {
-          el.style.transform = translate(posToTranslate(key2pos(k), asWhite, bounds));
           el.cgAnimating = false;
           el.classList.remove('anim');
         }
+        el.style.transform = translate(posToTranslate(pos, asWhite));
         // same piece: flag as same
         if (elPieceName === pieceNameOf(pieceAtKey) && (!fading || !el.cgFading)) {
           samePieces[k] = true;
@@ -114,15 +114,16 @@ export default function render(s: State): void {
     if (!sameSquares[sk]) {
       sMvdset = movedSquares[squares[sk]];
       sMvd = sMvdset && sMvdset.pop();
-      translation = posToTranslate(key2pos(sk as cg.Key), asWhite, bounds);
+      const translation = posToTranslate(key2pos(sk as cg.Key), asWhite);
       if (sMvd) {
         sMvd.cgKey = sk as cg.Key;
         sMvd.style.transform = translate(translation);
       }
       else {
-        boardEl.insertBefore(
-          renderSquareDom(sk as cg.Key, squares[sk], translation),
-          boardEl.firstChild);
+        const squareNode = createEl('square', squares[sk]) as cg.SquareNode;
+        squareNode.cgKey = sk as cg.Key;
+        squareNode.style.transform = translate(translation);
+        boardEl.insertBefore(squareNode, boardEl.firstChild);
       }
     }
   }
@@ -146,20 +147,35 @@ export default function render(s: State): void {
         }
         const pos = key2pos(k);
         if (s.addPieceZIndex) pMvd.style.zIndex = posZIndex(pos, asWhite);
-        translation = posToTranslate(pos, asWhite, bounds);
         if (anim) {
           pMvd.cgAnimating = true;
           pMvd.classList.add('anim');
-          translation[0] += anim[1][0];
-          translation[1] += anim[1][1];
+          pos[0] += anim[1][0];
+          pos[1] += anim[1][1];
         }
-        pMvd.style.transform = translate(translation);
+        pMvd.style.transform = translate(posToTranslate(pos, asWhite));
       }
       // no piece in moved obj: insert the new piece
       // new: assume the new piece is not being dragged
       // might be a bad idea
       else {
-        boardEl.appendChild(renderPieceDom(s, p, k, asWhite, anim, bounds));
+
+        const pieceName = pieceNameOf(p),
+        pieceNode = createEl('piece', pieceName) as cg.PieceNode,
+        pos = key2pos(k);
+
+        pieceNode.cgPiece = pieceName;
+        pieceNode.cgKey = k;
+        if (anim) {
+          pieceNode.cgAnimating = true;
+          pos[0] += anim[1][0];
+          pos[1] += anim[1][1];
+        }
+        pieceNode.style.transform = translate(posToTranslate(pos, asWhite));
+
+        if (s.addPieceZIndex) pieceNode.style.zIndex = posZIndex(pos, asWhite);
+
+        boardEl.appendChild(pieceNode);
       }
     }
   }
@@ -178,35 +194,6 @@ function isSquareNode(el: cg.PieceNode | cg.SquareNode): el is cg.SquareNode {
 
 function removeNodes(s: State, nodes: HTMLElement[]): void {
   for (const i in nodes) s.dom.elements.board.removeChild(nodes[i]);
-}
-
-function renderSquareDom(key: cg.Key, className: string, translation: cg.NumberPair): cg.SquareNode {
-  const s = createEl('square', className) as cg.SquareNode;
-  s.cgKey = key;
-  s.style.transform = translate(translation);
-  return s;
-}
-
-function renderPieceDom(s: State, piece: cg.Piece, key: cg.Key, asWhite: boolean, anim: AnimVector | undefined, bounds: ClientRect): cg.PieceNode {
-
-  const pieceName = pieceNameOf(piece),
-  p = createEl('piece', pieceName) as cg.PieceNode,
-  pos = key2pos(key);
-
-  p.cgPiece = pieceName;
-  p.cgKey = key;
-
-  const translation = posToTranslate(pos, asWhite, bounds);
-  if (anim) {
-    p.cgAnimating = true;
-    translation[0] += anim[1][0];
-    translation[1] += anim[1][1];
-  }
-  p.style.transform = translate(translation);
-
-  if (s.addPieceZIndex) p.style.zIndex = posZIndex(pos, asWhite);
-
-  return p;
 }
 
 function posZIndex(pos: cg.Pos, asWhite: boolean): string {
