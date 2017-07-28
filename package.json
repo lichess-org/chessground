@@ -13,11 +13,11 @@
     "gulp": "^3",
     "gulp-sourcemaps": "^2",
     "gulp-typescript": "^3",
-    "gulp-uglify": "^2",
+    "gulp-uglify": "^3",
     "gulp-util": "^3",
     "uglify-js": "^2",
     "tsify": "^3",
-    "typescript": "^2",
+    "typescript": "^2.4",
     "vinyl-buffer": "^1",
     "vinyl-source-stream": "^1",
     "watchify": "^3"
