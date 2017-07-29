@@ -4,10 +4,8 @@
   "description": "lichess.org Chess UI",
   "main": "chessground.js",
   "typings": "chessground.d.ts",
-  "directories": {
-  },
-  "dependencies": {
-  },
+  "directories": {},
+  "dependencies": {},
   "devDependencies": {
     "browserify": "^14",
     "gulp": "^3",
@@ -15,7 +13,7 @@
     "gulp-typescript": "^3",
     "gulp-uglify": "^3",
     "gulp-util": "^3",
-    "uglify-js": "^2",
+    "uglify-js": "^3",
     "tsify": "^3",
     "typescript": "^2.4",
     "vinyl-buffer": "^1",
