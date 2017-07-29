@@ -68,16 +68,17 @@ export default function render(s: State): void {
       if (pieceAtKey) {
         // continue animation if already animating and same piece
         // (otherwise it could animate a captured piece)
-        const pos = key2pos(k);
         if (anim && el.cgAnimating && elPieceName === pieceNameOf(pieceAtKey)) {
+          const pos = key2pos(k);
           pos[0] += anim[1][0];
           pos[1] += anim[1][1];
           el.classList.add('anim');
+          translate(el, posToTranslate(pos, asWhite));
         } else if (el.cgAnimating) {
           el.cgAnimating = false;
           el.classList.remove('anim');
+          translate(el, posToTranslate(key2pos(k), asWhite));
         }
-        translate(el, posToTranslate(pos, asWhite));
         // same piece: flag as same
         if (elPieceName === pieceNameOf(pieceAtKey) && (!fading || !el.cgFading)) {
           samePieces[k] = true;
