@@ -131,7 +131,7 @@ function processDrag(s: State): void {
 
         // support lazy elements
         if (typeof cur.element === 'function') {
-          let found = cur.element();
+          const found = cur.element();
           if (!found) return;
           cur.element = found;
           cur.element.cgDragging = true;
