@@ -78,6 +78,7 @@ export default function render(s: State): void {
           el.cgAnimating = false;
           el.classList.remove('anim');
           translate(el, posToTranslate(key2pos(k), asWhite));
+          if (s.addPieceZIndex) el.style.zIndex = posZIndex(key2pos(k), asWhite);
         }
         // same piece: flag as same
         if (elPieceName === pieceNameOf(pieceAtKey) && (!fading || !el.cgFading)) {
