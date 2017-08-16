@@ -17,6 +17,10 @@ interface CustomBrushes {
   [hash: string]: DrawBrush
 }
 
+interface ArrowDests {
+  [key: string]: number; // how many arrows land on a square
+}
+
 type Hash = string;
 
 let isTrident: boolean | undefined;
@@ -29,17 +33,24 @@ export function clearCache() {
 export function renderSvg(state: State, root: SVGElement): void {
 
   const d = state.drawable,
-  shapes: Shape[] = d.shapes.concat(d.autoShapes).map((s: DrawShape) => {
+  cur = d.current,
+  arrowDests: ArrowDests = {};
+
+  d.shapes.concat(d.autoShapes).concat(cur ? [cur] : []).forEach(s => {
+    if (s.dest) arrowDests[s.dest] = (arrowDests[s.dest] || 0) + 1;
+  });
+
+  const shapes: Shape[] = d.shapes.concat(d.autoShapes).map((s: DrawShape) => {
     return {
       shape: s,
       current: false,
-      hash: shapeHash(s, false)
+      hash: shapeHash(s, arrowDests, false)
     };
   });
-  if (d.current) shapes.push({
-    shape: d.current as DrawShape,
+  if (cur) shapes.push({
+    shape: cur as DrawShape,
     current: true,
-    hash: shapeHash(d.current, true)
+    hash: shapeHash(cur, arrowDests, true)
   });
 
   const fullHash = shapes.map(sc => sc.hash).join('');
@@ -49,7 +60,7 @@ export function renderSvg(state: State, root: SVGElement): void {
   const defsEl = root.firstChild as SVGElement;
 
   syncDefs(d, shapes, defsEl);
-  syncShapes(state, shapes, d.brushes, root, defsEl);
+  syncShapes(state, shapes, d.brushes, arrowDests, root, defsEl);
 }
 
 // append only. Don't try to update/remove.
@@ -75,7 +86,7 @@ function syncDefs(d: Drawable, shapes: Shape[], defsEl: SVGElement) {
 }
 
 // append and remove only. No updates.
-function syncShapes(state: State, shapes: Shape[], brushes: DrawBrushes, root: SVGElement, defsEl: SVGElement): void {
+function syncShapes(state: State, shapes: Shape[], brushes: DrawBrushes, arrowDests: ArrowDests, root: SVGElement, defsEl: SVGElement): void {
   if (isTrident === undefined) isTrident = computeIsTrident();
   const bounds = state.dom.bounds(),
   hashesInDom: {[hash: string]: boolean} = {},
@@ -94,12 +105,12 @@ function syncShapes(state: State, shapes: Shape[], brushes: DrawBrushes, root: S
   toRemove.forEach(el => root.removeChild(el));
   // insert shapes that are not yet in dom
   shapes.forEach(sc => {
-    if (!hashesInDom[sc.hash]) root.appendChild(renderShape(state, sc, brushes, bounds));
+    if (!hashesInDom[sc.hash]) root.appendChild(renderShape(state, sc, brushes, arrowDests, bounds));
   });
 }
 
-function shapeHash({orig, dest, brush, piece, modifiers}: DrawShape, current: boolean): Hash {
-  return [current, orig, dest, brush,
+function shapeHash({orig, dest, brush, piece, modifiers}: DrawShape, arrowDests: ArrowDests, current: boolean): Hash {
+  return [current, orig, dest, brush, dest && arrowDests[dest],
     piece && pieceHash(piece),
     modifiers && modifiersHash(modifiers)
   ].filter(x => x).join('');
@@ -113,7 +124,7 @@ function modifiersHash(m: DrawModifiers): Hash {
   return '' + (m.lineWidth || '');
 }
 
-function renderShape(state: State, {shape, current, hash}: Shape, brushes: DrawBrushes, bounds: ClientRect): SVGElement {
+function renderShape(state: State, {shape, current, hash}: Shape, brushes: DrawBrushes, arrowDests: ArrowDests, bounds: ClientRect): SVGElement {
   let el: SVGElement;
   if (shape.piece) el = renderPiece(
     state.drawable.pieces.baseUrl,
@@ -130,6 +141,7 @@ function renderShape(state: State, {shape, current, hash}: Shape, brushes: DrawB
         orig,
         orient(key2pos(shape.dest), state.orientation),
         current,
+        arrowDests[shape.dest] > 1,
         bounds);
     }
     else el = renderCircle(brushes[shape.brush], orig, current, bounds);
@@ -153,8 +165,8 @@ function renderCircle(brush: DrawBrush, pos: cg.Pos, current: boolean, bounds: C
   });
 }
 
-function renderArrow(brush: DrawBrush, orig: cg.Pos, dest: cg.Pos, current: boolean, bounds: ClientRect): SVGElement {
-  const m = arrowMargin(bounds, current),
+function renderArrow(brush: DrawBrush, orig: cg.Pos, dest: cg.Pos, current: boolean, shorten: boolean, bounds: ClientRect): SVGElement {
+  const m = arrowMargin(bounds, shorten && !current),
   a = pos2px(orig, bounds),
   b = pos2px(dest, bounds),
   dx = b[0] - a[0],
@@ -237,8 +249,8 @@ function opacity(brush: DrawBrush, current: boolean): number {
   return (brush.opacity || 1) * (current ? 0.9 : 1);
 }
 
-function arrowMargin(bounds: ClientRect, current: boolean): number {
-  return isTrident ? 0 : ((current ? 10 : 20) / 512 * bounds.width);
+function arrowMargin(bounds: ClientRect, shorten: boolean): number {
+  return isTrident ? 0 : ((shorten ? 20 : 10) / 512 * bounds.width);
 }
 
 function pos2px(pos: cg.Pos, bounds: ClientRect): cg.NumberPair {
