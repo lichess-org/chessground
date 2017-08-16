@@ -144,6 +144,8 @@ export function defaults(): Partial<State> {
       enabled: true
     },
     stats: {
+      // on touchscreen, default to "tap-tap" moves
+      // instead of drag
       dragged: !('ontouchstart' in window)
     },
     events: {},

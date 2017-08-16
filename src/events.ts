@@ -14,7 +14,7 @@ export function bindBoard(s: State): void {
   const boardEl = s.dom.elements.board,
   onStart = startDragOrDraw(s);
 
-  boardEl.addEventListener('touchstart', onStart);
+  boardEl.addEventListener('touchstart', onStart, { passive: true });
   boardEl.addEventListener('mousedown', onStart);
 
   if (s.disableContextMenu || s.drawable.enabled) {
