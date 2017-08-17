@@ -7,8 +7,6 @@ import * as cg from './types'
 type MouchBind = (e: cg.MouchEvent) => void;
 type StateMouchBind = (d: State, e: cg.MouchEvent) => void;
 
-const passive: any = { passive: true };
-
 export function bindBoard(s: State): void {
 
   if (s.viewOnly) return;
@@ -16,7 +14,8 @@ export function bindBoard(s: State): void {
   const boardEl = s.dom.elements.board,
   onStart = startDragOrDraw(s);
 
-  boardEl.addEventListener('touchstart', onStart, passive);
+  // must NOT be a passive event!
+  boardEl.addEventListener('touchstart', onStart);
   boardEl.addEventListener('mousedown', onStart);
 
   if (s.disableContextMenu || s.drawable.enabled) {
@@ -44,8 +43,8 @@ export function bindDocument(s: State, redrawAll: cg.Redraw): cg.Unbind {
   if (s.resizable) unbinds.push(unbindable(document.body, 'chessground.resize', onResize));
 
   const onScroll = () => s.dom.bounds.clear();
-  unbinds.push(unbindable(window, 'scroll', onScroll, passive));
-  unbinds.push(unbindable(window, 'resize', onScroll, passive));
+  unbinds.push(unbindable(window, 'scroll', onScroll, { passive: true }));
+  unbinds.push(unbindable(window, 'resize', onScroll, { passive: true }));
 
   return () => unbinds.forEach(f => f());
 }
