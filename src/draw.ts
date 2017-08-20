@@ -140,7 +140,7 @@ function addCircle(drawable: Drawable, cur: DrawCurrent): void {
 function addLine(drawable: Drawable, cur: DrawCurrent, dest: cg.Key): void {
   const orig = cur.orig;
   const sameLine = (s: DrawShape) => {
-    return !!s.dest && (s.orig === orig && s.dest === dest);
+    return !!s.dest && s.orig === orig && s.dest === dest;
   };
   const exists = drawable.shapes.filter(sameLine).length > 0;
   if (exists) drawable.shapes = drawable.shapes.filter(not(sameLine));
