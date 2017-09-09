@@ -26,25 +26,28 @@ export function bindBoard(s: State): void {
 // returns the unbind function
 export function bindDocument(s: State, redrawAll: cg.Redraw): cg.Unbind {
 
-  if (s.viewOnly) return () => {};
-
-  const onmove: MouchBind = dragOrDraw(s, drag.move, draw.move);
-  const onend: MouchBind = dragOrDraw(s, drag.end, draw.end);
-
   const unbinds: cg.Unbind[] = [];
 
-  ['touchmove', 'mousemove'].forEach(ev => unbinds.push(unbindable(document, ev, onmove)));
-  ['touchend', 'mouseup'].forEach(ev => unbinds.push(unbindable(document, ev, onend)));
+  if (!s.dom.relative && s.resizable) {
+    const onResize = () => {
+      s.dom.bounds.clear();
+      raf(redrawAll);
+    };
+    unbinds.push(unbindable(document.body, 'chessground.resize', onResize));
+  }
 
-  const onResize = () => {
-    s.dom.bounds.clear();
-    raf(redrawAll);
-  };
-  if (s.resizable) unbinds.push(unbindable(document.body, 'chessground.resize', onResize));
+  if (!s.viewOnly) {
 
-  const onScroll = () => s.dom.bounds.clear();
-  unbinds.push(unbindable(window, 'scroll', onScroll, { passive: true }));
-  unbinds.push(unbindable(window, 'resize', onScroll, { passive: true }));
+    const onmove: MouchBind = dragOrDraw(s, drag.move, draw.move);
+    const onend: MouchBind = dragOrDraw(s, drag.end, draw.end);
+
+    ['touchmove', 'mousemove'].forEach(ev => unbinds.push(unbindable(document, ev, onmove)));
+    ['touchend', 'mouseup'].forEach(ev => unbinds.push(unbindable(document, ev, onend)));
+
+    const onScroll = () => s.dom.bounds.clear();
+    unbinds.push(unbindable(window, 'scroll', onScroll, { passive: true }));
+    unbinds.push(unbindable(window, 'resize', onScroll, { passive: true }));
+  }
 
   return () => unbinds.forEach(f => f());
 }
