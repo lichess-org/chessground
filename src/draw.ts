@@ -33,7 +33,8 @@ export interface DrawModifiers {
 }
 
 export interface Drawable {
-  enabled: boolean; // allows SVG drawings
+  enabled: boolean; // can draw
+  visible: boolean; // can view
   eraseOnClick: boolean;
   onChange?: (shapes: DrawShape[]) => void;
   shapes: DrawShape[]; // user shapes

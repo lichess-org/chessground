@@ -19,7 +19,7 @@ export default function wrap(element: HTMLElement, s: State, bounds?: ClientRect
   element.appendChild(board);
 
   let svg: SVGElement | undefined;
-  if (s.drawable.enabled && bounds) {
+  if (s.drawable.visible && bounds) {
     svg = createSVG('svg');
     svg.appendChild(createSVG('defs'));
     element.appendChild(svg);

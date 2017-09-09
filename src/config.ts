@@ -78,7 +78,8 @@ export interface Config {
   };
   items?: (pos: cg.Pos, key: cg.Key) => any | undefined; // items on the board { render: key -> vdom }
   drawable?: {
-    enabled?: boolean;
+    enabled?: boolean; // can draw
+    visible?: boolean; // can view
     eraseOnClick?: boolean;
     shapes?: DrawShape[];
     autoShapes?: DrawShape[];

@@ -150,7 +150,8 @@ export function defaults(): Partial<State> {
     },
     events: {},
     drawable: {
-      enabled: true,
+      enabled: true, // can draw
+      visible: true, // can view drawings
       eraseOnClick: true,
       shapes: [],
       autoShapes: [],
