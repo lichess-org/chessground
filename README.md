@@ -68,7 +68,7 @@ var ground = Chessground(document.body, config);
 First of all, of course:
 
 ```
-npm i
+yarn install
 ```
 
 To build the node module:
