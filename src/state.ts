@@ -151,7 +151,7 @@ export function defaults(): Partial<State> {
     events: {},
     drawable: {
       enabled: true, // can draw
-      visible: true, // can view drawings
+      visible: true, // can view
       eraseOnClick: true,
       shapes: [],
       autoShapes: [],

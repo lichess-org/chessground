@@ -34,7 +34,7 @@ export function start(s: State, e: cg.MouchEvent): void {
   if (!orig) return;
   const piece = s.pieces[orig];
   const previouslySelected = s.selected;
-  if (!previouslySelected && (
+  if (!previouslySelected && s.drawable.enabled && (
     s.drawable.eraseOnClick || (!piece || piece.color !== s.turnColor)
   )) drawClear(s);
   const hadPremove = !!s.premovable.current;
