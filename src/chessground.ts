@@ -24,7 +24,7 @@ export function Chessground(element: HTMLElement, config?: Config): Api {
     // compute bounds from existing board element if possible
     // this allows non-square boards from CSS to be handled (for 3D)
     const bounds = util.memo(() => element.getBoundingClientRect());
-    const elements = renderWrap(element, state, state.viewOnly ? undefined : bounds());
+    const elements = renderWrap(element, state, state.viewOnly && !state.drawable.visible ? undefined : bounds());
     const redrawNow = (skipSvg: boolean) => {
       render(state);
       if (!skipSvg && elements.svg) svg.renderSvg(state, elements.svg);
