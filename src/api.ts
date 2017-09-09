@@ -10,7 +10,7 @@ import * as cg from './types'
 
 export interface Api {
 
-  // reconfigure the instance. Accepts all config options, except for viewOnly & minimalDom.
+  // reconfigure the instance. Accepts all config options, except for viewOnly & drawable.visible.
   // board will be animated accordingly, if animations are enabled.
   set(config: Config): void;
 
