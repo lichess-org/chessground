@@ -24,11 +24,6 @@ interface ArrowDests {
 type Hash = string;
 
 let isTrident: boolean | undefined;
-let fullHashPrev: Hash = '';
-
-export function clearCache() {
-  fullHashPrev = '';
-}
 
 export function renderSvg(state: State, root: SVGElement): void {
 
@@ -54,8 +49,8 @@ export function renderSvg(state: State, root: SVGElement): void {
   });
 
   const fullHash = shapes.map(sc => sc.hash).join('');
-  if (fullHash === fullHashPrev) return;
-  fullHashPrev = fullHash;
+  if (fullHash === state.drawable.prevSvgHash) return;
+  state.drawable.prevSvgHash = fullHash;
 
   const defsEl = root.firstChild as SVGElement;
 

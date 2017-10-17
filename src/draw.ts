@@ -44,7 +44,8 @@ export interface Drawable {
   // drawable SVG pieces; used for crazyhouse drop
   pieces: {
     baseUrl: string
-  }
+  },
+  prevSvgHash: string
 }
 
 export interface DrawCurrent {

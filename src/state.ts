@@ -167,7 +167,8 @@ export function defaults(): Partial<State> {
       },
       pieces: {
         baseUrl: 'https://lichess1.org/assets/piece/cburnett/'
-      }
+      },
+      prevSvgHash: ''
     },
     hold: timer()
   };
