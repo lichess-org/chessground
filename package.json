@@ -13,9 +13,9 @@
     "gulp-typescript": "^3",
     "gulp-uglify": "^3",
     "gulp-util": "^3",
-    "uglify-js": "^3",
     "tsify": "^3",
     "typescript": "^2.4",
+    "uglify-js": "^3",
     "vinyl-buffer": "^1",
     "vinyl-source-stream": "^1",
     "watchify": "^3"
