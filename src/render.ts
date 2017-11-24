@@ -70,8 +70,8 @@ export default function render(s: State): void {
         // (otherwise it could animate a captured piece)
         if (anim && el.cgAnimating && elPieceName === pieceNameOf(pieceAtKey)) {
           const pos = key2pos(k);
-          pos[0] += anim[1][0];
-          pos[1] += anim[1][1];
+          pos[0] += anim[2];
+          pos[1] += anim[3];
           el.classList.add('anim');
           translate(el, posToTranslate(pos, asWhite));
         } else if (el.cgAnimating) {
@@ -152,8 +152,8 @@ export default function render(s: State): void {
         if (anim) {
           pMvd.cgAnimating = true;
           pMvd.classList.add('anim');
-          pos[0] += anim[1][0];
-          pos[1] += anim[1][1];
+          pos[0] += anim[2];
+          pos[1] += anim[3];
         }
         translate(pMvd, posToTranslate(pos, asWhite));
       }
@@ -170,8 +170,8 @@ export default function render(s: State): void {
         pieceNode.cgKey = k;
         if (anim) {
           pieceNode.cgAnimating = true;
-          pos[0] += anim[1][0];
-          pos[1] += anim[1][1];
+          pos[0] += anim[2];
+          pos[1] += anim[3];
         }
         translate(pieceNode, posToTranslate(pos, asWhite));
 
