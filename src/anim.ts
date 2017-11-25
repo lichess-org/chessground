@@ -4,10 +4,9 @@ import * as cg from './types'
 
 export type Mutation<A> = (state: State) => A;
 
-export interface AnimVector {
-  0: cg.NumberPair; // animation goal
-  1: cg.NumberPair; // animation current status
-}
+// 0,1 animation goal
+// 2,3 animation current status
+export type AnimVector = cg.NumberQuad
 
 export interface AnimVectors {
   [key: string]: AnimVector
@@ -24,7 +23,7 @@ export interface AnimPlan {
 
 export interface AnimCurrent {
   start: cg.Timestamp;
-  duration: cg.Milliseconds;
+  frequency: cg.KHz;
   plan: AnimPlan;
 }
 
@@ -88,7 +87,7 @@ function computePlan(prevPieces: cg.Pieces, current: State): AnimPlan {
     preP = closer(newP, missings.filter(p => util.samePiece(newP.piece, p.piece)));
     if (preP) {
       vector = [preP.pos[0] - newP.pos[0], preP.pos[1] - newP.pos[1]];
-      anims[newP.key] = [vector, vector];
+      anims[newP.key] = vector.concat(vector) as AnimVector;
       animedOrigs.push(preP.key);
     }
   });
@@ -106,13 +105,16 @@ function computePlan(prevPieces: cg.Pieces, current: State): AnimPlan {
   };
 }
 
-function step(state: State): void {
+const perf = performance !== undefined && performance.now !== undefined ?
+   performance : Date;
+
+function step(state: State, now: cg.Timestamp): void {
   const cur = state.animation.current;
-  if (!cur) { // animation was canceled :(
+  if (cur === undefined) { // animation was canceled :(
     if (!state.dom.destroyed) state.dom.redrawNow();
     return;
   }
-  const rest = 1 - (Date.now() - cur.start) / cur.duration;
+  const rest = 1 - (now - cur.start) * cur.frequency;
   if (rest <= 0) {
     state.animation.current = undefined;
     state.dom.redrawNow();
@@ -120,10 +122,11 @@ function step(state: State): void {
     const ease = easing(rest);
     for (let i in cur.plan.anims) {
       const cfg = cur.plan.anims[i];
-      cfg[1] = [cfg[0][0] * ease, cfg[0][1] * ease];
+      cfg[2] = cfg[0] * ease;
+      cfg[3] = cfg[1] * ease;
     }
     state.dom.redrawNow(true); // optimisation: don't render SVG changes during animations
-    util.raf(() => step(state));
+    util.raf((now = perf.now()) => step(state, now));
   }
 }
 
@@ -136,11 +139,11 @@ function animate<A>(mutation: Mutation<A>, state: State): A {
   if (!isObjectEmpty(plan.anims) || !isObjectEmpty(plan.fadings)) {
     const alreadyRunning = state.animation.current && state.animation.current.start;
     state.animation.current = {
-      start: Date.now(),
-      duration: state.animation.duration,
+      start: perf.now(),
+      frequency: 1 / state.animation.duration,
       plan: plan
     };
-    if (!alreadyRunning) step(state);
+    if (!alreadyRunning) step(state, perf.now());
   } else {
     // don't animate, just render right away
     state.dom.redraw();
