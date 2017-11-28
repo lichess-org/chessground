@@ -105,8 +105,7 @@ function computePlan(prevPieces: cg.Pieces, current: State): AnimPlan {
   };
 }
 
-const perf = performance !== undefined && performance.now !== undefined ?
-   performance : Date;
+const perf = window.performance !== undefined ? window.performance : Date;
 
 function step(state: State, now: cg.Timestamp): void {
   const cur = state.animation.current;
