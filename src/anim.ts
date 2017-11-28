@@ -105,6 +105,9 @@ function computePlan(prevPieces: cg.Pieces, current: State): AnimPlan {
   };
 }
 
+const perf = performance !== undefined && performance.now !== undefined ?
+   performance : Date;
+
 function step(state: State, now: cg.Timestamp): void {
   const cur = state.animation.current;
   if (cur === undefined) { // animation was canceled :(
@@ -123,7 +126,7 @@ function step(state: State, now: cg.Timestamp): void {
       cfg[3] = cfg[1] * ease;
     }
     state.dom.redrawNow(true); // optimisation: don't render SVG changes during animations
-    util.raf((now = Date.now()) => step(state, now));
+    util.raf((now = perf.now()) => step(state, now));
   }
 }
 
@@ -136,11 +139,11 @@ function animate<A>(mutation: Mutation<A>, state: State): A {
   if (!isObjectEmpty(plan.anims) || !isObjectEmpty(plan.fadings)) {
     const alreadyRunning = state.animation.current && state.animation.current.start;
     state.animation.current = {
-      start: Date.now(),
+      start: perf.now(),
       frequency: 1 / state.animation.duration,
       plan: plan
     };
-    if (!alreadyRunning) step(state, Date.now());
+    if (!alreadyRunning) step(state, perf.now());
   } else {
     // don't animate, just render right away
     state.dom.redraw();
