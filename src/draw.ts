@@ -50,8 +50,8 @@ export interface Drawable {
 
 export interface DrawCurrent {
   orig: cg.Key; // orig key of drawing
-  dest?: cg.Key; // square being moused over, if != orig
-  destPrev?: cg.Key; // square previously moused over
+  dest?: cg.Key; // shape dest, or undefined for circle
+  mouseSq?: cg.Key; // square being moused over
   pos: cg.NumberPair; // relative current position
   brush: string; // brush name for shape
 }
@@ -68,7 +68,6 @@ export function start(state: State, e: cg.MouchEvent): void {
   if (!orig) return;
   state.drawable.current = {
     orig: orig,
-    dest: orig, // will immediately be set to undefined by processDraw, triggering redraw
     pos: position,
     brush: eventBrush(e)
   };
@@ -79,10 +78,10 @@ export function processDraw(state: State): void {
   raf(() => {
     const cur = state.drawable.current;
     if (cur) {
-      const dest = getKeyAtDomPos(cur.pos, state.orientation === 'white', state.dom.bounds());
-      const newDest = (cur.orig === dest) ? undefined : dest;
-      if (newDest !== cur.dest) {
-        cur.dest = newDest;
+      const mouseSq = getKeyAtDomPos(cur.pos, state.orientation === 'white', state.dom.bounds());
+      if (mouseSq !== cur.mouseSq) {
+        cur.mouseSq = mouseSq;
+        cur.dest = mouseSq !== cur.orig ? mouseSq : undefined;
         state.dom.redrawNow();
       }
       processDraw(state);
@@ -96,10 +95,10 @@ export function move(state: State, e: cg.MouchEvent): void {
 
 export function end(state: State): void {
   const cur = state.drawable.current;
-  if (!cur) return;
-  if (cur.dest && cur.dest !== cur.orig) addLine(state.drawable, cur, cur.dest);
-  else addCircle(state.drawable, cur);
-  cancel(state);
+  if (cur) {
+    if (cur.mouseSq) addShape(state.drawable, cur);
+    cancel(state);
+  }
 }
 
 export function cancel(state: State): void {
@@ -127,30 +126,13 @@ function not<A>(f: (a: A) => boolean): (a: A) => boolean {
   return (x: A) => !f(x);
 }
 
-function addCircle(drawable: Drawable, cur: DrawCurrent): void {
-  const orig = cur.orig;
-  const sameCircle = (s: DrawShape) => s.orig === orig && !s.dest;
-  const similar = drawable.shapes.filter(sameCircle)[0];
-  if (similar) drawable.shapes = drawable.shapes.filter(not(sameCircle));
-  if (!similar || similar.brush !== cur.brush) drawable.shapes.push({
-    brush: cur.brush,
-    orig: orig
-  });
-  onChange(drawable);
-}
-
-function addLine(drawable: Drawable, cur: DrawCurrent, dest: cg.Key): void {
-  const orig = cur.orig;
-  const sameLine = (s: DrawShape) => {
-    return !!s.dest && s.orig === orig && s.dest === dest;
+function addShape(drawable: Drawable, cur: DrawCurrent): void {
+  const sameShape = (s: DrawShape) => {
+    return s.orig === cur.orig && s.dest === cur.dest;
   };
-  const exists = drawable.shapes.filter(sameLine).length > 0;
-  if (exists) drawable.shapes = drawable.shapes.filter(not(sameLine));
-  else drawable.shapes.push({
-    brush: cur.brush,
-    orig: orig,
-    dest: dest
-  });
+  const similar = drawable.shapes.filter(sameShape)[0];
+  if (similar) drawable.shapes = drawable.shapes.filter(not(sameShape));
+  if (!similar || similar.brush !== cur.brush) drawable.shapes.push(cur);
   onChange(drawable);
 }
 

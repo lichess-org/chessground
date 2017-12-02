@@ -28,7 +28,8 @@ let isTrident: boolean | undefined;
 export function renderSvg(state: State, root: SVGElement): void {
 
   const d = state.drawable,
-  cur = d.current,
+  curD = d.current,
+  cur = curD && curD.mouseSq ? curD as DrawShape : undefined,
   arrowDests: ArrowDests = {};
 
   d.shapes.concat(d.autoShapes).concat(cur ? [cur] : []).forEach(s => {
@@ -43,7 +44,7 @@ export function renderSvg(state: State, root: SVGElement): void {
     };
   });
   if (cur) shapes.push({
-    shape: cur as DrawShape,
+    shape: cur,
     current: true,
     hash: shapeHash(cur, arrowDests, true)
   });
@@ -105,7 +106,7 @@ function syncShapes(state: State, shapes: Shape[], brushes: DrawBrushes, arrowDe
 }
 
 function shapeHash({orig, dest, brush, piece, modifiers}: DrawShape, arrowDests: ArrowDests, current: boolean): Hash {
-  return [current, orig, dest, brush, dest && arrowDests[dest],
+  return [current, orig, dest, brush, dest && arrowDests[dest] > 1,
     piece && pieceHash(piece),
     modifiers && modifiersHash(modifiers)
   ].filter(x => x).join('');
@@ -147,16 +148,16 @@ function renderShape(state: State, {shape, current, hash}: Shape, brushes: DrawB
 
 function renderCircle(brush: DrawBrush, pos: cg.Pos, current: boolean, bounds: ClientRect): SVGElement {
   const o = pos2px(pos, bounds),
-  width = circleWidth(current, bounds),
+  widths = circleWidth(bounds),
   radius = (bounds.width + bounds.height) / 32;
   return setAttributes(createElement('circle'), {
     stroke: brush.color,
-    'stroke-width': width,
+    'stroke-width': widths[current ? 0 : 1],
     fill: 'none',
     opacity: opacity(brush, current),
     cx: o[0],
     cy: o[1],
-    r: radius - width / 2
+    r: radius - widths[1] / 2
   });
 }
 
@@ -232,8 +233,9 @@ function makeCustomBrush(base: DrawBrush, modifiers: DrawModifiers): DrawBrush {
   return brush as DrawBrush;
 }
 
-function circleWidth(current: boolean, bounds: ClientRect): number {
-  return (current ? 3 : 4) / 512 * bounds.width;
+function circleWidth(bounds: ClientRect): [number, number] {
+  const base = bounds.width / 512;
+  return [3 * base, 4 * base];
 }
 
 function lineWidth(brush: DrawBrush, current: boolean, bounds: ClientRect): number {
