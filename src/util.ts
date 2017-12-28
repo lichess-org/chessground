@@ -65,7 +65,8 @@ export const posToTranslateRel: (pos: cg.Pos, asWhite: boolean) => cg.NumberPair
   (pos, asWhite) => posToTranslateBase(pos, asWhite, 12.5, 12.5);
 
 export const translateAbs = (el: HTMLElement, pos: cg.Pos) => {
-  el.style.transform = `translate(${pos[0]}px,${pos[1]}px)`;
+  el.style.left = pos[0] + 'px';
+  el.style.top = pos[1] + 'px';
 }
 
 export const translateRel = (el: HTMLElement, percents: cg.NumberPair) => {
