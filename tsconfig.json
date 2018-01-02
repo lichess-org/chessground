@@ -9,15 +9,12 @@
   "compilerOptions": {
     "outDir": "./",
     "declaration": true,
-    "noImplicitAny": true,
-    "strictNullChecks": true,
     "noUnusedLocals": true,
     "noEmitOnError": false,
     "removeComments": true,
-    "alwaysStrict": true,
     "noImplicitReturns": true,
-    "noImplicitThis": true,
     "noUnusedParameters": true,
-    "target": "es5"
+    "target": "es5",
+    "strict": true
   }
 }
