@@ -51,7 +51,7 @@ function rookFilesOf(pieces: cg.Pieces, color: cg.Color) {
   return Object.keys(pieces).filter(key => {
     piece = pieces[key];
     return piece && piece.color === color && piece.role === 'rook';
-  }).map((key: cg.Key) => util.key2pos(key)[0]);
+  }).map((key: string ) => util.key2pos(key as cg.Key)[0]);
 }
 
 export default function premove(pieces: cg.Pieces, key: cg.Key, canCastle: boolean): cg.Key[] {

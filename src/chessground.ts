@@ -26,7 +26,7 @@ export function Chessground(element: HTMLElement, config?: Config): Api {
     const bounds = util.memo(() => element.getBoundingClientRect());
     const relative = state.viewOnly && !state.drawable.visible;
     const elements = renderWrap(element, state, relative ? undefined : bounds());
-    const redrawNow = (skipSvg: boolean) => {
+    const redrawNow = (skipSvg?: boolean) => {
       render(state);
       if (!skipSvg && elements.svg) svg.renderSvg(state, elements.svg);
     };
