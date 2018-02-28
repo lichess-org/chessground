@@ -31,15 +31,6 @@ export default function wrap(element: HTMLElement, s: State, bounds?: ClientRect
     element.appendChild(renderCoords(files, 'files' + orientClass));
   }
 
-  let over: HTMLElement | undefined;
-  if (bounds && (s.movable.showDests || s.premovable.showDests)) {
-    over = createEl('div', 'over');
-    translateAway(over);
-    over.style.width = (bounds.width / 8) + 'px';
-    over.style.height = (bounds.height / 8) + 'px';
-    element.appendChild(over);
-  }
-
   let ghost: HTMLElement | undefined;
   if (bounds && s.draggable.showGhost) {
     ghost = createEl('piece', 'ghost');
@@ -49,7 +40,6 @@ export default function wrap(element: HTMLElement, s: State, bounds?: ClientRect
 
   return {
     board: board,
-    over: over,
     ghost: ghost,
     svg: svg
   };

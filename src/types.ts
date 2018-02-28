@@ -39,7 +39,6 @@ export interface MaterialDiff {
 }
 export interface Elements {
   board: HTMLElement;
-  over?: HTMLElement;
   ghost?: HTMLElement;
   svg?: SVGElement;
 }

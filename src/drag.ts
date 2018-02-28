@@ -13,8 +13,6 @@ export interface DragCurrent {
   epos: cg.NumberPair; // initial event position
   pos: cg.NumberPair; // relative current position
   dec: cg.NumberPair; // piece center decay
-  over?: cg.Key; // square being moused over
-  overPrev?: cg.Key; // square previously moused over
   started: boolean; // whether the drag has started; as per the distance setting
   element: cg.PieceNode | (() => cg.PieceNode | undefined);
   newPiece?: boolean; // it it a new piece from outside the board
@@ -144,32 +142,12 @@ function processDrag(s: State): void {
           cur.epos[0] - cur.rel[0],
           cur.epos[1] - cur.rel[1]
         ];
-        cur.over = board.getKeyAtDomPos(cur.epos, asWhite, bounds);
 
         // move piece
         const translation = util.posToTranslateAbs(bounds)(cur.origPos, asWhite);
         translation[0] += cur.pos[0] + cur.dec[0];
         translation[1] += cur.pos[1] + cur.dec[1];
         util.translateAbs(cur.element, translation);
-
-        // move over element
-        const overEl = s.dom.elements.over;
-        if (overEl && cur.over && cur.over !== cur.overPrev) {
-          const dests = s.movable.dests;
-          if (s.movable.free ||
-            util.containsX(dests && dests[cur.orig], cur.over) ||
-            util.containsX(s.premovable.dests, cur.over)) {
-            const pos = util.key2pos(cur.over),
-            vector: cg.NumberPair = [
-              (asWhite ? pos[0] - 1 : 8 - pos[0]) * bounds.width / 8,
-              (asWhite ? 8 - pos[1] : pos[1] - 1) * bounds.height / 8
-            ];
-            util.translateAbs(overEl, vector);
-          } else {
-            util.translateAway(overEl);
-          }
-          cur.overPrev = cur.over;
-        }
       }
     }
     processDrag(s);
@@ -232,7 +210,6 @@ export function cancel(s: State): void {
 
 function removeDragElements(s: State) {
   const e = s.dom.elements;
-  if (e.over) util.translateAway(e.over);
   if (e.ghost) util.translateAway(e.ghost);
 }
 
