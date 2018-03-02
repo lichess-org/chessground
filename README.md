@@ -31,11 +31,12 @@ Chessground is designed to fulfill all lichess.org web and mobile apps needs, so
   - minimum distance before drag
   - centralisation of the piece under the cursor
   - piece ghost element
+  - square over elements
   - drop off revert or trash
 - Premove by click or drag
 - Drag new pieces onto the board (editor, crazyhouse)
 - Animation of pieces: moving and fading away
-- Display last move, check, move destinations, and premove destinations (hover effects possible)
+- Display last move, check, move destinations, and premove destinations
 - Import and export positions in FEN notation
 - User callbacks
 - No chess logic inside: can be used for [chess variants](https://lichess.org/variant)
