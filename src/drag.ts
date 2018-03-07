@@ -70,6 +70,7 @@ export function start(s: State, e: cg.MouchEvent): void {
     if (ghost) {
       ghost.className = `ghost ${piece.color} ${piece.role}`;
       util.translateAbs(ghost, util.posToTranslateAbs(bounds)(util.key2pos(orig), asWhite));
+      util.setVisible(ghost, true);
     }
     processDrag(s);
   } else {
@@ -210,7 +211,7 @@ export function cancel(s: State): void {
 
 function removeDragElements(s: State) {
   const e = s.dom.elements;
-  if (e.ghost) util.translateAway(e.ghost);
+  if (e.ghost) util.setVisible(e.ghost, false);
 }
 
 function computeSquareBounds(key: cg.Key, asWhite: boolean, bounds: ClientRect) {

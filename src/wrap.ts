@@ -1,5 +1,5 @@
 import { State } from './state'
-import { colors, translateAway, createEl } from './util'
+import { colors, setVisible, createEl } from './util'
 import { files, ranks } from './types'
 import { createElement as createSVG } from './svg'
 import { Elements } from './types'
@@ -34,7 +34,7 @@ export default function wrap(element: HTMLElement, s: State, bounds?: ClientRect
   let ghost: HTMLElement | undefined;
   if (bounds && s.draggable.showGhost) {
     ghost = createEl('piece', 'ghost');
-    translateAway(ghost);
+    setVisible(ghost, false);
     element.appendChild(ghost);
   }
 

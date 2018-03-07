@@ -73,7 +73,9 @@ export const translateRel = (el: HTMLElement, percents: cg.NumberPair) => {
   el.style.top = percents[1] + '%';
 }
 
-export const translateAway = (el: HTMLElement) => translateAbs(el, [-99999, -99999]);
+export const setVisible = (el: HTMLElement, v: boolean) => {
+  el.style.visibility = v ? 'visible' : 'hidden';
+}
 
 // touchend has no position!
 export const eventPosition: (e: cg.MouchEvent) => cg.NumberPair | undefined = e => {
