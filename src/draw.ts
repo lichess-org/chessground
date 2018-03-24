@@ -1,5 +1,5 @@
 import { State } from './state'
-import { cancelMove, getKeyAtDomPos } from './board'
+import { unselect, cancelMove, getKeyAtDomPos } from './board'
 import { eventPosition, raf, isRightButton } from './util'
 import * as cg from './types'
 
@@ -62,7 +62,7 @@ export function start(state: State, e: cg.MouchEvent): void {
   if (e.touches && e.touches.length > 1) return; // support one finger touch only
   e.stopPropagation();
   e.preventDefault();
-  cancelMove(state);
+  e.ctrlKey ? unselect(state) : cancelMove(state);
   const position = eventPosition(e) as cg.NumberPair;
   const orig = getKeyAtDomPos(position, state.orientation === 'white', state.dom.bounds());
   if (!orig) return;
