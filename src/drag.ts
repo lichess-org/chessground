@@ -18,7 +18,7 @@ export interface DragCurrent {
   newPiece?: boolean; // it it a new piece from outside the board
   force?: boolean; // can the new piece replace an existing one (editor)
   previouslySelected?: cg.Key;
-  originTarget: EventTarget;
+  originTarget: EventTarget | null;
 }
 
 export function start(s: State, e: cg.MouchEvent): void {
