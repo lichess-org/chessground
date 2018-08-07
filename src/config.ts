@@ -121,7 +121,8 @@ export function configure(state: State, config: Config) {
     const rank = state.movable.color === 'white' ? 1 : 8;
     const kingStartPos = 'e' + rank;
     const dests = state.movable.dests[kingStartPos];
-    if (!dests || state.pieces[kingStartPos].role !== 'king') return;
+    const king = state.pieces[kingStartPos];
+    if (!dests || !king || king.role !== 'king') return;
     state.movable.dests[kingStartPos] = dests.filter(d =>
       !((d === 'a' + rank) && dests.indexOf('c' + rank as cg.Key) !== -1) &&
         !((d === 'h' + rank) && dests.indexOf('g' + rank as cg.Key) !== -1)

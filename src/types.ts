@@ -15,7 +15,7 @@ export interface Drop {
   key: Key;
 }
 export interface Pieces {
-  [key: string]: Piece;
+  [key: string]: Piece | undefined;
 }
 export interface PiecesDiff {
   [key: string]: Piece | null;

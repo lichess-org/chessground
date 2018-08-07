@@ -47,15 +47,14 @@ function king(color: cg.Color, rookFiles: number[], canCastle: boolean): Mobilit
 }
 
 function rookFilesOf(pieces: cg.Pieces, color: cg.Color) {
-  let piece: cg.Piece;
   return Object.keys(pieces).filter(key => {
-    piece = pieces[key];
+    const piece = pieces[key];
     return piece && piece.color === color && piece.role === 'rook';
   }).map((key: string ) => util.key2pos(key as cg.Key)[0]);
 }
 
 export default function premove(pieces: cg.Pieces, key: cg.Key, canCastle: boolean): cg.Key[] {
-  const piece = pieces[key],
+  const piece = pieces[key]!,
   pos = util.key2pos(key);
   let mobility: Mobility;
   switch (piece.role) {
