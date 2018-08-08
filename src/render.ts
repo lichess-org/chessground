@@ -134,7 +134,7 @@ export default function render(s: State): void {
   // or append new pieces
   for (const j in piecesKeys) {
     k = piecesKeys[j];
-    p = pieces[k];
+    p = pieces[k]!;
     anim = anims[k];
     if (!samePieces[k]) {
       pMvdset = movedPieces[pieceNameOf(p)];

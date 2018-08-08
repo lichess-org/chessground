@@ -22,7 +22,8 @@ export function read(fen: cg.FEN): cg.Pieces {
         col = 0;
         break;
       case '~':
-        pieces[pos2key([col, row])].promoted = true;
+        const piece = pieces[pos2key([col, row])];
+        if (piece) piece.promoted = true;
         break;
       default:
         const nb = c.charCodeAt(0);
@@ -41,11 +42,10 @@ export function read(fen: cg.FEN): cg.Pieces {
 }
 
 export function write(pieces: cg.Pieces): cg.FEN {
-  let piece: cg.Piece, letter: string;
   return invRanks.map(y => cg.ranks.map(x => {
-      piece = pieces[pos2key([x, y])];
+      const piece = pieces[pos2key([x, y])];
       if (piece) {
-        letter = letters[piece.role];
+        const letter = letters[piece.role];
         return piece.color === 'white' ? letter.toUpperCase() : letter;
       } else return '1';
     }).join('')
