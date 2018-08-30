@@ -8,10 +8,10 @@
   "dependencies": {},
   "devDependencies": {
     "browserify": "^16",
+    "fancy-log": "^1",
     "gulp": "^3",
     "gulp-sourcemaps": "^2",
     "gulp-uglify": "^3",
-    "gulp-util": "^3",
     "tsify": "^4",
     "typescript": "^3",
     "vinyl-buffer": "^1",
