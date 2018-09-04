@@ -30,13 +30,7 @@ export type NumberQuad = [number, number, number, number];
 export interface Dests {
   [key: string]: Key[]
 }
-export interface MaterialDiffSide {
-  [role: string]: number;
-}
-export interface MaterialDiff {
-  white: MaterialDiffSide;
-  black: MaterialDiffSide;
-}
+
 export interface Elements {
   board: HTMLElement;
   ghost?: HTMLElement;
