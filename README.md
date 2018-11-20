@@ -4,7 +4,7 @@
 
 It targets modern browsers, as well as mobile development using Cordova.
 
-Chessground is distributed under the AGPL-3.0 license. If you're not sure what this means, check out [greendrake.info](http://greendrake.info/).
+Chessground is distributed under the AGPL-3.0 license. If you're not sure what this means, check out [greendrake.info/#nfy0](http://greendrake.info/#nfy0).
 
 ### Demos
 
