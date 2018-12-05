@@ -18,7 +18,7 @@ export interface Pieces {
   [key: string]: Piece | undefined;
 }
 export interface PiecesDiff {
-  [key: string]: Piece | null;
+  [key: string]: Piece | undefined;
 }
 
 export type KeyPair = [Key, Key];
