@@ -76,7 +76,6 @@ export interface Config {
     dropNewPiece?: (piece: cg.Piece, key: cg.Key) => void;
     select?: (key: cg.Key) => void // called when a square is selected
   };
-  items?: (pos: cg.Pos, key: cg.Key) => any | undefined; // items on the board { render: key -> vdom }
   drawable?: {
     enabled?: boolean; // can draw
     visible?: boolean; // can view

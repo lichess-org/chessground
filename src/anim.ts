@@ -92,11 +92,7 @@ function computePlan(prevPieces: cg.Pieces, current: State): AnimPlan {
     }
   });
   missings.forEach(p => {
-    if (
-      !util.containsX(animedOrigs, p.key) &&
-      !(current.items ? current.items(p.pos, p.key) : false)
-    )
-    fadings[p.key] = p.piece;
+    if (!util.containsX(animedOrigs, p.key)) fadings[p.key] = p.piece;
   });
 
   return {
