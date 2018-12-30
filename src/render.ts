@@ -158,8 +158,7 @@ export default function render(s: State): void {
         translate(pMvd, posToTranslate(pos, asWhite));
       }
       // no piece in moved obj: insert the new piece
-      // new: assume the new piece is not being dragged
-      // might be a bad idea
+      // assumes the new piece is not being dragged
       else {
 
         const pieceName = pieceNameOf(p),
