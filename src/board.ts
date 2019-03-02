@@ -32,9 +32,9 @@ export function setPieces(state: State, pieces: cg.PiecesDiff): void {
 }
 
 export function setCheck(state: State, color: cg.Color | boolean): void {
+  state.check = undefined;
   if (color === true) color = state.turnColor;
-  if (!color) state.check = undefined;
-  else for (let k in state.pieces) {
+  if (color) for (let k in state.pieces) {
     if (state.pieces[k]!.role === 'king' && state.pieces[k]!.color === color) {
       state.check = k as cg.Key;
     }
