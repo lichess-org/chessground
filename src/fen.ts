@@ -7,7 +7,6 @@ const roles: { [letter: string]: cg.Role } = { p: 'pawn', r: 'rook', n: 'knight'
 
 const letters = { pawn: 'p', rook: 'r', knight: 'n', bishop: 'b', queen: 'q', king: 'k' };
 
-
 export function read(fen: cg.FEN): cg.Pieces {
   if (fen === 'start') fen = initial;
   const pieces: cg.Pieces = {};

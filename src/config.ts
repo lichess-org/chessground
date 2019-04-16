@@ -130,7 +130,7 @@ export function configure(state: State, config: Config) {
 };
 
 function merge(base: any, extend: any) {
-  for (var key in extend) {
+  for (let key in extend) {
     if (isObject(base[key]) && isObject(extend[key])) merge(base[key], extend[key]);
     else base[key] = extend[key];
   }
