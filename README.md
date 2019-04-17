@@ -4,7 +4,12 @@
 
 It targets modern browsers, as well as mobile development using Cordova.
 
-Chessground is distributed under the GPL-3.0 license. If you're not sure what this means, check out [greendrake.info/#nfy0](http://greendrake.info/#nfy0).
+### License
+
+Chessground is distributed under the *GPL-3.0 license*.
+When you use chessground, your website becomes GPL as well, and *you must release your source code*.
+
+Please read more about it on [greendrake.info/#nfy0](http://greendrake.info/#nfy0).
 
 ### Demos
 
