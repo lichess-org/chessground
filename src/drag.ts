@@ -83,7 +83,7 @@ export function start(s: State, e: cg.MouchEvent): void {
 export function pieceCloseTo(s: State, pos: cg.Pos): boolean {
   const asWhite = s.orientation === 'white',
   bounds = s.dom.bounds(),
-  radiusSq = Math.pow(bounds.width / 16, 2) + Math.pow(bounds.height / 16, 2);
+  radiusSq = Math.pow(bounds.width / 8, 2);
   for (let key in s.pieces) {
     const squareBounds = computeSquareBounds(key as cg.Key, asWhite, bounds),
     center: cg.Pos = [
