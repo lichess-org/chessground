@@ -4,7 +4,16 @@ import { files, ranks } from './types'
 import { createElement as createSVG } from './svg'
 import { Elements } from './types'
 
-export default function wrap(element: HTMLElement, s: State, bounds?: ClientRect): Elements {
+export default function wrap(element: HTMLElement, s: State, relative: boolean): Elements {
+
+  // div.cg-board-wrap
+  //   div
+  //     div
+  //       div.cg-board
+  //       svg
+  //       coords.ranks
+  //       coords.files
+  //       piece.ghost
 
   element.innerHTML = '';
 
@@ -14,28 +23,32 @@ export default function wrap(element: HTMLElement, s: State, bounds?: ClientRect
   });
   element.classList.toggle('manipulable', !s.viewOnly);
 
-  const board = createEl('div', 'cg-board');
+  const helper = createEl('div');
+  element.appendChild(helper);
+  const container = createEl('div');
+  helper.appendChild(container);
 
-  element.appendChild(board);
+  const board = createEl('div', 'cg-board');
+  container.appendChild(board);
 
   let svg: SVGElement | undefined;
-  if (s.drawable.visible && bounds) {
+  if (s.drawable.visible && !relative) {
     svg = createSVG('svg');
     svg.appendChild(createSVG('defs'));
-    element.appendChild(svg);
+    container.appendChild(svg);
   }
 
   if (s.coordinates) {
     const orientClass = s.orientation === 'black' ? ' black' : '';
-    element.appendChild(renderCoords(ranks, 'ranks' + orientClass));
-    element.appendChild(renderCoords(files, 'files' + orientClass));
+    container.appendChild(renderCoords(ranks, 'ranks' + orientClass));
+    container.appendChild(renderCoords(files, 'files' + orientClass));
   }
 
   let ghost: HTMLElement | undefined;
-  if (bounds && s.draggable.showGhost) {
+  if (s.draggable.showGhost && !relative) {
     ghost = createEl('piece', 'ghost');
     setVisible(ghost, false);
-    element.appendChild(ghost);
+    container.appendChild(ghost);
   }
 
   return {
