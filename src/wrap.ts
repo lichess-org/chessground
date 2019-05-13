@@ -6,10 +6,10 @@ import { Elements } from './types'
 
 export default function wrap(element: HTMLElement, s: State, relative: boolean): Elements {
 
-  // div.cg-board-wrap
-  //   div
-  //     div
-  //       div.cg-board
+  // .cg-wrap (element passed to Chessground)
+  //   cg-helper (12.5%)
+  //     cg-container (800%)
+  //       cg-board
   //       svg
   //       coords.ranks
   //       coords.files
@@ -17,18 +17,18 @@ export default function wrap(element: HTMLElement, s: State, relative: boolean):
 
   element.innerHTML = '';
 
-  element.classList.add('cg-board-wrap');
+  element.classList.add('cg-wrap');
   colors.forEach(c => {
     element.classList.toggle('orientation-' + c, s.orientation === c);
   });
   element.classList.toggle('manipulable', !s.viewOnly);
 
-  const helper = createEl('div');
+  const helper = createEl('cg-helper');
   element.appendChild(helper);
-  const container = createEl('div');
+  const container = createEl('cg-container');
   helper.appendChild(container);
 
-  const board = createEl('div', 'cg-board');
+  const board = createEl('cg-board');
   container.appendChild(board);
 
   let svg: SVGElement | undefined;

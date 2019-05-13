@@ -16,11 +16,11 @@ export function Chessground(element: HTMLElement, config?: Config): Api {
 
   function redrawAll() {
     let prevUnbind = state.dom && state.dom.unbind;
-    // first ensure the cg-board-wrap class is set
+    // first ensure the cg-wrap class is set
     // so bounds calculation can use the CSS width/height values
     // add that class yourself to the element before calling chessground
     // for a slight performance improvement! (avoids recomputing style)
-    element.classList.add('cg-board-wrap');
+    element.classList.add('cg-wrap');
     // compute bounds from existing board element if possible
     // this allows non-square boards from CSS to be handled (for 3D)
     const relative = state.viewOnly && !state.drawable.visible;
