@@ -235,9 +235,8 @@ function bindEvents(ctrl, el, context) {
 function renderBoard(ctrl) {
   var d = ctrl.data;
   return {
-    tag: 'div',
+    tag: 'cg-board',
     attrs: {
-      class: 'cg-board',
       config: function(el, isUpdate, context) {
         if (isUpdate) return;
         if (!d.viewOnly || d.drawable.enabled)
@@ -295,11 +294,13 @@ module.exports = function(ctrl) {
         }
       },
       class: [
-        'cg-board-wrap',
+        'cg-wrap',
         'orientation-' + d.orientation,
         d.viewOnly ? 'view-only' : 'manipulable'
       ].join(' ')
     },
-    children: [renderBoard(ctrl)]
+    children: [
+      m('cg-helper', m('cg-container', renderBoard(ctrl)))
+    ]
   };
 };
