@@ -33,6 +33,7 @@ export interface Dests {
 
 export interface Elements {
   board: HTMLElement;
+  container: HTMLElement;
   ghost?: HTMLElement;
   svg?: SVGElement;
 }
