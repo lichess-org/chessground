@@ -299,8 +299,12 @@ module.exports = function(ctrl) {
         d.viewOnly ? 'view-only' : 'manipulable'
       ].join(' ')
     },
-    children: [
-      m('cg-helper', m('cg-container', renderBoard(ctrl)))
-    ]
+    children: [{
+      tag: 'cg-helper',
+      children: [{
+        tag: 'cg-container',
+        children: [renderBoard(ctrl)]
+      }]
+    }]
   };
 };
