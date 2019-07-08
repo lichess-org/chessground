@@ -14,6 +14,7 @@ export interface DragCurrent {
   pos: cg.NumberPair; // relative current position
   dec: cg.NumberPair; // piece center decay
   started: boolean; // whether the drag has started; as per the distance setting
+  size: cg.NumberPair; // width; height of piece
   element: cg.PieceNode | (() => cg.PieceNode | undefined);
   newPiece?: boolean; // it it a new piece from outside the board
   force?: boolean; // can the new piece replace an existing one (editor)
@@ -60,6 +61,7 @@ export function start(s: State, e: cg.MouchEvent): void {
         position[0] - (squareBounds.left + squareBounds.width / 2),
         position[1] - (squareBounds.top + squareBounds.height / 2)
       ] : [0, 0],
+      size: [squareBounds.width, squareBounds.height],
       started: s.draggable.autoDistance && s.stats.dragged,
       element: element,
       previouslySelected: previouslySelected,
@@ -123,6 +125,7 @@ export function dragNewPiece(s: State, piece: cg.Piece, e: cg.MouchEvent, force?
     epos: position,
     pos: [position[0] - rel[0], position[1] - rel[1]],
     dec: [-squareBounds.width / 2, -squareBounds.height / 2],
+    size: [squareBounds.width, squareBounds.height],
     started: true,
     element: () => pieceElementByKey(s, key),
     originTarget: e.target,
@@ -165,6 +168,11 @@ function processDrag(s: State): void {
         const translation = util.posToTranslateAbs(bounds)(cur.origPos, asWhite);
         translation[0] += cur.pos[0] + cur.dec[0];
         translation[1] += cur.pos[1] + cur.dec[1];
+        // bound piece within screen
+        const maxX = document.body.clientWidth + document.body.scrollLeft - cur.size[0] - 8.5;
+        const maxY = document.body.clientHeight + document.body.scrollTop - cur.size[1] - 8.5;
+        translation[0] = Math.min(translation[0], maxX);
+        translation[1] = Math.min(translation[1], maxY);
         util.translateAbs(cur.element, translation);
       }
     }
