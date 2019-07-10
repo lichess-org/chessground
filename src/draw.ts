@@ -1,6 +1,6 @@
 import { State } from './state'
 import { unselect, cancelMove, getKeyAtDomPos } from './board'
-import { eventPosition, raf, isRightButton } from './util'
+import { eventPosition, isRightButton } from './util'
 import * as cg from './types'
 
 export interface DrawShape {
@@ -75,7 +75,7 @@ export function start(state: State, e: cg.MouchEvent): void {
 }
 
 export function processDraw(state: State): void {
-  raf(() => {
+  requestAnimationFrame(() => {
     const cur = state.drawable.current;
     if (cur) {
       const mouseSq = getKeyAtDomPos(cur.pos, state.orientation === 'white', state.dom.bounds());

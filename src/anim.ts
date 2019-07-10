@@ -22,7 +22,7 @@ export interface AnimPlan {
 }
 
 export interface AnimCurrent {
-  start: cg.Timestamp;
+  start: DOMHighResTimeStamp;
   frequency: cg.KHz;
   plan: AnimPlan;
 }
@@ -101,9 +101,7 @@ function computePlan(prevPieces: cg.Pieces, current: State): AnimPlan {
   };
 }
 
-const perf = window.performance !== undefined ? window.performance : Date;
-
-function step(state: State, now: cg.Timestamp): void {
+function step(state: State, now: DOMHighResTimeStamp): void {
   const cur = state.animation.current;
   if (cur === undefined) { // animation was canceled :(
     if (!state.dom.destroyed) state.dom.redrawNow();
@@ -121,7 +119,7 @@ function step(state: State, now: cg.Timestamp): void {
       cfg[3] = cfg[1] * ease;
     }
     state.dom.redrawNow(true); // optimisation: don't render SVG changes during animations
-    util.raf((now = perf.now()) => step(state, now));
+    requestAnimationFrame((now = performance.now()) => step(state, now));
   }
 }
 
@@ -134,11 +132,11 @@ function animate<A>(mutation: Mutation<A>, state: State): A {
   if (!isObjectEmpty(plan.anims) || !isObjectEmpty(plan.fadings)) {
     const alreadyRunning = state.animation.current && state.animation.current.start;
     state.animation.current = {
-      start: perf.now(),
+      start: performance.now(),
       frequency: 1 / state.animation.duration,
       plan: plan
     };
-    if (!alreadyRunning) step(state, perf.now());
+    if (!alreadyRunning) step(state, performance.now());
   } else {
     // don't animate, just render right away
     state.dom.redraw();
