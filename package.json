@@ -12,7 +12,7 @@
     "gulp": "^4",
     "gulp-size": "^3",
     "gulp-sourcemaps": "^2.6.4",
-    "gulp-uglify": "^3.0.1",
+    "gulp-terser": "^1",
     "tsify": "^4",
     "typescript": "^3",
     "vinyl-buffer": "^1.0.1",

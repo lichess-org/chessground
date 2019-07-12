@@ -9,12 +9,17 @@
   "compilerOptions": {
     "outDir": "./",
     "declaration": true,
-    "noUnusedLocals": true,
-    "noEmitOnError": false,
     "removeComments": true,
-    "noImplicitReturns": true,
+    "noEmitOnError": false,
+    "noUnusedLocals": true,
     "noUnusedParameters": true,
-    "target": "es5",
-    "strict": true
+    "noImplicitAny": true,
+    "noImplicitReturns": true,
+    "noImplicitThis": true,
+    "strict": true,
+    "strictNullChecks": true,
+    "alwaysStrict": true,
+    "target": "ES6",
+    "lib": ["DOM", "ES6"]
   }
 }
