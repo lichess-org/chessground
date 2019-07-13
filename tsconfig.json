@@ -20,6 +20,7 @@
     "strictNullChecks": true,
     "alwaysStrict": true,
     "target": "ES6",
+    "module": "commonjs",
     "lib": ["DOM", "ES6"]
   }
 }
