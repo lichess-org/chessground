@@ -60,15 +60,14 @@ export const posToTranslateAbs = (bounds: ClientRect) => {
 };
 
 export const posToTranslateRel: (pos: cg.Pos, asWhite: boolean) => cg.NumberPair =
-  (pos, asWhite) => posToTranslateBase(pos, asWhite, 12.5, 12.5);
+  (pos, asWhite) => posToTranslateBase(pos, asWhite, 100, 100);
 
 export const translateAbs = (el: HTMLElement, pos: cg.Pos) => {
   el.style.transform = `translate(${pos[0]}px,${pos[1]}px)`;
 }
 
 export const translateRel = (el: HTMLElement, percents: cg.NumberPair) => {
-  el.style.left = percents[0] + '%';
-  el.style.top = percents[1] + '%';
+  el.style.transform = `translate(${percents[0]}%,${percents[1]}%)`;
 }
 
 export const setVisible = (el: HTMLElement, v: boolean) => {
