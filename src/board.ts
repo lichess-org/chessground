@@ -56,10 +56,7 @@ export function unsetPremove(state: State): void {
 
 function setPredrop(state: State, role: cg.Role, key: cg.Key): void {
   unsetPremove(state);
-  state.predroppable.current = {
-    role: role,
-    key: key
-  };
+  state.predroppable.current = { role, key };
   callUserFunction(state.predroppable.events.set, role, key);
 }
 
@@ -151,7 +148,7 @@ export function userMove(state: State, orig: cg.Key, dest: cg.Key): boolean {
       const metadata: cg.MoveMetadata = {
         premove: false,
         ctrlKey: state.stats.ctrlKey,
-        holdTime: holdTime
+        holdTime
       };
       if (result !== true) metadata.captured = result;
       callUserFunction(state.movable.events.after, orig, dest, metadata);

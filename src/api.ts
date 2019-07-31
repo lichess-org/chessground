@@ -1,4 +1,4 @@
-import { State } from './state'
+import { State, whitePov } from './state'
 import * as board from './board'
 import { write as fenWrite } from './fen'
 import { Config, configure } from './config'
@@ -165,7 +165,7 @@ export function start(state: State, redrawAll: cg.Redraw): Api {
     },
 
     getKeyAtDomPos(pos) {
-      return board.getKeyAtDomPos(pos, state.orientation === 'white', state.dom.bounds());
+      return board.getKeyAtDomPos(pos, whitePov(state), state.dom.bounds());
     },
 
     redrawAll,
