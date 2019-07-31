@@ -23,11 +23,11 @@ export function memo<A>(f: () => A): cg.Memo<A> {
 export const timer: () => cg.Timer = () => {
   let startAt: number | undefined;
   return {
-    start() { startAt = Date.now(); },
-    cancel() { startAt = undefined; },
+    start() { startAt = performance.now() },
+    cancel() { startAt = undefined },
     stop() {
       if (!startAt) return 0;
-      const time = Date.now() - startAt;
+      const time = performance.now() - startAt;
       startAt = undefined;
       return time;
     }
