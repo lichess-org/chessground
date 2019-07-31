@@ -1,4 +1,4 @@
-import { State, whitePov } from './state'
+import { State } from './state'
 import * as cg from './types'
 import * as board from './board'
 import * as util from './util'
@@ -30,7 +30,7 @@ export function drop(s: State, e: cg.MouchEvent): void {
     s.pieces.a0 = piece;
     const position = util.eventPosition(e);
     const dest = position && board.getKeyAtDomPos(
-      position, whitePov(s), s.dom.bounds());
+      position, board.whitePov(s), s.dom.bounds());
     if (dest) board.dropNewPiece(s, 'a0', dest);
   }
   s.dom.redraw();

@@ -1,4 +1,4 @@
-import { State, whitePov } from './state'
+import { State } from './state'
 import * as board from './board'
 import * as util from './util'
 import { clear as drawClear } from './draw'
@@ -26,7 +26,7 @@ export function start(s: State, e: cg.MouchEvent): void {
   if (e.touches && e.touches.length > 1) return; // support one finger touch only
   const bounds = s.dom.bounds(),
   position = util.eventPosition(e) as cg.NumberPair,
-  orig = board.getKeyAtDomPos(position, whitePov(s), bounds);
+  orig = board.getKeyAtDomPos(position, board.whitePov(s), bounds);
   if (!orig) return;
   const piece = s.pieces[orig];
   const previouslySelected = s.selected;
@@ -51,7 +51,7 @@ export function start(s: State, e: cg.MouchEvent): void {
   const stillSelected = s.selected === orig;
   const element = pieceElementByKey(s, orig);
   if (piece && element && stillSelected && board.isDraggable(s, orig)) {
-    const squareBounds = computeSquareBounds(orig, whitePov(s), bounds);
+    const squareBounds = computeSquareBounds(orig, board.whitePov(s), bounds);
     s.draggable.current = {
       orig,
       origPos: util.key2pos(orig),
@@ -74,7 +74,7 @@ export function start(s: State, e: cg.MouchEvent): void {
     const ghost = s.dom.elements.ghost;
     if (ghost) {
       ghost.className = `ghost ${piece.color} ${piece.role}`;
-      util.translateAbs(ghost, util.posToTranslateAbs(bounds)(util.key2pos(orig), whitePov(s)));
+      util.translateAbs(ghost, util.posToTranslateAbs(bounds)(util.key2pos(orig), board.whitePov(s)));
       util.setVisible(ghost, true);
     }
     processDrag(s);
@@ -86,7 +86,7 @@ export function start(s: State, e: cg.MouchEvent): void {
 }
 
 export function pieceCloseTo(s: State, pos: cg.Pos): boolean {
-  const asWhite = whitePov(s),
+  const asWhite = board.whitePov(s),
   bounds = s.dom.bounds(),
   radiusSq = Math.pow(bounds.width / 8, 2);
   for (let key in s.pieces) {
@@ -109,7 +109,7 @@ export function dragNewPiece(s: State, piece: cg.Piece, e: cg.MouchEvent, force?
   s.dom.redraw();
 
   const position = util.eventPosition(e) as cg.NumberPair,
-  asWhite = whitePov(s),
+  asWhite = board.whitePov(s),
   bounds = s.dom.bounds(),
   squareBounds = computeSquareBounds(key, asWhite, bounds);
 
@@ -163,7 +163,7 @@ function processDrag(s: State): void {
         ];
 
         // move piece
-        const translation = util.posToTranslateAbs(s.dom.bounds())(cur.origPos, whitePov(s));
+        const translation = util.posToTranslateAbs(s.dom.bounds())(cur.origPos, board.whitePov(s));
         translation[0] += cur.pos[0] + cur.dec[0];
         translation[1] += cur.pos[1] + cur.dec[1];
         util.translateAbs(cur.element, translation);
@@ -195,7 +195,7 @@ export function end(s: State, e: cg.MouchEvent): void {
   board.unsetPredrop(s);
   // touchend has no position; so use the last touchmove position instead
   const eventPos: cg.NumberPair = util.eventPosition(e) || cur.epos;
-  const dest = board.getKeyAtDomPos(eventPos, whitePov(s), s.dom.bounds());
+  const dest = board.getKeyAtDomPos(eventPos, board.whitePov(s), s.dom.bounds());
   if (dest && cur.started && cur.orig !== dest) {
     if (cur.newPiece) board.dropNewPiece(s, cur.orig, dest, cur.force);
     else {

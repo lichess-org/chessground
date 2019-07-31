@@ -335,3 +335,7 @@ export function getKeyAtDomPos(pos: cg.NumberPair, asWhite: boolean, bounds: Cli
   if (!asWhite) rank = 9 - rank;
   return (file > 0 && file < 9 && rank > 0 && rank < 9) ? pos2key([file, rank]) : undefined;
 }
+
+export function whitePov(s: State): boolean {
+  return s.orientation === 'white';
+}

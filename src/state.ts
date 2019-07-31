@@ -99,10 +99,6 @@ export interface State {
   hold: cg.Timer
 }
 
-export function whitePov(s: State): boolean {
-  return s.orientation === 'white';
-}
-
 export function defaults(): Partial<State> {
   return {
     pieces: fen.read(fen.initial),

@@ -1,5 +1,5 @@
-import { State, whitePov } from './state'
-import { unselect, cancelMove, getKeyAtDomPos } from './board'
+import { State } from './state'
+import { unselect, cancelMove, getKeyAtDomPos, whitePov } from './board'
 import { eventPosition, isRightButton } from './util'
 import * as cg from './types'
 

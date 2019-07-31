@@ -1,5 +1,6 @@
-import { State, whitePov } from './state'
+import { State } from './state'
 import { key2pos, createEl } from './util'
+import { whitePov } from './board'
 import * as util from './util'
 import { AnimCurrent, AnimVectors, AnimVector, AnimFadings } from './anim'
 import { DragCurrent } from './drag'
