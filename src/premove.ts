@@ -53,31 +53,19 @@ function rookFilesOf(pieces: cg.Pieces, color: cg.Color) {
   }).map((key: string ) => util.key2pos(key as cg.Key)[0]);
 }
 
+const allPos = util.allKeys.map(util.key2pos);
+
 export default function premove(pieces: cg.Pieces, key: cg.Key, canCastle: boolean): cg.Key[] {
   const piece = pieces[key]!,
-  pos = util.key2pos(key);
-  let mobility: Mobility;
-  switch (piece.role) {
-    case 'pawn':
-      mobility = pawn(piece.color);
-      break;
-    case 'knight':
-      mobility = knight;
-      break;
-    case 'bishop':
-      mobility = bishop;
-      break;
-    case 'rook':
-      mobility = rook;
-      break;
-    case 'queen':
-      mobility = queen;
-      break;
-    case 'king':
-      mobility = king(piece.color, rookFilesOf(pieces, piece.color), canCastle);
-      break;
-  }
-  return util.allKeys.map(util.key2pos).filter(pos2 => {
-    return (pos[0] !== pos2[0] || pos[1] !== pos2[1]) && mobility(pos[0], pos[1], pos2[0], pos2[1]);
-  }).map(util.pos2key);
+    pos = util.key2pos(key),
+    r = piece.role,
+    mobility: Mobility = r === 'pawn' ? pawn(piece.color) : (
+      r === 'knight' ? knight : (
+        r === 'bishop' ? bishop : (
+          r === 'rook' ? rook : (
+            r === 'queen' ? queen : king(piece.color, rookFilesOf(pieces, piece.color), canCastle)
+          ))));
+  return allPos.filter(pos2 =>
+    (pos[0] !== pos2[0] || pos[1] !== pos2[1]) && mobility(pos[0], pos[1], pos2[0], pos2[1])
+  ).map(util.pos2key);
 };
