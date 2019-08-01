@@ -64,7 +64,6 @@ export interface State {
   draggable: {
     enabled: boolean; // allow moves & premoves to use drag'n drop
     distance: number; // minimum distance to initiate a drag; in pixels
-    autoDistance: boolean; // lets chessground set distance to zero when user drags pieces
     centerPiece: boolean; // center the piece on cursor at drag start
     showGhost: boolean; // show ghost of piece being dragged
     deleteOnDropOff: boolean; // delete a piece when it is dropped off the board
@@ -138,8 +137,7 @@ export function defaults(): Partial<State> {
     },
     draggable: {
       enabled: true,
-      distance: 3,
-      autoDistance: true,
+      distance: 0,
       centerPiece: true,
       showGhost: true,
       deleteOnDropOff: false

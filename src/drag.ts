@@ -63,7 +63,7 @@ export function start(s: State, e: cg.MouchEvent): void {
         position[0] - (squareBounds.left + squareBounds.width / 2),
         position[1] - (squareBounds.top + squareBounds.height / 2)
       ] : [0, 0],
-      started: s.draggable.autoDistance && s.stats.dragged,
+      started: s.draggable.distance === 0 && s.stats.dragged,
       element,
       previouslySelected,
       originTarget: e.target
