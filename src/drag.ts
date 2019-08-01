@@ -204,7 +204,7 @@ export function end(s: State, e: cg.MouchEvent): void {
     }
   } else if (cur.newPiece) {
     delete s.pieces[cur.orig];
-  } else if (s.draggable.deleteOnDropOff) {
+  } else if (s.draggable.deleteOnDropOff && !dest) {
     delete s.pieces[cur.orig];
     board.callUserFunction(s.events.change);
   }
