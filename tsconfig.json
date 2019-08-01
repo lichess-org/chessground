@@ -21,6 +21,8 @@
     "alwaysStrict": true,
     "target": "ES6",
     "module": "commonjs",
+    "inlineSourceMap": true,
+    "inlineSources": true,
     "lib": ["DOM", "ES6"]
   }
 }
