@@ -47,9 +47,10 @@ function king(color: cg.Color, rookFiles: number[], canCastle: boolean): Mobilit
 }
 
 function rookFilesOf(pieces: cg.Pieces, color: cg.Color) {
+  const backrank = color == 'white' ? '1' : '8';
   return Object.keys(pieces).filter(key => {
     const piece = pieces[key];
-    return piece && piece.color === color && piece.role === 'rook';
+    return key[1] === backrank && piece && piece.color === color && piece.role === 'rook';
   }).map((key: string ) => util.key2pos(key as cg.Key)[0]);
 }
 
