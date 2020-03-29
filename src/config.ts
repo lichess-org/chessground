@@ -87,6 +87,7 @@ export interface Config {
     pieces?: {
       baseUrl?: string;
     }
+    onChange?: (shapes: DrawShape[]) => void; // called after drawable shapes change
   }
 }
 
