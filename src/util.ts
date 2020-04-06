@@ -6,13 +6,13 @@ export const invRanks: cg.Rank[] = [8, 7, 6, 5, 4, 3, 2, 1];
 
 export const allKeys: cg.Key[] = Array.prototype.concat(...cg.files.map(c => cg.ranks.map(r => c+r)));
 
-export const pos2key = (pos: cg.Pos) => allKeys[8 * pos[0] + pos[1] - 9];
+export const pos2key = (pos: cg.Pos): cg.Key => allKeys[8 * pos[0] + pos[1] - 9];
 
-export const key2pos = (k: cg.Key) => [k.charCodeAt(0) - 96, k.charCodeAt(1) - 48] as cg.Pos;
+export const key2pos = (k: cg.Key): cg.Pos => [k.charCodeAt(0) - 96, k.charCodeAt(1) - 48] as cg.Pos;
 
 export function memo<A>(f: () => A): cg.Memo<A> {
   let v: A | undefined;
-  const ret: any = () => {
+  const ret = (): A => {
     if (v === undefined) v = f();
     return v;
   };
@@ -34,7 +34,7 @@ export const timer: () => cg.Timer = () => {
   };
 }
 
-export const opposite = (c: cg.Color) => c === 'white' ? 'black' : 'white';
+export const opposite = (c: cg.Color): cg.Color => c === 'white' ? 'black' : 'white';
 
 export function containsX<X>(xs: X[] | undefined, x: X): boolean {
   return xs !== undefined && xs.indexOf(x) !== -1;
@@ -62,15 +62,15 @@ export const posToTranslateAbs = (bounds: ClientRect) => {
 export const posToTranslateRel: (pos: cg.Pos, asWhite: boolean) => cg.NumberPair =
   (pos, asWhite) => posToTranslateBase(pos, asWhite, 100, 100);
 
-export const translateAbs = (el: HTMLElement, pos: cg.NumberPair) => {
+export const translateAbs = (el: HTMLElement, pos: cg.NumberPair): void => {
   el.style.transform = `translate(${pos[0]}px,${pos[1]}px)`;
 }
 
-export const translateRel = (el: HTMLElement, percents: cg.NumberPair) => {
+export const translateRel = (el: HTMLElement, percents: cg.NumberPair): void => {
   el.style.transform = `translate(${percents[0]}%,${percents[1]}%)`;
 }
 
-export const setVisible = (el: HTMLElement, v: boolean) => {
+export const setVisible = (el: HTMLElement, v: boolean): void => {
   el.style.visibility = v ? 'visible' : 'hidden';
 }
 
@@ -81,9 +81,9 @@ export const eventPosition: (e: cg.MouchEvent) => cg.NumberPair | undefined = e 
   return undefined;
 }
 
-export const isRightButton = (e: MouseEvent) => e.buttons === 2 || e.button === 2;
+export const isRightButton = (e: MouseEvent): boolean => e.buttons === 2 || e.button === 2;
 
-export const createEl = (tagName: string, className?: string) => {
+export const createEl = (tagName: string, className?: string): HTMLElement => {
   const el = document.createElement(tagName);
   if (className) el.className = className;
   return el;

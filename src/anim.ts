@@ -6,14 +6,14 @@ export type Mutation<A> = (state: State) => A;
 
 // 0,1 animation goal
 // 2,3 animation current status
-export type AnimVector = cg.NumberQuad
+export type AnimVector = cg.NumberQuad;
 
 export interface AnimVectors {
-  [key: string]: AnimVector;
+  [key: string]: AnimVector | undefined;
 }
 
 export interface AnimFadings {
-  [key: string]: cg.Piece;
+  [key: string]: cg.Piece | undefined;
 }
 
 export interface AnimPlan {
@@ -43,7 +43,7 @@ interface AnimPiece {
   piece: cg.Piece;
 }
 interface AnimPieces {
-  [key: string]: AnimPiece;
+  [key: string]: AnimPiece | undefined;
 }
 
 function makePiece(key: cg.Key, piece: cg.Piece): AnimPiece {
@@ -54,7 +54,7 @@ function makePiece(key: cg.Key, piece: cg.Piece): AnimPiece {
   };
 }
 
-function closer(piece: AnimPiece, pieces: AnimPiece[]): AnimPiece {
+function closer(piece: AnimPiece, pieces: AnimPiece[]): AnimPiece | undefined {
   return pieces.sort((p1, p2) => {
     return util.distanceSq(piece.pos, p1.pos) - util.distanceSq(piece.pos, p2.pos);
   })[0];
@@ -67,8 +67,8 @@ function computePlan(prevPieces: cg.Pieces, current: State): AnimPlan {
   missings: AnimPiece[] = [],
   news: AnimPiece[] = [],
   prePieces: AnimPieces = {};
-  let curP: cg.Piece | undefined, preP: AnimPiece | undefined, i: any, vector: cg.NumberPair;
-  for (i in prevPieces) {
+  let curP: cg.Piece | undefined, preP: AnimPiece | undefined, vector: cg.NumberPair;
+  for (const i in prevPieces) {
     prePieces[i] = makePiece(i as cg.Key, prevPieces[i]!);
   }
   for (const key of util.allKeys) {
@@ -113,8 +113,8 @@ function step(state: State, now: DOMHighResTimeStamp): void {
     state.dom.redrawNow();
   } else {
     const ease = easing(rest);
-    for (let i in cur.plan.anims) {
-      const cfg = cur.plan.anims[i];
+    for (const i in cur.plan.anims) {
+      const cfg = cur.plan.anims[i]!;
       cfg[2] = cfg[0] * ease;
       cfg[3] = cfg[1] * ease;
     }
@@ -144,7 +144,7 @@ function animate<A>(mutation: Mutation<A>, state: State): A {
   return result;
 }
 
-function isObjectEmpty(o: any): boolean {
+function isObjectEmpty(o: object): boolean {
   for (const _ in o) return false;
   return true;
 }

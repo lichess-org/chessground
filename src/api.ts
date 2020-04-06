@@ -80,14 +80,14 @@ export interface Api {
 // see API types and documentations in dts/api.d.ts
 export function start(state: State, redrawAll: cg.Redraw): Api {
 
-  function toggleOrientation() {
+  function toggleOrientation(): void {
     board.toggleOrientation(state);
     redrawAll();
   };
 
   return {
 
-    set(config) {
+    set(config): void {
       if (config.orientation && config.orientation !== state.orientation) toggleOrientation();
       (config.fen ? anim : render)(state => configure(state, config), state);
     },
@@ -98,11 +98,11 @@ export function start(state: State, redrawAll: cg.Redraw): Api {
 
     toggleOrientation,
 
-    setPieces(pieces) {
+    setPieces(pieces): void {
       anim(state => board.setPieces(state, pieces), state);
     },
 
-    selectSquare(key, force) {
+    selectSquare(key, force): void {
       if (key) anim(state => board.selectSquare(state, key, force), state);
       else if (state.selected) {
         board.unselect(state);
@@ -110,15 +110,15 @@ export function start(state: State, redrawAll: cg.Redraw): Api {
       }
     },
 
-    move(orig, dest) {
+    move(orig, dest): void {
       anim(state => board.baseMove(state, orig, dest), state);
     },
 
-    newPiece(piece, key) {
+    newPiece(piece, key): void {
       anim(state => board.baseNewPiece(state, piece, key), state);
     },
 
-    playPremove() {
+    playPremove(): boolean {
       if (state.premovable.current) {
         if (anim(board.playPremove, state)) return true;
         // if the premove couldn't be played, redraw to clear it up
@@ -127,7 +127,7 @@ export function start(state: State, redrawAll: cg.Redraw): Api {
       return false;
     },
 
-    playPredrop(validate) {
+    playPredrop(validate): boolean {
       if (state.predroppable.current) {
         const result = board.playPredrop(state, validate);
         state.dom.redraw();
@@ -136,45 +136,45 @@ export function start(state: State, redrawAll: cg.Redraw): Api {
       return false;
     },
 
-    cancelPremove() {
+    cancelPremove(): void {
       render(board.unsetPremove, state);
     },
 
-    cancelPredrop() {
+    cancelPredrop(): void {
       render(board.unsetPredrop, state);
     },
 
-    cancelMove() {
+    cancelMove(): void {
       render(state => { board.cancelMove(state); dragCancel(state); }, state);
     },
 
-    stop() {
+    stop(): void {
       render(state => { board.stop(state); dragCancel(state); }, state);
     },
 
-    explode(keys: cg.Key[]) {
+    explode(keys: cg.Key[]): void {
       explosion(state, keys);
     },
 
-    setAutoShapes(shapes: DrawShape[]) {
+    setAutoShapes(shapes: DrawShape[]): void {
       render(state => state.drawable.autoShapes = shapes, state);
     },
 
-    setShapes(shapes: DrawShape[]) {
+    setShapes(shapes: DrawShape[]): void {
       render(state => state.drawable.shapes = shapes, state);
     },
 
-    getKeyAtDomPos(pos) {
+    getKeyAtDomPos(pos): cg.Key | undefined {
       return board.getKeyAtDomPos(pos, board.whitePov(state), state.dom.bounds());
     },
 
     redrawAll,
 
-    dragNewPiece(piece, event, force) {
+    dragNewPiece(piece, event, force): void {
       dragNewPiece(state, piece, event, force)
     },
 
-    destroy() {
+    destroy(): void {
       board.stop(state);
       state.dom.unbind && state.dom.unbind();
       state.dom.destroyed = true;

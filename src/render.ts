@@ -11,8 +11,8 @@ type PieceName = string;
 
 interface SamePieces { [key: string]: boolean }
 interface SameSquares { [key: string]: boolean }
-interface MovedPieces { [pieceName: string]: cg.PieceNode[] }
-interface MovedSquares { [className: string]: cg.SquareNode[] }
+interface MovedPieces { [pieceName: string]: cg.PieceNode[] | undefined }
+interface MovedSquares { [className: string]: cg.SquareNode[] | undefined }
 interface SquareClasses { [key: string]: string }
 
 // ported from https://github.com/veloce/lichobile/blob/master/src/js/chessground/view.js
@@ -35,18 +35,18 @@ export default function render(s: State): void {
   piecesKeys: cg.Key[] = Object.keys(pieces) as cg.Key[];
   let k: cg.Key,
   p: cg.Piece | undefined,
-  el: cg.PieceNode | cg.SquareNode,
+  el: cg.PieceNode | cg.SquareNode | undefined,
   pieceAtKey: cg.Piece | undefined,
   elPieceName: PieceName,
   anim: AnimVector | undefined,
   fading: cg.Piece | undefined,
-  pMvdset: cg.PieceNode[],
+  pMvdset: cg.PieceNode[] | undefined,
   pMvd: cg.PieceNode | undefined,
-  sMvdset: cg.SquareNode[],
+  sMvdset: cg.SquareNode[] | undefined,
   sMvd: cg.SquareNode | undefined;
 
   // walk over all board dom elements, apply animations and flag moved pieces
-  el = boardEl.firstChild as cg.PieceNode | cg.SquareNode;
+  el = boardEl.firstChild as cg.PieceNode | cg.SquareNode | undefined;
   while (el) {
     k = el.cgKey;
     if (isPieceNode(el)) {
@@ -91,24 +91,24 @@ export default function render(s: State): void {
             el.classList.add('fading');
             el.cgFading = true;
           } else {
-            if (movedPieces[elPieceName]) movedPieces[elPieceName].push(el);
+            if (movedPieces[elPieceName]) movedPieces[elPieceName]!.push(el);
             else movedPieces[elPieceName] = [el];
           }
         }
       }
       // no piece: flag as moved
       else {
-        if (movedPieces[elPieceName]) movedPieces[elPieceName].push(el);
+        if (movedPieces[elPieceName]) movedPieces[elPieceName]!.push(el);
         else movedPieces[elPieceName] = [el];
       }
     }
     else if (isSquareNode(el)) {
       const cn = el.className;
       if (squares[k] === cn) sameSquares[k] = true;
-      else if (movedSquares[cn]) movedSquares[cn].push(el);
+      else if (movedSquares[cn]) movedSquares[cn]!.push(el);
       else movedSquares[cn] = [el];
     }
-    el = el.nextSibling as cg.PieceNode | cg.SquareNode;
+    el = el.nextSibling as cg.PieceNode | cg.SquareNode | undefined;
   }
 
   // walk over all squares in current set, apply dom changes to moved squares
@@ -183,8 +183,8 @@ export default function render(s: State): void {
   }
 
   // remove any element that remains in the moved sets
-  for (const i in movedPieces) removeNodes(s, movedPieces[i]);
-  for (const i in movedSquares) removeNodes(s, movedSquares[i]);
+  for (const i in movedPieces) removeNodes(s, movedPieces[i]!);
+  for (const i in movedSquares) removeNodes(s, movedSquares[i]!);
 }
 
 function isPieceNode(el: cg.PieceNode | cg.SquareNode): el is cg.PieceNode {

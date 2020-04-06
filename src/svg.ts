@@ -69,12 +69,12 @@ function syncDefs(d: Drawable, shapes: Shape[], defsEl: SVGElement) {
     }
   });
   const keysInDom: {[key: string]: boolean} = {};
-  let el: SVGElement = defsEl.firstChild as SVGElement;
-  while(el) {
+  let el: SVGElement | undefined = defsEl.firstChild as SVGElement;
+  while (el) {
     keysInDom[el.getAttribute('cgKey') as string] = true;
-    el = el.nextSibling as SVGElement;
+    el = el.nextSibling as SVGElement | undefined;
   }
-  for (let key in brushes) {
+  for (const key in brushes) {
     if (!keysInDom[key]) defsEl.appendChild(renderMarker(brushes[key]));
   }
 }
@@ -85,14 +85,14 @@ function syncShapes(state: State, shapes: Shape[], brushes: DrawBrushes, arrowDe
   hashesInDom: {[hash: string]: boolean} = {},
   toRemove: SVGElement[] = [];
   shapes.forEach(sc => { hashesInDom[sc.hash] = false; });
-  let el: SVGElement = defsEl.nextSibling as SVGElement, elHash: Hash;
-  while(el) {
+  let el: SVGElement | undefined = defsEl.nextSibling as SVGElement, elHash: Hash;
+  while (el) {
     elHash = el.getAttribute('cgHash') as Hash;
     // found a shape element that's here to stay
     if (hashesInDom.hasOwnProperty(elHash)) hashesInDom[elHash] = true;
     // or remove it
     else toRemove.push(el);
-    el = el.nextSibling as SVGElement;
+    el = el.nextSibling as SVGElement | undefined;
   }
   // remove old shapes
   toRemove.forEach(el => root.removeChild(el));
@@ -126,7 +126,7 @@ function renderShape(state: State, {shape, current, hash}: Shape, brushes: DrawB
     bounds);
   else {
     const orig = orient(key2pos(shape.orig), state.orientation);
-    if (shape.orig && shape.dest) {
+    if (shape.dest) {
       let brush: DrawBrush = brushes[shape.brush];
       if (shape.modifiers) brush = makeCustomBrush(brush, shape.modifiers);
       el = renderArrow(
@@ -212,7 +212,7 @@ function renderMarker(brush: DrawBrush): SVGElement {
 }
 
 function setAttributes(el: SVGElement, attrs: { [key: string]: any }): SVGElement {
-  for (let key in attrs) el.setAttribute(key, attrs[key]);
+  for (const key in attrs) el.setAttribute(key, attrs[key]);
   return el;
 }
 

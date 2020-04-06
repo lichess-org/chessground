@@ -43,7 +43,7 @@ export default function wrap(element: HTMLElement, s: State, relative: boolean):
 
   if (s.coordinates) {
     const orientClass = s.orientation === 'black' ? ' black' : '';
-    container.appendChild(renderCoords(ranks, 'ranks' + orientClass));
+    container.appendChild(renderCoords(ranks.map(r => r.toString()), 'ranks' + orientClass));
     container.appendChild(renderCoords(files, 'files' + orientClass));
   }
 
@@ -62,12 +62,12 @@ export default function wrap(element: HTMLElement, s: State, relative: boolean):
   };
 }
 
-function renderCoords(elems: any[], className: string): HTMLElement {
+function renderCoords(elems: string[], className: string): HTMLElement {
   const el = createEl('coords', className);
   let f: HTMLElement;
-  for (let i in elems) {
+  for (const elem of elems) {
     f = createEl('coord');
-    f.textContent = elems[i];
+    f.textContent = elem;
     el.appendChild(f);
   }
   return el;

@@ -24,7 +24,7 @@ export function reset(state: State): void {
 }
 
 export function setPieces(state: State, pieces: cg.PiecesDiff): void {
-  for (let key in pieces) {
+  for (const key in pieces) {
     const piece = pieces[key];
     if (piece) state.pieces[key] = piece;
     else delete state.pieces[key];
@@ -34,7 +34,7 @@ export function setPieces(state: State, pieces: cg.PiecesDiff): void {
 export function setCheck(state: State, color: cg.Color | boolean): void {
   state.check = undefined;
   if (color === true) color = state.turnColor;
-  if (color) for (let k in state.pieces) {
+  if (color) for (const k in state.pieces) {
     if (state.pieces[k]!.role === 'king' && state.pieces[k]!.color === color) {
       state.check = k as cg.Key;
     }
@@ -102,7 +102,7 @@ export function baseMove(state: State, orig: cg.Key, dest: cg.Key): cg.Piece | b
   const origPiece = state.pieces[orig], destPiece = state.pieces[dest];
   if (orig === dest || !origPiece) return false;
   const captured = (destPiece && destPiece.color !== origPiece.color) ? destPiece : undefined;
-  if (dest == state.selected) unselect(state);
+  if (dest === state.selected) unselect(state);
   callUserFunction(state.events.move, orig, dest, captured);
   if (!tryAutoCastle(state, orig, dest)) {
     state.pieces[dest] = origPiece;
@@ -296,8 +296,8 @@ export function playPremove(state: State): boolean {
 }
 
 export function playPredrop(state: State, validate: (drop: cg.Drop) => boolean): boolean {
-  const drop = state.predroppable.current,
-  success = false;
+  const drop = state.predroppable.current;
+  let success = false;
   if (!drop) return false;
   if (validate(drop)) {
     const piece = {

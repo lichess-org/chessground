@@ -39,7 +39,7 @@ export function start(s: State, e: cg.MouchEvent): void {
   // select squares.
   if (e.cancelable !== false &&
       (!e.touches || !s.movable.color || piece || previouslySelected || pieceCloseTo(s, position)))
-       e.preventDefault();
+        e.preventDefault();
   const hadPremove = !!s.premovable.current;
   const hadPredrop = !!s.predroppable.current;
   s.stats.ctrlKey = e.ctrlKey;
@@ -89,7 +89,7 @@ export function pieceCloseTo(s: State, pos: cg.NumberPair): boolean {
   const asWhite = board.whitePov(s),
   bounds = s.dom.bounds(),
   radiusSq = Math.pow(bounds.width / 8, 2);
-  for (let key in s.pieces) {
+  for (const key in s.pieces) {
     const squareBounds = computeSquareBounds(key as cg.Key, asWhite, bounds),
     center: cg.NumberPair = [
       squareBounds.left + squareBounds.width / 2,
@@ -208,7 +208,7 @@ export function end(s: State, e: cg.MouchEvent): void {
     delete s.pieces[cur.orig];
     board.callUserFunction(s.events.change);
   }
-  if (cur && cur.orig === cur.previouslySelected && (cur.orig === dest || !dest))
+  if (cur.orig === cur.previouslySelected && (cur.orig === dest || !dest))
     board.unselect(s);
   else if (!s.selectable.enabled) board.unselect(s);
 
@@ -229,12 +229,12 @@ export function cancel(s: State): void {
   }
 }
 
-function removeDragElements(s: State) {
+function removeDragElements(s: State): void {
   const e = s.dom.elements;
   if (e.ghost) util.setVisible(e.ghost, false);
 }
 
-function computeSquareBounds(key: cg.Key, asWhite: boolean, bounds: ClientRect) {
+function computeSquareBounds(key: cg.Key, asWhite: boolean, bounds: ClientRect): cg.Rect {
   const pos = util.key2pos(key);
   if (!asWhite) {
     pos[0] = 9 - pos[0];
@@ -249,10 +249,10 @@ function computeSquareBounds(key: cg.Key, asWhite: boolean, bounds: ClientRect) 
 }
 
 function pieceElementByKey(s: State, key: cg.Key): cg.PieceNode | undefined {
-  let el = s.dom.elements.board.firstChild as cg.PieceNode;
+  let el = s.dom.elements.board.firstChild as cg.PieceNode | undefined;
   while (el) {
     if (el.cgKey === key && el.tagName === 'PIECE') return el;
-    el = el.nextSibling as cg.PieceNode;
+    el = el.nextSibling as cg.PieceNode | undefined;
   }
   return undefined;
 }

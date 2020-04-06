@@ -91,7 +91,7 @@ export interface Config {
   };
 }
 
-export function configure(state: State, config: Config) {
+export function configure(state: State, config: Config): void {
 
   // don't merge destinations. Just override.
   if (config.movable && config.movable.dests) state.movable.dests = undefined;
@@ -131,13 +131,13 @@ export function configure(state: State, config: Config) {
   }
 };
 
-function merge(base: any, extend: any) {
-  for (let key in extend) {
+function merge(base: any, extend: any): void {
+  for (const key in extend) {
     if (isObject(base[key]) && isObject(extend[key])) merge(base[key], extend[key]);
     else base[key] = extend[key];
   }
 }
 
-function isObject(o: any): boolean {
+function isObject(o: unknown): boolean {
   return typeof o === 'object';
 }

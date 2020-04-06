@@ -27,8 +27,15 @@ export type NumberPair = [number, number];
 
 export type NumberQuad = [number, number, number, number];
 
+export interface Rect {
+  left: number;
+  top: number;
+  width: number;
+  height: number;
+}
+
 export interface Dests {
-  [key: string]: Key[];
+  [key: string]: Key[] | undefined;
 }
 
 export interface Elements {

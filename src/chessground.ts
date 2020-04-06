@@ -14,14 +14,14 @@ export function Chessground(element: HTMLElement, config?: Config): Api {
 
   configure(state, config || {});
 
-  function redrawAll() {
+  function redrawAll(): void {
     const prevUnbind = state.dom && state.dom.unbind;
     // compute bounds from existing board element if possible
     // this allows non-square boards from CSS to be handled (for 3D)
     const relative = state.viewOnly && !state.drawable.visible,
     elements = renderWrap(element, state, relative),
     bounds = util.memo(() => elements.board.getBoundingClientRect()),
-    redrawNow = (skipSvg?: boolean) => {
+    redrawNow = (skipSvg?: boolean): void => {
       render(state);
       if (!skipSvg && elements.svg) svg.renderSvg(state, elements.svg);
     };
