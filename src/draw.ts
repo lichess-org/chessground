@@ -124,7 +124,7 @@ function eventBrush(e: cg.MouchEvent): string {
 
 function addShape(drawable: Drawable, cur: DrawCurrent): void {
   const sameShape = (s: DrawShape) => s.orig === cur.orig && s.dest === cur.dest;
-  const similar = drawable.shapes.filter(sameShape)[0];
+  const similar = drawable.shapes.find(sameShape);
   if (similar) drawable.shapes = drawable.shapes.filter(s => !sameShape(s));
   if (!similar || similar.brush !== cur.brush) drawable.shapes.push(cur);
   onChange(drawable);
