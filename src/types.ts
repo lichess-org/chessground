@@ -28,7 +28,7 @@ export type NumberPair = [number, number];
 export type NumberQuad = [number, number, number, number];
 
 export interface Dests {
-  [key: string]: Key[]
+  [key: string]: Key[];
 }
 
 export interface Elements {
@@ -38,7 +38,7 @@ export interface Elements {
   svg?: SVGElement;
 }
 export interface Dom {
-  elements: Elements,
+  elements: Elements;
   bounds: Memo<ClientRect>;
   redraw: () => void;
   redrawNow: (skipSvg?: boolean) => void;
@@ -77,7 +77,10 @@ export interface PieceNode extends KeyedNode {
 }
 export interface SquareNode extends KeyedNode { }
 
-export interface Memo<A> { (): A; clear: () => void; }
+export interface Memo<A> {
+  (): A;
+  clear: () => void;
+}
 
 export interface Timer {
   start: () => void;

@@ -14,7 +14,7 @@ interface Shape {
 }
 
 interface CustomBrushes {
-  [hash: string]: DrawBrush
+  [hash: string]: DrawBrush;
 }
 
 interface ArrowDests {

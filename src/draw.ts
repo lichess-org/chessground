@@ -21,7 +21,7 @@ export interface DrawBrush {
   key: string;
   color: string;
   opacity: number;
-  lineWidth: number
+  lineWidth: number;
 }
 
 export interface DrawBrushes {
@@ -43,9 +43,9 @@ export interface Drawable {
   brushes: DrawBrushes;
   // drawable SVG pieces; used for crazyhouse drop
   pieces: {
-    baseUrl: string
-  },
-  prevSvgHash: string
+    baseUrl: string;
+  };
+  prevSvgHash: string;
 }
 
 export interface DrawCurrent {

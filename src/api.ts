@@ -74,7 +74,7 @@ export interface Api {
 
   // unbinds all events
   // (important for document-wide events like scroll and mousemove)
-  destroy: cg.Unbind
+  destroy: cg.Unbind;
 }
 
 // see API types and documentations in dts/api.d.ts

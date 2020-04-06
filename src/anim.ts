@@ -9,11 +9,11 @@ export type Mutation<A> = (state: State) => A;
 export type AnimVector = cg.NumberQuad
 
 export interface AnimVectors {
-  [key: string]: AnimVector
+  [key: string]: AnimVector;
 }
 
 export interface AnimFadings {
-  [key: string]: cg.Piece
+  [key: string]: cg.Piece;
 }
 
 export interface AnimPlan {
@@ -43,7 +43,7 @@ interface AnimPiece {
   piece: cg.Piece;
 }
 interface AnimPieces {
-  [key: string]: AnimPiece
+  [key: string]: AnimPiece;
 }
 
 function makePiece(key: cg.Key, piece: cg.Piece): AnimPiece {
@@ -145,7 +145,7 @@ function animate<A>(mutation: Mutation<A>, state: State): A {
 }
 
 function isObjectEmpty(o: any): boolean {
-  for (let _ in o) return false;
+  for (const _ in o) return false;
   return true;
 }
 // https://gist.github.com/gre/1650294

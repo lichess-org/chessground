@@ -30,14 +30,14 @@ export interface Config {
     free?: boolean; // all moves are valid - board editor
     color?: cg.Color | 'both'; // color that can move. white | black | both | undefined
     dests?: {
-      [key: string]: cg.Key[]
+      [key: string]: cg.Key[];
     }; // valid moves. {"a2" ["a3" "a4"] "b1" ["a3" "c3"]}
     showDests?: boolean; // whether to add the move-dest class on squares
     events?: {
       after?: (orig: cg.Key, dest: cg.Key, metadata: cg.MoveMetadata) => void; // called after the move has been played
       afterNewPiece?: (role: cg.Role, key: cg.Key, metadata: cg.MoveMetadata) => void; // called after a new piece is dropped on the board
     };
-    rookCastle?: boolean // castle by moving the king to the rook
+    rookCastle?: boolean; // castle by moving the king to the rook
   };
   premovable?: {
     enabled?: boolean; // allow premoves for color that can not move
@@ -47,14 +47,14 @@ export interface Config {
     events?: {
       set?: (orig: cg.Key, dest: cg.Key, metadata?: cg.SetPremoveMetadata) => void; // called after the premove has been set
       unset?: () => void;  // called after the premove has been unset
-    }
+    };
   };
   predroppable?: {
     enabled?: boolean; // allow predrops for color that can not move
     events?: {
       set?: (role: cg.Role, key: cg.Key) => void; // called after the predrop has been set
       unset?: () => void; // called after the predrop has been unset
-    }
+    };
   };
   draggable?: {
     enabled?: boolean; // allow moves & premoves to use drag'n drop
@@ -66,7 +66,7 @@ export interface Config {
   };
   selectable?: {
     // disable to enforce dragging over click-click move
-    enabled?: boolean
+    enabled?: boolean;
   };
   events?: {
     change?: () => void; // called after the situation changes on the board
@@ -86,9 +86,9 @@ export interface Config {
     brushes?: DrawBrush[];
     pieces?: {
       baseUrl?: string;
-    }
+    };
     onChange?: (shapes: DrawShape[]) => void; // called after drawable shapes change
-  }
+  };
 }
 
 export function configure(state: State, config: Config) {

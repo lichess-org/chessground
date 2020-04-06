@@ -1,9 +1,9 @@
 import * as util from './util'
 import * as cg from './types'
 
-type Mobility = (x1:number, y1:number, x2:number, y2:number) => boolean;
+type Mobility = (x1: number, y1: number, x2: number, y2: number) => boolean;
 
-function diff(a: number, b:number):number {
+function diff(a: number, b: number): number {
   return Math.abs(a - b);
 }
 

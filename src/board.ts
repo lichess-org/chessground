@@ -296,7 +296,7 @@ export function playPremove(state: State): boolean {
 }
 
 export function playPredrop(state: State, validate: (drop: cg.Drop) => boolean): boolean {
-  let drop = state.predroppable.current,
+  const drop = state.predroppable.current,
   success = false;
   if (!drop) return false;
   if (validate(drop)) {

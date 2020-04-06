@@ -10,7 +10,7 @@ const letters = { pawn: 'p', rook: 'r', knight: 'n', bishop: 'b', queen: 'q', ki
 export function read(fen: cg.FEN): cg.Pieces {
   if (fen === 'start') fen = initial;
   const pieces: cg.Pieces = {};
-  let row: number = 8, col: number = 0;
+  let row = 8, col = 0;
   for (const c of fen) {
     switch (c) {
       case ' ': return pieces;

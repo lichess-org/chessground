@@ -37,7 +37,7 @@ export interface State {
       after?: (orig: cg.Key, dest: cg.Key, metadata: cg.MoveMetadata) => void; // called after the move has been played
       afterNewPiece?: (role: cg.Role, key: cg.Key, metadata: cg.MoveMetadata) => void; // called after a new piece is dropped on the board
     };
-    rookCastle: boolean // castle by moving the king to the rook
+    rookCastle: boolean; // castle by moving the king to the rook
   };
   premovable: {
     enabled: boolean; // allow premoves for color that can not move
@@ -48,18 +48,18 @@ export interface State {
     events: {
       set?: (orig: cg.Key, dest: cg.Key, metadata?: cg.SetPremoveMetadata) => void; // called after the premove has been set
       unset?: () => void;  // called after the premove has been unset
-    }
+    };
   };
   predroppable: {
     enabled: boolean; // allow predrops for color that can not move
     current?: { // current saved predrop {role: 'knight'; key: 'e4'}
       role: cg.Role;
-      key: cg.Key
+      key: cg.Key;
     };
     events: {
       set?: (role: cg.Role, key: cg.Key) => void; // called after the predrop has been set
       unset?: () => void; // called after the predrop has been unset
-    }
+    };
   };
   draggable: {
     enabled: boolean; // allow moves & premoves to use drag'n drop
@@ -73,16 +73,16 @@ export interface State {
   dropmode: {
     active: boolean;
     piece?: cg.Piece;
-  }
+  };
   selectable: {
     // disable to enforce dragging over click-click move
-    enabled: boolean
+    enabled: boolean;
   };
   stats: {
     // was last piece dragged or clicked?
     // needs default to false for touch
-    dragged: boolean,
-    ctrlKey?: boolean
+    dragged: boolean;
+    ctrlKey?: boolean;
   };
   events: {
     change?: () => void; // called after the situation changes on the board
@@ -90,13 +90,13 @@ export interface State {
     // capturedPiece is undefined or like {color: 'white'; 'role': 'queen'}
     move?: (orig: cg.Key, dest: cg.Key, capturedPiece?: cg.Piece) => void;
     dropNewPiece?: (piece: cg.Piece, key: cg.Key) => void;
-    select?: (key: cg.Key) => void // called when a square is selected
+    select?: (key: cg.Key) => void; // called when a square is selected
     insert?: (elements: cg.Elements) => void; // when the board DOM has been (re)inserted
   };
-  drawable: Drawable,
+  drawable: Drawable;
   exploding?: cg.Exploding;
-  dom: cg.Dom,
-  hold: cg.Timer
+  dom: cg.Dom;
+  hold: cg.Timer;
 }
 
 export function defaults(): Partial<State> {
