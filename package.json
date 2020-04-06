@@ -26,6 +26,10 @@
     "compile": "tsc",
     "lint": "eslint src/*.ts"
   },
+  "files": [
+    "*.js",
+    "*.d.ts"
+  ],
   "repository": "https://github.com/ornicar/chessground",
   "keywords": [
     "chess",
