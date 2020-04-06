@@ -88,12 +88,12 @@ const ground = Chessground(document.body, config);
 
 Install build dependencies:
 ```sh
-yarn install
+npm install
 ```
 
 To build the node module:
 ```sh
-tsc -watch
+npm run compile -- --watch
 ```
 
 To build the standalone:
