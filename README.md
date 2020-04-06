@@ -1,6 +1,9 @@
 Chessground
 ===========
 
+[![Continuous Integration](https://github.com/ornicar/chessground/workflows/Continuous%20Integration/badge.svg)](https://github.com/ornicar/chessground/actions?query=workflow%3A%22Continuous+Integration%22)
+[![npm](https://img.shields.io/npm/v/chessground)](https://www.npmjs.com/package/chessground)
+
 ![Chessground in 2D and 3D](/screenshot/twin.jpg)
 
 *Chessground* is a free/libre open source chess UI developed for
@@ -63,6 +66,7 @@ npm install --save chessground
 ```js
 const Chessground = require('chessground').Chessground;
 
+const config = {};
 const ground = Chessground(document.body, config);
 ```
 
