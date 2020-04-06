@@ -83,17 +83,17 @@ function computePlan(prevPieces: cg.Pieces, current: State): AnimPlan {
       } else news.push(makePiece(key, curP));
     } else if (preP) missings.push(preP);
   }
-  news.forEach(newP => {
+  for (const newP of news) {
     preP = closer(newP, missings.filter(p => util.samePiece(newP.piece, p.piece)));
     if (preP) {
       vector = [preP.pos[0] - newP.pos[0], preP.pos[1] - newP.pos[1]];
       anims[newP.key] = vector.concat(vector) as AnimVector;
       animedOrigs.push(preP.key);
     }
-  });
-  missings.forEach(p => {
+  }
+  for (const p of missings) {
     if (!util.containsX(animedOrigs, p.key)) fadings[p.key] = p.piece;
-  });
+  }
 
   return {
     anims: anims,

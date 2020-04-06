@@ -30,9 +30,9 @@ export function renderSvg(state: State, root: SVGElement): void {
   cur = curD && curD.mouseSq ? curD as DrawShape : undefined,
   arrowDests: ArrowDests = {};
 
-  d.shapes.concat(d.autoShapes).concat(cur ? [cur] : []).forEach(s => {
+  for (const s of d.shapes.concat(d.autoShapes).concat(cur ? [cur] : [])) {
     if (s.dest) arrowDests[s.dest] = (arrowDests[s.dest] || 0) + 1;
-  });
+  }
 
   const shapes: Shape[] = d.shapes.concat(d.autoShapes).map((s: DrawShape) => {
     return {
@@ -61,13 +61,13 @@ export function renderSvg(state: State, root: SVGElement): void {
 function syncDefs(d: Drawable, shapes: Shape[], defsEl: SVGElement) {
   const brushes: CustomBrushes = {};
   let brush: DrawBrush;
-  shapes.forEach(s => {
+  for (const s of shapes) {
     if (s.shape.dest) {
       brush = d.brushes[s.shape.brush];
       if (s.shape.modifiers) brush = makeCustomBrush(brush, s.shape.modifiers);
       brushes[brush.key] = brush;
     }
-  });
+  }
   const keysInDom: {[key: string]: boolean} = {};
   let el: SVGElement | undefined = defsEl.firstChild as SVGElement;
   while (el) {
@@ -84,7 +84,7 @@ function syncShapes(state: State, shapes: Shape[], brushes: DrawBrushes, arrowDe
   const bounds = state.dom.bounds(),
   hashesInDom: {[hash: string]: boolean} = {},
   toRemove: SVGElement[] = [];
-  shapes.forEach(sc => { hashesInDom[sc.hash] = false; });
+  for (const sc of shapes) hashesInDom[sc.hash] = false;
   let el: SVGElement | undefined = defsEl.nextSibling as SVGElement, elHash: Hash;
   while (el) {
     elHash = el.getAttribute('cgHash') as Hash;
@@ -95,11 +95,11 @@ function syncShapes(state: State, shapes: Shape[], brushes: DrawBrushes, arrowDe
     el = el.nextSibling as SVGElement | undefined;
   }
   // remove old shapes
-  toRemove.forEach(el => root.removeChild(el));
+  for (const el of toRemove) root.removeChild(el);
   // insert shapes that are not yet in dom
-  shapes.forEach(sc => {
+  for (const sc of shapes) {
     if (!hashesInDom[sc.hash]) root.appendChild(renderShape(state, sc, brushes, arrowDests, bounds));
-  });
+  }
 }
 
 function shapeHash({orig, dest, brush, piece, modifiers}: DrawShape, arrowDests: ArrowDests, current: boolean): Hash {

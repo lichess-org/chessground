@@ -43,8 +43,8 @@ export function bindDocument(s: State, redrawAll: cg.Redraw): cg.Unbind {
     const onmove: MouchBind = dragOrDraw(s, drag.move, draw.move);
     const onend: MouchBind = dragOrDraw(s, drag.end, draw.end);
 
-    ['touchmove', 'mousemove'].forEach(ev => unbinds.push(unbindable(document, ev, onmove)));
-    ['touchend', 'mouseup'].forEach(ev => unbinds.push(unbindable(document, ev, onend)));
+    for (const ev of ['touchmove', 'mousemove']) unbinds.push(unbindable(document, ev, onmove));
+    for (const ev of ['touchend', 'mouseup']) unbinds.push(unbindable(document, ev, onend));
 
     const onScroll = () => s.dom.bounds.clear();
     unbinds.push(unbindable(window, 'scroll', onScroll, { passive: true }));
