@@ -59,7 +59,8 @@ export interface DrawCurrent {
 const brushes = ['green', 'red', 'blue', 'yellow'];
 
 export function start(state: State, e: cg.MouchEvent): void {
-  if (e.touches && e.touches.length > 1) return; // support one finger touch only
+  // support one finger touch only
+  if (e.touches && e.touches.length > 1) return; /* eslint-disable-line */
   e.stopPropagation();
   e.preventDefault();
   e.ctrlKey ? unselect(state) : cancelMove(state);
