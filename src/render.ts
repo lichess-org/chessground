@@ -209,32 +209,29 @@ function pieceNameOf(piece: cg.Piece): string {
 
 function computeSquareClasses(s: State): SquareClasses {
   const squares: SquareClasses = {};
-  let i: any, k: cg.Key;
-  if (s.lastMove && s.highlight.lastMove) for (i in s.lastMove) {
-    addSquare(squares, s.lastMove[i], 'last-move');
+  if (s.lastMove && s.highlight.lastMove) for (const k of s.lastMove) {
+    addSquare(squares, k, 'last-move');
   }
   if (s.check && s.highlight.check) addSquare(squares, s.check, 'check');
   if (s.selected) {
     addSquare(squares, s.selected, 'selected');
     if (s.movable.showDests) {
       const dests = s.movable.dests && s.movable.dests[s.selected];
-      if (dests) for (i in dests) {
-        k = dests[i];
+      if (dests) for (const k of dests) {
         addSquare(squares, k, 'move-dest' + (s.pieces[k] ? ' oc' : ''));
       }
       const pDests = s.premovable.dests;
-      if (pDests) for (i in pDests) {
-        k = pDests[i];
+      if (pDests) for (const k of pDests) {
         addSquare(squares, k, 'premove-dest' + (s.pieces[k] ? ' oc' : ''));
       }
     }
   }
   const premove = s.premovable.current;
-  if (premove) for (i in premove) addSquare(squares, premove[i], 'current-premove');
+  if (premove) for (const k of premove) addSquare(squares, k, 'current-premove');
   else if (s.predroppable.current) addSquare(squares, s.predroppable.current.key, 'current-premove');
 
   const o = s.exploding;
-  if (o) for (i in o.keys) addSquare(squares, o.keys[i], 'exploding' + o.stage);
+  if (o) for (const k of o.keys) addSquare(squares, k, 'exploding' + o.stage);
 
   return squares;
 }
