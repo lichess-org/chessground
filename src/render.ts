@@ -133,8 +133,7 @@ export default function render(s: State): void {
 
   // walk over all pieces in current set, apply dom changes to moved pieces
   // or append new pieces
-  for (const j in piecesKeys) {
-    k = piecesKeys[j];
+  for (k of piecesKeys) {
     p = pieces[k]!;
     anim = anims[k];
     if (!samePieces[k]) {
@@ -195,7 +194,7 @@ function isSquareNode(el: cg.PieceNode | cg.SquareNode): el is cg.SquareNode {
 }
 
 function removeNodes(s: State, nodes: HTMLElement[]): void {
-  for (const i in nodes) s.dom.elements.board.removeChild(nodes[i]);
+  for (const node of nodes) s.dom.elements.board.removeChild(node);
 }
 
 function posZIndex(pos: cg.Pos, asWhite: boolean): string {
