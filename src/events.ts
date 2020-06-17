@@ -47,7 +47,7 @@ export function bindDocument(s: State, redrawAll: cg.Redraw): cg.Unbind {
     for (const ev of ['touchend', 'mouseup']) unbinds.push(unbindable(document, ev, onend));
 
     const onScroll = () => s.dom.bounds.clear();
-    unbinds.push(unbindable(window, 'scroll', onScroll, { passive: true }));
+    unbinds.push(unbindable(document, 'scroll', onScroll, { capture: true, passive: true }));
     unbinds.push(unbindable(window, 'resize', onScroll, { passive: true }));
   }
 
@@ -56,7 +56,7 @@ export function bindDocument(s: State, redrawAll: cg.Redraw): cg.Unbind {
 
 function unbindable(el: EventTarget, eventName: string, callback: MouchBind, options?: any): cg.Unbind {
   el.addEventListener(eventName, callback as EventListener, options);
-  return () => el.removeEventListener(eventName, callback as EventListener);
+  return () => el.removeEventListener(eventName, callback as EventListener, options);
 }
 
 function startDragOrDraw(s: State): MouchBind {
