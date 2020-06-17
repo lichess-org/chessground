@@ -70,31 +70,30 @@ export function unsetPredrop(state: State): void {
 
 function tryAutoCastle(state: State, orig: cg.Key, dest: cg.Key): boolean {
   if (!state.autoCastle) return false;
+
   const king = state.pieces[orig];
   if (!king || king.role !== 'king') return false;
-  const origPos = key2pos(orig);
-  if (origPos[0] !== 5) return false;
-  if (origPos[1] !== 1 && origPos[1] !== 8) return false;
-  const destPos = key2pos(dest);
-  let oldRookPos, newRookPos, newKingPos;
-  if (destPos[0] === 7 || destPos[0] === 8) {
-    oldRookPos = pos2key([8, origPos[1]]);
-    newRookPos = pos2key([6, origPos[1]]);
-    newKingPos = pos2key([7, origPos[1]]);
-  } else if (destPos[0] === 3 || destPos[0] === 1) {
-    oldRookPos = pos2key([1, origPos[1]]);
-    newRookPos = pos2key([4, origPos[1]]);
-    newKingPos = pos2key([3, origPos[1]]);
-  } else return false;
 
-  const rook = state.pieces[oldRookPos];
-  if (!rook || rook.role !== 'rook') return false;
+  const origPos = key2pos(orig);
+  const destPos = key2pos(dest);
+  if ((origPos[1] !== 1 && origPos[1] !== 8) || origPos[1] !== destPos[1]) return false;
+  if (origPos[0] === 5) {
+    if (destPos[0] === 7) dest = pos2key([8, destPos[1]]);
+    else if (destPos[0] === 3) dest = pos2key([1, destPos[1]]);
+  }
+  const rook = state.pieces[dest];
+  if (!rook || rook.color !== king.color || rook.role !== 'rook') return false;
 
   delete state.pieces[orig];
-  delete state.pieces[oldRookPos];
+  delete state.pieces[dest];
 
-  state.pieces[newKingPos] = king
-  state.pieces[newRookPos] = rook;
+  if (origPos[0] < destPos[0]) {
+    state.pieces[pos2key([7, destPos[1]])] = king;
+    state.pieces[pos2key([6, destPos[1]])] = rook;
+  } else {
+    state.pieces[pos2key([3, destPos[1]])] = king;
+    state.pieces[pos2key([4, destPos[1]])] = rook;
+  }
   return true;
 }
 
