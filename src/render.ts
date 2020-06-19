@@ -17,7 +17,7 @@ interface SquareClasses { [key: string]: string }
 
 // ported from https://github.com/veloce/lichobile/blob/master/src/js/chessground/view.js
 // in case of bugs, blame @veloce
-export default function render(s: State): void {
+export function render(s: State): void {
   const asWhite: boolean = whitePov(s),
   posToTranslate = s.dom.relative ? util.posToTranslateRel : util.posToTranslateAbs(s.dom.bounds()),
   translate = s.dom.relative ? util.translateRel : util.translateAbs,
@@ -184,6 +184,19 @@ export default function render(s: State): void {
   // remove any element that remains in the moved sets
   for (const i in movedPieces) removeNodes(s, movedPieces[i]!);
   for (const i in movedSquares) removeNodes(s, movedSquares[i]!);
+}
+
+export function updateBounds(s: State) {
+  if (s.dom.relative) return;
+  const asWhite: boolean = whitePov(s),
+  posToTranslate = util.posToTranslateAbs(s.dom.bounds());
+  let el = s.dom.elements.board.firstChild as cg.PieceNode | cg.SquareNode | undefined;
+  while (el) {
+    if ((isPieceNode(el) && !el.cgAnimating) || isSquareNode(el)) {
+      util.translateAbs(el, posToTranslate(key2pos(el.cgKey), asWhite));
+    }
+    el = el.nextSibling as cg.PieceNode | cg.SquareNode | undefined;
+  }
 }
 
 function isPieceNode(el: cg.PieceNode | cg.SquareNode): el is cg.PieceNode {

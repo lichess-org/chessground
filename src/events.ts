@@ -8,7 +8,7 @@ import * as cg from './types'
 type MouchBind = (e: cg.MouchEvent) => void;
 type StateMouchBind = (d: State, e: cg.MouchEvent) => void;
 
-export function bindBoard(s: State): void {
+export function bindBoard(s: State, boundsUpdated: () => void): void {
 
   if (s.viewOnly) return;
 
@@ -23,19 +23,22 @@ export function bindBoard(s: State): void {
   if (s.disableContextMenu || s.drawable.enabled) {
     boardEl.addEventListener('contextmenu', e => e.preventDefault());
   }
+
+  if (!s.dom.relative && s.resizable && 'ResizeObserver' in window) {
+    const observer = new (window as any)['ResizeObserver'](boundsUpdated);
+    observer.observe(boardEl);
+  }
 }
 
 // returns the unbind function
-export function bindDocument(s: State, redrawAll: cg.Redraw): cg.Unbind {
+export function bindDocument(s: State, boundsUpdated: () => void): cg.Unbind {
 
   const unbinds: cg.Unbind[] = [];
 
-  if (!s.dom.relative && s.resizable) {
-    const onResize = () => {
-      s.dom.bounds.clear();
-      requestAnimationFrame(redrawAll);
-    };
-    unbinds.push(unbindable(document.body, 'chessground.resize', onResize));
+  // Old versions of Edge and Safari do not support ResizeObserver. Send
+  // chessground.resize if a user action has changed the bounds of the board.
+  if (!s.dom.relative && s.resizable && !('ResizeObserver' in window)) {
+    unbinds.push(unbindable(document.body, 'chessground.resize', boundsUpdated));
   }
 
   if (!s.viewOnly) {

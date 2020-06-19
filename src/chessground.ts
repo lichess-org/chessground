@@ -4,7 +4,7 @@ import { State, defaults } from './state'
 
 import renderWrap from './wrap';
 import * as events from './events'
-import render from './render';
+import { render, updateBounds } from './render';
 import * as svg from './svg';
 import * as util from './util';
 
@@ -24,6 +24,11 @@ export function Chessground(element: HTMLElement, config?: Config): Api {
     redrawNow = (skipSvg?: boolean): void => {
       render(state);
       if (!skipSvg && elements.svg) svg.renderSvg(state, elements.svg);
+    },
+    boundsUpdated = (): void => {
+      bounds.clear();
+      updateBounds(state);
+      if (elements.svg) svg.renderSvg(state, elements.svg);
     };
     state.dom = {
       elements,
@@ -35,8 +40,8 @@ export function Chessground(element: HTMLElement, config?: Config): Api {
     };
     state.drawable.prevSvgHash = '';
     redrawNow(false);
-    events.bindBoard(state);
-    if (!prevUnbind) state.dom.unbind = events.bindDocument(state, redrawAll);
+    events.bindBoard(state, boundsUpdated);
+    if (!prevUnbind) state.dom.unbind = events.bindDocument(state, boundsUpdated);
     state.events.insert && state.events.insert(elements);
   }
   redrawAll();
