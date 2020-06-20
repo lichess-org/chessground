@@ -36,10 +36,6 @@ export const timer = (): cg.Timer => {
 
 export const opposite = (c: cg.Color): cg.Color => c === 'white' ? 'black' : 'white';
 
-export function containsX<X>(xs: X[] | undefined, x: X): boolean {
-  return xs !== undefined && xs.indexOf(x) !== -1;
-}
-
 export const distanceSq = (pos1: cg.Pos, pos2: cg.Pos): number => {
   const dx = pos1[0] - pos2[0],
   dy = pos1[1] - pos2[1];

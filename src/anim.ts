@@ -92,7 +92,7 @@ function computePlan(prevPieces: cg.Pieces, current: State): AnimPlan {
     }
   }
   for (const p of missings) {
-    if (!util.containsX(animedOrigs, p.key)) fadings[p.key] = p.piece;
+    if (!animedOrigs.includes(p.key)) fadings[p.key] = p.piece;
   }
 
   return {

@@ -41,8 +41,8 @@ function king(color: cg.Color, rookFiles: number[], canCastle: boolean): Mobilit
     diff(x1, x2) < 2 && diff(y1, y2) < 2
   ) || (
     canCastle && y1 === y2 && y1 === (color === 'white' ? 1 : 8) && (
-      (x1 === 5 && ((util.containsX(rookFiles, 1) && x2 === 3) || (util.containsX(rookFiles, 8) && x2 === 7))) ||
-      util.containsX(rookFiles, x2)
+      (x1 === 5 && ((x2 === 3 && rookFiles.includes(1)) || (x2 === 7 && rookFiles.includes(8)))) ||
+      rookFiles.includes(x2)
     )
   );
 }
@@ -70,4 +70,4 @@ export default function premove(pieces: cg.Pieces, key: cg.Key, canCastle: boole
   return allPos.filter(pos2 =>
     (pos[0] !== pos2[0] || pos[1] !== pos2[1]) && mobility(pos[0], pos[1], pos2[0], pos2[1])
   ).map(util.pos2key);
-};
+}

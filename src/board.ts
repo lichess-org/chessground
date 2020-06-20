@@ -1,5 +1,5 @@
 import { State } from './state'
-import { pos2key, key2pos, opposite, containsX } from './util'
+import { pos2key, key2pos, opposite } from './util'
 import premove from './premove'
 import * as cg from './types'
 
@@ -227,7 +227,7 @@ function isMovable(state: State, orig: cg.Key): boolean {
 
 export function canMove(state: State, orig: cg.Key, dest: cg.Key): boolean {
   return orig !== dest && isMovable(state, orig) && (
-    state.movable.free || (!!state.movable.dests && containsX(state.movable.dests[orig], dest))
+    state.movable.free || (!!state.movable.dests && !!state.movable.dests[orig] && state.movable.dests[orig]!.includes(dest))
   );
 }
 
@@ -251,7 +251,7 @@ function isPremovable(state: State, orig: cg.Key): boolean {
 function canPremove(state: State, orig: cg.Key, dest: cg.Key): boolean {
   return orig !== dest &&
   isPremovable(state, orig) &&
-  containsX(premove(state.pieces, orig, state.premovable.castle), dest);
+  premove(state.pieces, orig, state.premovable.castle).includes(dest);
 }
 
 function canPredrop(state: State, orig: cg.Key, dest: cg.Key): boolean {
