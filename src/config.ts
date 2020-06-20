@@ -29,9 +29,7 @@ export interface Config {
   movable?: {
     free?: boolean; // all moves are valid - board editor
     color?: cg.Color | 'both'; // color that can move. white | black | both | undefined
-    dests?: {
-      [key: string]: cg.Key[];
-    }; // valid moves. {"a2" ["a3" "a4"] "b1" ["a3" "c3"]}
+    dests?: cg.Dests, // valid moves. {"a2" ["a3" "a4"] "b1" ["a3" "c3"]}
     showDests?: boolean; // whether to add the move-dest class on squares
     events?: {
       after?: (orig: cg.Key, dest: cg.Key, metadata: cg.MoveMetadata) => void; // called after the move has been played
