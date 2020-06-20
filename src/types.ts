@@ -77,12 +77,15 @@ export interface KeyedNode extends HTMLElement {
   cgKey: Key;
 }
 export interface PieceNode extends KeyedNode {
+  tagName: 'PIECE';
   cgPiece: string;
   cgAnimating?: boolean;
   cgFading?: boolean;
   cgDragging?: boolean;
 }
-export interface SquareNode extends KeyedNode { }
+export interface SquareNode extends KeyedNode {
+  tagName: 'SQUARE';
+}
 
 export interface Memo<A> {
   (): A;

@@ -50,10 +50,10 @@ const posToTranslateBase = (pos: cg.Pos, asWhite: boolean, xFactor: number, yFac
   (asWhite ? 8 - pos[1] : pos[1] - 1) * yFactor
 ];
 
-export const posToTranslateAbs = (bounds: ClientRect) => {
+export const posToTranslateAbs = (bounds: ClientRect): (pos: cg.Pos, asWhite: boolean) => cg.NumberPair => {
   const xFactor = bounds.width / 8,
   yFactor = bounds.height / 8;
-  return (pos: cg.Pos, asWhite: boolean) => posToTranslateBase(pos, asWhite, xFactor, yFactor);
+  return (pos, asWhite) => posToTranslateBase(pos, asWhite, xFactor, yFactor);
 }
 
 export const posToTranslateRel = (pos: cg.Pos, asWhite: boolean): cg.NumberPair =>

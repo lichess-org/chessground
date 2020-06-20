@@ -233,7 +233,7 @@ export function canMove(state: State, orig: cg.Key, dest: cg.Key): boolean {
 
 function canDrop(state: State, orig: cg.Key, dest: cg.Key): boolean {
   const piece = state.pieces[orig];
-  return !!piece && dest && (orig === dest || !state.pieces[dest]) && (
+  return !!piece && (orig === dest || !state.pieces[dest]) && (
     state.movable.color === 'both' || (
       state.movable.color === piece.color &&
         state.turnColor === piece.color
@@ -257,7 +257,7 @@ function canPremove(state: State, orig: cg.Key, dest: cg.Key): boolean {
 function canPredrop(state: State, orig: cg.Key, dest: cg.Key): boolean {
   const piece = state.pieces[orig];
   const destPiece = state.pieces[dest];
-  return !!piece && dest &&
+  return !!piece &&
   (!destPiece || destPiece.color !== state.movable.color) &&
   state.predroppable.enabled &&
   (piece.role !== 'pawn' || (dest[1] !== '1' && dest[1] !== '8')) &&

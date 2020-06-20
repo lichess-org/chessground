@@ -186,7 +186,7 @@ export function render(s: State): void {
   for (const i in movedSquares) removeNodes(s, movedSquares[i]!);
 }
 
-export function updateBounds(s: State) {
+export function updateBounds(s: State): void {
   if (s.dom.relative) return;
   const asWhite: boolean = whitePov(s),
   posToTranslate = util.posToTranslateAbs(s.dom.bounds());

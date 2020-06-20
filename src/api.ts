@@ -83,7 +83,7 @@ export function start(state: State, redrawAll: cg.Redraw): Api {
   function toggleOrientation(): void {
     board.toggleOrientation(state);
     redrawAll();
-  };
+  }
 
   return {
 

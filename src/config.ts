@@ -126,7 +126,7 @@ export function configure(state: State, config: Config): void {
         !((d === 'h' + rank) && dests.includes('g' + rank as cg.Key))
     );
   }
-};
+}
 
 function merge(base: any, extend: any): void {
   for (const key in extend) {

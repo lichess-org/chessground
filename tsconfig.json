@@ -19,7 +19,7 @@
     "strict": true,
     "strictNullChecks": true,
     "alwaysStrict": true,
-    "target": "ES6",
+    "target": "ES2016",
     "module": "commonjs",
     "inlineSourceMap": true,
     "inlineSources": true,

@@ -47,7 +47,7 @@ export function Chessground(element: HTMLElement, config?: Config): Api {
   redrawAll();
 
   return start(state, redrawAll);
-};
+}
 
 function debounceRedraw(redrawNow: (skipSvg?: boolean) => void): () => void {
   let redrawing = false;

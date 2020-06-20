@@ -19,6 +19,7 @@ export interface DragCurrent {
 }
 
 export function start(s: State, e: cg.MouchEvent): void {
+  // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
   if (e.button !== undefined && e.button !== 0) return; // only touch or left click
   // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
   if (e.touches && e.touches.length > 1) return; // support one finger touch only
@@ -160,7 +161,7 @@ export function end(s: State, e: cg.MouchEvent): void {
   if (e.type === 'touchend' && e.cancelable !== false) e.preventDefault();
   // comparing with the origin target is an easy way to test that the end event
   // has the same touch origin
-  if (e.type === 'touchend' && cur && cur.originTarget !== e.target && !cur.newPiece) {
+  if (e.type === 'touchend' && cur.originTarget !== e.target && !cur.newPiece) {
     s.draggable.current = undefined;
     return;
   }
@@ -222,10 +223,10 @@ function computeSquareBounds(key: cg.Key, asWhite: boolean, bounds: ClientRect):
 }
 
 function pieceElementByKey(s: State, key: cg.Key): cg.PieceNode | undefined {
-  let el = s.dom.elements.board.firstChild as cg.PieceNode | undefined;
+  let el = s.dom.elements.board.firstChild;
   while (el) {
-    if (el.cgKey === key && el.tagName === 'PIECE') return el;
-    el = el.nextSibling as cg.PieceNode | undefined;
+    if ((el as cg.KeyedNode).cgKey === key && (el as cg.KeyedNode).tagName === 'PIECE') return el as cg.PieceNode;
+    el = el.nextSibling;
   }
   return undefined;
 }
