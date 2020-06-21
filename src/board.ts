@@ -227,7 +227,7 @@ function isMovable(state: State, orig: cg.Key): boolean {
 
 export function canMove(state: State, orig: cg.Key, dest: cg.Key): boolean {
   return orig !== dest && isMovable(state, orig) && (
-    state.movable.free || (!!state.movable.dests && !!state.movable.dests[orig] && state.movable.dests[orig]!.includes(dest))
+    state.movable.free || !!state.movable.dests?.[orig]?.includes(dest)
   );
 }
 

@@ -91,7 +91,7 @@ export interface Config {
 export function configure(state: State, config: Config): void {
 
   // don't merge destinations. Just override.
-  if (config.movable && config.movable.dests) state.movable.dests = undefined;
+  if (config.movable?.dests) state.movable.dests = undefined;
 
   merge(state, config);
 

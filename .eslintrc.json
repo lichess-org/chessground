@@ -22,7 +22,7 @@
     "@typescript-eslint/no-use-before-define": ["error", { "functions": false }],
     "@typescript-eslint/explicit-function-return-type": "off",
     "@typescript-eslint/no-unused-vars": ["warn", { "argsIgnorePattern": "^_" }],
-    "@typescript-eslint/no-unnecessary-condition": ["warn"]
+    "@typescript-eslint/no-unnecessary-condition": "warn"
   },
   "root": true
 }
