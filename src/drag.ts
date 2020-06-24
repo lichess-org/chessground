@@ -77,7 +77,7 @@ export function start(s: State, e: cg.MouchEvent): void {
   s.dom.redraw();
 }
 
-export function pieceCloseTo(s: State, pos: cg.NumberPair): boolean {
+function pieceCloseTo(s: State, pos: cg.NumberPair): boolean {
   const asWhite = board.whitePov(s),
   bounds = s.dom.bounds(),
   radiusSq = Math.pow(bounds.width / 8, 2);
