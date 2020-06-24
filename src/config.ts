@@ -116,7 +116,7 @@ export function configure(state: State, config: Config): void {
   if (!state.animation.duration || state.animation.duration < 100) state.animation.enabled = false;
 
   if (!state.movable.rookCastle && state.movable.dests) {
-    const rank = state.movable.color === 'white' ? 1 : 8,
+    const rank = state.movable.color === 'white' ? '1' : '8',
     kingStartPos = 'e' + rank,
     dests = state.movable.dests[kingStartPos],
     king = state.pieces[kingStartPos];

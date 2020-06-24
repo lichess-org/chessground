@@ -43,7 +43,7 @@ export default function wrap(element: HTMLElement, s: State, relative: boolean):
 
   if (s.coordinates) {
     const orientClass = s.orientation === 'black' ? ' black' : '';
-    container.appendChild(renderCoords(ranks.map(r => r.toString()), 'ranks' + orientClass));
+    container.appendChild(renderCoords(ranks, 'ranks' + orientClass));
     container.appendChild(renderCoords(files, 'files' + orientClass));
   }
 

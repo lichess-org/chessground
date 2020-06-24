@@ -41,7 +41,7 @@ export function read(fen: cg.FEN): cg.Pieces {
 
 export function write(pieces: cg.Pieces): cg.FEN {
   return invRanks.map(y => cg.ranks.map(x => {
-      const piece = pieces[pos2key([x, y])];
+      const piece = pieces[x + y];
       if (piece) {
         const letter = letters[piece.role];
         return piece.color === 'white' ? letter.toUpperCase() : letter;

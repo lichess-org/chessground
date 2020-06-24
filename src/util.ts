@@ -1,6 +1,6 @@
 import * as cg from './types';
 
-export const invRanks: readonly cg.Rank[] = [8, 7, 6, 5, 4, 3, 2, 1];
+export const invRanks: readonly cg.Rank[] = ['8', '7', '6', '5', '4', '3', '2', '1'];
 
 export const allKeys: readonly cg.Key[] = Array.prototype.concat(...cg.files.map(c => cg.ranks.map(r => c + r)));
 
