@@ -76,7 +76,7 @@ function startDragOrDraw(s: State): MouchBind {
 
 function dragOrDraw(s: State, withDrag: StateMouchBind, withDraw: StateMouchBind): MouchBind {
   return e => {
-    if (e.shiftKey || isRightButton(e)) { if (s.drawable.enabled) withDraw(s, e); }
+    if (s.drawable.current) { if (s.drawable.enabled) withDraw(s, e); }
     else if (!s.viewOnly) withDrag(s, e);
   };
 }
