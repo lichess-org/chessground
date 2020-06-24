@@ -1,10 +1,10 @@
 import * as cg from './types';
 
-export const colors: cg.Color[] = ['white', 'black'];
+export const colors: readonly cg.Color[] = ['white', 'black'];
 
-export const invRanks: cg.Rank[] = [8, 7, 6, 5, 4, 3, 2, 1];
+export const invRanks: readonly cg.Rank[] = [8, 7, 6, 5, 4, 3, 2, 1];
 
-export const allKeys: cg.Key[] = Array.prototype.concat(...cg.files.map(c => cg.ranks.map(r => c + r)));
+export const allKeys: readonly cg.Key[] = Array.prototype.concat(...cg.files.map(c => cg.ranks.map(r => c + r)));
 
 export const pos2key = (pos: cg.Pos): cg.Key => allKeys[8 * pos[0] + pos[1] - 9];
 

@@ -62,7 +62,7 @@ export default function wrap(element: HTMLElement, s: State, relative: boolean):
   };
 }
 
-function renderCoords(elems: string[], className: string): HTMLElement {
+function renderCoords(elems: readonly string[], className: string): HTMLElement {
   const el = createEl('coords', className);
   let f: HTMLElement;
   for (const elem of elems) {
