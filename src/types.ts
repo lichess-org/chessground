@@ -103,5 +103,6 @@ export type Unbind = () => void;
 export type Milliseconds = number;
 export type KHz = number;
 
+export const colors: readonly Color[] = ['white', 'black'];
 export const files: readonly File[] = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h'];
 export const ranks: readonly Rank[] = [1, 2, 3, 4, 5, 6, 7, 8];

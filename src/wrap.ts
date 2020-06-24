@@ -1,6 +1,6 @@
 import { State } from './state'
-import { colors, setVisible, createEl } from './util'
-import { files, ranks } from './types'
+import { setVisible, createEl } from './util'
+import { colors, files, ranks } from './types'
 import { createElement as createSVG } from './svg'
 import { Elements } from './types'
 
