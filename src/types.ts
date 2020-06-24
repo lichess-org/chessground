@@ -69,8 +69,6 @@ export interface SetPremoveMetadata {
   ctrlKey?: boolean;
 }
 
-export type WindowEvent = 'onscroll' | 'onresize';
-
 export type MouchEvent = MouseEvent & TouchEvent;
 
 export interface KeyedNode extends HTMLElement {
