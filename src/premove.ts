@@ -10,10 +10,10 @@ function diff(a: number, b: number): number {
 function pawn(color: cg.Color): Mobility {
   return (x1, y1, x2, y2) => diff(x1, x2) < 2 && (
     color === 'white' ? (
-      // allow 2 squares from 1 and 8, for horde
-      y2 === y1 + 1 || (y1 <= 2 && y2 === (y1 + 2) && x1 === x2)
+      // allow 2 squares from first two ranks, for horde
+      y2 === y1 + 1 || (y1 <= 1 && y2 === (y1 + 2) && x1 === x2)
     ) : (
-      y2 === y1 - 1 || (y1 >= 7 && y2 === (y1 - 2) && x1 === x2)
+      y2 === y1 - 1 || (y1 >= 6 && y2 === (y1 - 2) && x1 === x2)
     )
   );
 }
@@ -40,8 +40,8 @@ function king(color: cg.Color, rookFiles: number[], canCastle: boolean): Mobilit
   return (x1, y1, x2, y2)  => (
     diff(x1, x2) < 2 && diff(y1, y2) < 2
   ) || (
-    canCastle && y1 === y2 && y1 === (color === 'white' ? 1 : 8) && (
-      (x1 === 5 && ((x2 === 3 && rookFiles.includes(1)) || (x2 === 7 && rookFiles.includes(8)))) ||
+    canCastle && y1 === y2 && y1 === (color === 'white' ? 0 : 7) && (
+      (x1 === 4 && ((x2 === 2 && rookFiles.includes(0)) || (x2 === 6 && rookFiles.includes(7)))) ||
       rookFiles.includes(x2)
     )
   );

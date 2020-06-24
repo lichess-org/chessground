@@ -211,12 +211,12 @@ function removeDragElements(s: State): void {
 function computeSquareBounds(key: cg.Key, asWhite: boolean, bounds: ClientRect): cg.Rect {
   const pos = util.key2pos(key);
   if (!asWhite) {
-    pos[0] = 9 - pos[0];
-    pos[1] = 9 - pos[1];
+    pos[0] = 7 - pos[0];
+    pos[1] = 7 - pos[1];
   }
   return {
-    left: bounds.left + bounds.width * (pos[0] - 1) / 8,
-    top: bounds.top + bounds.height * (8 - pos[1]) / 8,
+    left: bounds.left + bounds.width * pos[0] / 8,
+    top: bounds.top + bounds.height * (7 - pos[1]) / 8,
     width: bounds.width / 8,
     height: bounds.height / 8
   };
