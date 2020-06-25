@@ -4,9 +4,9 @@ export const invRanks: readonly cg.Rank[] = ['8', '7', '6', '5', '4', '3', '2', 
 
 export const allKeys: readonly cg.Key[] = Array.prototype.concat(...cg.files.map(c => cg.ranks.map(r => c + r)));
 
-export const pos2key = (pos: cg.Pos): cg.Key => allKeys[8 * pos[0] + pos[1] - 9];
+export const pos2key = (pos: cg.Pos): cg.Key => allKeys[8 * pos[0] + pos[1]];
 
-export const key2pos = (k: cg.Key): cg.Pos => [k.charCodeAt(0) - 96, k.charCodeAt(1) - 48];
+export const key2pos = (k: cg.Key): cg.Pos => [k.charCodeAt(0) - 97, k.charCodeAt(1) - 49];
 
 export function memo<A>(f: () => A): cg.Memo<A> {
   let v: A | undefined;
@@ -44,8 +44,8 @@ export const samePiece = (p1: cg.Piece, p2: cg.Piece): boolean =>
   p1.role === p2.role && p1.color === p2.color;
 
 const posToTranslateBase = (pos: cg.Pos, asWhite: boolean, xFactor: number, yFactor: number): cg.NumberPair => [
-  (asWhite ? pos[0] - 1 : 8 - pos[0]) * xFactor,
-  (asWhite ? 8 - pos[1] : pos[1] - 1) * yFactor
+  (asWhite ? pos[0] : 7 - pos[0]) * xFactor,
+  (asWhite ? 7 - pos[1] : pos[1]) * yFactor
 ];
 
 export const posToTranslateAbs = (bounds: ClientRect): (pos: cg.Pos, asWhite: boolean) => cg.NumberPair => {

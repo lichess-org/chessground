@@ -218,7 +218,7 @@ function setAttributes(el: SVGElement, attrs: { [key: string]: any }): SVGElemen
 }
 
 function orient(pos: cg.Pos, color: cg.Color): cg.Pos {
-  return color === 'white' ? pos : [9 - pos[0], 9 - pos[1]];
+  return color === 'white' ? pos : [7 - pos[0], 7 - pos[1]];
 }
 
 function makeCustomBrush(base: DrawBrush, modifiers: DrawModifiers): DrawBrush {
@@ -249,5 +249,5 @@ function arrowMargin(bounds: ClientRect, shorten: boolean): number {
 }
 
 function pos2px(pos: cg.Pos, bounds: ClientRect): cg.NumberPair {
-  return [(pos[0] - 0.5) * bounds.width / 8, (8.5 - pos[1]) * bounds.height / 8];
+  return [(pos[0] + 0.5) * bounds.width / 8, (7.5 - pos[1]) * bounds.height / 8];
 }

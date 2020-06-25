@@ -10,13 +10,13 @@ const letters = { pawn: 'p', rook: 'r', knight: 'n', bishop: 'b', queen: 'q', ki
 export function read(fen: cg.FEN): cg.Pieces {
   if (fen === 'start') fen = initial;
   const pieces: cg.Pieces = {};
-  let row = 8, col = 0;
+  let row = 7, col = 0;
   for (const c of fen) {
     switch (c) {
       case ' ': return pieces;
       case '/':
         --row;
-        if (row === 0) return pieces;
+        if (row < 0) return pieces;
         col = 0;
         break;
       case '~':
@@ -27,12 +27,12 @@ export function read(fen: cg.FEN): cg.Pieces {
         const nb = c.charCodeAt(0);
         if (nb < 57) col += nb - 48;
         else {
-          ++col;
           const role = c.toLowerCase();
           pieces[pos2key([col, row])] = {
             role: roles[role],
             color: (c === role ? 'black' : 'white') as cg.Color
           };
+          ++col;
         }
     }
   }

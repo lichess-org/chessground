@@ -76,10 +76,10 @@ function tryAutoCastle(state: State, orig: cg.Key, dest: cg.Key): boolean {
 
   const origPos = key2pos(orig);
   const destPos = key2pos(dest);
-  if ((origPos[1] !== 1 && origPos[1] !== 8) || origPos[1] !== destPos[1]) return false;
-  if (origPos[0] === 5) {
-    if (destPos[0] === 7) dest = pos2key([8, destPos[1]]);
-    else if (destPos[0] === 3) dest = pos2key([1, destPos[1]]);
+  if ((origPos[1] !== 0 && origPos[1] !== 7) || origPos[1] !== destPos[1]) return false;
+  if (origPos[0] === 4) {
+    if (destPos[0] === 6) dest = pos2key([7, destPos[1]]);
+    else if (destPos[0] === 2) dest = pos2key([0, destPos[1]]);
   }
   const rook = state.pieces[dest];
   if (!rook || rook.color !== king.color || rook.role !== 'rook') return false;
@@ -88,11 +88,11 @@ function tryAutoCastle(state: State, orig: cg.Key, dest: cg.Key): boolean {
   delete state.pieces[dest];
 
   if (origPos[0] < destPos[0]) {
-    state.pieces[pos2key([7, destPos[1]])] = king;
-    state.pieces[pos2key([6, destPos[1]])] = rook;
+    state.pieces[pos2key([6, destPos[1]])] = king;
+    state.pieces[pos2key([5, destPos[1]])] = rook;
   } else {
-    state.pieces[pos2key([3, destPos[1]])] = king;
-    state.pieces[pos2key([4, destPos[1]])] = rook;
+    state.pieces[pos2key([2, destPos[1]])] = king;
+    state.pieces[pos2key([3, destPos[1]])] = rook;
   }
   return true;
 }
@@ -328,11 +328,11 @@ export function stop(state: State): void {
 }
 
 export function getKeyAtDomPos(pos: cg.NumberPair, asWhite: boolean, bounds: ClientRect): cg.Key | undefined {
-  let file = Math.ceil(8 * ((pos[0] - bounds.left) / bounds.width));
-  if (!asWhite) file = 9 - file;
-  let rank = Math.ceil(8 - (8 * ((pos[1] - bounds.top) / bounds.height)));
-  if (!asWhite) rank = 9 - rank;
-  return (file > 0 && file < 9 && rank > 0 && rank < 9) ? pos2key([file, rank]) : undefined;
+  let file = Math.floor(8 * (pos[0] - bounds.left) / bounds.width);
+  if (!asWhite) file = 7 - file;
+  let rank = 7 - Math.floor(8 * (pos[1] - bounds.top) / bounds.height);
+  if (!asWhite) rank = 7 - rank;
+  return (file >= 0 && file < 8 && rank >= 0 && rank < 8) ? pos2key([file, rank]) : undefined;
 }
 
 export function whitePov(s: State): boolean {
