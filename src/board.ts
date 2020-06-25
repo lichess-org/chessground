@@ -77,7 +77,7 @@ function tryAutoCastle(state: State, orig: cg.Key, dest: cg.Key): boolean {
   const origPos = key2pos(orig);
   const destPos = key2pos(dest);
   if ((origPos[1] !== 0 && origPos[1] !== 7) || origPos[1] !== destPos[1]) return false;
-  if (origPos[0] === 4) {
+  if (origPos[0] === 4 && !state.pieces[dest]) {
     if (destPos[0] === 6) dest = pos2key([7, destPos[1]]);
     else if (destPos[0] === 2) dest = pos2key([0, destPos[1]]);
   }
