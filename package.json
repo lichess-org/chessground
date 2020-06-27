@@ -29,7 +29,8 @@
   },
   "files": [
     "*.js",
-    "*.d.ts"
+    "*.d.ts",
+    "!gulpfile.js"
   ],
   "repository": "https://github.com/ornicar/chessground",
   "keywords": [
