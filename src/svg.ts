@@ -48,7 +48,7 @@ export function renderSvg(state: State, root: SVGElement): void {
     hash: shapeHash(cur, arrowDests, true, bounds)
   });
 
-  const fullHash = shapes.map(sc => sc.hash).join('');
+  const fullHash = shapes.map(sc => sc.hash).join(';');
   if (fullHash === state.drawable.prevSvgHash) return;
   state.drawable.prevSvgHash = fullHash;
 
@@ -222,13 +222,12 @@ function orient(pos: cg.Pos, color: cg.Color): cg.Pos {
 }
 
 function makeCustomBrush(base: DrawBrush, modifiers: DrawModifiers): DrawBrush {
-  const brush: Partial<DrawBrush> = {
+  return {
     color: base.color,
     opacity: Math.round(base.opacity * 10) / 10,
-    lineWidth: Math.round(modifiers.lineWidth || base.lineWidth)
+    lineWidth: Math.round(modifiers.lineWidth || base.lineWidth),
+    key: [base.key, modifiers.lineWidth].filter(x => x).join(''),
   };
-  brush.key = [base.key, modifiers.lineWidth].filter(x => x).join('');
-  return brush as DrawBrush;
 }
 
 function circleWidth(bounds: ClientRect): [number, number] {
