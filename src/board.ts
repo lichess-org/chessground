@@ -1,6 +1,6 @@
 import { State } from './state'
 import { pos2key, key2pos, opposite } from './util'
-import premove from './premove'
+import { premove } from './premove'
 import * as cg from './types'
 
 export type Callback = (...args: any[]) => void;

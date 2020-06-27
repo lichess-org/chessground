@@ -2,7 +2,7 @@ import { Api, start } from './api'
 import { Config, configure } from './config'
 import { State, defaults } from './state'
 
-import renderWrap from './wrap';
+import { renderWrap } from './wrap';
 import * as events from './events'
 import { render, updateBounds } from './render';
 import * as svg from './svg';

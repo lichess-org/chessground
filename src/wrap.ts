@@ -4,7 +4,7 @@ import { colors, files, ranks } from './types'
 import { createElement as createSVG } from './svg'
 import { Elements } from './types'
 
-export default function wrap(element: HTMLElement, s: State, relative: boolean): Elements {
+export function renderWrap(element: HTMLElement, s: State, relative: boolean): Elements {
 
   // .cg-wrap (element passed to Chessground)
   //   cg-helper (12.5%)

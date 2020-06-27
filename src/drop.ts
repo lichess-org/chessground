@@ -2,14 +2,14 @@ import { State } from './state'
 import * as cg from './types'
 import * as board from './board'
 import * as util from './util'
-import { cancel as cancelDrag } from './drag'
+import { cancel as dragCancel } from './drag'
 
 export function setDropMode(s: State, piece?: cg.Piece): void {
   s.dropmode = {
     active: true,
     piece
   };
-  cancelDrag(s);
+  dragCancel(s);
 }
 
 export function cancelDropMode(s: State): void {

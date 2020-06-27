@@ -5,7 +5,7 @@ import { Config, configure } from './config'
 import { anim, render } from './anim'
 import { cancel as dragCancel, dragNewPiece } from './drag'
 import { DrawShape } from './draw'
-import explosion from './explosion'
+import { explosion } from './explosion'
 import * as cg from './types'
 
 export interface Api {
