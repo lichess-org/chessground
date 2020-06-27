@@ -7,22 +7,17 @@
   ],
   "exclude": [],
   "compilerOptions": {
+    "noEmitOnError": false,
     "outDir": "./",
     "declaration": true,
+    "sourceMap": true,
     "removeComments": true,
-    "noEmitOnError": false,
+    "strict": true,
     "noUnusedLocals": true,
     "noUnusedParameters": true,
-    "noImplicitAny": true,
     "noImplicitReturns": true,
-    "noImplicitThis": true,
-    "strict": true,
-    "strictNullChecks": true,
-    "alwaysStrict": true,
-    "target": "ES2016",
     "module": "commonjs",
-    "inlineSourceMap": true,
-    "inlineSources": true,
+    "target": "ES2016",
     "lib": ["DOM", "ES2016"]
   }
 }

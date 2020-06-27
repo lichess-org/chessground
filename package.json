@@ -28,9 +28,11 @@
     "lint": "eslint src/*.ts"
   },
   "files": [
-    "*.js",
-    "*.d.ts",
-    "!gulpfile.js"
+    "/*.js",
+    "/*.d.ts",
+    "/*.js.map",
+    "/src/*.ts",
+    "!/gulpfile.js"
   ],
   "repository": "https://github.com/ornicar/chessground",
   "keywords": [
