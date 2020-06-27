@@ -141,6 +141,9 @@ function start(state, redrawAll) {
         setPieces(pieces) {
             anim_1.anim(state => board.setPieces(state, pieces), state);
         },
+        setCheck(color) {
+            anim_1.anim((state) => board.setCheck(state, color), state);
+        },
         selectSquare(key, force) {
             if (key)
                 anim_1.anim(state => board.selectSquare(state, key, force), state);
@@ -244,7 +247,7 @@ function setPieces(state, pieces) {
 exports.setPieces = setPieces;
 function setCheck(state, color) {
     state.check = undefined;
-    if (color === true)
+    if (color === undefined)
         color = state.turnColor;
     if (color)
         for (const k in state.pieces) {
