@@ -2,6 +2,7 @@
   "name": "chessground",
   "version": "7.7.1",
   "description": "lichess.org chess ui",
+  "type": "commonjs",
   "main": "chessground.js",
   "typings": "chessground.d.ts",
   "dependencies": {},
