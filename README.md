@@ -74,7 +74,8 @@ const ground = Chessground(document.body, config);
 
 - React: [ruilisi/react-chessground](https://github.com/ruilisi/react-chessground)
 - Vue.js: [vitogit/vue-chessboard](https://github.com/vitogit/vue-chessboard)
-- More? Please make a pull request to include it here.
+
+More? Please make a pull request to include it here.
 
 ## Documentation
 
@@ -98,7 +99,5 @@ npm run compile -- --watch
 
 To build the standalone:
 ```sh
-gulp dev  # build once
-gulp      # build and watch
-gulp prod # build minified
+npm run dist -- --watch
 ```
