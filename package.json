@@ -7,10 +7,10 @@
   "typings": "chessground.d.ts",
   "dependencies": {},
   "devDependencies": {
-    "@typescript-eslint/eslint-plugin": "^3.3.0",
-    "@typescript-eslint/parser": "^3.3.0",
+    "@typescript-eslint/eslint-plugin": "^3.4.0",
+    "@typescript-eslint/parser": "^3.4.0",
     "browserify": "^16.5.1",
-    "eslint": "^7.3.0",
+    "eslint": "^7.3.1",
     "fancy-log": "^1.3.3",
     "gulp": "^4",
     "gulp-size": "^3",
