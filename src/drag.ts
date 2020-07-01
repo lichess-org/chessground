@@ -24,7 +24,7 @@ export function start(s: State, e: cg.MouchEvent): void {
   // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
   if (e.touches && e.touches.length > 1) return; // support one finger touch only
   const bounds = s.dom.bounds(),
-  position = util.eventPosition(e) as cg.NumberPair,
+  position = util.eventPosition(e)!,
   orig = board.getKeyAtDomPos(position, board.whitePov(s), bounds);
   if (!orig) return;
   const piece = s.pieces[orig];
@@ -82,11 +82,7 @@ function pieceCloseTo(s: State, pos: cg.NumberPair): boolean {
   bounds = s.dom.bounds(),
   radiusSq = Math.pow(bounds.width / 8, 2);
   for (const key in s.pieces) {
-    const squareBounds = computeSquareBounds(key as cg.Key, asWhite, bounds),
-    center: cg.NumberPair = [
-      squareBounds.left + squareBounds.width / 2,
-      squareBounds.top + squareBounds.height / 2
-    ];
+    const center = computeSquareCenter(key as cg.Key, asWhite, bounds);
     if (util.distanceSq(center, pos) <= radiusSq) return true;
   }
   return false;
@@ -98,7 +94,7 @@ export function dragNewPiece(s: State, piece: cg.Piece, e: cg.MouchEvent, force?
   s.pieces[key] = piece;
   s.dom.redraw();
 
-  const position = util.eventPosition(e) as cg.NumberPair;
+  const position = util.eventPosition(e)!;
 
   s.draggable.current = {
     orig: key,
@@ -150,7 +146,7 @@ function processDrag(s: State): void {
 export function move(s: State, e: cg.MouchEvent): void {
   // support one finger touch only
   if (s.draggable.current && (!e.touches || e.touches.length < 2)) { /* eslint-disable-line */
-    s.draggable.current.pos = util.eventPosition(e) as cg.NumberPair;
+    s.draggable.current.pos = util.eventPosition(e)!;
   }
 }
 
@@ -168,7 +164,7 @@ export function end(s: State, e: cg.MouchEvent): void {
   board.unsetPremove(s);
   board.unsetPredrop(s);
   // touchend has no position; so use the last touchmove position instead
-  const eventPos: cg.NumberPair = util.eventPosition(e) || cur.pos;
+  const eventPos = util.eventPosition(e) || cur.pos;
   const dest = board.getKeyAtDomPos(eventPos, board.whitePov(s), s.dom.bounds());
   if (dest && cur.started && cur.orig !== dest) {
     if (cur.newPiece) board.dropNewPiece(s, cur.orig, dest, cur.force);
@@ -208,18 +204,16 @@ function removeDragElements(s: State): void {
   if (e.ghost) util.setVisible(e.ghost, false);
 }
 
-function computeSquareBounds(key: cg.Key, asWhite: boolean, bounds: ClientRect): cg.Rect {
+function computeSquareCenter(key: cg.Key, asWhite: boolean, bounds: ClientRect): cg.NumberPair {
   const pos = util.key2pos(key);
   if (!asWhite) {
     pos[0] = 7 - pos[0];
     pos[1] = 7 - pos[1];
   }
-  return {
-    left: bounds.left + bounds.width * pos[0] / 8,
-    top: bounds.top + bounds.height * (7 - pos[1]) / 8,
-    width: bounds.width / 8,
-    height: bounds.height / 8
-  };
+  return [
+    bounds.left + bounds.width * pos[0] / 8 + bounds.width / 16,
+    bounds.top + bounds.height * (7 - pos[1]) / 8 + bounds.height / 16
+  ];
 }
 
 function pieceElementByKey(s: State, key: cg.Key): cg.PieceNode | undefined {
@@ -228,5 +222,5 @@ function pieceElementByKey(s: State, key: cg.Key): cg.PieceNode | undefined {
     if ((el as cg.KeyedNode).cgKey === key && (el as cg.KeyedNode).tagName === 'PIECE') return el as cg.PieceNode;
     el = el.nextSibling;
   }
-  return undefined;
+  return;
 }

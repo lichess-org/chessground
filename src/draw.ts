@@ -64,7 +64,7 @@ export function start(state: State, e: cg.MouchEvent): void {
   e.stopPropagation();
   e.preventDefault();
   e.ctrlKey ? unselect(state) : cancelMove(state);
-  const pos = eventPosition(e) as cg.NumberPair,
+  const pos = eventPosition(e)!,
   orig = getKeyAtDomPos(pos, whitePov(state), state.dom.bounds());
   if (!orig) return;
   state.drawable.current = {
@@ -91,7 +91,7 @@ export function processDraw(state: State): void {
 }
 
 export function move(state: State, e: cg.MouchEvent): void {
-  if (state.drawable.current) state.drawable.current.pos = eventPosition(e) as cg.NumberPair;
+  if (state.drawable.current) state.drawable.current.pos = eventPosition(e)!;
 }
 
 export function end(state: State): void {
