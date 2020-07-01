@@ -18,8 +18,8 @@
     "typescript": "^3.9.5"
   },
   "scripts": {
-    "prepare": "tsc",
-    "compile": "tsc",
+    "prepare": "npm run compile",
+    "compile": "tsc --outDir . --sourceMap --declaration",
     "lint": "eslint src/*.ts",
     "dist": "rollup --config"
   },

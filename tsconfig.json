@@ -3,9 +3,6 @@
   "exclude": [],
   "compilerOptions": {
     "noEmitOnError": false,
-    "outDir": "./",
-    "declaration": true,
-    "sourceMap": true,
     "removeComments": true,
     "strict": true,
     "noUnusedLocals": true,

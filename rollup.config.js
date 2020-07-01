@@ -2,14 +2,6 @@ import commonjs from '@rollup/plugin-commonjs';
 import typescript from '@rollup/plugin-typescript';
 import { terser } from 'rollup-plugin-terser';
 
-import tsconfig from './tsconfig.json';
-
-function stripUndefined(obj) {
-  const r = {};
-  for (const prop in obj) if (obj[prop] !== undefined) r[prop] = obj[prop];
-  return r;
-}
-
 export default {
   input: 'src/index.js',
   output: [
@@ -30,13 +22,7 @@ export default {
     },
   ],
   plugins: [
-    typescript(stripUndefined({
-      ...tsconfig.compilerOptions,
-      tsconfig: false,
-      outDir: undefined,
-      sourceMap: undefined,
-      declaration: undefined,
-    })),
+    typescript(),
     commonjs({
       extensions: ['.js', '.ts'],
     }),
