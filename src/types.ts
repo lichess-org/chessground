@@ -30,9 +30,7 @@ export interface Rect {
   height: number;
 }
 
-export interface Dests {
-  [key: string]: readonly Key[] | undefined;
-}
+export type Dests = Map<Key, Key[]>;
 
 export interface Elements {
   board: HTMLElement;

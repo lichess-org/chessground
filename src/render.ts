@@ -218,7 +218,7 @@ function computeSquareClasses(s: State): SquareClasses {
   if (s.selected) {
     addSquare(squares, s.selected, 'selected');
     if (s.movable.showDests) {
-      const dests = s.movable.dests?.[s.selected];
+      const dests = s.movable.dests?.get(s.selected);
       if (dests) for (const k of dests) {
         addSquare(squares, k, 'move-dest' + (s.pieces.has(k) ? ' oc' : ''));
       }
