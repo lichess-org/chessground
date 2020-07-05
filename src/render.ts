@@ -10,10 +10,8 @@ import * as cg from './types'
 type PieceName = string;
 
 interface SamePieces { [key: string]: boolean }
-interface SameSquares { [key: string]: boolean }
 interface MovedPieces { [pieceName: string]: cg.PieceNode[] | undefined }
-interface MovedSquares { [className: string]: cg.SquareNode[] | undefined }
-interface SquareClasses { [key: string]: string }
+type SquareClasses = Map<cg.Key, string>
 
 // ported from https://github.com/veloce/lichobile/blob/master/src/js/chessground/view.js
 // in case of bugs, blame @veloce
@@ -29,9 +27,9 @@ export function render(s: State): void {
   curDrag: DragCurrent | undefined = s.draggable.current,
   squares: SquareClasses = computeSquareClasses(s),
   samePieces: SamePieces = {},
-  sameSquares: SameSquares = {},
+  sameSquares: Set<cg.Key> = new Set(),
   movedPieces: MovedPieces = {},
-  movedSquares: MovedSquares = {};
+  movedSquares: Map<string, cg.SquareNode[]> = new Map(); // by class name
   let k: cg.Key,
   el: cg.PieceNode | cg.SquareNode | undefined,
   pieceAtKey: cg.Piece | undefined,
@@ -102,27 +100,26 @@ export function render(s: State): void {
     }
     else if (isSquareNode(el)) {
       const cn = el.className;
-      if (squares[k] === cn) sameSquares[k] = true;
-      else if (movedSquares[cn]) movedSquares[cn]!.push(el);
-      else movedSquares[cn] = [el];
+      if (squares.get(k) === cn) sameSquares.add(k);
+      else movedSquares.set(cn, [...(movedSquares.get(cn) || []), el]);
     }
     el = el.nextSibling as cg.PieceNode | cg.SquareNode | undefined;
   }
 
   // walk over all squares in current set, apply dom changes to moved squares
   // or append new squares
-  for (const sk in squares) {
-    if (!sameSquares[sk]) {
-      sMvdset = movedSquares[squares[sk]];
+  for (const [sk, className] of squares) {
+    if (!sameSquares.has(sk)) {
+      sMvdset = movedSquares.get(className);
       sMvd = sMvdset && sMvdset.pop();
-      const translation = posToTranslate(key2pos(sk as cg.Key), asWhite);
+      const translation = posToTranslate(key2pos(sk), asWhite);
       if (sMvd) {
-        sMvd.cgKey = sk as cg.Key;
+        sMvd.cgKey = sk;
         translate(sMvd, translation);
       }
       else {
-        const squareNode = createEl('square', squares[sk]) as cg.SquareNode;
-        squareNode.cgKey = sk as cg.Key;
+        const squareNode = createEl('square', className) as cg.SquareNode;
+        squareNode.cgKey = sk;
         translate(squareNode, translation);
         boardEl.insertBefore(squareNode, boardEl.firstChild);
       }
@@ -180,7 +177,7 @@ export function render(s: State): void {
 
   // remove any element that remains in the moved sets
   for (const i in movedPieces) removeNodes(s, movedPieces[i]!);
-  for (const i in movedSquares) removeNodes(s, movedSquares[i]!);
+  for (const nodes of movedSquares.values()) removeNodes(s, nodes);
 }
 
 export function updateBounds(s: State): void {
@@ -218,7 +215,7 @@ function pieceNameOf(piece: cg.Piece): string {
 }
 
 function computeSquareClasses(s: State): SquareClasses {
-  const squares: SquareClasses = {};
+  const squares: SquareClasses = new Map();
   if (s.lastMove && s.highlight.lastMove) for (const k of s.lastMove) {
     addSquare(squares, k, 'last-move');
   }
@@ -247,6 +244,7 @@ function computeSquareClasses(s: State): SquareClasses {
 }
 
 function addSquare(squares: SquareClasses, key: cg.Key, klass: string): void {
-  if (squares[key]) squares[key] += ' ' + klass;
-  else squares[key] = klass;
+  const classes = squares.get(key);
+  if (classes) squares.set(key, `${classes} ${klass}`);
+  else squares.set(key, klass)
 }
