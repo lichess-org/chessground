@@ -68,11 +68,11 @@ function computePlan(prevPieces: cg.Pieces, current: State): AnimPlan {
   news: AnimPiece[] = [],
   prePieces: AnimPieces = {};
   let curP: cg.Piece | undefined, preP: AnimPiece | undefined, vector: cg.NumberPair;
-  for (const i in prevPieces) {
-    prePieces[i] = makePiece(i as cg.Key, prevPieces[i]!);
+  for (const [k, p] of prevPieces) {
+    prePieces[k] = makePiece(k, p);
   }
   for (const key of util.allKeys) {
-    curP = current.pieces[key];
+    curP = current.pieces.get(key);
     preP = prePieces[key];
     if (curP) {
       if (preP) {
@@ -125,7 +125,7 @@ function step(state: State, now: DOMHighResTimeStamp): void {
 
 function animate<A>(mutation: Mutation<A>, state: State): A {
   // clone state before mutating it
-  const prevPieces: cg.Pieces = {...state.pieces};
+  const prevPieces: cg.Pieces = new Map(state.pieces);
 
   const result = mutation(state);
   const plan = computePlan(prevPieces, state);

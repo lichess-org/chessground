@@ -31,10 +31,8 @@ export function render(s: State): void {
   samePieces: SamePieces = {},
   sameSquares: SameSquares = {},
   movedPieces: MovedPieces = {},
-  movedSquares: MovedSquares = {},
-  piecesKeys: cg.Key[] = Object.keys(pieces) as cg.Key[];
+  movedSquares: MovedSquares = {};
   let k: cg.Key,
-  p: cg.Piece | undefined,
   el: cg.PieceNode | cg.SquareNode | undefined,
   pieceAtKey: cg.Piece | undefined,
   elPieceName: PieceName,
@@ -50,7 +48,7 @@ export function render(s: State): void {
   while (el) {
     k = el.cgKey;
     if (isPieceNode(el)) {
-      pieceAtKey = pieces[k];
+      pieceAtKey = pieces.get(k);
       anim = anims[k];
       fading = fadings[k];
       elPieceName = el.cgPiece;
@@ -133,8 +131,7 @@ export function render(s: State): void {
 
   // walk over all pieces in current set, apply dom changes to moved pieces
   // or append new pieces
-  for (k of piecesKeys) {
-    p = pieces[k]!;
+  for (const [k, p] of pieces) {
     anim = anims[k];
     if (!samePieces[k]) {
       pMvdset = movedPieces[pieceNameOf(p)];
@@ -231,11 +228,11 @@ function computeSquareClasses(s: State): SquareClasses {
     if (s.movable.showDests) {
       const dests = s.movable.dests?.[s.selected];
       if (dests) for (const k of dests) {
-        addSquare(squares, k, 'move-dest' + (s.pieces[k] ? ' oc' : ''));
+        addSquare(squares, k, 'move-dest' + (s.pieces.has(k) ? ' oc' : ''));
       }
       const pDests = s.premovable.dests;
       if (pDests) for (const k of pDests) {
-        addSquare(squares, k, 'premove-dest' + (s.pieces[k] ? ' oc' : ''));
+        addSquare(squares, k, 'premove-dest' + (s.pieces.has(k) ? ' oc' : ''));
       }
     }
   }
