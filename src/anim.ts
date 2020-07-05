@@ -122,7 +122,7 @@ function animate<A>(mutation: Mutation<A>, state: State): A {
 
   const result = mutation(state);
   const plan = computePlan(prevPieces, state);
-  if (!isObjectEmpty(plan.anims) || !isObjectEmpty(plan.fadings)) {
+  if (plan.anims.size || plan.fadings.size) {
     const alreadyRunning = state.animation.current && state.animation.current.start;
     state.animation.current = {
       start: performance.now(),
@@ -135,11 +135,6 @@ function animate<A>(mutation: Mutation<A>, state: State): A {
     state.dom.redraw();
   }
   return result;
-}
-
-function isObjectEmpty(o: object): boolean {
-  for (const _ in o) return false;
-  return true;
 }
 
 // https://gist.github.com/gre/1650294
