@@ -14,12 +14,8 @@ export interface Drop {
   role: Role;
   key: Key;
 }
-export interface Pieces {
-  [key: string]: Piece | undefined;
-}
-export interface PiecesDiff {
-  [key: string]: Piece | undefined;
-}
+export type Pieces = Map<Key, Piece>
+export type PiecesDiff = Map<Key, Piece | undefined>
 
 export type KeyPair = [Key, Key];
 
@@ -34,9 +30,7 @@ export interface Rect {
   height: number;
 }
 
-export interface Dests {
-  [key: string]: Key[] | undefined;
-}
+export type Dests = Map<Key, Key[]>;
 
 export interface Elements {
   board: HTMLElement;
@@ -55,7 +49,7 @@ export interface Dom {
 }
 export interface Exploding {
   stage: number;
-  keys: Key[];
+  keys: readonly Key[];
 }
 
 export interface MoveMetadata {
