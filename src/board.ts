@@ -33,7 +33,7 @@ export function setPieces(state: State, pieces: cg.PiecesDiff): void {
 export function setCheck(state: State, color: cg.Color | boolean): void {
   state.check = undefined;
   if (color === true) color = state.turnColor;
-  else if (color) for (const [k, p] of state.pieces) {
+  if (color) for (const [k, p] of state.pieces) {
     if (p.role === 'king' && p.color === color) {
       state.check = k;
     }
