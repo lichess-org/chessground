@@ -86,7 +86,7 @@ var Chessground = (function () {
 	        return [e.clientX, e.clientY];
 	    if (e.touches && e.targetTouches[0])
 	        return [e.targetTouches[0].clientX, e.targetTouches[0].clientY];
-	    return undefined;
+	    return;
 	};
 	exports.isRightButton = (e) => e.buttons === 2 || e.button === 2;
 	exports.createEl = (tagName, className) => {
@@ -128,14 +128,20 @@ var Chessground = (function () {
 	}
 	function rookFilesOf(pieces, color) {
 	    const backrank = color === 'white' ? '1' : '8';
-	    return Object.keys(pieces).filter(key => {
-	        const piece = pieces[key];
-	        return key[1] === backrank && piece && piece.color === color && piece.role === 'rook';
-	    }).map((key) => util.key2pos(key)[0]);
+	    const files = [];
+	    for (const [key, piece] of pieces) {
+	        if (key[1] === backrank && piece.color === color && piece.role === 'rook') {
+	            files.push(util.key2pos(key)[0]);
+	        }
+	    }
+	    return files;
 	}
 	const allPos = util.allKeys.map(util.key2pos);
 	function premove(pieces, key, canCastle) {
-	    const piece = pieces[key], pos = util.key2pos(key), r = piece.role, mobility = r === 'pawn' ? pawn(piece.color) : (r === 'knight' ? knight : (r === 'bishop' ? bishop : (r === 'rook' ? rook : (r === 'queen' ? queen : king(piece.color, rookFilesOf(pieces, piece.color), canCastle)))));
+	    const piece = pieces.get(key);
+	    if (!piece)
+	        return [];
+	    const pos = util.key2pos(key), r = piece.role, mobility = r === 'pawn' ? pawn(piece.color) : (r === 'knight' ? knight : (r === 'bishop' ? bishop : (r === 'rook' ? rook : (r === 'queen' ? queen : king(piece.color, rookFilesOf(pieces, piece.color), canCastle)))));
 	    return allPos.filter(pos2 => (pos[0] !== pos2[0] || pos[1] !== pos2[1]) && mobility(pos[0], pos[1], pos2[0], pos2[1])).map(util.pos2key);
 	}
 	exports.premove = premove;
@@ -167,12 +173,11 @@ var Chessground = (function () {
 	}
 	exports.reset = reset;
 	function setPieces(state, pieces) {
-	    for (const key in pieces) {
-	        const piece = pieces[key];
+	    for (const [key, piece] of pieces) {
 	        if (piece)
-	            state.pieces[key] = piece;
+	            state.pieces.set(key, piece);
 	        else
-	            delete state.pieces[key];
+	            state.pieces.delete(key);
 	    }
 	}
 	exports.setPieces = setPieces;
@@ -181,8 +186,8 @@ var Chessground = (function () {
 	    if (color === true)
 	        color = state.turnColor;
 	    if (color)
-	        for (const k in state.pieces) {
-	            if (state.pieces[k].role === 'king' && state.pieces[k].color === color) {
+	        for (const [k, p] of state.pieces) {
+	            if (p.role === 'king' && p.color === color) {
 	                state.check = k;
 	            }
 	        }
@@ -216,36 +221,36 @@ var Chessground = (function () {
 	function tryAutoCastle(state, orig, dest) {
 	    if (!state.autoCastle)
 	        return false;
-	    const king = state.pieces[orig];
+	    const king = state.pieces.get(orig);
 	    if (!king || king.role !== 'king')
 	        return false;
 	    const origPos = util.key2pos(orig);
 	    const destPos = util.key2pos(dest);
 	    if ((origPos[1] !== 0 && origPos[1] !== 7) || origPos[1] !== destPos[1])
 	        return false;
-	    if (origPos[0] === 4 && !state.pieces[dest]) {
+	    if (origPos[0] === 4 && !state.pieces.has(dest)) {
 	        if (destPos[0] === 6)
 	            dest = util.pos2key([7, destPos[1]]);
 	        else if (destPos[0] === 2)
 	            dest = util.pos2key([0, destPos[1]]);
 	    }
-	    const rook = state.pieces[dest];
+	    const rook = state.pieces.get(dest);
 	    if (!rook || rook.color !== king.color || rook.role !== 'rook')
 	        return false;
-	    delete state.pieces[orig];
-	    delete state.pieces[dest];
+	    state.pieces.delete(orig);
+	    state.pieces.delete(dest);
 	    if (origPos[0] < destPos[0]) {
-	        state.pieces[util.pos2key([6, destPos[1]])] = king;
-	        state.pieces[util.pos2key([5, destPos[1]])] = rook;
+	        state.pieces.set(util.pos2key([6, destPos[1]]), king);
+	        state.pieces.set(util.pos2key([5, destPos[1]]), rook);
 	    }
 	    else {
-	        state.pieces[util.pos2key([2, destPos[1]])] = king;
-	        state.pieces[util.pos2key([3, destPos[1]])] = rook;
+	        state.pieces.set(util.pos2key([2, destPos[1]]), king);
+	        state.pieces.set(util.pos2key([3, destPos[1]]), rook);
 	    }
 	    return true;
 	}
 	function baseMove(state, orig, dest) {
-	    const origPiece = state.pieces[orig], destPiece = state.pieces[dest];
+	    const origPiece = state.pieces.get(orig), destPiece = state.pieces.get(dest);
 	    if (orig === dest || !origPiece)
 	        return false;
 	    const captured = (destPiece && destPiece.color !== origPiece.color) ? destPiece : undefined;
@@ -253,8 +258,8 @@ var Chessground = (function () {
 	        unselect(state);
 	    callUserFunction(state.events.move, orig, dest, captured);
 	    if (!tryAutoCastle(state, orig, dest)) {
-	        state.pieces[dest] = origPiece;
-	        delete state.pieces[orig];
+	        state.pieces.set(dest, origPiece);
+	        state.pieces.delete(orig);
 	    }
 	    state.lastMove = [orig, dest];
 	    state.check = undefined;
@@ -263,14 +268,14 @@ var Chessground = (function () {
 	}
 	exports.baseMove = baseMove;
 	function baseNewPiece(state, piece, key, force) {
-	    if (state.pieces[key]) {
+	    if (state.pieces.has(key)) {
 	        if (force)
-	            delete state.pieces[key];
+	            state.pieces.delete(key);
 	        else
 	            return false;
 	    }
 	    callUserFunction(state.events.dropNewPiece, piece, key);
-	    state.pieces[key] = piece;
+	    state.pieces.set(key, piece);
 	    state.lastMove = [key];
 	    state.check = undefined;
 	    callUserFunction(state.events.change);
@@ -317,22 +322,22 @@ var Chessground = (function () {
 	}
 	exports.userMove = userMove;
 	function dropNewPiece(state, orig, dest, force) {
-	    if (canDrop(state, orig, dest) || force) {
-	        const piece = state.pieces[orig];
-	        delete state.pieces[orig];
+	    const piece = state.pieces.get(orig);
+	    if (piece && (canDrop(state, orig, dest) || force)) {
+	        state.pieces.delete(orig);
 	        baseNewPiece(state, piece, dest, force);
 	        callUserFunction(state.movable.events.afterNewPiece, piece.role, dest, {
 	            predrop: false
 	        });
 	    }
-	    else if (canPredrop(state, orig, dest)) {
-	        setPredrop(state, state.pieces[orig].role, dest);
+	    else if (piece && canPredrop(state, orig, dest)) {
+	        setPredrop(state, piece.role, dest);
 	    }
 	    else {
 	        unsetPremove(state);
 	        unsetPredrop(state);
 	    }
-	    delete state.pieces[orig];
+	    state.pieces.delete(orig);
 	    unselect(state);
 	}
 	exports.dropNewPiece = dropNewPiece;
@@ -373,22 +378,22 @@ var Chessground = (function () {
 	}
 	exports.unselect = unselect;
 	function isMovable(state, orig) {
-	    const piece = state.pieces[orig];
+	    const piece = state.pieces.get(orig);
 	    return !!piece && (state.movable.color === 'both' || (state.movable.color === piece.color &&
 	        state.turnColor === piece.color));
 	}
 	function canMove(state, orig, dest) {
 	    var _a, _b;
-	    return orig !== dest && isMovable(state, orig) && (state.movable.free || !!((_b = (_a = state.movable.dests) === null || _a === void 0 ? void 0 : _a[orig]) === null || _b === void 0 ? void 0 : _b.includes(dest)));
+	    return orig !== dest && isMovable(state, orig) && (state.movable.free || !!((_b = (_a = state.movable.dests) === null || _a === void 0 ? void 0 : _a.get(orig)) === null || _b === void 0 ? void 0 : _b.includes(dest)));
 	}
 	exports.canMove = canMove;
 	function canDrop(state, orig, dest) {
-	    const piece = state.pieces[orig];
-	    return !!piece && (orig === dest || !state.pieces[dest]) && (state.movable.color === 'both' || (state.movable.color === piece.color &&
+	    const piece = state.pieces.get(orig);
+	    return !!piece && (orig === dest || !state.pieces.has(dest)) && (state.movable.color === 'both' || (state.movable.color === piece.color &&
 	        state.turnColor === piece.color));
 	}
 	function isPremovable(state, orig) {
-	    const piece = state.pieces[orig];
+	    const piece = state.pieces.get(orig);
 	    return !!piece && state.premovable.enabled &&
 	        state.movable.color === piece.color &&
 	        state.turnColor !== piece.color;
@@ -399,8 +404,8 @@ var Chessground = (function () {
 	        premove_1.premove(state.pieces, orig, state.premovable.castle).includes(dest);
 	}
 	function canPredrop(state, orig, dest) {
-	    const piece = state.pieces[orig];
-	    const destPiece = state.pieces[dest];
+	    const piece = state.pieces.get(orig);
+	    const destPiece = state.pieces.get(dest);
 	    return !!piece &&
 	        (!destPiece || destPiece.color !== state.movable.color) &&
 	        state.predroppable.enabled &&
@@ -409,7 +414,7 @@ var Chessground = (function () {
 	        state.turnColor !== piece.color;
 	}
 	function isDraggable(state, orig) {
-	    const piece = state.pieces[orig];
+	    const piece = state.pieces.get(orig);
 	    return !!piece && state.draggable.enabled && (state.movable.color === 'both' || (state.movable.color === piece.color && (state.turnColor === piece.color || state.premovable.enabled)));
 	}
 	exports.isDraggable = isDraggable;
@@ -495,7 +500,7 @@ var Chessground = (function () {
 	function read(fen) {
 	    if (fen === 'start')
 	        fen = exports.initial;
-	    const pieces = {};
+	    const pieces = new Map();
 	    let row = 7, col = 0;
 	    for (const c of fen) {
 	        switch (c) {
@@ -507,7 +512,7 @@ var Chessground = (function () {
 	                col = 0;
 	                break;
 	            case '~':
-	                const piece = pieces[util.pos2key([col, row])];
+	                const piece = pieces.get(util.pos2key([col, row]));
 	                if (piece)
 	                    piece.promoted = true;
 	                break;
@@ -517,10 +522,10 @@ var Chessground = (function () {
 	                    col += nb - 48;
 	                else {
 	                    const role = c.toLowerCase();
-	                    pieces[util.pos2key([col, row])] = {
+	                    pieces.set(util.pos2key([col, row]), {
 	                        role: roles[role],
 	                        color: c === role ? 'black' : 'white',
-	                    };
+	                    });
 	                    ++col;
 	                }
 	        }
@@ -530,7 +535,7 @@ var Chessground = (function () {
 	exports.read = read;
 	function write(pieces) {
 	    return util.invRanks.map(y => types.files.map(x => {
-	        const piece = pieces[x + y];
+	        const piece = pieces.get(x + y);
 	        if (piece) {
 	            const letter = letters[piece.role];
 	            return piece.color === 'white' ? letter.toUpperCase() : letter;
@@ -568,11 +573,11 @@ var Chessground = (function () {
 	    if (!state.animation.duration || state.animation.duration < 100)
 	        state.animation.enabled = false;
 	    if (!state.movable.rookCastle && state.movable.dests) {
-	        const rank = state.movable.color === 'white' ? '1' : '8', kingStartPos = 'e' + rank, dests = state.movable.dests[kingStartPos], king = state.pieces[kingStartPos];
+	        const rank = state.movable.color === 'white' ? '1' : '8', kingStartPos = 'e' + rank, dests = state.movable.dests.get(kingStartPos), king = state.pieces.get(kingStartPos);
 	        if (!dests || !king || king.role !== 'king')
 	            return;
-	        state.movable.dests[kingStartPos] = dests.filter(d => !((d === 'a' + rank) && dests.includes('c' + rank)) &&
-	            !((d === 'h' + rank) && dests.includes('g' + rank)));
+	        state.movable.dests.set(kingStartPos, dests.filter(d => !((d === 'a' + rank) && dests.includes('c' + rank)) &&
+	            !((d === 'h' + rank) && dests.includes('g' + rank))));
 	    }
 	}
 	exports.configure = configure;
@@ -617,14 +622,14 @@ var Chessground = (function () {
 	    })[0];
 	}
 	function computePlan(prevPieces, current) {
-	    const anims = {}, animedOrigs = [], fadings = {}, missings = [], news = [], prePieces = {};
+	    const anims = new Map(), animedOrigs = [], fadings = new Map(), missings = [], news = [], prePieces = new Map();
 	    let curP, preP, vector;
-	    for (const i in prevPieces) {
-	        prePieces[i] = makePiece(i, prevPieces[i]);
+	    for (const [k, p] of prevPieces) {
+	        prePieces.set(k, makePiece(k, p));
 	    }
 	    for (const key of util.allKeys) {
-	        curP = current.pieces[key];
-	        preP = prePieces[key];
+	        curP = current.pieces.get(key);
+	        preP = prePieces.get(key);
 	        if (curP) {
 	            if (preP) {
 	                if (!util.samePiece(curP, preP.piece)) {
@@ -642,13 +647,13 @@ var Chessground = (function () {
 	        preP = closer(newP, missings.filter(p => util.samePiece(newP.piece, p.piece)));
 	        if (preP) {
 	            vector = [preP.pos[0] - newP.pos[0], preP.pos[1] - newP.pos[1]];
-	            anims[newP.key] = vector.concat(vector);
+	            anims.set(newP.key, vector.concat(vector));
 	            animedOrigs.push(preP.key);
 	        }
 	    }
 	    for (const p of missings) {
 	        if (!animedOrigs.includes(p.key))
-	            fadings[p.key] = p.piece;
+	            fadings.set(p.key, p.piece);
 	    }
 	    return {
 	        anims: anims,
@@ -669,8 +674,7 @@ var Chessground = (function () {
 	    }
 	    else {
 	        const ease = easing(rest);
-	        for (const i in cur.plan.anims) {
-	            const cfg = cur.plan.anims[i];
+	        for (const cfg of cur.plan.anims.values()) {
 	            cfg[2] = cfg[0] * ease;
 	            cfg[3] = cfg[1] * ease;
 	        }
@@ -679,10 +683,10 @@ var Chessground = (function () {
 	    }
 	}
 	function animate(mutation, state) {
-	    const prevPieces = Object.assign({}, state.pieces);
+	    const prevPieces = new Map(state.pieces);
 	    const result = mutation(state);
 	    const plan = computePlan(prevPieces, state);
-	    if (!isObjectEmpty(plan.anims) || !isObjectEmpty(plan.fadings)) {
+	    if (plan.anims.size || plan.fadings.size) {
 	        const alreadyRunning = state.animation.current && state.animation.current.start;
 	        state.animation.current = {
 	            start: performance.now(),
@@ -696,11 +700,6 @@ var Chessground = (function () {
 	        state.dom.redraw();
 	    }
 	    return result;
-	}
-	function isObjectEmpty(o) {
-	    for (const _ in o)
-	        return false;
-	    return true;
 	}
 	function easing(t) {
 	    return t < 0.5 ? 4 * t * t * t : (t - 1) * (2 * t - 2) * (2 * t - 2) + 1;
@@ -811,7 +810,7 @@ var Chessground = (function () {
 	    const bounds = s.dom.bounds(), position = util.eventPosition(e), orig = board.getKeyAtDomPos(position, board.whitePov(s), bounds);
 	    if (!orig)
 	        return;
-	    const piece = s.pieces[orig];
+	    const piece = s.pieces.get(orig);
 	    const previouslySelected = s.selected;
 	    if (!previouslySelected && s.drawable.enabled && (s.drawable.eraseOnClick || (!piece || piece.color !== s.turnColor)))
 	        draw.clear(s);
@@ -862,10 +861,7 @@ var Chessground = (function () {
 	function pieceCloseTo(s, pos) {
 	    const asWhite = board.whitePov(s), bounds = s.dom.bounds(), radiusSq = Math.pow(bounds.width / 8, 2);
 	    for (const key in s.pieces) {
-	        const squareBounds = computeSquareBounds(key, asWhite, bounds), center = [
-	            squareBounds.left + squareBounds.width / 2,
-	            squareBounds.top + squareBounds.height / 2
-	        ];
+	        const center = computeSquareCenter(key, asWhite, bounds);
 	        if (util.distanceSq(center, pos) <= radiusSq)
 	            return true;
 	    }
@@ -873,7 +869,7 @@ var Chessground = (function () {
 	}
 	function dragNewPiece(s, piece, e, force) {
 	    const key = 'a0';
-	    s.pieces[key] = piece;
+	    s.pieces.set(key, piece);
 	    s.dom.redraw();
 	    const position = util.eventPosition(e);
 	    s.draggable.current = {
@@ -896,9 +892,9 @@ var Chessground = (function () {
 	        const cur = s.draggable.current;
 	        if (!cur)
 	            return;
-	        if ((_a = s.animation.current) === null || _a === void 0 ? void 0 : _a.plan.anims[cur.orig])
+	        if ((_a = s.animation.current) === null || _a === void 0 ? void 0 : _a.plan.anims.has(cur.orig))
 	            s.animation.current = undefined;
-	        const origPiece = s.pieces[cur.orig];
+	        const origPiece = s.pieces.get(cur.orig);
 	        if (!origPiece || !util.samePiece(origPiece, cur.piece))
 	            cancel(s);
 	        else {
@@ -953,10 +949,10 @@ var Chessground = (function () {
 	        }
 	    }
 	    else if (cur.newPiece) {
-	        delete s.pieces[cur.orig];
+	        s.pieces.delete(cur.orig);
 	    }
 	    else if (s.draggable.deleteOnDropOff && !dest) {
-	        delete s.pieces[cur.orig];
+	        s.pieces.delete(cur.orig);
 	        board.callUserFunction(s.events.change);
 	    }
 	    if (cur.orig === cur.previouslySelected && (cur.orig === dest || !dest))
@@ -972,7 +968,7 @@ var Chessground = (function () {
 	    const cur = s.draggable.current;
 	    if (cur) {
 	        if (cur.newPiece)
-	            delete s.pieces[cur.orig];
+	            s.pieces.delete(cur.orig);
 	        s.draggable.current = undefined;
 	        board.unselect(s);
 	        removeDragElements(s);
@@ -985,18 +981,16 @@ var Chessground = (function () {
 	    if (e.ghost)
 	        util.setVisible(e.ghost, false);
 	}
-	function computeSquareBounds(key, asWhite, bounds) {
+	function computeSquareCenter(key, asWhite, bounds) {
 	    const pos = util.key2pos(key);
 	    if (!asWhite) {
 	        pos[0] = 7 - pos[0];
 	        pos[1] = 7 - pos[1];
 	    }
-	    return {
-	        left: bounds.left + bounds.width * pos[0] / 8,
-	        top: bounds.top + bounds.height * (7 - pos[1]) / 8,
-	        width: bounds.width / 8,
-	        height: bounds.height / 8
-	    };
+	    return [
+	        bounds.left + bounds.width * pos[0] / 8 + bounds.width / 16,
+	        bounds.top + bounds.height * (7 - pos[1]) / 8 + bounds.height / 16
+	    ];
 	}
 	function pieceElementByKey(s, key) {
 	    let el = s.dom.elements.board.firstChild;
@@ -1005,7 +999,7 @@ var Chessground = (function () {
 	            return el;
 	        el = el.nextSibling;
 	    }
-	    return undefined;
+	    return;
 	}
 
 	});
@@ -1225,10 +1219,10 @@ var Chessground = (function () {
 	}
 	exports.createElement = createElement;
 	function renderSvg(state, root) {
-	    const d = state.drawable, curD = d.current, cur = curD && curD.mouseSq ? curD : undefined, arrowDests = {}, bounds = state.dom.bounds();
+	    const d = state.drawable, curD = d.current, cur = curD && curD.mouseSq ? curD : undefined, arrowDests = new Map(), bounds = state.dom.bounds();
 	    for (const s of d.shapes.concat(d.autoShapes).concat(cur ? [cur] : [])) {
 	        if (s.dest)
-	            arrowDests[s.dest] = (arrowDests[s.dest] || 0) + 1;
+	            arrowDests.set(s.dest, (arrowDests.get(s.dest) || 0) + 1);
 	    }
 	    const shapes = d.shapes.concat(d.autoShapes).map((s) => {
 	        return {
@@ -1253,36 +1247,36 @@ var Chessground = (function () {
 	}
 	exports.renderSvg = renderSvg;
 	function syncDefs(d, shapes, defsEl) {
-	    const brushes = {};
+	    const brushes = new Map();
 	    let brush;
 	    for (const s of shapes) {
 	        if (s.shape.dest) {
 	            brush = d.brushes[s.shape.brush];
 	            if (s.shape.modifiers)
 	                brush = makeCustomBrush(brush, s.shape.modifiers);
-	            brushes[brush.key] = brush;
+	            brushes.set(brush.key, brush);
 	        }
 	    }
-	    const keysInDom = {};
+	    const keysInDom = new Set();
 	    let el = defsEl.firstChild;
 	    while (el) {
-	        keysInDom[el.getAttribute('cgKey')] = true;
+	        keysInDom.add(el.getAttribute('cgKey'));
 	        el = el.nextSibling;
 	    }
-	    for (const key in brushes) {
-	        if (!keysInDom[key])
-	            defsEl.appendChild(renderMarker(brushes[key]));
+	    for (const [key, brush] of brushes.entries()) {
+	        if (!keysInDom.has(key))
+	            defsEl.appendChild(renderMarker(brush));
 	    }
 	}
 	function syncShapes(state, shapes, brushes, arrowDests, root, defsEl) {
-	    const bounds = state.dom.bounds(), hashesInDom = {}, toRemove = [];
+	    const bounds = state.dom.bounds(), hashesInDom = new Map(), toRemove = [];
 	    for (const sc of shapes)
-	        hashesInDom[sc.hash] = false;
+	        hashesInDom.set(sc.hash, false);
 	    let el = defsEl.nextSibling, elHash;
 	    while (el) {
 	        elHash = el.getAttribute('cgHash');
-	        if (hashesInDom.hasOwnProperty(elHash))
-	            hashesInDom[elHash] = true;
+	        if (hashesInDom.has(elHash))
+	            hashesInDom.set(elHash, true);
 	        else
 	            toRemove.push(el);
 	        el = el.nextSibling;
@@ -1290,12 +1284,12 @@ var Chessground = (function () {
 	    for (const el of toRemove)
 	        root.removeChild(el);
 	    for (const sc of shapes) {
-	        if (!hashesInDom[sc.hash])
+	        if (!hashesInDom.get(sc.hash))
 	            root.appendChild(renderShape(state, sc, brushes, arrowDests, bounds));
 	    }
 	}
 	function shapeHash({ orig, dest, brush, piece, modifiers }, arrowDests, current, bounds) {
-	    return [bounds.width, bounds.height, current, orig, dest, brush, dest && arrowDests[dest] > 1,
+	    return [bounds.width, bounds.height, current, orig, dest, brush, dest && (arrowDests.get(dest) || 0) > 1,
 	        piece && pieceHash(piece),
 	        modifiers && modifiersHash(modifiers)
 	    ].filter(x => x).join(',');
@@ -1316,7 +1310,7 @@ var Chessground = (function () {
 	            let brush = brushes[shape.brush];
 	            if (shape.modifiers)
 	                brush = makeCustomBrush(brush, shape.modifiers);
-	            el = renderArrow(brush, orig, orient(util.key2pos(shape.dest), state.orientation), current, arrowDests[shape.dest] > 1, bounds);
+	            el = renderArrow(brush, orig, orient(util.key2pos(shape.dest), state.orientation), current, (arrowDests.get(shape.dest) || 0) > 1, bounds);
 	        }
 	        else
 	            el = renderCircle(brushes[shape.brush], orig, current, bounds);
@@ -1495,7 +1489,7 @@ var Chessground = (function () {
 	    board.unsetPredrop(s);
 	    const piece = s.dropmode.piece;
 	    if (piece) {
-	        s.pieces.a0 = piece;
+	        s.pieces.set('a0', piece);
 	        const position = util.eventPosition(e);
 	        const dest = position && board.getKeyAtDomPos(position, board.whitePov(s), s.dom.bounds());
 	        if (dest)
@@ -1591,15 +1585,15 @@ var Chessground = (function () {
 
 	const util$1 = util;
 	function render(s) {
-	    const asWhite = board.whitePov(s), posToTranslate = s.dom.relative ? util$1.posToTranslateRel : util$1.posToTranslateAbs(s.dom.bounds()), translate = s.dom.relative ? util$1.translateRel : util$1.translateAbs, boardEl = s.dom.elements.board, pieces = s.pieces, curAnim = s.animation.current, anims = curAnim ? curAnim.plan.anims : {}, fadings = curAnim ? curAnim.plan.fadings : {}, curDrag = s.draggable.current, squares = computeSquareClasses(s), samePieces = {}, sameSquares = {}, movedPieces = {}, movedSquares = {}, piecesKeys = Object.keys(pieces);
-	    let k, p, el, pieceAtKey, elPieceName, anim, fading, pMvdset, pMvd, sMvdset, sMvd;
+	    const asWhite = board.whitePov(s), posToTranslate = s.dom.relative ? util$1.posToTranslateRel : util$1.posToTranslateAbs(s.dom.bounds()), translate = s.dom.relative ? util$1.translateRel : util$1.translateAbs, boardEl = s.dom.elements.board, pieces = s.pieces, curAnim = s.animation.current, anims = curAnim ? curAnim.plan.anims : new Map(), fadings = curAnim ? curAnim.plan.fadings : new Map(), curDrag = s.draggable.current, squares = computeSquareClasses(s), samePieces = new Set(), sameSquares = new Set(), movedPieces = new Map(), movedSquares = new Map();
+	    let k, el, pieceAtKey, elPieceName, anim, fading, pMvdset, pMvd, sMvdset, sMvd;
 	    el = boardEl.firstChild;
 	    while (el) {
 	        k = el.cgKey;
 	        if (isPieceNode(el)) {
-	            pieceAtKey = pieces[k];
-	            anim = anims[k];
-	            fading = fadings[k];
+	            pieceAtKey = pieces.get(k);
+	            anim = anims.get(k);
+	            fading = fadings.get(k);
 	            elPieceName = el.cgPiece;
 	            if (el.cgDragging && (!curDrag || curDrag.orig !== k)) {
 	                el.classList.remove('dragging');
@@ -1626,7 +1620,7 @@ var Chessground = (function () {
 	                        el.style.zIndex = posZIndex(util.key2pos(k), asWhite);
 	                }
 	                if (elPieceName === pieceNameOf(pieceAtKey) && (!fading || !el.cgFading)) {
-	                    samePieces[k] = true;
+	                    samePieces.add(k);
 	                }
 	                else {
 	                    if (fading && elPieceName === pieceNameOf(fading)) {
@@ -1634,34 +1628,26 @@ var Chessground = (function () {
 	                        el.cgFading = true;
 	                    }
 	                    else {
-	                        if (movedPieces[elPieceName])
-	                            movedPieces[elPieceName].push(el);
-	                        else
-	                            movedPieces[elPieceName] = [el];
+	                        appendValue(movedPieces, elPieceName, el);
 	                    }
 	                }
 	            }
 	            else {
-	                if (movedPieces[elPieceName])
-	                    movedPieces[elPieceName].push(el);
-	                else
-	                    movedPieces[elPieceName] = [el];
+	                appendValue(movedPieces, elPieceName, el);
 	            }
 	        }
 	        else if (isSquareNode(el)) {
 	            const cn = el.className;
-	            if (squares[k] === cn)
-	                sameSquares[k] = true;
-	            else if (movedSquares[cn])
-	                movedSquares[cn].push(el);
+	            if (squares.get(k) === cn)
+	                sameSquares.add(k);
 	            else
-	                movedSquares[cn] = [el];
+	                appendValue(movedSquares, cn, el);
 	        }
 	        el = el.nextSibling;
 	    }
-	    for (const sk in squares) {
-	        if (!sameSquares[sk]) {
-	            sMvdset = movedSquares[squares[sk]];
+	    for (const [sk, className] of squares) {
+	        if (!sameSquares.has(sk)) {
+	            sMvdset = movedSquares.get(className);
 	            sMvd = sMvdset && sMvdset.pop();
 	            const translation = posToTranslate(util.key2pos(sk), asWhite);
 	            if (sMvd) {
@@ -1669,18 +1655,17 @@ var Chessground = (function () {
 	                translate(sMvd, translation);
 	            }
 	            else {
-	                const squareNode = util.createEl('square', squares[sk]);
+	                const squareNode = util.createEl('square', className);
 	                squareNode.cgKey = sk;
 	                translate(squareNode, translation);
 	                boardEl.insertBefore(squareNode, boardEl.firstChild);
 	            }
 	        }
 	    }
-	    for (k of piecesKeys) {
-	        p = pieces[k];
-	        anim = anims[k];
-	        if (!samePieces[k]) {
-	            pMvdset = movedPieces[pieceNameOf(p)];
+	    for (const [k, p] of pieces) {
+	        anim = anims.get(k);
+	        if (!samePieces.has(k)) {
+	            pMvdset = movedPieces.get(pieceNameOf(p));
 	            pMvd = pMvdset && pMvdset.pop();
 	            if (pMvd) {
 	                pMvd.cgKey = k;
@@ -1715,10 +1700,10 @@ var Chessground = (function () {
 	            }
 	        }
 	    }
-	    for (const i in movedPieces)
-	        removeNodes(s, movedPieces[i]);
-	    for (const i in movedSquares)
-	        removeNodes(s, movedSquares[i]);
+	    for (const nodes of movedPieces.values())
+	        removeNodes(s, nodes);
+	    for (const nodes of movedSquares.values())
+	        removeNodes(s, nodes);
 	}
 	exports.render = render;
 	function updateBounds(s) {
@@ -1755,7 +1740,7 @@ var Chessground = (function () {
 	}
 	function computeSquareClasses(s) {
 	    var _a;
-	    const squares = {};
+	    const squares = new Map();
 	    if (s.lastMove && s.highlight.lastMove)
 	        for (const k of s.lastMove) {
 	            addSquare(squares, k, 'last-move');
@@ -1765,15 +1750,15 @@ var Chessground = (function () {
 	    if (s.selected) {
 	        addSquare(squares, s.selected, 'selected');
 	        if (s.movable.showDests) {
-	            const dests = (_a = s.movable.dests) === null || _a === void 0 ? void 0 : _a[s.selected];
+	            const dests = (_a = s.movable.dests) === null || _a === void 0 ? void 0 : _a.get(s.selected);
 	            if (dests)
 	                for (const k of dests) {
-	                    addSquare(squares, k, 'move-dest' + (s.pieces[k] ? ' oc' : ''));
+	                    addSquare(squares, k, 'move-dest' + (s.pieces.has(k) ? ' oc' : ''));
 	                }
 	            const pDests = s.premovable.dests;
 	            if (pDests)
 	                for (const k of pDests) {
-	                    addSquare(squares, k, 'premove-dest' + (s.pieces[k] ? ' oc' : ''));
+	                    addSquare(squares, k, 'premove-dest' + (s.pieces.has(k) ? ' oc' : ''));
 	                }
 	        }
 	    }
@@ -1790,10 +1775,18 @@ var Chessground = (function () {
 	    return squares;
 	}
 	function addSquare(squares, key, klass) {
-	    if (squares[key])
-	        squares[key] += ' ' + klass;
+	    const classes = squares.get(key);
+	    if (classes)
+	        squares.set(key, `${classes} ${klass}`);
 	    else
-	        squares[key] = klass;
+	        squares.set(key, klass);
+	}
+	function appendValue(map, key, value) {
+	    const arr = map.get(key);
+	    if (arr)
+	        arr.push(value);
+	    else
+	        map.set(key, [value]);
 	}
 
 	});
