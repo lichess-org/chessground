@@ -1,6 +1,7 @@
 import { State } from './state'
 import { pos2key, key2pos, opposite } from './util'
 import { premove } from './premove'
+import { computeSquareCenter } from './drag'
 import * as cg from './types'
 
 export type Callback = (...args: any[]) => void;
@@ -332,6 +333,156 @@ export function getKeyAtDomPos(pos: cg.NumberPair, asWhite: boolean, bounds: Cli
   let rank = 7 - Math.floor(8 * (pos[1] - bounds.top) / bounds.height);
   if (!asWhite) rank = 7 - rank;
   return (file >= 0 && file < 8 && rank >= 0 && rank < 8) ? pos2key([file, rank]) : undefined;
+}
+
+function isAlreadySnapped(orig: cg.Pos, targetKey: cg.Key | undefined): boolean {
+  // TODO profile performance - precompute this function's values to an object?
+  if (targetKey === undefined) return false;
+  const pos = key2pos(targetKey);
+  // +
+  if (orig[0] === pos[0] || orig[1] === pos[1]) return true;
+  // x
+  if (Math.abs(orig[0] - pos[0]) === Math.abs(orig[1] - pos[1])) return true;
+  // knight
+  // a ^ b is 3 for combinations of 1 and 2
+  // 0 ^ 3 also passes, but that case is valid and already encompassed above, so no harm
+  if ((Math.abs(orig[0] - pos[0]) ^ Math.abs(orig[1] - pos[1])) === 3) return true;
+  // all other
+  return false;
+}
+
+export function getSnappedKeyAtDomPos(orig: cg.Key, pos: cg.NumberPair, asWhite: boolean, bounds: ClientRect): cg.Key | undefined {
+  // 1. Get key at dom pos
+  // 2. If move is valid, short circuit
+  // 3. If move is not valid, pick nearest angle and snap distance to dragged distance
+  // Only snapping to + and x currently.
+  // TODO: also snap to knight angles, but stop after going past knight tile?
+  // TODO: cleanly roll these if statements into 1 loop?
+
+  const unsnappedKey = getKeyAtDomPos(pos, asWhite, bounds);
+  const origRowCol = key2pos(orig);
+  if (isAlreadySnapped(origRowCol, unsnappedKey)) return unsnappedKey;
+
+  const draggedOutOfBox = unsnappedKey === undefined;
+  const unsnappedRowCol = unsnappedKey === undefined ? origRowCol : key2pos(unsnappedKey);
+  const origCenterCoord = computeSquareCenter(orig, asWhite, bounds);
+
+  // Use degrees for ease of round numbers in code
+  const origCenterToMouseDegrees = Math.atan2(pos[1] - origCenterCoord[1], origCenterCoord[0] - pos[0]) * 180 / Math.PI + 180;
+  const origCenterToMouseCoordX = origCenterCoord[0] - pos[0];
+  const origCenterToMouseCoordY = origCenterCoord[1] - pos[1];
+
+  const origCenterToMouseCoordDistance = Math.sqrt(
+      origCenterToMouseCoordX * origCenterToMouseCoordX +
+      origCenterToMouseCoordY * origCenterToMouseCoordY
+  );
+  const diagonalCoordDistance = Math.sqrt(
+      bounds.width * bounds.width +
+      bounds.height * bounds.height
+  ) / 8;
+  const squareCoordDistance = Math.floor((origCenterToMouseCoordDistance + diagonalCoordDistance / 2) / diagonalCoordDistance);
+
+  if (origCenterToMouseDegrees < (45 * 0 + 45 / 2)) {
+    // console.log('e+');
+    if (draggedOutOfBox) {
+      return pos2key([asWhite ? 7 : 0, origRowCol[1]]);
+    }
+    return pos2key([unsnappedRowCol[0], origRowCol[1]]);
+  }
+  if (origCenterToMouseDegrees < (45 * 1 + 45 / 2)) {
+    // console.log('ne');
+    if (asWhite) {
+      let newPos: cg.NumberPair = [origRowCol[0] + squareCoordDistance, origRowCol[1] + squareCoordDistance];
+      while (newPos[0] > 7 || newPos[1] > 7) {
+        newPos = [newPos[0] - 1, newPos[1] - 1];
+      }
+      return pos2key(newPos);
+    } else {
+      let newPos: cg.NumberPair = [origRowCol[0] - squareCoordDistance, origRowCol[1] - squareCoordDistance];
+      while (newPos[0] < 0 || newPos[1] < 0) {
+        newPos = [newPos[0] + 1, newPos[1] + 1];
+      }
+      return pos2key(newPos);
+    }
+  }
+  if (origCenterToMouseDegrees < (45 * 2 + 45 / 2)) {
+    // console.log('n');
+    if (draggedOutOfBox) {
+      return pos2key([origRowCol[0], asWhite ? 7 : 0]);
+    }
+    return pos2key([origRowCol[0], unsnappedRowCol[1]]);
+  }
+  if (origCenterToMouseDegrees < (45 * 3 + 45 / 2)) {
+    // console.log('nw');
+    if (asWhite) {
+      let newPos: cg.NumberPair = [origRowCol[0] - squareCoordDistance, origRowCol[1] + squareCoordDistance];
+      while (newPos[0] < 0 || newPos[1] > 7) {
+        newPos = [newPos[0] + 1, newPos[1] - 1];
+      }
+      return pos2key(newPos);
+    } else {
+      let newPos: cg.NumberPair = [origRowCol[0] + squareCoordDistance, origRowCol[1] - squareCoordDistance];
+      while (newPos[0] > 7 || newPos[1] < 0) {
+        newPos = [newPos[0] - 1, newPos[1] + 1];
+      }
+      return pos2key(newPos);
+    }
+  }
+  if (origCenterToMouseDegrees < (45 * 4 + 45 / 2)) {
+    // console.log('w');
+    if (draggedOutOfBox) {
+      return pos2key([asWhite ? 0 : 7, origRowCol[1]]);
+    }
+    return pos2key([unsnappedRowCol[0], origRowCol[1]]);
+  }
+  if (origCenterToMouseDegrees < (45 * 5 + 45 / 2)) {
+    // console.log('sw');
+    if (asWhite) {
+      let newPos: cg.NumberPair = [origRowCol[0] - squareCoordDistance, origRowCol[1] - squareCoordDistance];
+      while (newPos[0] < 0 || newPos[1] < 0) {
+        newPos = [newPos[0] + 1, newPos[1] + 1];
+      }
+      return pos2key(newPos);
+    } else {
+      let newPos: cg.NumberPair = [origRowCol[0] + squareCoordDistance, origRowCol[1] + squareCoordDistance];
+      while (newPos[0] > 7 || newPos[1] > 7) {
+        newPos = [newPos[0] - 1, newPos[1] - 1];
+      }
+      return pos2key(newPos);
+    }
+  }
+  if (origCenterToMouseDegrees < (45 * 6 + 45 / 2)) {
+    // console.log('s');
+    if (draggedOutOfBox) {
+      return pos2key([origRowCol[0], asWhite ? 0 : 7]);
+    }
+    return pos2key([origRowCol[0], unsnappedRowCol[1]]);
+  }
+  if (origCenterToMouseDegrees < (45 * 7 + 45 / 2)) {
+    // console.log('se');
+    if (asWhite) {
+      let newPos: cg.NumberPair = [origRowCol[0] + squareCoordDistance, origRowCol[1] - squareCoordDistance];
+      while (newPos[0] > 7 || newPos[1] < 0) {
+        newPos = [newPos[0] - 1, newPos[1] + 1];
+      }
+      return pos2key(newPos);
+    } else {
+      let newPos: cg.NumberPair = [origRowCol[0] - squareCoordDistance, origRowCol[1] + squareCoordDistance];
+      while (newPos[0] < 0 || newPos[1] > 7) {
+        newPos = [newPos[0] + 1, newPos[1] - 1];
+      }
+      return pos2key(newPos);
+    }
+  } else if (origCenterToMouseDegrees < (45 * 8 + 45 / 2)) {
+    // console.log('e-');
+    if (draggedOutOfBox) {
+      return pos2key([asWhite ? 7 : 0, origRowCol[1]]);
+    }
+    return pos2key([unsnappedRowCol[0], origRowCol[1]]);
+  }
+
+  // should not be reachable
+  return unsnappedKey;
 }
 
 export function whitePov(s: State): boolean {
