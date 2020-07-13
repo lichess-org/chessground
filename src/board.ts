@@ -344,9 +344,8 @@ function isAlreadySnapped(orig: cg.Pos, targetKey: cg.Key | undefined): boolean 
   // x
   if (Math.abs(orig[0] - pos[0]) === Math.abs(orig[1] - pos[1])) return true;
   // knight
-  // a ^ b is 3 for combinations of 1 and 2
-  // 0 ^ 3 also passes, but that case is valid and already encompassed above, so no harm
-  if ((Math.abs(orig[0] - pos[0]) ^ Math.abs(orig[1] - pos[1])) === 3) return true;
+  if (Math.abs(orig[0] - pos[0]) === 2 && Math.abs(orig[1] - pos[1]) === 1) return true;
+  if (Math.abs(orig[0] - pos[0]) === 1 && Math.abs(orig[1] - pos[1]) === 2) return true;
   // all other
   return false;
 }
