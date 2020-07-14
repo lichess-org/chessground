@@ -350,19 +350,62 @@ function isAlreadySnapped(orig: cg.Pos, targetKey: cg.Key | undefined): boolean 
   return false;
 }
 
+function clamp(n: number) {
+  if (n < 0) return 0
+  if (n > 7) return 7
+  return n
+}
+
+interface SnapCriteria {
+  x1: number;
+  y1: number;
+  x2: number;
+  y2: number;
+  dd: number;
+}
+
+const snapFunctions = {
+  e: ({y1, x2}: SnapCriteria): cg.Pos => [clamp(x2), y1],
+  ne: ({x1, y1, dd}: SnapCriteria): cg.Pos => {const c = Math.min(Math.min(dd, 7 - x1), Math.min(dd, 7 - y1));return [x1 + c, y1 + c]},
+  n: ({x1, y2}: SnapCriteria): cg.Pos => [x1, clamp(y2)],
+  nw: ({x1, y1, dd}: SnapCriteria): cg.Pos => {const c = Math.min(Math.min(dd, x1), Math.min(dd, 7 - y1));return [x1 - c, y1 + c];},
+  w: ({y1, x2}: SnapCriteria): cg.Pos => [clamp(x2), y1],
+  sw: ({x1, y1, dd}: SnapCriteria): cg.Pos => {const c = Math.min(Math.min(dd, x1), Math.min(dd, y1));return [x1 - c, y1 - c];},
+  s: ({x1, y2}: SnapCriteria): cg.Pos => [x1, clamp(y2)],
+  se: ({x1, y1, dd}: SnapCriteria): cg.Pos => {const c = Math.min(Math.min(dd, 7 - x1), Math.min(dd, y1));return [x1 + c, y1 - c];},
+}
+
+const snapAngles = [
+  {angle: 0, snap:   (asWhite: boolean) => asWhite ? snapFunctions.e : snapFunctions.w},
+  {angle: 45, snap:  (asWhite: boolean) => asWhite ? snapFunctions.ne : snapFunctions.sw},
+  {angle: 90, snap:  (asWhite: boolean) => asWhite ? snapFunctions.n : snapFunctions.s},
+  {angle: 135, snap: (asWhite: boolean) => asWhite ? snapFunctions.nw : snapFunctions.se},
+  {angle: 180, snap: (asWhite: boolean) => asWhite ? snapFunctions.w : snapFunctions.e},
+  {angle: 225, snap: (asWhite: boolean) => asWhite ? snapFunctions.sw : snapFunctions.ne},
+  {angle: 270, snap: (asWhite: boolean) => asWhite ? snapFunctions.s : snapFunctions.n},
+  {angle: 315, snap: (asWhite: boolean) => asWhite ? snapFunctions.se : snapFunctions.nw},
+  {angle: 360, snap: (asWhite: boolean) => asWhite ? snapFunctions.e : snapFunctions.w},
+  {angle: 405, snap: (asWhite: boolean) => asWhite ? snapFunctions.e : snapFunctions.w},
+];
+const angleThresholds = [snapAngles[0]].concat(snapAngles.slice(0, -1)).map(({angle}, i, arr) => ({
+  angle: (angle + snapAngles[i].angle) / 2,
+  snap: arr[i].snap
+})).slice(1);
+
 export function getSnappedKeyAtDomPos(orig: cg.Key, pos: cg.NumberPair, asWhite: boolean, bounds: ClientRect): cg.Key | undefined {
   // 1. Get key at dom pos
   // 2. If move is valid, short circuit
   // 3. If move is not valid, pick nearest angle and snap distance to dragged distance
   // Only snapping to + and x currently.
   // TODO: also snap to knight angles, but stop after going past knight tile?
-  // TODO: cleanly roll these if statements into 1 loop?
 
   const unsnappedKey = getKeyAtDomPos(pos, asWhite, bounds);
-  const origRowCol = key2pos(orig);
+  const origRowCol: cg.Pos = key2pos(orig);
   if (isAlreadySnapped(origRowCol, unsnappedKey)) return unsnappedKey;
 
   const draggedOutOfBox = unsnappedKey === undefined;
+  if (draggedOutOfBox) return;
+
   const unsnappedRowCol = unsnappedKey === undefined ? origRowCol : key2pos(unsnappedKey);
   const origCenterCoord = computeSquareCenter(orig, asWhite, bounds);
 
@@ -379,109 +422,22 @@ export function getSnappedKeyAtDomPos(orig: cg.Key, pos: cg.NumberPair, asWhite:
       bounds.width * bounds.width +
       bounds.height * bounds.height
   ) / 8;
-  const squareCoordDistance = Math.floor((origCenterToMouseCoordDistance + diagonalCoordDistance / 2) / diagonalCoordDistance);
+  const squareDiagonalCoordDistance = Math.floor((origCenterToMouseCoordDistance + diagonalCoordDistance / 2) / diagonalCoordDistance);
 
-  if (origCenterToMouseDegrees < (45 * 0 + 45 / 2)) {
-    // console.log('e+');
-    if (draggedOutOfBox) {
-      return pos2key([asWhite ? 7 : 0, origRowCol[1]]);
-    }
-    return pos2key([unsnappedRowCol[0], origRowCol[1]]);
-  }
-  if (origCenterToMouseDegrees < (45 * 1 + 45 / 2)) {
-    // console.log('ne');
-    if (asWhite) {
-      let newPos: cg.NumberPair = [origRowCol[0] + squareCoordDistance, origRowCol[1] + squareCoordDistance];
-      while (newPos[0] > 7 || newPos[1] > 7) {
-        newPos = [newPos[0] - 1, newPos[1] - 1];
-      }
-      return pos2key(newPos);
-    } else {
-      let newPos: cg.NumberPair = [origRowCol[0] - squareCoordDistance, origRowCol[1] - squareCoordDistance];
-      while (newPos[0] < 0 || newPos[1] < 0) {
-        newPos = [newPos[0] + 1, newPos[1] + 1];
-      }
-      return pos2key(newPos);
-    }
-  }
-  if (origCenterToMouseDegrees < (45 * 2 + 45 / 2)) {
-    // console.log('n');
-    if (draggedOutOfBox) {
-      return pos2key([origRowCol[0], asWhite ? 7 : 0]);
-    }
-    return pos2key([origRowCol[0], unsnappedRowCol[1]]);
-  }
-  if (origCenterToMouseDegrees < (45 * 3 + 45 / 2)) {
-    // console.log('nw');
-    if (asWhite) {
-      let newPos: cg.NumberPair = [origRowCol[0] - squareCoordDistance, origRowCol[1] + squareCoordDistance];
-      while (newPos[0] < 0 || newPos[1] > 7) {
-        newPos = [newPos[0] + 1, newPos[1] - 1];
-      }
-      return pos2key(newPos);
-    } else {
-      let newPos: cg.NumberPair = [origRowCol[0] + squareCoordDistance, origRowCol[1] - squareCoordDistance];
-      while (newPos[0] > 7 || newPos[1] < 0) {
-        newPos = [newPos[0] - 1, newPos[1] + 1];
-      }
-      return pos2key(newPos);
-    }
-  }
-  if (origCenterToMouseDegrees < (45 * 4 + 45 / 2)) {
-    // console.log('w');
-    if (draggedOutOfBox) {
-      return pos2key([asWhite ? 0 : 7, origRowCol[1]]);
-    }
-    return pos2key([unsnappedRowCol[0], origRowCol[1]]);
-  }
-  if (origCenterToMouseDegrees < (45 * 5 + 45 / 2)) {
-    // console.log('sw');
-    if (asWhite) {
-      let newPos: cg.NumberPair = [origRowCol[0] - squareCoordDistance, origRowCol[1] - squareCoordDistance];
-      while (newPos[0] < 0 || newPos[1] < 0) {
-        newPos = [newPos[0] + 1, newPos[1] + 1];
-      }
-      return pos2key(newPos);
-    } else {
-      let newPos: cg.NumberPair = [origRowCol[0] + squareCoordDistance, origRowCol[1] + squareCoordDistance];
-      while (newPos[0] > 7 || newPos[1] > 7) {
-        newPos = [newPos[0] - 1, newPos[1] - 1];
-      }
-      return pos2key(newPos);
-    }
-  }
-  if (origCenterToMouseDegrees < (45 * 6 + 45 / 2)) {
-    // console.log('s');
-    if (draggedOutOfBox) {
-      return pos2key([origRowCol[0], asWhite ? 0 : 7]);
-    }
-    return pos2key([origRowCol[0], unsnappedRowCol[1]]);
-  }
-  if (origCenterToMouseDegrees < (45 * 7 + 45 / 2)) {
-    // console.log('se');
-    if (asWhite) {
-      let newPos: cg.NumberPair = [origRowCol[0] + squareCoordDistance, origRowCol[1] - squareCoordDistance];
-      while (newPos[0] > 7 || newPos[1] < 0) {
-        newPos = [newPos[0] - 1, newPos[1] + 1];
-      }
-      return pos2key(newPos);
-    } else {
-      let newPos: cg.NumberPair = [origRowCol[0] - squareCoordDistance, origRowCol[1] + squareCoordDistance];
-      while (newPos[0] < 0 || newPos[1] > 7) {
-        newPos = [newPos[0] + 1, newPos[1] - 1];
-      }
-      return pos2key(newPos);
-    }
-  } else if (origCenterToMouseDegrees < (45 * 8 + 45 / 2)) {
-    // console.log('e-');
-    if (draggedOutOfBox) {
-      return pos2key([asWhite ? 7 : 0, origRowCol[1]]);
-    }
-    return pos2key([unsnappedRowCol[0], origRowCol[1]]);
-  }
 
-  // should not be reachable
-  return unsnappedKey;
+  for (const {angle, snap} of angleThresholds) {
+    if (origCenterToMouseDegrees < angle) {
+      const snappedPos = snap(asWhite)({
+        x1: origRowCol[0],
+        y1: origRowCol[1],
+        x2: unsnappedRowCol[0],
+        y2: unsnappedRowCol[1],
+        dd: squareDiagonalCoordDistance,
+      });
+      return pos2key(snappedPos);
+    }
+  }
+  return undefined; // should not be reachable
 }
 
 export function whitePov(s: State): boolean {
