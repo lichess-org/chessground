@@ -368,13 +368,13 @@ interface SnapCriteria {
 
 const snapFunctions = {
   e: ({y1, x2}: SnapCriteria): cg.Pos => [clamp(x2), y1],
-  ne: ({x1, y1, dd}: SnapCriteria): cg.Pos => {const c = Math.min(Math.min(dd, 7 - x1), Math.min(dd, 7 - y1));return [x1 + c, y1 + c]},
+  ne: ({x1, y1, dd}: SnapCriteria): cg.Pos => {const c = Math.min(Math.min(dd, 7 - x1), (7 - y1));return [x1 + c, y1 + c]},
   n: ({x1, y2}: SnapCriteria): cg.Pos => [x1, clamp(y2)],
-  nw: ({x1, y1, dd}: SnapCriteria): cg.Pos => {const c = Math.min(Math.min(dd, x1), Math.min(dd, 7 - y1));return [x1 - c, y1 + c];},
+  nw: ({x1, y1, dd}: SnapCriteria): cg.Pos => {const c = Math.min(Math.min(dd, x1), (7 - y1));return [x1 - c, y1 + c];},
   w: ({y1, x2}: SnapCriteria): cg.Pos => [clamp(x2), y1],
-  sw: ({x1, y1, dd}: SnapCriteria): cg.Pos => {const c = Math.min(Math.min(dd, x1), Math.min(dd, y1));return [x1 - c, y1 - c];},
+  sw: ({x1, y1, dd}: SnapCriteria): cg.Pos => {const c = Math.min(Math.min(dd, x1), (y1));return [x1 - c, y1 - c];},
   s: ({x1, y2}: SnapCriteria): cg.Pos => [x1, clamp(y2)],
-  se: ({x1, y1, dd}: SnapCriteria): cg.Pos => {const c = Math.min(Math.min(dd, 7 - x1), Math.min(dd, y1));return [x1 + c, y1 - c];},
+  se: ({x1, y1, dd}: SnapCriteria): cg.Pos => {const c = Math.min(Math.min(dd, 7 - x1), (y1));return [x1 + c, y1 - c];},
 }
 
 const snapAngles = [
