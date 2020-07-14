@@ -399,7 +399,6 @@ export function getSnappedKeyAtDomPos(orig: cg.Key, pos: cg.NumberPair, asWhite:
   // 2. If move is valid, short circuit
   // 3. If move is not valid, pick nearest angle and snap distance to dragged distance
   // Only snapping to + and x currently.
-  // TODO: also snap to knight angles, but stop after going past knight tile?
 
   const unsnappedKey = getKeyAtDomPos(pos, asWhite, bounds);
   const origRowCol: cg.Pos = key2pos(orig);
