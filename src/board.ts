@@ -341,11 +341,13 @@ function isAlreadySnapped(orig: cg.Pos, targetKey: cg.Key | undefined): boolean 
   const pos = key2pos(targetKey);
   // +
   if (orig[0] === pos[0] || orig[1] === pos[1]) return true;
+  const deltaX = Math.abs(orig[0] - pos[0]);
+  const deltaY = Math.abs(orig[1] - pos[1]);
   // x
-  if (Math.abs(orig[0] - pos[0]) === Math.abs(orig[1] - pos[1])) return true;
+  if (deltaX === deltaY) return true;
   // knight
-  if (Math.abs(orig[0] - pos[0]) === 2 && Math.abs(orig[1] - pos[1]) === 1) return true;
-  if (Math.abs(orig[0] - pos[0]) === 1 && Math.abs(orig[1] - pos[1]) === 2) return true;
+  if (deltaX === 2 && deltaY === 1) return true;
+  if (deltaX === 1 && deltaY === 2) return true;
   // all other
   return false;
 }
