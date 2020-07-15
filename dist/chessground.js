@@ -176,9 +176,13 @@ var Chessground = (function () {
 	    requestAnimationFrame(() => {
 	        const cur = state.drawable.current;
 	        if (cur) {
+	            const keyAtDomPos = board.getKeyAtDomPos(cur.pos, board.whitePov(state), state.dom.bounds());
+	            if (!keyAtDomPos) {
+	                cur.snapToValidMove = false;
+	            }
 	            const mouseSq = cur.snapToValidMove ?
 	                board.getSnappedKeyAtDomPos(cur.orig, cur.pos, board.whitePov(state), state.dom.bounds()) :
-	                board.getKeyAtDomPos(cur.pos, board.whitePov(state), state.dom.bounds());
+	                keyAtDomPos;
 	            if (mouseSq !== cur.mouseSq) {
 	                cur.mouseSq = mouseSq;
 	                cur.dest = mouseSq !== cur.orig ? mouseSq : undefined;
@@ -1556,10 +1560,6 @@ var Chessground = (function () {
 	        const onScroll = () => s.dom.bounds.clear();
 	        unbinds.push(unbindable(document, 'scroll', onScroll, { capture: true, passive: true }));
 	        unbinds.push(unbindable(window, 'resize', onScroll, { passive: true }));
-	        if (s.drawable.enabled) {
-	            unbinds.push(unbindable(document, 'keydown', toggleDrawSnap(s, true), { passive: false, capture: true }));
-	            unbinds.push(unbindable(document, 'keyup', toggleDrawSnap(s, false), { passive: false, capture: true }));
-	        }
 	    }
 	    return () => unbinds.forEach(f => f());
 	}
@@ -1594,15 +1594,6 @@ var Chessground = (function () {
 	        }
 	        else if (!s.viewOnly)
 	            withDrag(s, e);
-	    };
-	}
-	function toggleDrawSnap(s, toggle) {
-	    return (e) => {
-	        if (e.key === 's' && s.drawable.current) {
-	            e.stopPropagation();
-	            e.preventDefault();
-	            s.drawable.current.snapToValidMove = s.drawable.defaultSnapToValidMove !== toggle;
-	        }
 	    };
 	}
 
