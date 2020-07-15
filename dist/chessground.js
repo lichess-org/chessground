@@ -26,12 +26,13 @@ var Chessground = (function () {
 
 	var util = createCommonjsModule(function (module, exports) {
 	Object.defineProperty(exports, "__esModule", { value: true });
-	exports.createEl = exports.isRightButton = exports.eventPosition = exports.setVisible = exports.translateRel = exports.translateAbs = exports.posToTranslateRel = exports.posToTranslateAbs = exports.samePiece = exports.distanceSq = exports.opposite = exports.timer = exports.memo = exports.key2pos = exports.pos2key = exports.allKeys = exports.invRanks = void 0;
+	exports.createEl = exports.isRightButton = exports.eventPosition = exports.setVisible = exports.translateRel = exports.translateAbs = exports.posToTranslateRel = exports.posToTranslateAbs = exports.samePiece = exports.distanceSq = exports.opposite = exports.timer = exports.memo = exports.allPos = exports.key2pos = exports.pos2key = exports.allKeys = exports.invRanks = void 0;
 
 	exports.invRanks = ['8', '7', '6', '5', '4', '3', '2', '1'];
 	exports.allKeys = Array.prototype.concat(...types.files.map(c => types.ranks.map(r => c + r)));
 	exports.pos2key = (pos) => exports.allKeys[8 * pos[0] + pos[1]];
 	exports.key2pos = (k) => [k.charCodeAt(0) - 97, k.charCodeAt(1) - 49];
+	exports.allPos = exports.allKeys.map(exports.key2pos);
 	function memo(f) {
 	    let v;
 	    const ret = () => {
@@ -100,7 +101,7 @@ var Chessground = (function () {
 
 	var premove_1 = createCommonjsModule(function (module, exports) {
 	Object.defineProperty(exports, "__esModule", { value: true });
-	exports.premove = void 0;
+	exports.premove = exports.queen = exports.knight = void 0;
 
 	function diff(a, b) {
 	    return Math.abs(a - b);
@@ -108,7 +109,7 @@ var Chessground = (function () {
 	function pawn(color) {
 	    return (x1, y1, x2, y2) => diff(x1, x2) < 2 && (color === 'white' ? (y2 === y1 + 1 || (y1 <= 1 && y2 === (y1 + 2) && x1 === x2)) : (y2 === y1 - 1 || (y1 >= 6 && y2 === (y1 - 2) && x1 === x2)));
 	}
-	const knight = (x1, y1, x2, y2) => {
+	exports.knight = (x1, y1, x2, y2) => {
 	    const xd = diff(x1, x2);
 	    const yd = diff(y1, y2);
 	    return (xd === 1 && yd === 2) || (xd === 2 && yd === 1);
@@ -119,7 +120,7 @@ var Chessground = (function () {
 	const rook = (x1, y1, x2, y2) => {
 	    return x1 === x2 || y1 === y2;
 	};
-	const queen = (x1, y1, x2, y2) => {
+	exports.queen = (x1, y1, x2, y2) => {
 	    return bishop(x1, y1, x2, y2) || rook(x1, y1, x2, y2);
 	};
 	function king(color, rookFiles, canCastle) {
@@ -136,21 +137,434 @@ var Chessground = (function () {
 	    }
 	    return files;
 	}
-	const allPos = util.allKeys.map(util.key2pos);
 	function premove(pieces, key, canCastle) {
 	    const piece = pieces.get(key);
 	    if (!piece)
 	        return [];
-	    const pos = util.key2pos(key), r = piece.role, mobility = r === 'pawn' ? pawn(piece.color) : (r === 'knight' ? knight : (r === 'bishop' ? bishop : (r === 'rook' ? rook : (r === 'queen' ? queen : king(piece.color, rookFilesOf(pieces, piece.color), canCastle)))));
-	    return allPos.filter(pos2 => (pos[0] !== pos2[0] || pos[1] !== pos2[1]) && mobility(pos[0], pos[1], pos2[0], pos2[1])).map(util.pos2key);
+	    const pos = util.key2pos(key), r = piece.role, mobility = r === 'pawn' ? pawn(piece.color) : (r === 'knight' ? exports.knight : (r === 'bishop' ? bishop : (r === 'rook' ? rook : (r === 'queen' ? exports.queen : king(piece.color, rookFilesOf(pieces, piece.color), canCastle)))));
+	    return util.allPos.filter(pos2 => (pos[0] !== pos2[0] || pos[1] !== pos2[1]) && mobility(pos[0], pos[1], pos2[0], pos2[1])).map(util.pos2key);
 	}
 	exports.premove = premove;
 
 	});
 
+	var draw = createCommonjsModule(function (module, exports) {
+	Object.defineProperty(exports, "__esModule", { value: true });
+	exports.clear = exports.cancel = exports.end = exports.move = exports.processDraw = exports.start = void 0;
+
+
+	const brushes = ['green', 'red', 'blue', 'yellow'];
+	function start(state, e) {
+	    if (e.touches && e.touches.length > 1)
+	        return;
+	    e.stopPropagation();
+	    e.preventDefault();
+	    e.ctrlKey ? board.unselect(state) : board.cancelMove(state);
+	    const pos = util.eventPosition(e), orig = board.getKeyAtDomPos(pos, board.whitePov(state), state.dom.bounds());
+	    if (!orig)
+	        return;
+	    state.drawable.current = {
+	        orig,
+	        pos,
+	        brush: eventBrush(e),
+	        snapToValidMove: state.drawable.defaultSnapToValidMove,
+	    };
+	    processDraw(state);
+	}
+	exports.start = start;
+	function processDraw(state) {
+	    requestAnimationFrame(() => {
+	        const cur = state.drawable.current;
+	        if (cur) {
+	            const mouseSq = cur.snapToValidMove ?
+	                board.getSnappedKeyAtDomPos(cur.orig, cur.pos, board.whitePov(state), state.dom.bounds()) :
+	                board.getKeyAtDomPos(cur.pos, board.whitePov(state), state.dom.bounds());
+	            if (mouseSq !== cur.mouseSq) {
+	                cur.mouseSq = mouseSq;
+	                cur.dest = mouseSq !== cur.orig ? mouseSq : undefined;
+	                state.dom.redrawNow();
+	            }
+	            processDraw(state);
+	        }
+	    });
+	}
+	exports.processDraw = processDraw;
+	function move(state, e) {
+	    if (state.drawable.current)
+	        state.drawable.current.pos = util.eventPosition(e);
+	}
+	exports.move = move;
+	function end(state) {
+	    const cur = state.drawable.current;
+	    if (cur) {
+	        if (cur.mouseSq)
+	            addShape(state.drawable, cur);
+	        cancel(state);
+	    }
+	}
+	exports.end = end;
+	function cancel(state) {
+	    if (state.drawable.current) {
+	        state.drawable.current = undefined;
+	        state.dom.redraw();
+	    }
+	}
+	exports.cancel = cancel;
+	function clear(state) {
+	    if (state.drawable.shapes.length) {
+	        state.drawable.shapes = [];
+	        state.dom.redraw();
+	        onChange(state.drawable);
+	    }
+	}
+	exports.clear = clear;
+	function eventBrush(e) {
+	    const modA = (e.shiftKey || e.ctrlKey) && util.isRightButton(e);
+	    const modB = e.altKey || e.metaKey || e.getModifierState('AltGraph');
+	    return brushes[(modA ? 1 : 0) + (modB ? 2 : 0)];
+	}
+	function addShape(drawable, cur) {
+	    const sameShape = (s) => s.orig === cur.orig && s.dest === cur.dest;
+	    const similar = drawable.shapes.find(sameShape);
+	    if (similar)
+	        drawable.shapes = drawable.shapes.filter(s => !sameShape(s));
+	    if (!similar || similar.brush !== cur.brush)
+	        drawable.shapes.push(cur);
+	    onChange(drawable);
+	}
+	function onChange(drawable) {
+	    if (drawable.onChange)
+	        drawable.onChange(drawable.shapes);
+	}
+
+	});
+
+	var anim_1 = createCommonjsModule(function (module, exports) {
+	Object.defineProperty(exports, "__esModule", { value: true });
+	exports.render = exports.anim = void 0;
+
+	function anim(mutation, state) {
+	    return state.animation.enabled ? animate(mutation, state) : render(mutation, state);
+	}
+	exports.anim = anim;
+	function render(mutation, state) {
+	    const result = mutation(state);
+	    state.dom.redraw();
+	    return result;
+	}
+	exports.render = render;
+	function makePiece(key, piece) {
+	    return {
+	        key: key,
+	        pos: util.key2pos(key),
+	        piece: piece
+	    };
+	}
+	function closer(piece, pieces) {
+	    return pieces.sort((p1, p2) => {
+	        return util.distanceSq(piece.pos, p1.pos) - util.distanceSq(piece.pos, p2.pos);
+	    })[0];
+	}
+	function computePlan(prevPieces, current) {
+	    const anims = new Map(), animedOrigs = [], fadings = new Map(), missings = [], news = [], prePieces = new Map();
+	    let curP, preP, vector;
+	    for (const [k, p] of prevPieces) {
+	        prePieces.set(k, makePiece(k, p));
+	    }
+	    for (const key of util.allKeys) {
+	        curP = current.pieces.get(key);
+	        preP = prePieces.get(key);
+	        if (curP) {
+	            if (preP) {
+	                if (!util.samePiece(curP, preP.piece)) {
+	                    missings.push(preP);
+	                    news.push(makePiece(key, curP));
+	                }
+	            }
+	            else
+	                news.push(makePiece(key, curP));
+	        }
+	        else if (preP)
+	            missings.push(preP);
+	    }
+	    for (const newP of news) {
+	        preP = closer(newP, missings.filter(p => util.samePiece(newP.piece, p.piece)));
+	        if (preP) {
+	            vector = [preP.pos[0] - newP.pos[0], preP.pos[1] - newP.pos[1]];
+	            anims.set(newP.key, vector.concat(vector));
+	            animedOrigs.push(preP.key);
+	        }
+	    }
+	    for (const p of missings) {
+	        if (!animedOrigs.includes(p.key))
+	            fadings.set(p.key, p.piece);
+	    }
+	    return {
+	        anims: anims,
+	        fadings: fadings
+	    };
+	}
+	function step(state, now) {
+	    const cur = state.animation.current;
+	    if (cur === undefined) {
+	        if (!state.dom.destroyed)
+	            state.dom.redrawNow();
+	        return;
+	    }
+	    const rest = 1 - (now - cur.start) * cur.frequency;
+	    if (rest <= 0) {
+	        state.animation.current = undefined;
+	        state.dom.redrawNow();
+	    }
+	    else {
+	        const ease = easing(rest);
+	        for (const cfg of cur.plan.anims.values()) {
+	            cfg[2] = cfg[0] * ease;
+	            cfg[3] = cfg[1] * ease;
+	        }
+	        state.dom.redrawNow(true);
+	        requestAnimationFrame((now = performance.now()) => step(state, now));
+	    }
+	}
+	function animate(mutation, state) {
+	    const prevPieces = new Map(state.pieces);
+	    const result = mutation(state);
+	    const plan = computePlan(prevPieces, state);
+	    if (plan.anims.size || plan.fadings.size) {
+	        const alreadyRunning = state.animation.current && state.animation.current.start;
+	        state.animation.current = {
+	            start: performance.now(),
+	            frequency: 1 / state.animation.duration,
+	            plan: plan
+	        };
+	        if (!alreadyRunning)
+	            step(state, performance.now());
+	    }
+	    else {
+	        state.dom.redraw();
+	    }
+	    return result;
+	}
+	function easing(t) {
+	    return t < 0.5 ? 4 * t * t * t : (t - 1) * (2 * t - 2) * (2 * t - 2) + 1;
+	}
+
+	});
+
+	var drag = createCommonjsModule(function (module, exports) {
+	Object.defineProperty(exports, "__esModule", { value: true });
+	exports.computeSquareCenter = exports.cancel = exports.end = exports.move = exports.dragNewPiece = exports.start = void 0;
+
+
+
+
+	function start(s, e) {
+	    if (e.button !== undefined && e.button !== 0)
+	        return;
+	    if (e.touches && e.touches.length > 1)
+	        return;
+	    const bounds = s.dom.bounds(), position = util.eventPosition(e), orig = board.getKeyAtDomPos(position, board.whitePov(s), bounds);
+	    if (!orig)
+	        return;
+	    const piece = s.pieces.get(orig);
+	    const previouslySelected = s.selected;
+	    if (!previouslySelected && s.drawable.enabled && (s.drawable.eraseOnClick || (!piece || piece.color !== s.turnColor)))
+	        draw.clear(s);
+	    if (e.cancelable !== false &&
+	        (!e.touches || !s.movable.color || piece || previouslySelected || pieceCloseTo(s, position)))
+	        e.preventDefault();
+	    const hadPremove = !!s.premovable.current;
+	    const hadPredrop = !!s.predroppable.current;
+	    s.stats.ctrlKey = e.ctrlKey;
+	    if (s.selected && board.canMove(s, s.selected, orig)) {
+	        anim_1.anim(state => board.selectSquare(state, orig), s);
+	    }
+	    else {
+	        board.selectSquare(s, orig);
+	    }
+	    const stillSelected = s.selected === orig;
+	    const element = pieceElementByKey(s, orig);
+	    if (piece && element && stillSelected && board.isDraggable(s, orig)) {
+	        s.draggable.current = {
+	            orig,
+	            piece,
+	            origPos: position,
+	            pos: position,
+	            started: s.draggable.autoDistance && s.stats.dragged,
+	            element,
+	            previouslySelected,
+	            originTarget: e.target
+	        };
+	        element.cgDragging = true;
+	        element.classList.add('dragging');
+	        const ghost = s.dom.elements.ghost;
+	        if (ghost) {
+	            ghost.className = `ghost ${piece.color} ${piece.role}`;
+	            util.translateAbs(ghost, util.posToTranslateAbs(bounds)(util.key2pos(orig), board.whitePov(s)));
+	            util.setVisible(ghost, true);
+	        }
+	        processDrag(s);
+	    }
+	    else {
+	        if (hadPremove)
+	            board.unsetPremove(s);
+	        if (hadPredrop)
+	            board.unsetPredrop(s);
+	    }
+	    s.dom.redraw();
+	}
+	exports.start = start;
+	function pieceCloseTo(s, pos) {
+	    const asWhite = board.whitePov(s), bounds = s.dom.bounds(), radiusSq = Math.pow(bounds.width / 8, 2);
+	    for (const key in s.pieces) {
+	        const center = computeSquareCenter(key, asWhite, bounds);
+	        if (util.distanceSq(center, pos) <= radiusSq)
+	            return true;
+	    }
+	    return false;
+	}
+	function dragNewPiece(s, piece, e, force) {
+	    const key = 'a0';
+	    s.pieces.set(key, piece);
+	    s.dom.redraw();
+	    const position = util.eventPosition(e);
+	    s.draggable.current = {
+	        orig: key,
+	        piece,
+	        origPos: position,
+	        pos: position,
+	        started: true,
+	        element: () => pieceElementByKey(s, key),
+	        originTarget: e.target,
+	        newPiece: true,
+	        force: !!force
+	    };
+	    processDrag(s);
+	}
+	exports.dragNewPiece = dragNewPiece;
+	function processDrag(s) {
+	    requestAnimationFrame(() => {
+	        var _a;
+	        const cur = s.draggable.current;
+	        if (!cur)
+	            return;
+	        if ((_a = s.animation.current) === null || _a === void 0 ? void 0 : _a.plan.anims.has(cur.orig))
+	            s.animation.current = undefined;
+	        const origPiece = s.pieces.get(cur.orig);
+	        if (!origPiece || !util.samePiece(origPiece, cur.piece))
+	            cancel(s);
+	        else {
+	            if (!cur.started && util.distanceSq(cur.pos, cur.origPos) >= Math.pow(s.draggable.distance, 2))
+	                cur.started = true;
+	            if (cur.started) {
+	                if (typeof cur.element === 'function') {
+	                    const found = cur.element();
+	                    if (!found)
+	                        return;
+	                    found.cgDragging = true;
+	                    found.classList.add('dragging');
+	                    cur.element = found;
+	                }
+	                const bounds = s.dom.bounds();
+	                util.translateAbs(cur.element, [
+	                    cur.pos[0] - bounds.left - bounds.width / 16,
+	                    cur.pos[1] - bounds.top - bounds.height / 16
+	                ]);
+	            }
+	        }
+	        processDrag(s);
+	    });
+	}
+	function move(s, e) {
+	    if (s.draggable.current && (!e.touches || e.touches.length < 2)) {
+	        s.draggable.current.pos = util.eventPosition(e);
+	    }
+	}
+	exports.move = move;
+	function end(s, e) {
+	    const cur = s.draggable.current;
+	    if (!cur)
+	        return;
+	    if (e.type === 'touchend' && e.cancelable !== false)
+	        e.preventDefault();
+	    if (e.type === 'touchend' && cur.originTarget !== e.target && !cur.newPiece) {
+	        s.draggable.current = undefined;
+	        return;
+	    }
+	    board.unsetPremove(s);
+	    board.unsetPredrop(s);
+	    const eventPos = util.eventPosition(e) || cur.pos;
+	    const dest = board.getKeyAtDomPos(eventPos, board.whitePov(s), s.dom.bounds());
+	    if (dest && cur.started && cur.orig !== dest) {
+	        if (cur.newPiece)
+	            board.dropNewPiece(s, cur.orig, dest, cur.force);
+	        else {
+	            s.stats.ctrlKey = e.ctrlKey;
+	            if (board.userMove(s, cur.orig, dest))
+	                s.stats.dragged = true;
+	        }
+	    }
+	    else if (cur.newPiece) {
+	        s.pieces.delete(cur.orig);
+	    }
+	    else if (s.draggable.deleteOnDropOff && !dest) {
+	        s.pieces.delete(cur.orig);
+	        board.callUserFunction(s.events.change);
+	    }
+	    if (cur.orig === cur.previouslySelected && (cur.orig === dest || !dest))
+	        board.unselect(s);
+	    else if (!s.selectable.enabled)
+	        board.unselect(s);
+	    removeDragElements(s);
+	    s.draggable.current = undefined;
+	    s.dom.redraw();
+	}
+	exports.end = end;
+	function cancel(s) {
+	    const cur = s.draggable.current;
+	    if (cur) {
+	        if (cur.newPiece)
+	            s.pieces.delete(cur.orig);
+	        s.draggable.current = undefined;
+	        board.unselect(s);
+	        removeDragElements(s);
+	        s.dom.redraw();
+	    }
+	}
+	exports.cancel = cancel;
+	function removeDragElements(s) {
+	    const e = s.dom.elements;
+	    if (e.ghost)
+	        util.setVisible(e.ghost, false);
+	}
+	function computeSquareCenter(key, asWhite, bounds) {
+	    const pos = util.key2pos(key);
+	    if (!asWhite) {
+	        pos[0] = 7 - pos[0];
+	        pos[1] = 7 - pos[1];
+	    }
+	    return [
+	        bounds.left + bounds.width * pos[0] / 8 + bounds.width / 16,
+	        bounds.top + bounds.height * (7 - pos[1]) / 8 + bounds.height / 16
+	    ];
+	}
+	exports.computeSquareCenter = computeSquareCenter;
+	function pieceElementByKey(s, key) {
+	    let el = s.dom.elements.board.firstChild;
+	    while (el) {
+	        if (el.cgKey === key && el.tagName === 'PIECE')
+	            return el;
+	        el = el.nextSibling;
+	    }
+	    return;
+	}
+
+	});
+
 	var board = createCommonjsModule(function (module, exports) {
 	Object.defineProperty(exports, "__esModule", { value: true });
-	exports.whitePov = exports.getKeyAtDomPos = exports.stop = exports.cancelMove = exports.playPredrop = exports.playPremove = exports.isDraggable = exports.canMove = exports.unselect = exports.setSelected = exports.selectSquare = exports.dropNewPiece = exports.userMove = exports.baseNewPiece = exports.baseMove = exports.unsetPredrop = exports.unsetPremove = exports.setCheck = exports.setPieces = exports.reset = exports.toggleOrientation = exports.callUserFunction = void 0;
+	exports.whitePov = exports.getSnappedKeyAtDomPos = exports.getKeyAtDomPos = exports.stop = exports.cancelMove = exports.playPredrop = exports.playPremove = exports.isDraggable = exports.canMove = exports.unselect = exports.setSelected = exports.selectSquare = exports.dropNewPiece = exports.userMove = exports.baseNewPiece = exports.baseMove = exports.unsetPredrop = exports.unsetPremove = exports.setCheck = exports.setPieces = exports.reset = exports.toggleOrientation = exports.callUserFunction = void 0;
+
 
 
 	function callUserFunction(f, ...args) {
@@ -482,6 +896,17 @@ var Chessground = (function () {
 	    return (file >= 0 && file < 8 && rank >= 0 && rank < 8) ? util.pos2key([file, rank]) : undefined;
 	}
 	exports.getKeyAtDomPos = getKeyAtDomPos;
+	function getSnappedKeyAtDomPos(orig, pos, asWhite, bounds) {
+	    const origPos = util.key2pos(orig);
+	    const validSnapPos = util.allPos.filter(pos2 => {
+	        return premove_1.queen(origPos[0], origPos[1], pos2[0], pos2[1]) || premove_1.knight(origPos[0], origPos[1], pos2[0], pos2[1]);
+	    });
+	    const validSnapCenters = validSnapPos.map(pos2 => drag.computeSquareCenter(util.pos2key(pos2), asWhite, bounds));
+	    const validSnapDistances = validSnapCenters.map(pos2 => util.distanceSq(pos, pos2));
+	    const [, closestSnapIndex] = validSnapDistances.reduce((a, b, index) => a[0] < b ? a : [b, index], [validSnapDistances[0], 0]);
+	    return util.pos2key(validSnapPos[closestSnapIndex]);
+	}
+	exports.getSnappedKeyAtDomPos = getSnappedKeyAtDomPos;
 	function whitePov(s) {
 	    return s.orientation === 'white';
 	}
@@ -591,415 +1016,6 @@ var Chessground = (function () {
 	}
 	function isObject(o) {
 	    return typeof o === 'object';
-	}
-
-	});
-
-	var anim_1 = createCommonjsModule(function (module, exports) {
-	Object.defineProperty(exports, "__esModule", { value: true });
-	exports.render = exports.anim = void 0;
-
-	function anim(mutation, state) {
-	    return state.animation.enabled ? animate(mutation, state) : render(mutation, state);
-	}
-	exports.anim = anim;
-	function render(mutation, state) {
-	    const result = mutation(state);
-	    state.dom.redraw();
-	    return result;
-	}
-	exports.render = render;
-	function makePiece(key, piece) {
-	    return {
-	        key: key,
-	        pos: util.key2pos(key),
-	        piece: piece
-	    };
-	}
-	function closer(piece, pieces) {
-	    return pieces.sort((p1, p2) => {
-	        return util.distanceSq(piece.pos, p1.pos) - util.distanceSq(piece.pos, p2.pos);
-	    })[0];
-	}
-	function computePlan(prevPieces, current) {
-	    const anims = new Map(), animedOrigs = [], fadings = new Map(), missings = [], news = [], prePieces = new Map();
-	    let curP, preP, vector;
-	    for (const [k, p] of prevPieces) {
-	        prePieces.set(k, makePiece(k, p));
-	    }
-	    for (const key of util.allKeys) {
-	        curP = current.pieces.get(key);
-	        preP = prePieces.get(key);
-	        if (curP) {
-	            if (preP) {
-	                if (!util.samePiece(curP, preP.piece)) {
-	                    missings.push(preP);
-	                    news.push(makePiece(key, curP));
-	                }
-	            }
-	            else
-	                news.push(makePiece(key, curP));
-	        }
-	        else if (preP)
-	            missings.push(preP);
-	    }
-	    for (const newP of news) {
-	        preP = closer(newP, missings.filter(p => util.samePiece(newP.piece, p.piece)));
-	        if (preP) {
-	            vector = [preP.pos[0] - newP.pos[0], preP.pos[1] - newP.pos[1]];
-	            anims.set(newP.key, vector.concat(vector));
-	            animedOrigs.push(preP.key);
-	        }
-	    }
-	    for (const p of missings) {
-	        if (!animedOrigs.includes(p.key))
-	            fadings.set(p.key, p.piece);
-	    }
-	    return {
-	        anims: anims,
-	        fadings: fadings
-	    };
-	}
-	function step(state, now) {
-	    const cur = state.animation.current;
-	    if (cur === undefined) {
-	        if (!state.dom.destroyed)
-	            state.dom.redrawNow();
-	        return;
-	    }
-	    const rest = 1 - (now - cur.start) * cur.frequency;
-	    if (rest <= 0) {
-	        state.animation.current = undefined;
-	        state.dom.redrawNow();
-	    }
-	    else {
-	        const ease = easing(rest);
-	        for (const cfg of cur.plan.anims.values()) {
-	            cfg[2] = cfg[0] * ease;
-	            cfg[3] = cfg[1] * ease;
-	        }
-	        state.dom.redrawNow(true);
-	        requestAnimationFrame((now = performance.now()) => step(state, now));
-	    }
-	}
-	function animate(mutation, state) {
-	    const prevPieces = new Map(state.pieces);
-	    const result = mutation(state);
-	    const plan = computePlan(prevPieces, state);
-	    if (plan.anims.size || plan.fadings.size) {
-	        const alreadyRunning = state.animation.current && state.animation.current.start;
-	        state.animation.current = {
-	            start: performance.now(),
-	            frequency: 1 / state.animation.duration,
-	            plan: plan
-	        };
-	        if (!alreadyRunning)
-	            step(state, performance.now());
-	    }
-	    else {
-	        state.dom.redraw();
-	    }
-	    return result;
-	}
-	function easing(t) {
-	    return t < 0.5 ? 4 * t * t * t : (t - 1) * (2 * t - 2) * (2 * t - 2) + 1;
-	}
-
-	});
-
-	var draw = createCommonjsModule(function (module, exports) {
-	Object.defineProperty(exports, "__esModule", { value: true });
-	exports.clear = exports.cancel = exports.end = exports.move = exports.processDraw = exports.start = void 0;
-
-
-	const brushes = ['green', 'red', 'blue', 'yellow'];
-	function start(state, e) {
-	    if (e.touches && e.touches.length > 1)
-	        return;
-	    e.stopPropagation();
-	    e.preventDefault();
-	    e.ctrlKey ? board.unselect(state) : board.cancelMove(state);
-	    const pos = util.eventPosition(e), orig = board.getKeyAtDomPos(pos, board.whitePov(state), state.dom.bounds());
-	    if (!orig)
-	        return;
-	    state.drawable.current = {
-	        orig,
-	        pos,
-	        brush: eventBrush(e)
-	    };
-	    processDraw(state);
-	}
-	exports.start = start;
-	function processDraw(state) {
-	    requestAnimationFrame(() => {
-	        const cur = state.drawable.current;
-	        if (cur) {
-	            const mouseSq = board.getKeyAtDomPos(cur.pos, board.whitePov(state), state.dom.bounds());
-	            if (mouseSq !== cur.mouseSq) {
-	                cur.mouseSq = mouseSq;
-	                cur.dest = mouseSq !== cur.orig ? mouseSq : undefined;
-	                state.dom.redrawNow();
-	            }
-	            processDraw(state);
-	        }
-	    });
-	}
-	exports.processDraw = processDraw;
-	function move(state, e) {
-	    if (state.drawable.current)
-	        state.drawable.current.pos = util.eventPosition(e);
-	}
-	exports.move = move;
-	function end(state) {
-	    const cur = state.drawable.current;
-	    if (cur) {
-	        if (cur.mouseSq)
-	            addShape(state.drawable, cur);
-	        cancel(state);
-	    }
-	}
-	exports.end = end;
-	function cancel(state) {
-	    if (state.drawable.current) {
-	        state.drawable.current = undefined;
-	        state.dom.redraw();
-	    }
-	}
-	exports.cancel = cancel;
-	function clear(state) {
-	    if (state.drawable.shapes.length) {
-	        state.drawable.shapes = [];
-	        state.dom.redraw();
-	        onChange(state.drawable);
-	    }
-	}
-	exports.clear = clear;
-	function eventBrush(e) {
-	    const modA = (e.shiftKey || e.ctrlKey) && util.isRightButton(e);
-	    const modB = e.altKey || e.metaKey || e.getModifierState('AltGraph');
-	    return brushes[(modA ? 1 : 0) + (modB ? 2 : 0)];
-	}
-	function addShape(drawable, cur) {
-	    const sameShape = (s) => s.orig === cur.orig && s.dest === cur.dest;
-	    const similar = drawable.shapes.find(sameShape);
-	    if (similar)
-	        drawable.shapes = drawable.shapes.filter(s => !sameShape(s));
-	    if (!similar || similar.brush !== cur.brush)
-	        drawable.shapes.push(cur);
-	    onChange(drawable);
-	}
-	function onChange(drawable) {
-	    if (drawable.onChange)
-	        drawable.onChange(drawable.shapes);
-	}
-
-	});
-
-	var drag = createCommonjsModule(function (module, exports) {
-	Object.defineProperty(exports, "__esModule", { value: true });
-	exports.cancel = exports.end = exports.move = exports.dragNewPiece = exports.start = void 0;
-
-
-
-
-	function start(s, e) {
-	    if (e.button !== undefined && e.button !== 0)
-	        return;
-	    if (e.touches && e.touches.length > 1)
-	        return;
-	    const bounds = s.dom.bounds(), position = util.eventPosition(e), orig = board.getKeyAtDomPos(position, board.whitePov(s), bounds);
-	    if (!orig)
-	        return;
-	    const piece = s.pieces.get(orig);
-	    const previouslySelected = s.selected;
-	    if (!previouslySelected && s.drawable.enabled && (s.drawable.eraseOnClick || (!piece || piece.color !== s.turnColor)))
-	        draw.clear(s);
-	    if (e.cancelable !== false &&
-	        (!e.touches || !s.movable.color || piece || previouslySelected || pieceCloseTo(s, position)))
-	        e.preventDefault();
-	    const hadPremove = !!s.premovable.current;
-	    const hadPredrop = !!s.predroppable.current;
-	    s.stats.ctrlKey = e.ctrlKey;
-	    if (s.selected && board.canMove(s, s.selected, orig)) {
-	        anim_1.anim(state => board.selectSquare(state, orig), s);
-	    }
-	    else {
-	        board.selectSquare(s, orig);
-	    }
-	    const stillSelected = s.selected === orig;
-	    const element = pieceElementByKey(s, orig);
-	    if (piece && element && stillSelected && board.isDraggable(s, orig)) {
-	        s.draggable.current = {
-	            orig,
-	            piece,
-	            origPos: position,
-	            pos: position,
-	            started: s.draggable.autoDistance && s.stats.dragged,
-	            element,
-	            previouslySelected,
-	            originTarget: e.target
-	        };
-	        element.cgDragging = true;
-	        element.classList.add('dragging');
-	        const ghost = s.dom.elements.ghost;
-	        if (ghost) {
-	            ghost.className = `ghost ${piece.color} ${piece.role}`;
-	            util.translateAbs(ghost, util.posToTranslateAbs(bounds)(util.key2pos(orig), board.whitePov(s)));
-	            util.setVisible(ghost, true);
-	        }
-	        processDrag(s);
-	    }
-	    else {
-	        if (hadPremove)
-	            board.unsetPremove(s);
-	        if (hadPredrop)
-	            board.unsetPredrop(s);
-	    }
-	    s.dom.redraw();
-	}
-	exports.start = start;
-	function pieceCloseTo(s, pos) {
-	    const asWhite = board.whitePov(s), bounds = s.dom.bounds(), radiusSq = Math.pow(bounds.width / 8, 2);
-	    for (const key in s.pieces) {
-	        const center = computeSquareCenter(key, asWhite, bounds);
-	        if (util.distanceSq(center, pos) <= radiusSq)
-	            return true;
-	    }
-	    return false;
-	}
-	function dragNewPiece(s, piece, e, force) {
-	    const key = 'a0';
-	    s.pieces.set(key, piece);
-	    s.dom.redraw();
-	    const position = util.eventPosition(e);
-	    s.draggable.current = {
-	        orig: key,
-	        piece,
-	        origPos: position,
-	        pos: position,
-	        started: true,
-	        element: () => pieceElementByKey(s, key),
-	        originTarget: e.target,
-	        newPiece: true,
-	        force: !!force
-	    };
-	    processDrag(s);
-	}
-	exports.dragNewPiece = dragNewPiece;
-	function processDrag(s) {
-	    requestAnimationFrame(() => {
-	        var _a;
-	        const cur = s.draggable.current;
-	        if (!cur)
-	            return;
-	        if ((_a = s.animation.current) === null || _a === void 0 ? void 0 : _a.plan.anims.has(cur.orig))
-	            s.animation.current = undefined;
-	        const origPiece = s.pieces.get(cur.orig);
-	        if (!origPiece || !util.samePiece(origPiece, cur.piece))
-	            cancel(s);
-	        else {
-	            if (!cur.started && util.distanceSq(cur.pos, cur.origPos) >= Math.pow(s.draggable.distance, 2))
-	                cur.started = true;
-	            if (cur.started) {
-	                if (typeof cur.element === 'function') {
-	                    const found = cur.element();
-	                    if (!found)
-	                        return;
-	                    found.cgDragging = true;
-	                    found.classList.add('dragging');
-	                    cur.element = found;
-	                }
-	                const bounds = s.dom.bounds();
-	                util.translateAbs(cur.element, [
-	                    cur.pos[0] - bounds.left - bounds.width / 16,
-	                    cur.pos[1] - bounds.top - bounds.height / 16
-	                ]);
-	            }
-	        }
-	        processDrag(s);
-	    });
-	}
-	function move(s, e) {
-	    if (s.draggable.current && (!e.touches || e.touches.length < 2)) {
-	        s.draggable.current.pos = util.eventPosition(e);
-	    }
-	}
-	exports.move = move;
-	function end(s, e) {
-	    const cur = s.draggable.current;
-	    if (!cur)
-	        return;
-	    if (e.type === 'touchend' && e.cancelable !== false)
-	        e.preventDefault();
-	    if (e.type === 'touchend' && cur.originTarget !== e.target && !cur.newPiece) {
-	        s.draggable.current = undefined;
-	        return;
-	    }
-	    board.unsetPremove(s);
-	    board.unsetPredrop(s);
-	    const eventPos = util.eventPosition(e) || cur.pos;
-	    const dest = board.getKeyAtDomPos(eventPos, board.whitePov(s), s.dom.bounds());
-	    if (dest && cur.started && cur.orig !== dest) {
-	        if (cur.newPiece)
-	            board.dropNewPiece(s, cur.orig, dest, cur.force);
-	        else {
-	            s.stats.ctrlKey = e.ctrlKey;
-	            if (board.userMove(s, cur.orig, dest))
-	                s.stats.dragged = true;
-	        }
-	    }
-	    else if (cur.newPiece) {
-	        s.pieces.delete(cur.orig);
-	    }
-	    else if (s.draggable.deleteOnDropOff && !dest) {
-	        s.pieces.delete(cur.orig);
-	        board.callUserFunction(s.events.change);
-	    }
-	    if (cur.orig === cur.previouslySelected && (cur.orig === dest || !dest))
-	        board.unselect(s);
-	    else if (!s.selectable.enabled)
-	        board.unselect(s);
-	    removeDragElements(s);
-	    s.draggable.current = undefined;
-	    s.dom.redraw();
-	}
-	exports.end = end;
-	function cancel(s) {
-	    const cur = s.draggable.current;
-	    if (cur) {
-	        if (cur.newPiece)
-	            s.pieces.delete(cur.orig);
-	        s.draggable.current = undefined;
-	        board.unselect(s);
-	        removeDragElements(s);
-	        s.dom.redraw();
-	    }
-	}
-	exports.cancel = cancel;
-	function removeDragElements(s) {
-	    const e = s.dom.elements;
-	    if (e.ghost)
-	        util.setVisible(e.ghost, false);
-	}
-	function computeSquareCenter(key, asWhite, bounds) {
-	    const pos = util.key2pos(key);
-	    if (!asWhite) {
-	        pos[0] = 7 - pos[0];
-	        pos[1] = 7 - pos[1];
-	    }
-	    return [
-	        bounds.left + bounds.width * pos[0] / 8 + bounds.width / 16,
-	        bounds.top + bounds.height * (7 - pos[1]) / 8 + bounds.height / 16
-	    ];
-	}
-	function pieceElementByKey(s, key) {
-	    let el = s.dom.elements.board.firstChild;
-	    while (el) {
-	        if (el.cgKey === key && el.tagName === 'PIECE')
-	            return el;
-	        el = el.nextSibling;
-	    }
-	    return;
 	}
 
 	});
@@ -1185,6 +1201,7 @@ var Chessground = (function () {
 	        drawable: {
 	            enabled: true,
 	            visible: true,
+	            defaultSnapToValidMove: true,
 	            eraseOnClick: true,
 	            shapes: [],
 	            autoShapes: [],
@@ -1539,6 +1556,10 @@ var Chessground = (function () {
 	        const onScroll = () => s.dom.bounds.clear();
 	        unbinds.push(unbindable(document, 'scroll', onScroll, { capture: true, passive: true }));
 	        unbinds.push(unbindable(window, 'resize', onScroll, { passive: true }));
+	        if (s.drawable.enabled) {
+	            unbinds.push(unbindable(document, 'keydown', toggleDrawSnap(s, true), { passive: false, capture: true }));
+	            unbinds.push(unbindable(document, 'keyup', toggleDrawSnap(s, false), { passive: false, capture: true }));
+	        }
 	    }
 	    return () => unbinds.forEach(f => f());
 	}
@@ -1573,6 +1594,15 @@ var Chessground = (function () {
 	        }
 	        else if (!s.viewOnly)
 	            withDrag(s, e);
+	    };
+	}
+	function toggleDrawSnap(s, toggle) {
+	    return (e) => {
+	        if (e.key === 's' && s.drawable.current) {
+	            e.stopPropagation();
+	            e.preventDefault();
+	            s.drawable.current.snapToValidMove = s.drawable.defaultSnapToValidMove !== toggle;
+	        }
 	    };
 	}
 
