@@ -55,7 +55,7 @@ export function bindDocument(s: State, boundsUpdated: () => void): cg.Unbind {
 
     if (s.drawable.enabled) {
       unbinds.push(unbindable(document, 'keydown', toggleDrawSnap(s) as EventListener, { passive: false, capture: true }));
-      unbinds.push(unbindable(document, 'keyup', restoreDrawSnap(s) as EventListener, {passive: false, capture: true }));
+      unbinds.push(unbindable(document, 'keyup', restoreDrawSnap(s) as EventListener, { passive: false, capture: true }));
     }
   }
 
@@ -88,7 +88,7 @@ function dragOrDraw(s: State, withDrag: StateMouchBind, withDraw: StateMouchBind
 
 function toggleDrawSnap(s: State) {
   return (e: KeyboardEvent) => {
-    if (e.code === 'Space' && s.drawable.current) {
+    if (e.key === 's' && s.drawable.current) {
       e.stopPropagation();
       e.preventDefault();
       s.drawable.current.snapToValidMove = !s.drawable.defaultSnapToValidMove;
@@ -98,7 +98,7 @@ function toggleDrawSnap(s: State) {
 
 function restoreDrawSnap(s: State) {
   return (e: KeyboardEvent) => {
-    if (e.code === 'Space' && s.drawable.current) {
+    if (e.key === 's' && s.drawable.current) {
       e.stopPropagation();
       e.preventDefault();
       s.drawable.current.snapToValidMove = s.drawable.defaultSnapToValidMove;
