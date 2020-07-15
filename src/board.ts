@@ -336,7 +336,6 @@ export function getKeyAtDomPos(pos: cg.NumberPair, asWhite: boolean, bounds: Cli
 }
 
 function isAlreadySnapped(orig: cg.Pos, targetKey: cg.Key | undefined): boolean {
-  // TODO profile performance - precompute this function's values to an object for O(1) time?
   if (targetKey === undefined) return false;
   const pos = key2pos(targetKey);
   // +
