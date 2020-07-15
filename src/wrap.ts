@@ -1,10 +1,10 @@
-import { State } from './state'
+import { HeadlessState } from './state'
 import { setVisible, createEl } from './util'
 import { colors, files, ranks } from './types'
 import { createElement as createSVG } from './svg'
 import { Elements } from './types'
 
-export function renderWrap(element: HTMLElement, s: State, relative: boolean): Elements {
+export function renderWrap(element: HTMLElement, s: HeadlessState, relative: boolean): Elements {
 
   // .cg-wrap (element passed to Chessground)
   //   cg-helper (12.5%)

@@ -1,4 +1,4 @@
-import { State } from './state'
+import { HeadlessState } from './state'
 import { setCheck, setSelected } from './board'
 import { read as fenRead } from './fen'
 import { DrawShape, DrawBrush } from './draw'
@@ -89,7 +89,7 @@ export interface Config {
   };
 }
 
-export function configure(state: State, config: Config): void {
+export function configure(state: HeadlessState, config: Config): void {
 
   // don't merge destinations. Just override.
   if (config.movable?.dests) state.movable.dests = undefined;

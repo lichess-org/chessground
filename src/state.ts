@@ -5,7 +5,7 @@ import { Drawable } from './draw'
 import { timer } from './util'
 import * as cg from './types';
 
-export interface State {
+export interface HeadlessState {
   pieces: cg.Pieces;
   orientation: cg.Color; // board orientation. white | black
   turnColor: cg.Color; // turn to play. white | black
@@ -94,11 +94,14 @@ export interface State {
   };
   drawable: Drawable;
   exploding?: cg.Exploding;
-  dom: cg.Dom;
   hold: cg.Timer;
 }
 
-export function defaults(): Partial<State> {
+export interface State extends HeadlessState {
+  dom: cg.Dom;
+}
+
+export function defaults(): HeadlessState {
   return {
     pieces: fen.read(fen.initial),
     orientation: 'white',
