@@ -18,7 +18,7 @@ function pawn(color: cg.Color): Mobility {
   );
 }
 
-const knight: Mobility = (x1, y1, x2, y2) => {
+export const knight: Mobility = (x1, y1, x2, y2) => {
   const xd = diff(x1, x2);
   const yd = diff(y1, y2);
   return (xd === 1 && yd === 2) || (xd === 2 && yd === 1);
@@ -32,7 +32,7 @@ const rook: Mobility = (x1, y1, x2, y2) => {
   return x1 === x2 || y1 === y2;
 }
 
-const queen: Mobility = (x1, y1, x2, y2) => {
+export const queen: Mobility = (x1, y1, x2, y2) => {
   return bishop(x1, y1, x2, y2) || rook(x1, y1, x2, y2);
 }
 
@@ -58,8 +58,6 @@ function rookFilesOf(pieces: cg.Pieces, color: cg.Color) {
   return files;
 }
 
-const allPos = util.allKeys.map(util.key2pos);
-
 export function premove(pieces: cg.Pieces, key: cg.Key, canCastle: boolean): cg.Key[] {
   const piece = pieces.get(key);
   if (!piece) return [];
@@ -71,7 +69,7 @@ export function premove(pieces: cg.Pieces, key: cg.Key, canCastle: boolean): cg.
           r === 'rook' ? rook : (
             r === 'queen' ? queen : king(piece.color, rookFilesOf(pieces, piece.color), canCastle)
           ))));
-  return allPos.filter(pos2 =>
+  return util.allPos.filter(pos2 =>
     (pos[0] !== pos2[0] || pos[1] !== pos2[1]) && mobility(pos[0], pos[1], pos2[0], pos2[1])
   ).map(util.pos2key);
 }

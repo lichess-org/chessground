@@ -157,6 +157,7 @@ export function defaults(): Partial<State> {
     drawable: {
       enabled: true, // can draw
       visible: true, // can view
+      defaultSnapToValidMove: true,
       eraseOnClick: true,
       shapes: [],
       autoShapes: [],
