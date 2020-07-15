@@ -335,28 +335,8 @@ export function getKeyAtDomPos(pos: cg.NumberPair, asWhite: boolean, bounds: Cli
   return (file >= 0 && file < 8 && rank >= 0 && rank < 8) ? pos2key([file, rank]) : undefined;
 }
 
-function isAlreadySnapped(orig: cg.Pos, targetKey: cg.Key | undefined): boolean {
-  if (targetKey === undefined) return false;
-  const pos = key2pos(targetKey);
-  // +
-  if (orig[0] === pos[0] || orig[1] === pos[1]) return true;
-  const deltaX = Math.abs(orig[0] - pos[0]);
-  const deltaY = Math.abs(orig[1] - pos[1]);
-  // x
-  if (deltaX === deltaY) return true;
-  // knight
-  if (deltaX === 2 && deltaY === 1) return true;
-  if (deltaX === 1 && deltaY === 2) return true;
-  // all other
-  return false;
-}
-
 export function getSnappedKeyAtDomPos(orig: cg.Key, pos: cg.NumberPair, asWhite: boolean, bounds: ClientRect): cg.Key | undefined {
-  const unsnapped = getKeyAtDomPos(pos, asWhite, bounds);
   const origPos = key2pos(orig);
-  const alreadySnapped = isAlreadySnapped(origPos, unsnapped);
-  if (alreadySnapped) return unsnapped; // O(1) short circuit
-
   const validSnapPos = allPos.filter(pos2 => {
     return queen(origPos[0], origPos[1], pos2[0], pos2[1]) || knight(origPos[0], origPos[1], pos2[0], pos2[1]);
   });
