@@ -32,7 +32,7 @@ const rook: Mobility = (x1, y1, x2, y2) => {
   return x1 === x2 || y1 === y2;
 }
 
-const queen: Mobility = (x1, y1, x2, y2) => {
+export const queen: Mobility = (x1, y1, x2, y2) => {
   return bishop(x1, y1, x2, y2) || rook(x1, y1, x2, y2);
 }
 

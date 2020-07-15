@@ -1,8 +1,9 @@
 import { State } from './state'
 import { pos2key, key2pos, opposite } from './util'
-import { premove } from './premove'
-import { computeSquareCenter } from './drag'
+import {premove, queen} from './premove'
 import * as cg from './types'
+import {computeSquareCenter} from './drag';
+import * as util from "./util";
 
 export type Callback = (...args: any[]) => void;
 
@@ -336,109 +337,34 @@ export function getKeyAtDomPos(pos: cg.NumberPair, asWhite: boolean, bounds: Cli
 }
 
 function isAlreadySnapped(orig: cg.Pos, targetKey: cg.Key | undefined): boolean {
-  // TODO profile performance - precompute this function's values to an object?
+  // TODO profile performance - precompute this function's values to an object for O(1) time?
   if (targetKey === undefined) return false;
   const pos = key2pos(targetKey);
   // +
   if (orig[0] === pos[0] || orig[1] === pos[1]) return true;
-  const deltaX = Math.abs(orig[0] - pos[0]);
-  const deltaY = Math.abs(orig[1] - pos[1]);
   // x
-  if (deltaX === deltaY) return true;
+  if (Math.abs(orig[0] - pos[0]) === Math.abs(orig[1] - pos[1])) return true;
   // knight
-  if (deltaX === 2 && deltaY === 1) return true;
-  if (deltaX === 1 && deltaY === 2) return true;
+  if ((Math.abs(orig[0] - pos[0]) ^ Math.abs(orig[1] - pos[1])) === 3) return true;
   // all other
   return false;
 }
 
-function clamp(n: number) {
-  if (n < 0) return 0
-  if (n > 7) return 7
-  return n
-}
-
-interface SnapCriteria {
-  x1: number;
-  y1: number;
-  x2: number;
-  y2: number;
-  dd: number;
-}
-
-const snapFunctions = {
-  e: ({y1, x2}: SnapCriteria): cg.Pos => [clamp(x2), y1],
-  ne: ({x1, y1, dd}: SnapCriteria): cg.Pos => {const c = Math.min(Math.min(dd, 7 - x1), (7 - y1));return [x1 + c, y1 + c]},
-  n: ({x1, y2}: SnapCriteria): cg.Pos => [x1, clamp(y2)],
-  nw: ({x1, y1, dd}: SnapCriteria): cg.Pos => {const c = Math.min(Math.min(dd, x1), (7 - y1));return [x1 - c, y1 + c];},
-  w: ({y1, x2}: SnapCriteria): cg.Pos => [clamp(x2), y1],
-  sw: ({x1, y1, dd}: SnapCriteria): cg.Pos => {const c = Math.min(Math.min(dd, x1), (y1));return [x1 - c, y1 - c];},
-  s: ({x1, y2}: SnapCriteria): cg.Pos => [x1, clamp(y2)],
-  se: ({x1, y1, dd}: SnapCriteria): cg.Pos => {const c = Math.min(Math.min(dd, 7 - x1), (y1));return [x1 + c, y1 - c];},
-}
-
-const snapAngles = [
-  {angle: 0, snap:   (asWhite: boolean) => asWhite ? snapFunctions.e : snapFunctions.w},
-  {angle: 45, snap:  (asWhite: boolean) => asWhite ? snapFunctions.ne : snapFunctions.sw},
-  {angle: 90, snap:  (asWhite: boolean) => asWhite ? snapFunctions.n : snapFunctions.s},
-  {angle: 135, snap: (asWhite: boolean) => asWhite ? snapFunctions.nw : snapFunctions.se},
-  {angle: 180, snap: (asWhite: boolean) => asWhite ? snapFunctions.w : snapFunctions.e},
-  {angle: 225, snap: (asWhite: boolean) => asWhite ? snapFunctions.sw : snapFunctions.ne},
-  {angle: 270, snap: (asWhite: boolean) => asWhite ? snapFunctions.s : snapFunctions.n},
-  {angle: 315, snap: (asWhite: boolean) => asWhite ? snapFunctions.se : snapFunctions.nw},
-  {angle: 360, snap: (asWhite: boolean) => asWhite ? snapFunctions.e : snapFunctions.w},
-  {angle: 405, snap: (asWhite: boolean) => asWhite ? snapFunctions.e : snapFunctions.w},
-];
-const angleThresholds = [snapAngles[0]].concat(snapAngles.slice(0, -1)).map(({angle}, i, arr) => ({
-  angle: (angle + snapAngles[i].angle) / 2,
-  snap: arr[i].snap
-})).slice(1);
+const allPos = util.allKeys.map(util.key2pos);
 
 export function getSnappedKeyAtDomPos(orig: cg.Key, pos: cg.NumberPair, asWhite: boolean, bounds: ClientRect): cg.Key | undefined {
-  // 1. Get key at dom pos
-  // 2. If move is valid, short circuit
-  // 3. If move is not valid, pick nearest angle and snap distance to dragged distance
-  // Only snapping to + and x currently.
+  const unsnapped = getKeyAtDomPos(pos, asWhite, bounds);
+  const origPos = key2pos(orig);
+  const alreadySnapped = isAlreadySnapped(origPos, unsnapped);
+  if (alreadySnapped) return unsnapped; // O(1) short circuit
 
-  const unsnappedKey = getKeyAtDomPos(pos, asWhite, bounds);
-  const origRowCol: cg.Pos = key2pos(orig);
-  if (isAlreadySnapped(origRowCol, unsnappedKey)) return unsnappedKey;
-
-  const draggedOutOfBox = unsnappedKey === undefined;
-  if (draggedOutOfBox) return;
-
-  const unsnappedRowCol = unsnappedKey === undefined ? origRowCol : key2pos(unsnappedKey);
-  const origCenterCoord = computeSquareCenter(orig, asWhite, bounds);
-
-  // Use degrees for ease of round numbers in code
-  const origCenterToMouseDegrees = Math.atan2(pos[1] - origCenterCoord[1], origCenterCoord[0] - pos[0]) * 180 / Math.PI + 180;
-  const origCenterToMouseCoordX = origCenterCoord[0] - pos[0];
-  const origCenterToMouseCoordY = origCenterCoord[1] - pos[1];
-
-  const origCenterToMouseCoordDistance = Math.sqrt(
-      origCenterToMouseCoordX * origCenterToMouseCoordX +
-      origCenterToMouseCoordY * origCenterToMouseCoordY
-  );
-  const diagonalCoordDistance = Math.sqrt(
-      bounds.width * bounds.width +
-      bounds.height * bounds.height
-  ) / 8;
-  const squareDiagonalCoordDistance = Math.floor((origCenterToMouseCoordDistance + diagonalCoordDistance / 2) / diagonalCoordDistance);
-
-
-  for (const {angle, snap} of angleThresholds) {
-    if (origCenterToMouseDegrees < angle) {
-      const snappedPos = snap(asWhite)({
-        x1: origRowCol[0],
-        y1: origRowCol[1],
-        x2: unsnappedRowCol[0],
-        y2: unsnappedRowCol[1],
-        dd: squareDiagonalCoordDistance,
-      });
-      return pos2key(snappedPos);
-    }
-  }
-  return undefined; // should not be reachable
+  const validSnapPos = allPos.filter(pos2 => {
+    return queen(...origPos, ...pos2);
+  });
+  const validSnapCenters = validSnapPos.map(pos2 => computeSquareCenter(pos2key(pos2), asWhite, bounds));
+  const validSnapDistances = validSnapCenters.map(pos2 => util.distanceSq(pos, pos2));
+  const [,closestSnapIndex] = validSnapDistances.reduce((a, b, index) => a[0] < b ? a : [b, index], [validSnapDistances[0], 0]);
+  return pos2key(validSnapPos[closestSnapIndex])
 }
 
 export function whitePov(s: State): boolean {
