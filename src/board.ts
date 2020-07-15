@@ -359,7 +359,7 @@ export function getSnappedKeyAtDomPos(orig: cg.Key, pos: cg.NumberPair, asWhite:
   if (alreadySnapped) return unsnapped; // O(1) short circuit
 
   const validSnapPos = allPos.filter(pos2 => {
-    return queen(...origPos, ...pos2);
+    return queen(origPos[0], origPos[1], pos2[0], pos2[1]);
   });
   const validSnapCenters = validSnapPos.map(pos2 => computeSquareCenter(pos2key(pos2), asWhite, bounds));
   const validSnapDistances = validSnapCenters.map(pos2 => util.distanceSq(pos, pos2));
