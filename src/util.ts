@@ -72,12 +72,12 @@ export const setVisible = (el: HTMLElement, v: boolean): void => {
 }
 
 export const eventPosition = (e: cg.MouchEvent): cg.NumberPair | undefined => {
-  if (e.clientX || e.clientX === 0) return [e.clientX, e.clientY];
-  if (e.touches && e.targetTouches[0]) return [e.targetTouches[0].clientX, e.targetTouches[0].clientY]; /* eslint-disable-line */
+  if (e.clientX || e.clientX === 0) return [e.clientX, e.clientY!];
+  if (e.targetTouches?.[0]) return [e.targetTouches[0].clientX, e.targetTouches[0].clientY];
   return; // touchend has no position!
 }
 
-export const isRightButton = (e: MouseEvent): boolean => e.buttons === 2 || e.button === 2;
+export const isRightButton = (e: cg.MouchEvent): boolean => e.buttons === 2 || e.button === 2;
 
 export const createEl = (tagName: string, className?: string): HTMLElement => {
   const el = document.createElement(tagName);

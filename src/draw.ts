@@ -62,7 +62,7 @@ const brushes = ['green', 'red', 'blue', 'yellow'];
 
 export function start(state: State, e: cg.MouchEvent): void {
   // support one finger touch only
-  if (e.touches && e.touches.length > 1) return; /* eslint-disable-line */
+  if (e.touches && e.touches.length > 1) return;
   e.stopPropagation();
   e.preventDefault();
   e.ctrlKey ? unselect(state) : cancelMove(state);
@@ -129,7 +129,7 @@ export function clear(state: State): void {
 
 function eventBrush(e: cg.MouchEvent): string {
   const modA = (e.shiftKey || e.ctrlKey) && isRightButton(e);
-  const modB = e.altKey || e.metaKey || e.getModifierState('AltGraph');
+  const modB = e.altKey || e.metaKey || e.getModifierState?.('AltGraph');
   return brushes[(modA ? 1 : 0) + (modB ? 2 : 0)];
 }
 

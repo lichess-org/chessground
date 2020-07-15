@@ -63,7 +63,7 @@ export interface SetPremoveMetadata {
   ctrlKey?: boolean;
 }
 
-export type MouchEvent = MouseEvent & TouchEvent;
+export type MouchEvent = Event & Partial<MouseEvent & TouchEvent>;
 
 export interface KeyedNode extends HTMLElement {
   cgKey: Key;

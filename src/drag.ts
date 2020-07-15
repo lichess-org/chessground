@@ -19,9 +19,7 @@ export interface DragCurrent {
 }
 
 export function start(s: State, e: cg.MouchEvent): void {
-  // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
   if (e.button !== undefined && e.button !== 0) return; // only touch or left click
-  // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
   if (e.touches && e.touches.length > 1) return; // support one finger touch only
   const bounds = s.dom.bounds(),
   position = util.eventPosition(e)!,
@@ -37,7 +35,7 @@ export function start(s: State, e: cg.MouchEvent): void {
   // (and the board is not for viewing only), touches are likely intended to
   // select squares.
   if (e.cancelable !== false &&
-      (!e.touches || !s.movable.color || piece || previouslySelected || pieceCloseTo(s, position))) /* eslint-disable-line */
+      (!e.touches || !s.movable.color || piece || previouslySelected || pieceCloseTo(s, position)))
         e.preventDefault();
   const hadPremove = !!s.premovable.current;
   const hadPredrop = !!s.predroppable.current;
@@ -145,7 +143,7 @@ function processDrag(s: State): void {
 
 export function move(s: State, e: cg.MouchEvent): void {
   // support one finger touch only
-  if (s.draggable.current && (!e.touches || e.touches.length < 2)) { /* eslint-disable-line */
+  if (s.draggable.current && (!e.touches || e.touches.length < 2)) {
     s.draggable.current.pos = util.eventPosition(e)!;
   }
 }
