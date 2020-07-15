@@ -83,9 +83,13 @@ export function processDraw(state: State): void {
   requestAnimationFrame(() => {
     const cur = state.drawable.current;
     if (cur) {
+      const keyAtDomPos = getKeyAtDomPos(cur.pos, whitePov(state), state.dom.bounds());
+      if (!keyAtDomPos || !cur.snapToValidMove) {
+        cur.snapToValidMove = false;
+      }
       const mouseSq = cur.snapToValidMove ?
           getSnappedKeyAtDomPos(cur.orig, cur.pos, whitePov(state), state.dom.bounds()) :
-          getKeyAtDomPos(cur.pos, whitePov(state), state.dom.bounds());
+          keyAtDomPos;
       if (mouseSq !== cur.mouseSq) {
         cur.mouseSq = mouseSq;
         cur.dest = mouseSq !== cur.orig ? mouseSq : undefined;
