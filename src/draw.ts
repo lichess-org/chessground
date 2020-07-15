@@ -35,7 +35,7 @@ export interface DrawModifiers {
 export interface Drawable {
   enabled: boolean; // can draw
   visible: boolean; // can view
-  snapToValidMove: boolean;
+  defaultSnapToValidMove: boolean;
   eraseOnClick: boolean;
   onChange?: (shapes: DrawShape[]) => void;
   shapes: DrawShape[]; // user shapes
@@ -55,6 +55,7 @@ export interface DrawCurrent {
   mouseSq?: cg.Key; // square being moused over
   pos: cg.NumberPair; // relative current position
   brush: string; // brush name for shape
+  snapToValidMove: boolean; // whether to snap to valid piece moves
 }
 
 const brushes = ['green', 'red', 'blue', 'yellow'];
@@ -71,8 +72,10 @@ export function start(state: State, e: cg.MouchEvent): void {
   state.drawable.current = {
     orig,
     pos,
-    brush: eventBrush(e)
+    brush: eventBrush(e),
+    snapToValidMove: state.drawable.defaultSnapToValidMove,
   };
+
   processDraw(state);
 }
 
@@ -80,7 +83,7 @@ export function processDraw(state: State): void {
   requestAnimationFrame(() => {
     const cur = state.drawable.current;
     if (cur) {
-      const mouseSq = state.drawable.snapToValidMove ?
+      const mouseSq = cur.snapToValidMove ?
           getSnappedKeyAtDomPos(cur.orig, cur.pos, whitePov(state), state.dom.bounds()) :
           getKeyAtDomPos(cur.pos, whitePov(state), state.dom.bounds());
       if (mouseSq !== cur.mouseSq) {

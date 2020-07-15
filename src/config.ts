@@ -77,7 +77,7 @@ export interface Config {
   drawable?: {
     enabled?: boolean; // can draw
     visible?: boolean; // can view
-    snapToValidMove?: boolean;
+    defaultSnapToValidMove?: boolean;
     eraseOnClick?: boolean;
     shapes?: DrawShape[];
     autoShapes?: DrawShape[];
