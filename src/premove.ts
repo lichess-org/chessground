@@ -18,7 +18,7 @@ function pawn(color: cg.Color): Mobility {
   );
 }
 
-const knight: Mobility = (x1, y1, x2, y2) => {
+export const knight: Mobility = (x1, y1, x2, y2) => {
   const xd = diff(x1, x2);
   const yd = diff(y1, y2);
   return (xd === 1 && yd === 2) || (xd === 2 && yd === 1);

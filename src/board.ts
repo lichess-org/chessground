@@ -1,6 +1,6 @@
 import { State } from './state'
 import { pos2key, key2pos, opposite, distanceSq, allPos } from './util'
-import { premove, queen } from './premove'
+import { premove, queen, knight } from './premove'
 import { computeSquareCenter } from './drag'
 import * as cg from './types'
 
@@ -358,7 +358,7 @@ export function getSnappedKeyAtDomPos(orig: cg.Key, pos: cg.NumberPair, asWhite:
   if (alreadySnapped) return unsnapped; // O(1) short circuit
 
   const validSnapPos = allPos.filter(pos2 => {
-    return queen(origPos[0], origPos[1], pos2[0], pos2[1]);
+    return queen(origPos[0], origPos[1], pos2[0], pos2[1]) || knight(origPos[0], origPos[1], pos2[0], pos2[1]);
   });
   const validSnapCenters = validSnapPos.map(pos2 => computeSquareCenter(pos2key(pos2), asWhite, bounds));
   const validSnapDistances = validSnapCenters.map(pos2 => distanceSq(pos, pos2));
