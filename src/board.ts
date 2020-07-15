@@ -1,9 +1,8 @@
 import { State } from './state'
-import { pos2key, key2pos, opposite } from './util'
-import {premove, queen} from './premove'
+import { pos2key, key2pos, opposite, distanceSq, allPos } from './util'
+import { premove, queen } from './premove'
+import { computeSquareCenter } from './drag'
 import * as cg from './types'
-import {computeSquareCenter} from './drag';
-import * as util from "./util";
 
 export type Callback = (...args: any[]) => void;
 
@@ -350,8 +349,6 @@ function isAlreadySnapped(orig: cg.Pos, targetKey: cg.Key | undefined): boolean 
   return false;
 }
 
-const allPos = util.allKeys.map(util.key2pos);
-
 export function getSnappedKeyAtDomPos(orig: cg.Key, pos: cg.NumberPair, asWhite: boolean, bounds: ClientRect): cg.Key | undefined {
   const unsnapped = getKeyAtDomPos(pos, asWhite, bounds);
   const origPos = key2pos(orig);
@@ -362,9 +359,9 @@ export function getSnappedKeyAtDomPos(orig: cg.Key, pos: cg.NumberPair, asWhite:
     return queen(origPos[0], origPos[1], pos2[0], pos2[1]);
   });
   const validSnapCenters = validSnapPos.map(pos2 => computeSquareCenter(pos2key(pos2), asWhite, bounds));
-  const validSnapDistances = validSnapCenters.map(pos2 => util.distanceSq(pos, pos2));
+  const validSnapDistances = validSnapCenters.map(pos2 => distanceSq(pos, pos2));
   const [,closestSnapIndex] = validSnapDistances.reduce((a, b, index) => a[0] < b ? a : [b, index], [validSnapDistances[0], 0]);
-  return pos2key(validSnapPos[closestSnapIndex])
+  return pos2key(validSnapPos[closestSnapIndex]);
 }
 
 export function whitePov(s: State): boolean {
