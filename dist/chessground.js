@@ -83,9 +83,10 @@ var Chessground = (function () {
 	    el.style.visibility = v ? 'visible' : 'hidden';
 	};
 	exports.eventPosition = (e) => {
+	    var _a;
 	    if (e.clientX || e.clientX === 0)
 	        return [e.clientX, e.clientY];
-	    if (e.touches && e.targetTouches[0])
+	    if ((_a = e.targetTouches) === null || _a === void 0 ? void 0 : _a[0])
 	        return [e.targetTouches[0].clientX, e.targetTouches[0].clientY];
 	    return;
 	};
@@ -223,8 +224,9 @@ var Chessground = (function () {
 	}
 	exports.clear = clear;
 	function eventBrush(e) {
+	    var _a;
 	    const modA = (e.shiftKey || e.ctrlKey) && util.isRightButton(e);
-	    const modB = e.altKey || e.metaKey || e.getModifierState('AltGraph');
+	    const modB = e.altKey || e.metaKey || ((_a = e.getModifierState) === null || _a === void 0 ? void 0 : _a.call(e, 'AltGraph'));
 	    return brushes[(modA ? 1 : 0) + (modB ? 2 : 0)];
 	}
 	function addShape(drawable, cur) {
@@ -1824,21 +1826,22 @@ var Chessground = (function () {
 
 
 	function Chessground(element, config$1) {
-	    const state$1 = state.defaults();
-	    config.configure(state$1, config$1 || {});
+	    const maybeState = state.defaults();
+	    config.configure(maybeState, config$1 || {});
 	    function redrawAll() {
-	        const prevUnbind = state$1.dom && state$1.dom.unbind;
-	        const relative = state$1.viewOnly && !state$1.drawable.visible, elements = wrap.renderWrap(element, state$1, relative), bounds = util.memo(() => elements.board.getBoundingClientRect()), redrawNow = (skipSvg) => {
-	            render_1.render(state$1);
+	        const prevUnbind = 'dom' in maybeState ? maybeState.dom.unbind : undefined;
+	        const relative = maybeState.viewOnly && !maybeState.drawable.visible, elements = wrap.renderWrap(element, maybeState, relative), bounds = util.memo(() => elements.board.getBoundingClientRect()), redrawNow = (skipSvg) => {
+	            render_1.render(state);
 	            if (!skipSvg && elements.svg)
-	                svg.renderSvg(state$1, elements.svg);
+	                svg.renderSvg(state, elements.svg);
 	        }, boundsUpdated = () => {
 	            bounds.clear();
-	            render_1.updateBounds(state$1);
+	            render_1.updateBounds(state);
 	            if (elements.svg)
-	                svg.renderSvg(state$1, elements.svg);
+	                svg.renderSvg(state, elements.svg);
 	        };
-	        state$1.dom = {
+	        const state = maybeState;
+	        state.dom = {
 	            elements,
 	            bounds,
 	            redraw: debounceRedraw(redrawNow),
@@ -1846,15 +1849,15 @@ var Chessground = (function () {
 	            unbind: prevUnbind,
 	            relative
 	        };
-	        state$1.drawable.prevSvgHash = '';
+	        state.drawable.prevSvgHash = '';
 	        redrawNow(false);
-	        events.bindBoard(state$1, boundsUpdated);
+	        events.bindBoard(state, boundsUpdated);
 	        if (!prevUnbind)
-	            state$1.dom.unbind = events.bindDocument(state$1, boundsUpdated);
-	        state$1.events.insert && state$1.events.insert(elements);
+	            state.dom.unbind = events.bindDocument(state, boundsUpdated);
+	        state.events.insert && state.events.insert(elements);
+	        return state;
 	    }
-	    redrawAll();
-	    return api.start(state$1, redrawAll);
+	    return api.start(redrawAll(), redrawAll);
 	}
 	exports.Chessground = Chessground;
 	function debounceRedraw(redrawNow) {
