@@ -1,7 +1,6 @@
 import { HeadlessState } from './state'
-import { pos2key, key2pos, opposite, distanceSq, allPos } from './util'
+import { pos2key, key2pos, opposite, distanceSq, allPos, computeSquareCenter } from './util'
 import { premove, queen, knight } from './premove'
-import { computeSquareCenter } from './drag'
 import * as cg from './types'
 
 export type Callback = (...args: any[]) => void;
