@@ -84,3 +84,15 @@ export const createEl = (tagName: string, className?: string): HTMLElement => {
   if (className) el.className = className;
   return el;
 }
+
+export function computeSquareCenter(key: cg.Key, asWhite: boolean, bounds: ClientRect): cg.NumberPair {
+  const pos = key2pos(key);
+  if (!asWhite) {
+    pos[0] = 7 - pos[0];
+    pos[1] = 7 - pos[1];
+  }
+  return [
+    bounds.left + bounds.width * pos[0] / 8 + bounds.width / 16,
+    bounds.top + bounds.height * (7 - pos[1]) / 8 + bounds.height / 16
+  ];
+}
