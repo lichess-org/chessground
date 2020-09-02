@@ -80,7 +80,7 @@ function pieceCloseTo(s: State, pos: cg.NumberPair): boolean {
   bounds = s.dom.bounds(),
   radiusSq = Math.pow(bounds.width / 8, 2);
   for (const key in s.pieces) {
-    const center = computeSquareCenter(key as cg.Key, asWhite, bounds);
+    const center = util.computeSquareCenter(key as cg.Key, asWhite, bounds);
     if (util.distanceSq(center, pos) <= radiusSq) return true;
   }
   return false;
@@ -202,17 +202,6 @@ function removeDragElements(s: State): void {
   if (e.ghost) util.setVisible(e.ghost, false);
 }
 
-export function computeSquareCenter(key: cg.Key, asWhite: boolean, bounds: ClientRect): cg.NumberPair {
-  const pos = util.key2pos(key);
-  if (!asWhite) {
-    pos[0] = 7 - pos[0];
-    pos[1] = 7 - pos[1];
-  }
-  return [
-    bounds.left + bounds.width * pos[0] / 8 + bounds.width / 16,
-    bounds.top + bounds.height * (7 - pos[1]) / 8 + bounds.height / 16
-  ];
-}
 
 function pieceElementByKey(s: State, key: cg.Key): cg.PieceNode | undefined {
   let el = s.dom.elements.board.firstChild;
