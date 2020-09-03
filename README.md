@@ -90,15 +90,15 @@ More? Please make a pull request to include it here.
 
 Install build dependencies:
 ```sh
-npm install
+yarn install
 ```
 
 To build the node module:
 ```sh
-npm run compile -- --watch
+yarn run compile -- --watch
 ```
 
 To build the standalone:
 ```sh
-npm run dist -- --watch
+yarn run dist -- --watch
 ```
