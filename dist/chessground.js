@@ -28,7 +28,7 @@ var Chessground = (function () {
 	Object.defineProperty(exports, "__esModule", { value: true });
 	exports.computeSquareCenter = exports.createEl = exports.isRightButton = exports.eventPosition = exports.setVisible = exports.translateRel = exports.translateAbs = exports.posToTranslateRel = exports.posToTranslateAbs = exports.samePiece = exports.distanceSq = exports.opposite = exports.timer = exports.memo = exports.allPos = exports.key2pos = exports.pos2key = exports.allKeys = exports.invRanks = void 0;
 
-	exports.invRanks = ['8', '7', '6', '5', '4', '3', '2', '1'];
+	exports.invRanks = [...types.ranks].reverse();
 	exports.allKeys = Array.prototype.concat(...types.files.map(c => types.ranks.map(r => c + r)));
 	exports.pos2key = (pos) => exports.allKeys[8 * pos[0] + pos[1]];
 	exports.key2pos = (k) => [k.charCodeAt(0) - 97, k.charCodeAt(1) - 49];
