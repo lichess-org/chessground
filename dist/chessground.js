@@ -3,11 +3,11 @@ var Chessground = (function () {
 
 	function createCommonjsModule(fn, basedir, module) {
 		return module = {
-		  path: basedir,
-		  exports: {},
-		  require: function (path, base) {
-	      return commonjsRequire(path, (base === undefined || base === null) ? module.path : base);
-	    }
+			path: basedir,
+			exports: {},
+			require: function (path, base) {
+				return commonjsRequire(path, (base === undefined || base === null) ? module.path : base);
+			}
 		}, fn(module, module.exports), module.exports;
 	}
 
@@ -30,8 +30,10 @@ var Chessground = (function () {
 
 	exports.invRanks = [...types.ranks].reverse();
 	exports.allKeys = Array.prototype.concat(...types.files.map(c => types.ranks.map(r => c + r)));
-	exports.pos2key = (pos) => exports.allKeys[8 * pos[0] + pos[1]];
-	exports.key2pos = (k) => [k.charCodeAt(0) - 97, k.charCodeAt(1) - 49];
+	const pos2key = (pos) => exports.allKeys[8 * pos[0] + pos[1]];
+	exports.pos2key = pos2key;
+	const key2pos = (k) => [k.charCodeAt(0) - 97, k.charCodeAt(1) - 49];
+	exports.key2pos = key2pos;
 	exports.allPos = exports.allKeys.map(exports.key2pos);
 	function memo(f) {
 	    let v;
@@ -44,7 +46,7 @@ var Chessground = (function () {
 	    return ret;
 	}
 	exports.memo = memo;
-	exports.timer = () => {
+	const timer = () => {
 	    let startAt;
 	    return {
 	        start() { startAt = performance.now(); },
@@ -58,31 +60,40 @@ var Chessground = (function () {
 	        }
 	    };
 	};
-	exports.opposite = (c) => c === 'white' ? 'black' : 'white';
-	exports.distanceSq = (pos1, pos2) => {
+	exports.timer = timer;
+	const opposite = (c) => c === 'white' ? 'black' : 'white';
+	exports.opposite = opposite;
+	const distanceSq = (pos1, pos2) => {
 	    const dx = pos1[0] - pos2[0], dy = pos1[1] - pos2[1];
 	    return dx * dx + dy * dy;
 	};
-	exports.samePiece = (p1, p2) => p1.role === p2.role && p1.color === p2.color;
+	exports.distanceSq = distanceSq;
+	const samePiece = (p1, p2) => p1.role === p2.role && p1.color === p2.color;
+	exports.samePiece = samePiece;
 	const posToTranslateBase = (pos, asWhite, xFactor, yFactor) => [
 	    (asWhite ? pos[0] : 7 - pos[0]) * xFactor,
 	    (asWhite ? 7 - pos[1] : pos[1]) * yFactor
 	];
-	exports.posToTranslateAbs = (bounds) => {
+	const posToTranslateAbs = (bounds) => {
 	    const xFactor = bounds.width / 8, yFactor = bounds.height / 8;
 	    return (pos, asWhite) => posToTranslateBase(pos, asWhite, xFactor, yFactor);
 	};
-	exports.posToTranslateRel = (pos, asWhite) => posToTranslateBase(pos, asWhite, 100, 100);
-	exports.translateAbs = (el, pos) => {
+	exports.posToTranslateAbs = posToTranslateAbs;
+	const posToTranslateRel = (pos, asWhite) => posToTranslateBase(pos, asWhite, 100, 100);
+	exports.posToTranslateRel = posToTranslateRel;
+	const translateAbs = (el, pos) => {
 	    el.style.transform = `translate(${pos[0]}px,${pos[1]}px)`;
 	};
-	exports.translateRel = (el, percents) => {
+	exports.translateAbs = translateAbs;
+	const translateRel = (el, percents) => {
 	    el.style.transform = `translate(${percents[0]}%,${percents[1]}%)`;
 	};
-	exports.setVisible = (el, v) => {
+	exports.translateRel = translateRel;
+	const setVisible = (el, v) => {
 	    el.style.visibility = v ? 'visible' : 'hidden';
 	};
-	exports.eventPosition = (e) => {
+	exports.setVisible = setVisible;
+	const eventPosition = (e) => {
 	    var _a;
 	    if (e.clientX || e.clientX === 0)
 	        return [e.clientX, e.clientY];
@@ -90,13 +101,16 @@ var Chessground = (function () {
 	        return [e.targetTouches[0].clientX, e.targetTouches[0].clientY];
 	    return;
 	};
-	exports.isRightButton = (e) => e.buttons === 2 || e.button === 2;
-	exports.createEl = (tagName, className) => {
+	exports.eventPosition = eventPosition;
+	const isRightButton = (e) => e.buttons === 2 || e.button === 2;
+	exports.isRightButton = isRightButton;
+	const createEl = (tagName, className) => {
 	    const el = document.createElement(tagName);
 	    if (className)
 	        el.className = className;
 	    return el;
 	};
+	exports.createEl = createEl;
 	function computeSquareCenter(key, asWhite, bounds) {
 	    const pos = exports.key2pos(key);
 	    if (!asWhite) {
@@ -122,20 +136,22 @@ var Chessground = (function () {
 	function pawn(color) {
 	    return (x1, y1, x2, y2) => diff(x1, x2) < 2 && (color === 'white' ? (y2 === y1 + 1 || (y1 <= 1 && y2 === (y1 + 2) && x1 === x2)) : (y2 === y1 - 1 || (y1 >= 6 && y2 === (y1 - 2) && x1 === x2)));
 	}
-	exports.knight = (x1, y1, x2, y2) => {
+	const knight = (x1, y1, x2, y2) => {
 	    const xd = diff(x1, x2);
 	    const yd = diff(y1, y2);
 	    return (xd === 1 && yd === 2) || (xd === 2 && yd === 1);
 	};
+	exports.knight = knight;
 	const bishop = (x1, y1, x2, y2) => {
 	    return diff(x1, x2) === diff(y1, y2);
 	};
 	const rook = (x1, y1, x2, y2) => {
 	    return x1 === x2 || y1 === y2;
 	};
-	exports.queen = (x1, y1, x2, y2) => {
+	const queen = (x1, y1, x2, y2) => {
 	    return bishop(x1, y1, x2, y2) || rook(x1, y1, x2, y2);
 	};
+	exports.queen = queen;
 	function king(color, rookFiles, canCastle) {
 	    return (x1, y1, x2, y2) => (diff(x1, x2) < 2 && diff(y1, y2) < 2) || (canCastle && y1 === y2 && y1 === (color === 'white' ? 0 : 7) && ((x1 === 4 && ((x2 === 2 && rookFiles.includes(0)) || (x2 === 6 && rookFiles.includes(7)))) ||
 	        rookFiles.includes(x2)));
@@ -168,7 +184,7 @@ var Chessground = (function () {
 
 	function callUserFunction(f, ...args) {
 	    if (f)
-	        setTimeout(() => f(...args), 1);
+	        setTimeout(() => f(args), 1);
 	}
 	exports.callUserFunction = callUserFunction;
 	function toggleOrientation(state) {
@@ -340,6 +356,7 @@ var Chessground = (function () {
 	        state.pieces.delete(orig);
 	        baseNewPiece(state, piece, dest, force);
 	        callUserFunction(state.movable.events.afterNewPiece, piece.role, dest, {
+	            premove: false,
 	            predrop: false
 	        });
 	    }
@@ -463,6 +480,7 @@ var Chessground = (function () {
 	        };
 	        if (baseNewPiece(state, piece, drop.key)) {
 	            callUserFunction(state.movable.events.afterNewPiece, drop.role, drop.key, {
+	                premove: false,
 	                predrop: true
 	            });
 	            success = true;
@@ -835,7 +853,7 @@ var Chessground = (function () {
 
 
 	function start(s, e) {
-	    if (e.button !== undefined && e.button !== 0)
+	    if (!e.isTrusted || e.button !== undefined && e.button !== 0)
 	        return;
 	    if (e.touches && e.touches.length > 1)
 	        return;
