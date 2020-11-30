@@ -184,7 +184,7 @@ var Chessground = (function () {
 
 	function callUserFunction(f, ...args) {
 	    if (f)
-	        setTimeout(() => f(args), 1);
+	        setTimeout(() => f.apply(null, args), 1);
 	}
 	exports.callUserFunction = callUserFunction;
 	function toggleOrientation(state) {
