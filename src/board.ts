@@ -3,12 +3,11 @@ import { pos2key, key2pos, opposite, distanceSq, allPos, computeSquareCenter } f
 import { premove, queen, knight } from './premove'
 import * as cg from './types'
 
-export function callUserFunction<T  extends (...args: any) => void>(
+export function callUserFunction<T  extends (...args: any[]) => void>(
   f: T | undefined,
   ...args: Parameters<T>
 ): void {
-  /* eslint-disable prefer-spread */
-  if (f) setTimeout(() => f.apply(null,args), 1);  
+  if (f) setTimeout(() => f(...args), 1);  
 }
 
 export function toggleOrientation(state: HeadlessState): void {
