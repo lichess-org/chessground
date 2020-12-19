@@ -7,20 +7,24 @@
   "typings": "chessground.d.ts",
   "dependencies": {},
   "devDependencies": {
-    "@rollup/plugin-commonjs": "^16.0.0",
-    "@rollup/plugin-typescript": "^6.1.0",
-    "@typescript-eslint/eslint-plugin": "^4.8.2",
-    "@typescript-eslint/parser": "^4.8.2",
-    "eslint": "^7.14.0",
-    "rollup": "^2.34.0",
-    "rollup-plugin-terser": "^7.0.2",
-    "tslib": "^2.0.3",
-    "typescript": "^4.1.2"
+    "@rollup/plugin-commonjs": "^17",
+    "@rollup/plugin-typescript": "^8",
+    "@typescript-eslint/eslint-plugin": "^4",
+    "@typescript-eslint/parser": "^4",
+    "eslint": "^7",
+    "eslint-config-prettier": "^7",
+    "prettier": "^2",
+    "rollup": "^2",
+    "rollup-plugin-terser": "^7",
+    "tslib": "^2",
+    "typescript": "^4"
   },
   "scripts": {
     "prepare": "npm run compile",
     "compile": "tsc --outDir . --sourceMap --declaration",
     "lint": "eslint src/*.ts",
+    "format": "prettier --write src/*.ts",
+    "check-format": "prettier --check src/*.ts",
     "dist": "rollup --config"
   },
   "files": [

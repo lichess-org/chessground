@@ -1,8 +1,8 @@
-import * as fen from './fen'
-import { AnimCurrent } from './anim'
-import { DragCurrent } from './drag'
-import { Drawable } from './draw'
-import { timer } from './util'
+import * as fen from './fen';
+import { AnimCurrent } from './anim';
+import { DragCurrent } from './drag';
+import { Drawable } from './draw';
+import { timer } from './util';
 import * as cg from './types';
 
 export interface HeadlessState {
@@ -35,7 +35,11 @@ export interface HeadlessState {
     showDests: boolean; // whether to add the move-dest class on squares
     events: {
       after?: (orig: cg.Key, dest: cg.Key, metadata: cg.MoveMetadata) => void; // called after the move has been played
-      afterNewPiece?: (role: cg.Role, key: cg.Key, metadata: cg.MoveMetadata) => void; // called after a new piece is dropped on the board
+      afterNewPiece?: (
+        role: cg.Role,
+        key: cg.Key,
+        metadata: cg.MoveMetadata
+      ) => void; // called after a new piece is dropped on the board
     };
     rookCastle: boolean; // castle by moving the king to the rook
   };
@@ -46,13 +50,18 @@ export interface HeadlessState {
     dests?: cg.Key[]; // premove destinations for the current selection
     current?: cg.KeyPair; // keys of the current saved premove ["e2" "e4"]
     events: {
-      set?: (orig: cg.Key, dest: cg.Key, metadata?: cg.SetPremoveMetadata) => void; // called after the premove has been set
-      unset?: () => void;  // called after the premove has been unset
+      set?: (
+        orig: cg.Key,
+        dest: cg.Key,
+        metadata?: cg.SetPremoveMetadata
+      ) => void; // called after the premove has been set
+      unset?: () => void; // called after the premove has been unset
     };
   };
   predroppable: {
     enabled: boolean; // allow predrops for color that can not move
-    current?: { // current saved predrop {role: 'knight'; key: 'e4'}
+    current?: {
+      // current saved predrop {role: 'knight'; key: 'e4'}
       role: cg.Role;
       key: cg.Key;
     };
@@ -115,46 +124,46 @@ export function defaults(): HeadlessState {
     pieceKey: false,
     highlight: {
       lastMove: true,
-      check: true
+      check: true,
     },
     animation: {
       enabled: true,
-      duration: 200
+      duration: 200,
     },
     movable: {
       free: true,
       color: 'both',
       showDests: true,
       events: {},
-      rookCastle: true
+      rookCastle: true,
     },
     premovable: {
       enabled: true,
       showDests: true,
       castle: true,
-      events: {}
+      events: {},
     },
     predroppable: {
       enabled: false,
-      events: {}
+      events: {},
     },
     draggable: {
       enabled: true,
       distance: 3,
       autoDistance: true,
       showGhost: true,
-      deleteOnDropOff: false
+      deleteOnDropOff: false,
     },
     dropmode: {
-      active: false
+      active: false,
     },
     selectable: {
-      enabled: true
+      enabled: true,
     },
     stats: {
       // on touchscreen, default to "tap-tap" moves
       // instead of drag
-      dragged: !('ontouchstart' in window)
+      dragged: !('ontouchstart' in window),
     },
     events: {},
     drawable: {
@@ -172,13 +181,18 @@ export function defaults(): HeadlessState {
         paleBlue: { key: 'pb', color: '#003088', opacity: 0.4, lineWidth: 15 },
         paleGreen: { key: 'pg', color: '#15781B', opacity: 0.4, lineWidth: 15 },
         paleRed: { key: 'pr', color: '#882020', opacity: 0.4, lineWidth: 15 },
-        paleGrey: { key: 'pgr', color: '#4a4a4a', opacity: 0.35, lineWidth: 15 }
+        paleGrey: {
+          key: 'pgr',
+          color: '#4a4a4a',
+          opacity: 0.35,
+          lineWidth: 15,
+        },
       },
       pieces: {
-        baseUrl: 'https://lichess1.org/assets/piece/cburnett/'
+        baseUrl: 'https://lichess1.org/assets/piece/cburnett/',
       },
-      prevSvgHash: ''
+      prevSvgHash: '',
     },
-    hold: timer()
+    hold: timer(),
   };
 }
