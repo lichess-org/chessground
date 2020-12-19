@@ -1,18 +1,9 @@
 var Chessground = (function () {
 	'use strict';
 
-	function createCommonjsModule(fn, basedir, module) {
-		return module = {
-			path: basedir,
-			exports: {},
-			require: function (path, base) {
-				return commonjsRequire(path, (base === undefined || base === null) ? module.path : base);
-			}
-		}, fn(module, module.exports), module.exports;
-	}
-
-	function commonjsRequire () {
-		throw new Error('Dynamic requires are not currently supported by @rollup/plugin-commonjs');
+	function createCommonjsModule(fn) {
+	  var module = { exports: {} };
+		return fn(module, module.exports), module.exports;
 	}
 
 	var types = createCommonjsModule(function (module, exports) {
@@ -29,10 +20,13 @@ var Chessground = (function () {
 	exports.computeSquareCenter = exports.createEl = exports.isRightButton = exports.eventPosition = exports.setVisible = exports.translateRel = exports.translateAbs = exports.posToTranslateRel = exports.posToTranslateAbs = exports.samePiece = exports.distanceSq = exports.opposite = exports.timer = exports.memo = exports.allPos = exports.key2pos = exports.pos2key = exports.allKeys = exports.invRanks = void 0;
 
 	exports.invRanks = [...types.ranks].reverse();
-	exports.allKeys = Array.prototype.concat(...types.files.map(c => types.ranks.map(r => c + r)));
+	exports.allKeys = Array.prototype.concat(...types.files.map((c) => types.ranks.map((r) => c + r)));
 	const pos2key = (pos) => exports.allKeys[8 * pos[0] + pos[1]];
 	exports.pos2key = pos2key;
-	const key2pos = (k) => [k.charCodeAt(0) - 97, k.charCodeAt(1) - 49];
+	const key2pos = (k) => [
+	    k.charCodeAt(0) - 97,
+	    k.charCodeAt(1) - 49,
+	];
 	exports.key2pos = key2pos;
 	exports.allPos = exports.allKeys.map(exports.key2pos);
 	function memo(f) {
@@ -42,22 +36,28 @@ var Chessground = (function () {
 	            v = f();
 	        return v;
 	    };
-	    ret.clear = () => { v = undefined; };
+	    ret.clear = () => {
+	        v = undefined;
+	    };
 	    return ret;
 	}
 	exports.memo = memo;
 	const timer = () => {
 	    let startAt;
 	    return {
-	        start() { startAt = performance.now(); },
-	        cancel() { startAt = undefined; },
+	        start() {
+	            startAt = performance.now();
+	        },
+	        cancel() {
+	            startAt = undefined;
+	        },
 	        stop() {
 	            if (!startAt)
 	                return 0;
 	            const time = performance.now() - startAt;
 	            startAt = undefined;
 	            return time;
-	        }
+	        },
 	    };
 	};
 	exports.timer = timer;
@@ -72,7 +72,7 @@ var Chessground = (function () {
 	exports.samePiece = samePiece;
 	const posToTranslateBase = (pos, asWhite, xFactor, yFactor) => [
 	    (asWhite ? pos[0] : 7 - pos[0]) * xFactor,
-	    (asWhite ? 7 - pos[1] : pos[1]) * yFactor
+	    (asWhite ? 7 - pos[1] : pos[1]) * yFactor,
 	];
 	const posToTranslateAbs = (bounds) => {
 	    const xFactor = bounds.width / 8, yFactor = bounds.height / 8;
@@ -118,8 +118,8 @@ var Chessground = (function () {
 	        pos[1] = 7 - pos[1];
 	    }
 	    return [
-	        bounds.left + bounds.width * pos[0] / 8 + bounds.width / 16,
-	        bounds.top + bounds.height * (7 - pos[1]) / 8 + bounds.height / 16
+	        bounds.left + (bounds.width * pos[0]) / 8 + bounds.width / 16,
+	        bounds.top + (bounds.height * (7 - pos[1])) / 8 + bounds.height / 16,
 	    ];
 	}
 	exports.computeSquareCenter = computeSquareCenter;
@@ -134,7 +134,11 @@ var Chessground = (function () {
 	    return Math.abs(a - b);
 	}
 	function pawn(color) {
-	    return (x1, y1, x2, y2) => diff(x1, x2) < 2 && (color === 'white' ? (y2 === y1 + 1 || (y1 <= 1 && y2 === (y1 + 2) && x1 === x2)) : (y2 === y1 - 1 || (y1 >= 6 && y2 === (y1 - 2) && x1 === x2)));
+	    return (x1, y1, x2, y2) => diff(x1, x2) < 2 &&
+	        (color === 'white'
+	            ?
+	                y2 === y1 + 1 || (y1 <= 1 && y2 === y1 + 2 && x1 === x2)
+	            : y2 === y1 - 1 || (y1 >= 6 && y2 === y1 - 2 && x1 === x2));
 	}
 	const knight = (x1, y1, x2, y2) => {
 	    const xd = diff(x1, x2);
@@ -153,8 +157,14 @@ var Chessground = (function () {
 	};
 	exports.queen = queen;
 	function king(color, rookFiles, canCastle) {
-	    return (x1, y1, x2, y2) => (diff(x1, x2) < 2 && diff(y1, y2) < 2) || (canCastle && y1 === y2 && y1 === (color === 'white' ? 0 : 7) && ((x1 === 4 && ((x2 === 2 && rookFiles.includes(0)) || (x2 === 6 && rookFiles.includes(7)))) ||
-	        rookFiles.includes(x2)));
+	    return (x1, y1, x2, y2) => (diff(x1, x2) < 2 && diff(y1, y2) < 2) ||
+	        (canCastle &&
+	            y1 === y2 &&
+	            y1 === (color === 'white' ? 0 : 7) &&
+	            ((x1 === 4 &&
+	                ((x2 === 2 && rookFiles.includes(0)) ||
+	                    (x2 === 6 && rookFiles.includes(7)))) ||
+	                rookFiles.includes(x2)));
 	}
 	function rookFilesOf(pieces, color) {
 	    const backrank = color === 'white' ? '1' : '8';
@@ -170,8 +180,21 @@ var Chessground = (function () {
 	    const piece = pieces.get(key);
 	    if (!piece)
 	        return [];
-	    const pos = util.key2pos(key), r = piece.role, mobility = r === 'pawn' ? pawn(piece.color) : (r === 'knight' ? exports.knight : (r === 'bishop' ? bishop : (r === 'rook' ? rook : (r === 'queen' ? exports.queen : king(piece.color, rookFilesOf(pieces, piece.color), canCastle)))));
-	    return util.allPos.filter(pos2 => (pos[0] !== pos2[0] || pos[1] !== pos2[1]) && mobility(pos[0], pos[1], pos2[0], pos2[1])).map(util.pos2key);
+	    const pos = util.key2pos(key), r = piece.role, mobility = r === 'pawn'
+	        ? pawn(piece.color)
+	        : r === 'knight'
+	            ? exports.knight
+	            : r === 'bishop'
+	                ? bishop
+	                : r === 'rook'
+	                    ? rook
+	                    : r === 'queen'
+	                        ? exports.queen
+	                        : king(piece.color, rookFilesOf(pieces, piece.color), canCastle);
+	    return util.allPos
+	        .filter((pos2) => (pos[0] !== pos2[0] || pos[1] !== pos2[1]) &&
+	        mobility(pos[0], pos[1], pos2[0], pos2[1]))
+	        .map(util.pos2key);
 	}
 	exports.premove = premove;
 
@@ -189,9 +212,7 @@ var Chessground = (function () {
 	exports.callUserFunction = callUserFunction;
 	function toggleOrientation(state) {
 	    state.orientation = util.opposite(state.orientation);
-	    state.animation.current =
-	        state.draggable.current =
-	            state.selected = undefined;
+	    state.animation.current = state.draggable.current = state.selected = undefined;
 	}
 	exports.toggleOrientation = toggleOrientation;
 	function reset(state) {
@@ -282,7 +303,7 @@ var Chessground = (function () {
 	    const origPiece = state.pieces.get(orig), destPiece = state.pieces.get(dest);
 	    if (orig === dest || !origPiece)
 	        return false;
-	    const captured = (destPiece && destPiece.color !== origPiece.color) ? destPiece : undefined;
+	    const captured = destPiece && destPiece.color !== origPiece.color ? destPiece : undefined;
 	    if (dest === state.selected)
 	        unselect(state);
 	    callUserFunction(state.events.move, orig, dest, captured);
@@ -331,7 +352,7 @@ var Chessground = (function () {
 	            const metadata = {
 	                premove: false,
 	                ctrlKey: state.stats.ctrlKey,
-	                holdTime
+	                holdTime,
 	            };
 	            if (result !== true)
 	                metadata.captured = result;
@@ -341,7 +362,7 @@ var Chessground = (function () {
 	    }
 	    else if (canPremove(state, orig, dest)) {
 	        setPremove(state, orig, dest, {
-	            ctrlKey: state.stats.ctrlKey
+	            ctrlKey: state.stats.ctrlKey,
 	        });
 	        unselect(state);
 	        return true;
@@ -357,7 +378,7 @@ var Chessground = (function () {
 	        baseNewPiece(state, piece, dest, force);
 	        callUserFunction(state.movable.events.afterNewPiece, piece.role, dest, {
 	            premove: false,
-	            predrop: false
+	            predrop: false,
 	        });
 	    }
 	    else if (piece && canPredrop(state, orig, dest)) {
@@ -409,43 +430,53 @@ var Chessground = (function () {
 	exports.unselect = unselect;
 	function isMovable(state, orig) {
 	    const piece = state.pieces.get(orig);
-	    return !!piece && (state.movable.color === 'both' || (state.movable.color === piece.color &&
-	        state.turnColor === piece.color));
+	    return (!!piece &&
+	        (state.movable.color === 'both' ||
+	            (state.movable.color === piece.color && state.turnColor === piece.color)));
 	}
 	function canMove(state, orig, dest) {
 	    var _a, _b;
-	    return orig !== dest && isMovable(state, orig) && (state.movable.free || !!((_b = (_a = state.movable.dests) === null || _a === void 0 ? void 0 : _a.get(orig)) === null || _b === void 0 ? void 0 : _b.includes(dest)));
+	    return (orig !== dest &&
+	        isMovable(state, orig) &&
+	        (state.movable.free || !!((_b = (_a = state.movable.dests) === null || _a === void 0 ? void 0 : _a.get(orig)) === null || _b === void 0 ? void 0 : _b.includes(dest))));
 	}
 	exports.canMove = canMove;
 	function canDrop(state, orig, dest) {
 	    const piece = state.pieces.get(orig);
-	    return !!piece && (orig === dest || !state.pieces.has(dest)) && (state.movable.color === 'both' || (state.movable.color === piece.color &&
-	        state.turnColor === piece.color));
+	    return (!!piece &&
+	        (orig === dest || !state.pieces.has(dest)) &&
+	        (state.movable.color === 'both' ||
+	            (state.movable.color === piece.color && state.turnColor === piece.color)));
 	}
 	function isPremovable(state, orig) {
 	    const piece = state.pieces.get(orig);
-	    return !!piece && state.premovable.enabled &&
+	    return (!!piece &&
+	        state.premovable.enabled &&
 	        state.movable.color === piece.color &&
-	        state.turnColor !== piece.color;
+	        state.turnColor !== piece.color);
 	}
 	function canPremove(state, orig, dest) {
-	    return orig !== dest &&
+	    return (orig !== dest &&
 	        isPremovable(state, orig) &&
-	        premove_1.premove(state.pieces, orig, state.premovable.castle).includes(dest);
+	        premove_1.premove(state.pieces, orig, state.premovable.castle).includes(dest));
 	}
 	function canPredrop(state, orig, dest) {
 	    const piece = state.pieces.get(orig);
 	    const destPiece = state.pieces.get(dest);
-	    return !!piece &&
+	    return (!!piece &&
 	        (!destPiece || destPiece.color !== state.movable.color) &&
 	        state.predroppable.enabled &&
 	        (piece.role !== 'pawn' || (dest[1] !== '1' && dest[1] !== '8')) &&
 	        state.movable.color === piece.color &&
-	        state.turnColor !== piece.color;
+	        state.turnColor !== piece.color);
 	}
 	function isDraggable(state, orig) {
 	    const piece = state.pieces.get(orig);
-	    return !!piece && state.draggable.enabled && (state.movable.color === 'both' || (state.movable.color === piece.color && (state.turnColor === piece.color || state.premovable.enabled)));
+	    return (!!piece &&
+	        state.draggable.enabled &&
+	        (state.movable.color === 'both' ||
+	            (state.movable.color === piece.color &&
+	                (state.turnColor === piece.color || state.premovable.enabled))));
 	}
 	exports.isDraggable = isDraggable;
 	function playPremove(state) {
@@ -476,12 +507,12 @@ var Chessground = (function () {
 	    if (validate(drop)) {
 	        const piece = {
 	            role: drop.role,
-	            color: state.movable.color
+	            color: state.movable.color,
 	        };
 	        if (baseNewPiece(state, piece, drop.key)) {
 	            callUserFunction(state.movable.events.afterNewPiece, drop.role, drop.key, {
 	                premove: false,
-	                predrop: true
+	                predrop: true,
 	            });
 	            success = true;
 	        }
@@ -497,30 +528,31 @@ var Chessground = (function () {
 	}
 	exports.cancelMove = cancelMove;
 	function stop(state) {
-	    state.movable.color =
-	        state.movable.dests =
-	            state.animation.current = undefined;
+	    state.movable.color = state.movable.dests = state.animation.current = undefined;
 	    cancelMove(state);
 	}
 	exports.stop = stop;
 	function getKeyAtDomPos(pos, asWhite, bounds) {
-	    let file = Math.floor(8 * (pos[0] - bounds.left) / bounds.width);
+	    let file = Math.floor((8 * (pos[0] - bounds.left)) / bounds.width);
 	    if (!asWhite)
 	        file = 7 - file;
-	    let rank = 7 - Math.floor(8 * (pos[1] - bounds.top) / bounds.height);
+	    let rank = 7 - Math.floor((8 * (pos[1] - bounds.top)) / bounds.height);
 	    if (!asWhite)
 	        rank = 7 - rank;
-	    return (file >= 0 && file < 8 && rank >= 0 && rank < 8) ? util.pos2key([file, rank]) : undefined;
+	    return file >= 0 && file < 8 && rank >= 0 && rank < 8
+	        ? util.pos2key([file, rank])
+	        : undefined;
 	}
 	exports.getKeyAtDomPos = getKeyAtDomPos;
 	function getSnappedKeyAtDomPos(orig, pos, asWhite, bounds) {
 	    const origPos = util.key2pos(orig);
-	    const validSnapPos = util.allPos.filter(pos2 => {
-	        return premove_1.queen(origPos[0], origPos[1], pos2[0], pos2[1]) || premove_1.knight(origPos[0], origPos[1], pos2[0], pos2[1]);
+	    const validSnapPos = util.allPos.filter((pos2) => {
+	        return (premove_1.queen(origPos[0], origPos[1], pos2[0], pos2[1]) ||
+	            premove_1.knight(origPos[0], origPos[1], pos2[0], pos2[1]));
 	    });
-	    const validSnapCenters = validSnapPos.map(pos2 => util.computeSquareCenter(util.pos2key(pos2), asWhite, bounds));
-	    const validSnapDistances = validSnapCenters.map(pos2 => util.distanceSq(pos, pos2));
-	    const [, closestSnapIndex] = validSnapDistances.reduce((a, b, index) => a[0] < b ? a : [b, index], [validSnapDistances[0], 0]);
+	    const validSnapCenters = validSnapPos.map((pos2) => util.computeSquareCenter(util.pos2key(pos2), asWhite, bounds));
+	    const validSnapDistances = validSnapCenters.map((pos2) => util.distanceSq(pos, pos2));
+	    const [, closestSnapIndex] = validSnapDistances.reduce((a, b, index) => (a[0] < b ? a : [b, index]), [validSnapDistances[0], 0]);
 	    return util.pos2key(validSnapPos[closestSnapIndex]);
 	}
 	exports.getSnappedKeyAtDomPos = getSnappedKeyAtDomPos;
@@ -537,8 +569,22 @@ var Chessground = (function () {
 
 
 	exports.initial = 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR';
-	const roles = { p: 'pawn', r: 'rook', n: 'knight', b: 'bishop', q: 'queen', k: 'king' };
-	const letters = { pawn: 'p', rook: 'r', knight: 'n', bishop: 'b', queen: 'q', king: 'k' };
+	const roles = {
+	    p: 'pawn',
+	    r: 'rook',
+	    n: 'knight',
+	    b: 'bishop',
+	    q: 'queen',
+	    k: 'king',
+	};
+	const letters = {
+	    pawn: 'p',
+	    rook: 'r',
+	    knight: 'n',
+	    bishop: 'b',
+	    queen: 'q',
+	    king: 'k',
+	};
 	function read(fen) {
 	    if (fen === 'start')
 	        fen = exports.initial;
@@ -546,7 +592,8 @@ var Chessground = (function () {
 	    let row = 7, col = 0;
 	    for (const c of fen) {
 	        switch (c) {
-	            case ' ': return pieces;
+	            case ' ':
+	                return pieces;
 	            case '/':
 	                --row;
 	                if (row < 0)
@@ -576,15 +623,20 @@ var Chessground = (function () {
 	}
 	exports.read = read;
 	function write(pieces) {
-	    return util.invRanks.map(y => types.files.map(x => {
-	        const piece = pieces.get(x + y);
+	    return util.invRanks
+	        .map((y) => types.files
+	        .map((x) => {
+	        const piece = pieces.get((x + y));
 	        if (piece) {
 	            const letter = letters[piece.role];
 	            return piece.color === 'white' ? letter.toUpperCase() : letter;
 	        }
 	        else
 	            return '1';
-	    }).join('')).join('/').replace(/1{2,}/g, s => s.length.toString());
+	    })
+	        .join(''))
+	        .join('/')
+	        .replace(/1{2,}/g, (s) => s.length.toString());
 	}
 	exports.write = write;
 
@@ -615,11 +667,11 @@ var Chessground = (function () {
 	    if (!state.animation.duration || state.animation.duration < 100)
 	        state.animation.enabled = false;
 	    if (!state.movable.rookCastle && state.movable.dests) {
-	        const rank = state.movable.color === 'white' ? '1' : '8', kingStartPos = 'e' + rank, dests = state.movable.dests.get(kingStartPos), king = state.pieces.get(kingStartPos);
+	        const rank = state.movable.color === 'white' ? '1' : '8', kingStartPos = ('e' + rank), dests = state.movable.dests.get(kingStartPos), king = state.pieces.get(kingStartPos);
 	        if (!dests || !king || king.role !== 'king')
 	            return;
-	        state.movable.dests.set(kingStartPos, dests.filter(d => !((d === 'a' + rank) && dests.includes('c' + rank)) &&
-	            !((d === 'h' + rank) && dests.includes('g' + rank))));
+	        state.movable.dests.set(kingStartPos, dests.filter((d) => !(d === 'a' + rank && dests.includes(('c' + rank))) &&
+	            !(d === 'h' + rank && dests.includes(('g' + rank)))));
 	    }
 	}
 	exports.configure = configure;
@@ -642,7 +694,9 @@ var Chessground = (function () {
 	exports.render = exports.anim = void 0;
 
 	function anim(mutation, state) {
-	    return state.animation.enabled ? animate(mutation, state) : render(mutation, state);
+	    return state.animation.enabled
+	        ? animate(mutation, state)
+	        : render(mutation, state);
 	}
 	exports.anim = anim;
 	function render(mutation, state) {
@@ -655,12 +709,12 @@ var Chessground = (function () {
 	    return {
 	        key: key,
 	        pos: util.key2pos(key),
-	        piece: piece
+	        piece: piece,
 	    };
 	}
 	function closer(piece, pieces) {
 	    return pieces.sort((p1, p2) => {
-	        return util.distanceSq(piece.pos, p1.pos) - util.distanceSq(piece.pos, p2.pos);
+	        return (util.distanceSq(piece.pos, p1.pos) - util.distanceSq(piece.pos, p2.pos));
 	    })[0];
 	}
 	function computePlan(prevPieces, current) {
@@ -686,7 +740,7 @@ var Chessground = (function () {
 	            missings.push(preP);
 	    }
 	    for (const newP of news) {
-	        preP = closer(newP, missings.filter(p => util.samePiece(newP.piece, p.piece)));
+	        preP = closer(newP, missings.filter((p) => util.samePiece(newP.piece, p.piece)));
 	        if (preP) {
 	            vector = [preP.pos[0] - newP.pos[0], preP.pos[1] - newP.pos[1]];
 	            anims.set(newP.key, vector.concat(vector));
@@ -699,7 +753,7 @@ var Chessground = (function () {
 	    }
 	    return {
 	        anims: anims,
-	        fadings: fadings
+	        fadings: fadings,
 	    };
 	}
 	function step(state, now) {
@@ -733,7 +787,7 @@ var Chessground = (function () {
 	        state.animation.current = {
 	            start: performance.now(),
 	            frequency: 1 / state.animation.duration,
-	            plan: plan
+	            plan: plan,
 	        };
 	        if (!alreadyRunning)
 	            step(state, performance.now());
@@ -781,9 +835,9 @@ var Chessground = (function () {
 	            if (!keyAtDomPos) {
 	                cur.snapToValidMove = false;
 	            }
-	            const mouseSq = cur.snapToValidMove ?
-	                board.getSnappedKeyAtDomPos(cur.orig, cur.pos, board.whitePov(state), state.dom.bounds()) :
-	                keyAtDomPos;
+	            const mouseSq = cur.snapToValidMove
+	                ? board.getSnappedKeyAtDomPos(cur.orig, cur.pos, board.whitePov(state), state.dom.bounds())
+	                : keyAtDomPos;
 	            if (mouseSq !== cur.mouseSq) {
 	                cur.mouseSq = mouseSq;
 	                cur.dest = mouseSq !== cur.orig ? mouseSq : undefined;
@@ -833,7 +887,7 @@ var Chessground = (function () {
 	    const sameShape = (s) => s.orig === cur.orig && s.dest === cur.dest;
 	    const similar = drawable.shapes.find(sameShape);
 	    if (similar)
-	        drawable.shapes = drawable.shapes.filter(s => !sameShape(s));
+	        drawable.shapes = drawable.shapes.filter((s) => !sameShape(s));
 	    if (!similar || similar.brush !== cur.brush)
 	        drawable.shapes.push(cur);
 	    onChange(drawable);
@@ -853,7 +907,7 @@ var Chessground = (function () {
 
 
 	function start(s, e) {
-	    if (!e.isTrusted || e.button !== undefined && e.button !== 0)
+	    if (!e.isTrusted || (e.button !== undefined && e.button !== 0))
 	        return;
 	    if (e.touches && e.touches.length > 1)
 	        return;
@@ -862,16 +916,22 @@ var Chessground = (function () {
 	        return;
 	    const piece = s.pieces.get(orig);
 	    const previouslySelected = s.selected;
-	    if (!previouslySelected && s.drawable.enabled && (s.drawable.eraseOnClick || (!piece || piece.color !== s.turnColor)))
+	    if (!previouslySelected &&
+	        s.drawable.enabled &&
+	        (s.drawable.eraseOnClick || !piece || piece.color !== s.turnColor))
 	        draw.clear(s);
 	    if (e.cancelable !== false &&
-	        (!e.touches || !s.movable.color || piece || previouslySelected || pieceCloseTo(s, position)))
+	        (!e.touches ||
+	            !s.movable.color ||
+	            piece ||
+	            previouslySelected ||
+	            pieceCloseTo(s, position)))
 	        e.preventDefault();
 	    const hadPremove = !!s.premovable.current;
 	    const hadPredrop = !!s.predroppable.current;
 	    s.stats.ctrlKey = e.ctrlKey;
 	    if (s.selected && board.canMove(s, s.selected, orig)) {
-	        anim_1.anim(state => board.selectSquare(state, orig), s);
+	        anim_1.anim((state) => board.selectSquare(state, orig), s);
 	    }
 	    else {
 	        board.selectSquare(s, orig);
@@ -887,7 +947,7 @@ var Chessground = (function () {
 	            started: s.draggable.autoDistance && s.stats.dragged,
 	            element,
 	            previouslySelected,
-	            originTarget: e.target
+	            originTarget: e.target,
 	        };
 	        element.cgDragging = true;
 	        element.classList.add('dragging');
@@ -931,7 +991,7 @@ var Chessground = (function () {
 	        element: () => pieceElementByKey(s, key),
 	        originTarget: e.target,
 	        newPiece: true,
-	        force: !!force
+	        force: !!force,
 	    };
 	    processDrag(s);
 	}
@@ -948,7 +1008,9 @@ var Chessground = (function () {
 	        if (!origPiece || !util.samePiece(origPiece, cur.piece))
 	            cancel(s);
 	        else {
-	            if (!cur.started && util.distanceSq(cur.pos, cur.origPos) >= Math.pow(s.draggable.distance, 2))
+	            if (!cur.started &&
+	                util.distanceSq(cur.pos, cur.origPos) >=
+	                    Math.pow(s.draggable.distance, 2))
 	                cur.started = true;
 	            if (cur.started) {
 	                if (typeof cur.element === 'function') {
@@ -962,7 +1024,7 @@ var Chessground = (function () {
 	                const bounds = s.dom.bounds();
 	                util.translateAbs(cur.element, [
 	                    cur.pos[0] - bounds.left - bounds.width / 16,
-	                    cur.pos[1] - bounds.top - bounds.height / 16
+	                    cur.pos[1] - bounds.top - bounds.height / 16,
 	                ]);
 	            }
 	        }
@@ -1034,7 +1096,8 @@ var Chessground = (function () {
 	function pieceElementByKey(s, key) {
 	    let el = s.dom.elements.board.firstChild;
 	    while (el) {
-	        if (el.cgKey === key && el.tagName === 'PIECE')
+	        if (el.cgKey === key &&
+	            el.tagName === 'PIECE')
 	            return el;
 	        el = el.nextSibling;
 	    }
@@ -1085,27 +1148,27 @@ var Chessground = (function () {
 	        set(config$1) {
 	            if (config$1.orientation && config$1.orientation !== state.orientation)
 	                toggleOrientation();
-	            (config$1.fen ? anim_1.anim : anim_1.render)(state => config.configure(state, config$1), state);
+	            (config$1.fen ? anim_1.anim : anim_1.render)((state) => config.configure(state, config$1), state);
 	        },
 	        state,
 	        getFen: () => fen.write(state.pieces),
 	        toggleOrientation,
 	        setPieces(pieces) {
-	            anim_1.anim(state => board.setPieces(state, pieces), state);
+	            anim_1.anim((state) => board.setPieces(state, pieces), state);
 	        },
 	        selectSquare(key, force) {
 	            if (key)
-	                anim_1.anim(state => board.selectSquare(state, key, force), state);
+	                anim_1.anim((state) => board.selectSquare(state, key, force), state);
 	            else if (state.selected) {
 	                board.unselect(state);
 	                state.dom.redraw();
 	            }
 	        },
 	        move(orig, dest) {
-	            anim_1.anim(state => board.baseMove(state, orig, dest), state);
+	            anim_1.anim((state) => board.baseMove(state, orig, dest), state);
 	        },
 	        newPiece(piece, key) {
-	            anim_1.anim(state => board.baseNewPiece(state, piece, key), state);
+	            anim_1.anim((state) => board.baseNewPiece(state, piece, key), state);
 	        },
 	        playPremove() {
 	            if (state.premovable.current) {
@@ -1130,19 +1193,25 @@ var Chessground = (function () {
 	            anim_1.render(board.unsetPredrop, state);
 	        },
 	        cancelMove() {
-	            anim_1.render(state => { board.cancelMove(state); drag.cancel(state); }, state);
+	            anim_1.render((state) => {
+	                board.cancelMove(state);
+	                drag.cancel(state);
+	            }, state);
 	        },
 	        stop() {
-	            anim_1.render(state => { board.stop(state); drag.cancel(state); }, state);
+	            anim_1.render((state) => {
+	                board.stop(state);
+	                drag.cancel(state);
+	            }, state);
 	        },
 	        explode(keys) {
 	            explosion_1.explosion(state, keys);
 	        },
 	        setAutoShapes(shapes) {
-	            anim_1.render(state => state.drawable.autoShapes = shapes, state);
+	            anim_1.render((state) => (state.drawable.autoShapes = shapes), state);
 	        },
 	        setShapes(shapes) {
-	            anim_1.render(state => state.drawable.shapes = shapes, state);
+	            anim_1.render((state) => (state.drawable.shapes = shapes), state);
 	        },
 	        getKeyAtDomPos(pos) {
 	            return board.getKeyAtDomPos(pos, board.whitePov(state), state.dom.bounds());
@@ -1155,7 +1224,7 @@ var Chessground = (function () {
 	            board.stop(state);
 	            state.dom.unbind && state.dom.unbind();
 	            state.dom.destroyed = true;
-	        }
+	        },
 	    };
 	}
 	exports.start = start;
@@ -1181,44 +1250,44 @@ var Chessground = (function () {
 	        pieceKey: false,
 	        highlight: {
 	            lastMove: true,
-	            check: true
+	            check: true,
 	        },
 	        animation: {
 	            enabled: true,
-	            duration: 200
+	            duration: 200,
 	        },
 	        movable: {
 	            free: true,
 	            color: 'both',
 	            showDests: true,
 	            events: {},
-	            rookCastle: true
+	            rookCastle: true,
 	        },
 	        premovable: {
 	            enabled: true,
 	            showDests: true,
 	            castle: true,
-	            events: {}
+	            events: {},
 	        },
 	        predroppable: {
 	            enabled: false,
-	            events: {}
+	            events: {},
 	        },
 	        draggable: {
 	            enabled: true,
 	            distance: 3,
 	            autoDistance: true,
 	            showGhost: true,
-	            deleteOnDropOff: false
+	            deleteOnDropOff: false,
 	        },
 	        dropmode: {
-	            active: false
+	            active: false,
 	        },
 	        selectable: {
-	            enabled: true
+	            enabled: true,
 	        },
 	        stats: {
-	            dragged: !('ontouchstart' in window)
+	            dragged: !('ontouchstart' in window),
 	        },
 	        events: {},
 	        drawable: {
@@ -1236,14 +1305,19 @@ var Chessground = (function () {
 	                paleBlue: { key: 'pb', color: '#003088', opacity: 0.4, lineWidth: 15 },
 	                paleGreen: { key: 'pg', color: '#15781B', opacity: 0.4, lineWidth: 15 },
 	                paleRed: { key: 'pr', color: '#882020', opacity: 0.4, lineWidth: 15 },
-	                paleGrey: { key: 'pgr', color: '#4a4a4a', opacity: 0.35, lineWidth: 15 }
+	                paleGrey: {
+	                    key: 'pgr',
+	                    color: '#4a4a4a',
+	                    opacity: 0.35,
+	                    lineWidth: 15,
+	                },
 	            },
 	            pieces: {
-	                baseUrl: 'https://lichess1.org/assets/piece/cburnett/'
+	                baseUrl: 'https://lichess1.org/assets/piece/cburnett/',
 	            },
-	            prevSvgHash: ''
+	            prevSvgHash: '',
 	        },
-	        hold: util.timer()
+	        hold: util.timer(),
 	    };
 	}
 	exports.defaults = defaults;
@@ -1268,16 +1342,16 @@ var Chessground = (function () {
 	        return {
 	            shape: s,
 	            current: false,
-	            hash: shapeHash(s, arrowDests, false, bounds)
+	            hash: shapeHash(s, arrowDests, false, bounds),
 	        };
 	    });
 	    if (cur)
 	        shapes.push({
 	            shape: cur,
 	            current: true,
-	            hash: shapeHash(cur, arrowDests, true, bounds)
+	            hash: shapeHash(cur, arrowDests, true, bounds),
 	        });
-	    const fullHash = shapes.map(sc => sc.hash).join(';');
+	    const fullHash = shapes.map((sc) => sc.hash).join(';');
 	    if (fullHash === state.drawable.prevSvgHash)
 	        return;
 	    state.drawable.prevSvgHash = fullHash;
@@ -1329,13 +1403,22 @@ var Chessground = (function () {
 	    }
 	}
 	function shapeHash({ orig, dest, brush, piece, modifiers }, arrowDests, current, bounds) {
-	    return [bounds.width, bounds.height, current, orig, dest, brush, dest && (arrowDests.get(dest) || 0) > 1,
+	    return [
+	        bounds.width,
+	        bounds.height,
+	        current,
+	        orig,
+	        dest,
+	        brush,
+	        dest && (arrowDests.get(dest) || 0) > 1,
 	        piece && pieceHash(piece),
-	        modifiers && modifiersHash(modifiers)
-	    ].filter(x => x).join(',');
+	        modifiers && modifiersHash(modifiers),
+	    ]
+	        .filter((x) => x)
+	        .join(',');
 	}
 	function pieceHash(piece) {
-	    return [piece.color, piece.role, piece.scale].filter(x => x).join(',');
+	    return [piece.color, piece.role, piece.scale].filter((x) => x).join(',');
 	}
 	function modifiersHash(m) {
 	    return '' + (m.lineWidth || '');
@@ -1367,7 +1450,7 @@ var Chessground = (function () {
 	        opacity: opacity(brush, current),
 	        cx: o[0],
 	        cy: o[1],
-	        r: radius - widths[1] / 2
+	        r: radius - widths[1] / 2,
 	    });
 	}
 	function renderArrow(brush, orig, dest, current, shorten, bounds) {
@@ -1381,18 +1464,19 @@ var Chessground = (function () {
 	        x1: a[0],
 	        y1: a[1],
 	        x2: b[0] - xo,
-	        y2: b[1] - yo
+	        y2: b[1] - yo,
 	    });
 	}
 	function renderPiece(baseUrl, pos, piece, bounds) {
-	    const o = pos2px(pos, bounds), size = bounds.width / 8 * (piece.scale || 1), name = piece.color[0] + (piece.role === 'knight' ? 'n' : piece.role[0]).toUpperCase();
+	    const o = pos2px(pos, bounds), size = (bounds.width / 8) * (piece.scale || 1), name = piece.color[0] +
+	        (piece.role === 'knight' ? 'n' : piece.role[0]).toUpperCase();
 	    return setAttributes(createElement('image'), {
 	        className: `${piece.role} ${piece.color}`,
 	        x: o[0] - size / 2,
 	        y: o[1] - size / 2,
 	        width: size,
 	        height: size,
-	        href: baseUrl + name + '.svg'
+	        href: baseUrl + name + '.svg',
 	    });
 	}
 	function renderMarker(brush) {
@@ -1402,11 +1486,11 @@ var Chessground = (function () {
 	        markerWidth: 4,
 	        markerHeight: 8,
 	        refX: 2.05,
-	        refY: 2.01
+	        refY: 2.01,
 	    });
 	    marker.appendChild(setAttributes(createElement('path'), {
 	        d: 'M0,0 V4 L3,2 Z',
-	        fill: brush.color
+	        fill: brush.color,
 	    }));
 	    marker.setAttribute('cgKey', brush.key);
 	    return marker;
@@ -1424,7 +1508,7 @@ var Chessground = (function () {
 	        color: base.color,
 	        opacity: Math.round(base.opacity * 10) / 10,
 	        lineWidth: Math.round(modifiers.lineWidth || base.lineWidth),
-	        key: [base.key, modifiers.lineWidth].filter(x => x).join(''),
+	        key: [base.key, modifiers.lineWidth].filter((x) => x).join(''),
 	    };
 	}
 	function circleWidth(bounds) {
@@ -1432,16 +1516,19 @@ var Chessground = (function () {
 	    return [3 * base, 4 * base];
 	}
 	function lineWidth(brush, current, bounds) {
-	    return (brush.lineWidth || 10) * (current ? 0.85 : 1) / 512 * bounds.width;
+	    return ((((brush.lineWidth || 10) * (current ? 0.85 : 1)) / 512) * bounds.width);
 	}
 	function opacity(brush, current) {
 	    return (brush.opacity || 1) * (current ? 0.9 : 1);
 	}
 	function arrowMargin(bounds, shorten) {
-	    return (shorten ? 20 : 10) / 512 * bounds.width;
+	    return ((shorten ? 20 : 10) / 512) * bounds.width;
 	}
 	function pos2px(pos, bounds) {
-	    return [(pos[0] + 0.5) * bounds.width / 8, (7.5 - pos[1]) * bounds.height / 8];
+	    return [
+	        ((pos[0] + 0.5) * bounds.width) / 8,
+	        ((7.5 - pos[1]) * bounds.height) / 8,
+	    ];
 	}
 
 	});
@@ -1485,7 +1572,7 @@ var Chessground = (function () {
 	        board,
 	        container,
 	        ghost,
-	        svg: svg$1
+	        svg: svg$1,
 	    };
 	}
 	exports.renderWrap = renderWrap;
@@ -1511,14 +1598,14 @@ var Chessground = (function () {
 	function setDropMode(s, piece) {
 	    s.dropmode = {
 	        active: true,
-	        piece
+	        piece,
 	    };
 	    drag.cancel(s);
 	}
 	exports.setDropMode = setDropMode;
 	function cancelDropMode(s) {
 	    s.dropmode = {
-	        active: false
+	        active: false,
 	    };
 	}
 	exports.cancelDropMode = cancelDropMode;
@@ -1531,7 +1618,8 @@ var Chessground = (function () {
 	    if (piece) {
 	        s.pieces.set('a0', piece);
 	        const position = util.eventPosition(e);
-	        const dest = position && board.getKeyAtDomPos(position, board.whitePov(s), s.dom.bounds());
+	        const dest = position &&
+	            board.getKeyAtDomPos(position, board.whitePov(s), s.dom.bounds());
 	        if (dest)
 	            board.dropNewPiece(s, 'a0', dest);
 	    }
@@ -1557,10 +1645,14 @@ var Chessground = (function () {
 	    if (s.viewOnly)
 	        return;
 	    const onStart = startDragOrDraw(s);
-	    boardEl.addEventListener('touchstart', onStart, { passive: false });
-	    boardEl.addEventListener('mousedown', onStart, { passive: false });
+	    boardEl.addEventListener('touchstart', onStart, {
+	        passive: false,
+	    });
+	    boardEl.addEventListener('mousedown', onStart, {
+	        passive: false,
+	    });
 	    if (s.disableContextMenu || s.drawable.enabled) {
-	        boardEl.addEventListener('contextmenu', e => e.preventDefault());
+	        boardEl.addEventListener('contextmenu', (e) => e.preventDefault());
 	    }
 	}
 	exports.bindBoard = bindBoard;
@@ -1580,7 +1672,7 @@ var Chessground = (function () {
 	        unbinds.push(unbindable(document, 'scroll', onScroll, { capture: true, passive: true }));
 	        unbinds.push(unbindable(window, 'resize', onScroll, { passive: true }));
 	    }
-	    return () => unbinds.forEach(f => f());
+	    return () => unbinds.forEach((f) => f());
 	}
 	exports.bindDocument = bindDocument;
 	function unbindable(el, eventName, callback, options) {
@@ -1588,7 +1680,7 @@ var Chessground = (function () {
 	    return () => el.removeEventListener(eventName, callback, options);
 	}
 	function startDragOrDraw(s) {
-	    return e => {
+	    return (e) => {
 	        if (s.draggable.current)
 	            drag.cancel(s);
 	        else if (s.drawable.current)
@@ -1606,7 +1698,7 @@ var Chessground = (function () {
 	    };
 	}
 	function dragOrDraw(s, withDrag, withDraw) {
-	    return e => {
+	    return (e) => {
 	        if (s.drawable.current) {
 	            if (s.drawable.enabled)
 	                withDraw(s, e);
@@ -1625,7 +1717,9 @@ var Chessground = (function () {
 
 	const util$1 = util;
 	function render(s) {
-	    const asWhite = board.whitePov(s), posToTranslate = s.dom.relative ? util$1.posToTranslateRel : util$1.posToTranslateAbs(s.dom.bounds()), translate = s.dom.relative ? util$1.translateRel : util$1.translateAbs, boardEl = s.dom.elements.board, pieces = s.pieces, curAnim = s.animation.current, anims = curAnim ? curAnim.plan.anims : new Map(), fadings = curAnim ? curAnim.plan.fadings : new Map(), curDrag = s.draggable.current, squares = computeSquareClasses(s), samePieces = new Set(), sameSquares = new Set(), movedPieces = new Map(), movedSquares = new Map();
+	    const asWhite = board.whitePov(s), posToTranslate = s.dom.relative
+	        ? util$1.posToTranslateRel
+	        : util$1.posToTranslateAbs(s.dom.bounds()), translate = s.dom.relative ? util$1.translateRel : util$1.translateAbs, boardEl = s.dom.elements.board, pieces = s.pieces, curAnim = s.animation.current, anims = curAnim ? curAnim.plan.anims : new Map(), fadings = curAnim ? curAnim.plan.fadings : new Map(), curDrag = s.draggable.current, squares = computeSquareClasses(s), samePieces = new Set(), sameSquares = new Set(), movedPieces = new Map(), movedSquares = new Map();
 	    let k, el, pieceAtKey, elPieceName, anim, fading, pMvdset, pMvd, sMvdset, sMvd;
 	    el = boardEl.firstChild;
 	    while (el) {
@@ -1659,7 +1753,8 @@ var Chessground = (function () {
 	                    if (s.addPieceZIndex)
 	                        el.style.zIndex = posZIndex(util.key2pos(k), asWhite);
 	                }
-	                if (elPieceName === pieceNameOf(pieceAtKey) && (!fading || !el.cgFading)) {
+	                if (elPieceName === pieceNameOf(pieceAtKey) &&
+	                    (!fading || !el.cgFading)) {
 	                    samePieces.add(k);
 	                }
 	                else {
@@ -1864,7 +1959,7 @@ var Chessground = (function () {
 	            redraw: debounceRedraw(redrawNow),
 	            redrawNow,
 	            unbind: prevUnbind,
-	            relative
+	            relative,
 	        };
 	        state.drawable.prevSvgHash = '';
 	        redrawNow(false);

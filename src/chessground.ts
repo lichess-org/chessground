@@ -1,15 +1,14 @@
-import { Api, start } from './api'
-import { Config, configure } from './config'
-import { HeadlessState, State, defaults } from './state'
+import { Api, start } from './api';
+import { Config, configure } from './config';
+import { HeadlessState, State, defaults } from './state';
 
 import { renderWrap } from './wrap';
-import * as events from './events'
+import * as events from './events';
 import { render, updateBounds } from './render';
 import * as svg from './svg';
 import * as util from './util';
 
 export function Chessground(element: HTMLElement, config?: Config): Api {
-
   const maybeState: State | HeadlessState = defaults();
 
   configure(maybeState, config || {});
@@ -19,17 +18,17 @@ export function Chessground(element: HTMLElement, config?: Config): Api {
     // compute bounds from existing board element if possible
     // this allows non-square boards from CSS to be handled (for 3D)
     const relative = maybeState.viewOnly && !maybeState.drawable.visible,
-    elements = renderWrap(element, maybeState, relative),
-    bounds = util.memo(() => elements.board.getBoundingClientRect()),
-    redrawNow = (skipSvg?: boolean): void => {
-      render(state);
-      if (!skipSvg && elements.svg) svg.renderSvg(state, elements.svg);
-    },
-    boundsUpdated = (): void => {
-      bounds.clear();
-      updateBounds(state);
-      if (elements.svg) svg.renderSvg(state, elements.svg);
-    };
+      elements = renderWrap(element, maybeState, relative),
+      bounds = util.memo(() => elements.board.getBoundingClientRect()),
+      redrawNow = (skipSvg?: boolean): void => {
+        render(state);
+        if (!skipSvg && elements.svg) svg.renderSvg(state, elements.svg);
+      },
+      boundsUpdated = (): void => {
+        bounds.clear();
+        updateBounds(state);
+        if (elements.svg) svg.renderSvg(state, elements.svg);
+      };
     const state = maybeState as State;
     state.dom = {
       elements,
@@ -37,12 +36,13 @@ export function Chessground(element: HTMLElement, config?: Config): Api {
       redraw: debounceRedraw(redrawNow),
       redrawNow,
       unbind: prevUnbind,
-      relative
+      relative,
     };
     state.drawable.prevSvgHash = '';
     redrawNow(false);
     events.bindBoard(state, boundsUpdated);
-    if (!prevUnbind) state.dom.unbind = events.bindDocument(state, boundsUpdated);
+    if (!prevUnbind)
+      state.dom.unbind = events.bindDocument(state, boundsUpdated);
     state.events.insert && state.events.insert(elements);
     return state;
   }

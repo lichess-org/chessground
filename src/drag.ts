@@ -1,9 +1,9 @@
-import { State } from './state'
-import * as board from './board'
-import * as util from './util'
-import { clear as drawClear } from './draw'
-import * as cg from './types'
-import { anim } from './anim'
+import { State } from './state';
+import * as board from './board';
+import * as util from './util';
+import { clear as drawClear } from './draw';
+import * as cg from './types';
+import { anim } from './anim';
 
 export interface DragCurrent {
   orig: cg.Key; // orig key of dragging piece
@@ -19,29 +19,38 @@ export interface DragCurrent {
 }
 
 export function start(s: State, e: cg.MouchEvent): void {
-  if (!e.isTrusted || e.button !== undefined && e.button !== 0) return; // only touch or left click
+  if (!e.isTrusted || (e.button !== undefined && e.button !== 0)) return; // only touch or left click
   if (e.touches && e.touches.length > 1) return; // support one finger touch only
   const bounds = s.dom.bounds(),
-  position = util.eventPosition(e)!,
-  orig = board.getKeyAtDomPos(position, board.whitePov(s), bounds);
+    position = util.eventPosition(e)!,
+    orig = board.getKeyAtDomPos(position, board.whitePov(s), bounds);
   if (!orig) return;
   const piece = s.pieces.get(orig);
   const previouslySelected = s.selected;
-  if (!previouslySelected && s.drawable.enabled && (
-    s.drawable.eraseOnClick || (!piece || piece.color !== s.turnColor)
-  )) drawClear(s);
+  if (
+    !previouslySelected &&
+    s.drawable.enabled &&
+    (s.drawable.eraseOnClick || !piece || piece.color !== s.turnColor)
+  )
+    drawClear(s);
   // Prevent touch scroll and create no corresponding mouse event, if there
   // is an intent to interact with the board. If no color is movable
   // (and the board is not for viewing only), touches are likely intended to
   // select squares.
-  if (e.cancelable !== false &&
-      (!e.touches || !s.movable.color || piece || previouslySelected || pieceCloseTo(s, position)))
-        e.preventDefault();
+  if (
+    e.cancelable !== false &&
+    (!e.touches ||
+      !s.movable.color ||
+      piece ||
+      previouslySelected ||
+      pieceCloseTo(s, position))
+  )
+    e.preventDefault();
   const hadPremove = !!s.premovable.current;
   const hadPredrop = !!s.predroppable.current;
   s.stats.ctrlKey = e.ctrlKey;
   if (s.selected && board.canMove(s, s.selected, orig)) {
-    anim(state => board.selectSquare(state, orig), s);
+    anim((state) => board.selectSquare(state, orig), s);
   } else {
     board.selectSquare(s, orig);
   }
@@ -56,7 +65,7 @@ export function start(s: State, e: cg.MouchEvent): void {
       started: s.draggable.autoDistance && s.stats.dragged,
       element,
       previouslySelected,
-      originTarget: e.target
+      originTarget: e.target,
     };
     element.cgDragging = true;
     element.classList.add('dragging');
@@ -64,7 +73,10 @@ export function start(s: State, e: cg.MouchEvent): void {
     const ghost = s.dom.elements.ghost;
     if (ghost) {
       ghost.className = `ghost ${piece.color} ${piece.role}`;
-      util.translateAbs(ghost, util.posToTranslateAbs(bounds)(util.key2pos(orig), board.whitePov(s)));
+      util.translateAbs(
+        ghost,
+        util.posToTranslateAbs(bounds)(util.key2pos(orig), board.whitePov(s))
+      );
       util.setVisible(ghost, true);
     }
     processDrag(s);
@@ -77,8 +89,8 @@ export function start(s: State, e: cg.MouchEvent): void {
 
 function pieceCloseTo(s: State, pos: cg.NumberPair): boolean {
   const asWhite = board.whitePov(s),
-  bounds = s.dom.bounds(),
-  radiusSq = Math.pow(bounds.width / 8, 2);
+    bounds = s.dom.bounds(),
+    radiusSq = Math.pow(bounds.width / 8, 2);
   for (const key in s.pieces) {
     const center = util.computeSquareCenter(key as cg.Key, asWhite, bounds);
     if (util.distanceSq(center, pos) <= radiusSq) return true;
@@ -86,8 +98,12 @@ function pieceCloseTo(s: State, pos: cg.NumberPair): boolean {
   return false;
 }
 
-export function dragNewPiece(s: State, piece: cg.Piece, e: cg.MouchEvent, force?: boolean): void {
-
+export function dragNewPiece(
+  s: State,
+  piece: cg.Piece,
+  e: cg.MouchEvent,
+  force?: boolean
+): void {
   const key: cg.Key = 'a0';
   s.pieces.set(key, piece);
   s.dom.redraw();
@@ -103,7 +119,7 @@ export function dragNewPiece(s: State, piece: cg.Piece, e: cg.MouchEvent, force?
     element: () => pieceElementByKey(s, key),
     originTarget: e.target,
     newPiece: true,
-    force: !!force
+    force: !!force,
   };
   processDrag(s);
 }
@@ -113,14 +129,19 @@ function processDrag(s: State): void {
     const cur = s.draggable.current;
     if (!cur) return;
     // cancel animations while dragging
-    if (s.animation.current?.plan.anims.has(cur.orig)) s.animation.current = undefined;
+    if (s.animation.current?.plan.anims.has(cur.orig))
+      s.animation.current = undefined;
     // if moving piece is gone, cancel
     const origPiece = s.pieces.get(cur.orig);
     if (!origPiece || !util.samePiece(origPiece, cur.piece)) cancel(s);
     else {
-      if (!cur.started && util.distanceSq(cur.pos, cur.origPos) >= Math.pow(s.draggable.distance, 2)) cur.started = true;
+      if (
+        !cur.started &&
+        util.distanceSq(cur.pos, cur.origPos) >=
+          Math.pow(s.draggable.distance, 2)
+      )
+        cur.started = true;
       if (cur.started) {
-
         // support lazy elements
         if (typeof cur.element === 'function') {
           const found = cur.element();
@@ -133,7 +154,7 @@ function processDrag(s: State): void {
         const bounds = s.dom.bounds();
         util.translateAbs(cur.element, [
           cur.pos[0] - bounds.left - bounds.width / 16,
-          cur.pos[1] - bounds.top - bounds.height / 16
+          cur.pos[1] - bounds.top - bounds.height / 16,
         ]);
       }
     }
@@ -163,7 +184,11 @@ export function end(s: State, e: cg.MouchEvent): void {
   board.unsetPredrop(s);
   // touchend has no position; so use the last touchmove position instead
   const eventPos = util.eventPosition(e) || cur.pos;
-  const dest = board.getKeyAtDomPos(eventPos, board.whitePov(s), s.dom.bounds());
+  const dest = board.getKeyAtDomPos(
+    eventPos,
+    board.whitePov(s),
+    s.dom.bounds()
+  );
   if (dest && cur.started && cur.orig !== dest) {
     if (cur.newPiece) board.dropNewPiece(s, cur.orig, dest, cur.force);
     else {
@@ -202,11 +227,14 @@ function removeDragElements(s: State): void {
   if (e.ghost) util.setVisible(e.ghost, false);
 }
 
-
 function pieceElementByKey(s: State, key: cg.Key): cg.PieceNode | undefined {
   let el = s.dom.elements.board.firstChild;
   while (el) {
-    if ((el as cg.KeyedNode).cgKey === key && (el as cg.KeyedNode).tagName === 'PIECE') return el as cg.PieceNode;
+    if (
+      (el as cg.KeyedNode).cgKey === key &&
+      (el as cg.KeyedNode).tagName === 'PIECE'
+    )
+      return el as cg.PieceNode;
     el = el.nextSibling;
   }
   return;
