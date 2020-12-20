@@ -44,6 +44,10 @@ cg-board square {
   pointer-events: none;
 }
 
+cg-board square.move-dest {
+  pointer-events: auto;
+}
+
 cg-board square.last-move {
   will-change: transform;
 }
