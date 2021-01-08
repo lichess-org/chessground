@@ -10,7 +10,7 @@ export function renderWrap(
   relative: boolean
 ): Elements {
   // .cg-wrap (element passed to Chessground)
-  //   cg-helper (12.5%)
+  //   cg-helper (12.5%, display: table)
   //     cg-container (800%)
   //       cg-board
   //       svg
