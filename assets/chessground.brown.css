@@ -36,28 +36,16 @@ cg-board square.current-premove {
 }
 
 /** Alternating colors in rank/file labels */
-.cg-wrap.orientation-white coords.ranks coord:nth-child(2n) {
-  color: #b58863;
-}
-.cg-wrap.orientation-white coords.ranks coord:nth-child(2n + 1) {
-  color: #f0d9b5;
-}
-.cg-wrap.orientation-white coords.files coord:nth-child(2n) {
-  color: #b58863;
-}
-.cg-wrap.orientation-white coords.files coord:nth-child(2n + 1) {
-  color: #f0d9b5;
-}
-
-.cg-wrap.orientation-black coords.ranks coord:nth-child(2n) {
-  color: #f0d9b5;
-}
-.cg-wrap.orientation-black coords.ranks coord:nth-child(2n + 1) {
-  color: #b58863;
-}
-.cg-wrap.orientation-black coords.files coord:nth-child(2n) {
-  color: #f0d9b5;
-}
+.cg-wrap.orientation-white coords.ranks coord:nth-child(2n),
+.cg-wrap.orientation-white coords.files coord:nth-child(2n),
+.cg-wrap.orientation-black coords.ranks coord:nth-child(2n + 1),
 .cg-wrap.orientation-black coords.files coord:nth-child(2n + 1) {
   color: #b58863;
+}
+
+.cg-wrap.orientation-black coords.ranks coord:nth-child(2n),
+.cg-wrap.orientation-black coords.files coord:nth-child(2n),
+.cg-wrap.orientation-white coords.ranks coord:nth-child(2n + 1),
+.cg-wrap.orientation-white coords.files coord:nth-child(2n + 1) {
+  color: #f0d9b5;
 }
