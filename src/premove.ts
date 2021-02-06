@@ -34,19 +34,13 @@ export const queen: Mobility = (x1, y1, x2, y2) => {
   return bishop(x1, y1, x2, y2) || rook(x1, y1, x2, y2);
 };
 
-function king(
-  color: cg.Color,
-  rookFiles: number[],
-  canCastle: boolean
-): Mobility {
+function king(color: cg.Color, rookFiles: number[], canCastle: boolean): Mobility {
   return (x1, y1, x2, y2) =>
     (diff(x1, x2) < 2 && diff(y1, y2) < 2) ||
     (canCastle &&
       y1 === y2 &&
       y1 === (color === 'white' ? 0 : 7) &&
-      ((x1 === 4 &&
-        ((x2 === 2 && rookFiles.includes(0)) ||
-          (x2 === 6 && rookFiles.includes(7)))) ||
+      ((x1 === 4 && ((x2 === 2 && rookFiles.includes(0)) || (x2 === 6 && rookFiles.includes(7)))) ||
         rookFiles.includes(x2)));
 }
 
@@ -61,11 +55,7 @@ function rookFilesOf(pieces: cg.Pieces, color: cg.Color) {
   return files;
 }
 
-export function premove(
-  pieces: cg.Pieces,
-  key: cg.Key,
-  canCastle: boolean
-): cg.Key[] {
+export function premove(pieces: cg.Pieces, key: cg.Key, canCastle: boolean): cg.Key[] {
   const piece = pieces.get(key);
   if (!piece) return [];
   const pos = util.key2pos(key),
@@ -83,10 +73,6 @@ export function premove(
         ? queen
         : king(piece.color, rookFilesOf(pieces, piece.color), canCastle);
   return util.allPos
-    .filter(
-      (pos2) =>
-        (pos[0] !== pos2[0] || pos[1] !== pos2[1]) &&
-        mobility(pos[0], pos[1], pos2[0], pos2[1])
-    )
+    .filter(pos2 => (pos[0] !== pos2[0] || pos[1] !== pos2[1]) && mobility(pos[0], pos[1], pos2[0], pos2[1]))
     .map(util.pos2key);
 }

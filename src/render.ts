@@ -14,9 +14,7 @@ type SquareClasses = Map<cg.Key, string>;
 // in case of bugs, blame @veloce
 export function render(s: State): void {
   const asWhite: boolean = whitePov(s),
-    posToTranslate = s.dom.relative
-      ? util.posToTranslateRel
-      : util.posToTranslateAbs(s.dom.bounds()),
+    posToTranslate = s.dom.relative ? util.posToTranslateRel : util.posToTranslateAbs(s.dom.bounds()),
     translate = s.dom.relative ? util.translateRel : util.translateAbs,
     boardEl: HTMLElement = s.dom.elements.board,
     pieces: cg.Pieces = s.pieces,
@@ -74,14 +72,10 @@ export function render(s: State): void {
           el.cgAnimating = false;
           el.classList.remove('anim');
           translate(el, posToTranslate(key2pos(k), asWhite));
-          if (s.addPieceZIndex)
-            el.style.zIndex = posZIndex(key2pos(k), asWhite);
+          if (s.addPieceZIndex) el.style.zIndex = posZIndex(key2pos(k), asWhite);
         }
         // same piece: flag as same
-        if (
-          elPieceName === pieceNameOf(pieceAtKey) &&
-          (!fading || !el.cgFading)
-        ) {
+        if (elPieceName === pieceNameOf(pieceAtKey) && (!fading || !el.cgFading)) {
           samePieces.add(k);
         }
         // different piece: flag as moved unless it is a fading piece
@@ -182,10 +176,7 @@ export function updateBounds(s: State): void {
   if (s.dom.relative) return;
   const asWhite: boolean = whitePov(s),
     posToTranslate = util.posToTranslateAbs(s.dom.bounds());
-  let el = s.dom.elements.board.firstChild as
-    | cg.PieceNode
-    | cg.SquareNode
-    | undefined;
+  let el = s.dom.elements.board.firstChild as cg.PieceNode | cg.SquareNode | undefined;
   while (el) {
     if ((isPieceNode(el) && !el.cgAnimating) || isSquareNode(el)) {
       util.translateAbs(el, posToTranslate(key2pos(el.cgKey), asWhite));
@@ -233,19 +224,13 @@ function computeSquareClasses(s: State): SquareClasses {
       const pDests = s.premovable.dests;
       if (pDests)
         for (const k of pDests) {
-          addSquare(
-            squares,
-            k,
-            'premove-dest' + (s.pieces.has(k) ? ' oc' : '')
-          );
+          addSquare(squares, k, 'premove-dest' + (s.pieces.has(k) ? ' oc' : ''));
         }
     }
   }
   const premove = s.premovable.current;
-  if (premove)
-    for (const k of premove) addSquare(squares, k, 'current-premove');
-  else if (s.predroppable.current)
-    addSquare(squares, s.predroppable.current.key, 'current-premove');
+  if (premove) for (const k of premove) addSquare(squares, k, 'current-premove');
+  else if (s.predroppable.current) addSquare(squares, s.predroppable.current.key, 'current-premove');
 
   const o = s.exploding;
   if (o) for (const k of o.keys) addSquare(squares, k, 'exploding' + o.stage);

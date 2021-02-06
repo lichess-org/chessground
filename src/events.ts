@@ -29,7 +29,7 @@ export function bindBoard(s: State, boundsUpdated: () => void): void {
   });
 
   if (s.disableContextMenu || s.drawable.enabled) {
-    boardEl.addEventListener('contextmenu', (e) => e.preventDefault());
+    boardEl.addEventListener('contextmenu', e => e.preventDefault());
   }
 }
 
@@ -40,28 +40,22 @@ export function bindDocument(s: State, boundsUpdated: () => void): cg.Unbind {
   // Old versions of Edge and Safari do not support ResizeObserver. Send
   // chessground.resize if a user action has changed the bounds of the board.
   if (!s.dom.relative && s.resizable && !('ResizeObserver' in window)) {
-    unbinds.push(
-      unbindable(document.body, 'chessground.resize', boundsUpdated)
-    );
+    unbinds.push(unbindable(document.body, 'chessground.resize', boundsUpdated));
   }
 
   if (!s.viewOnly) {
     const onmove = dragOrDraw(s, drag.move, draw.move);
     const onend = dragOrDraw(s, drag.end, draw.end);
 
-    for (const ev of ['touchmove', 'mousemove'])
-      unbinds.push(unbindable(document, ev, onmove as EventListener));
-    for (const ev of ['touchend', 'mouseup'])
-      unbinds.push(unbindable(document, ev, onend as EventListener));
+    for (const ev of ['touchmove', 'mousemove']) unbinds.push(unbindable(document, ev, onmove as EventListener));
+    for (const ev of ['touchend', 'mouseup']) unbinds.push(unbindable(document, ev, onend as EventListener));
 
     const onScroll = () => s.dom.bounds.clear();
-    unbinds.push(
-      unbindable(document, 'scroll', onScroll, { capture: true, passive: true })
-    );
+    unbinds.push(unbindable(document, 'scroll', onScroll, { capture: true, passive: true }));
     unbinds.push(unbindable(window, 'resize', onScroll, { passive: true }));
   }
 
-  return () => unbinds.forEach((f) => f());
+  return () => unbinds.forEach(f => f());
 }
 
 function unbindable(
@@ -75,7 +69,7 @@ function unbindable(
 }
 
 function startDragOrDraw(s: State): MouchBind {
-  return (e) => {
+  return e => {
     if (s.draggable.current) drag.cancel(s);
     else if (s.drawable.current) draw.cancel(s);
     else if (e.shiftKey || isRightButton(e)) {
@@ -87,12 +81,8 @@ function startDragOrDraw(s: State): MouchBind {
   };
 }
 
-function dragOrDraw(
-  s: State,
-  withDrag: StateMouchBind,
-  withDraw: StateMouchBind
-): MouchBind {
-  return (e) => {
+function dragOrDraw(s: State, withDrag: StateMouchBind, withDraw: StateMouchBind): MouchBind {
+  return e => {
     if (s.drawable.current) {
       if (s.drawable.enabled) withDraw(s, e);
     } else if (!s.viewOnly) withDrag(s, e);

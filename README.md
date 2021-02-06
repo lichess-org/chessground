@@ -1,12 +1,11 @@
-Chessground
-===========
+# Chessground
 
 [![Continuous Integration](https://github.com/ornicar/chessground/workflows/Continuous%20Integration/badge.svg)](https://github.com/ornicar/chessground/actions?query=workflow%3A%22Continuous+Integration%22)
 [![npm](https://img.shields.io/npm/v/chessground)](https://www.npmjs.com/package/chessground)
 
 ![Chessground in 2D and 3D](/screenshot/twin.jpg)
 
-*Chessground* is a free/libre open source chess UI developed for
+_Chessground_ is a free/libre open source chess UI developed for
 [lichess.org](https://lichess.org).
 It targets modern browsers, as well as mobile development using Cordova.
 
@@ -90,16 +89,19 @@ More? Please make a pull request to include it here.
 ## Development
 
 Install build dependencies:
+
 ```sh
 yarn install
 ```
 
 To build the node module:
+
 ```sh
 yarn run compile -- --watch
 ```
 
 To build the standalone:
+
 ```sh
 yarn run dist -- --watch
 ```

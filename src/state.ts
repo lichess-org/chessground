@@ -35,11 +35,7 @@ export interface HeadlessState {
     showDests: boolean; // whether to add the move-dest class on squares
     events: {
       after?: (orig: cg.Key, dest: cg.Key, metadata: cg.MoveMetadata) => void; // called after the move has been played
-      afterNewPiece?: (
-        role: cg.Role,
-        key: cg.Key,
-        metadata: cg.MoveMetadata
-      ) => void; // called after a new piece is dropped on the board
+      afterNewPiece?: (role: cg.Role, key: cg.Key, metadata: cg.MoveMetadata) => void; // called after a new piece is dropped on the board
     };
     rookCastle: boolean; // castle by moving the king to the rook
   };
@@ -50,11 +46,7 @@ export interface HeadlessState {
     dests?: cg.Key[]; // premove destinations for the current selection
     current?: cg.KeyPair; // keys of the current saved premove ["e2" "e4"]
     events: {
-      set?: (
-        orig: cg.Key,
-        dest: cg.Key,
-        metadata?: cg.SetPremoveMetadata
-      ) => void; // called after the premove has been set
+      set?: (orig: cg.Key, dest: cg.Key, metadata?: cg.SetPremoveMetadata) => void; // called after the premove has been set
       unset?: () => void; // called after the premove has been unset
     };
   };

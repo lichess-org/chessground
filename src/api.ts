@@ -85,9 +85,8 @@ export function start(state: State, redrawAll: cg.Redraw): Api {
 
   return {
     set(config): void {
-      if (config.orientation && config.orientation !== state.orientation)
-        toggleOrientation();
-      (config.fen ? anim : render)((state) => configure(state, config), state);
+      if (config.orientation && config.orientation !== state.orientation) toggleOrientation();
+      (config.fen ? anim : render)(state => configure(state, config), state);
     },
 
     state,
@@ -97,11 +96,11 @@ export function start(state: State, redrawAll: cg.Redraw): Api {
     toggleOrientation,
 
     setPieces(pieces): void {
-      anim((state) => board.setPieces(state, pieces), state);
+      anim(state => board.setPieces(state, pieces), state);
     },
 
     selectSquare(key, force): void {
-      if (key) anim((state) => board.selectSquare(state, key, force), state);
+      if (key) anim(state => board.selectSquare(state, key, force), state);
       else if (state.selected) {
         board.unselect(state);
         state.dom.redraw();
@@ -109,11 +108,11 @@ export function start(state: State, redrawAll: cg.Redraw): Api {
     },
 
     move(orig, dest): void {
-      anim((state) => board.baseMove(state, orig, dest), state);
+      anim(state => board.baseMove(state, orig, dest), state);
     },
 
     newPiece(piece, key): void {
-      anim((state) => board.baseNewPiece(state, piece, key), state);
+      anim(state => board.baseNewPiece(state, piece, key), state);
     },
 
     playPremove(): boolean {
@@ -143,14 +142,14 @@ export function start(state: State, redrawAll: cg.Redraw): Api {
     },
 
     cancelMove(): void {
-      render((state) => {
+      render(state => {
         board.cancelMove(state);
         dragCancel(state);
       }, state);
     },
 
     stop(): void {
-      render((state) => {
+      render(state => {
         board.stop(state);
         dragCancel(state);
       }, state);
@@ -161,19 +160,15 @@ export function start(state: State, redrawAll: cg.Redraw): Api {
     },
 
     setAutoShapes(shapes: DrawShape[]): void {
-      render((state) => (state.drawable.autoShapes = shapes), state);
+      render(state => (state.drawable.autoShapes = shapes), state);
     },
 
     setShapes(shapes: DrawShape[]): void {
-      render((state) => (state.drawable.shapes = shapes), state);
+      render(state => (state.drawable.shapes = shapes), state);
     },
 
     getKeyAtDomPos(pos): cg.Key | undefined {
-      return board.getKeyAtDomPos(
-        pos,
-        board.whitePov(state),
-        state.dom.bounds()
-      );
+      return board.getKeyAtDomPos(pos, board.whitePov(state), state.dom.bounds());
     },
 
     redrawAll,

@@ -1,5 +1,5 @@
+node_modules/
+
 /*.js
 /*.d.ts
 /*.js.map
-node_modules
-npm-debug.log

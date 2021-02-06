@@ -1,13 +1,6 @@
 import { State } from './state';
 import { key2pos } from './util';
-import {
-  Drawable,
-  DrawShape,
-  DrawShapePiece,
-  DrawBrush,
-  DrawBrushes,
-  DrawModifiers,
-} from './draw';
+import { Drawable, DrawShape, DrawShapePiece, DrawBrush, DrawBrushes, DrawModifiers } from './draw';
 import * as cg from './types';
 
 export function createElement(tagName: string): SVGElement {
@@ -51,7 +44,7 @@ export function renderSvg(state: State, root: SVGElement): void {
       hash: shapeHash(cur, arrowDests, true, bounds),
     });
 
-  const fullHash = shapes.map((sc) => sc.hash).join(';');
+  const fullHash = shapes.map(sc => sc.hash).join(';');
   if (fullHash === state.drawable.prevSvgHash) return;
   state.drawable.prevSvgHash = fullHash;
 
@@ -110,8 +103,7 @@ function syncShapes(
   for (const el of toRemove) root.removeChild(el);
   // insert shapes that are not yet in dom
   for (const sc of shapes) {
-    if (!hashesInDom.get(sc.hash))
-      root.appendChild(renderShape(state, sc, brushes, arrowDests, bounds));
+    if (!hashesInDom.get(sc.hash)) root.appendChild(renderShape(state, sc, brushes, arrowDests, bounds));
   }
 }
 
@@ -132,12 +124,12 @@ function shapeHash(
     piece && pieceHash(piece),
     modifiers && modifiersHash(modifiers),
   ]
-    .filter((x) => x)
+    .filter(x => x)
     .join(',');
 }
 
 function pieceHash(piece: DrawShapePiece): Hash {
-  return [piece.color, piece.role, piece.scale].filter((x) => x).join(',');
+  return [piece.color, piece.role, piece.scale].filter(x => x).join(',');
 }
 
 function modifiersHash(m: DrawModifiers): Hash {
@@ -178,12 +170,7 @@ function renderShape(
   return el;
 }
 
-function renderCircle(
-  brush: DrawBrush,
-  pos: cg.Pos,
-  current: boolean,
-  bounds: ClientRect
-): SVGElement {
+function renderCircle(brush: DrawBrush, pos: cg.Pos, current: boolean, bounds: ClientRect): SVGElement {
   const o = pos2px(pos, bounds),
     widths = circleWidth(bounds),
     radius = (bounds.width + bounds.height) / 32;
@@ -227,17 +214,10 @@ function renderArrow(
   });
 }
 
-function renderPiece(
-  baseUrl: string,
-  pos: cg.Pos,
-  piece: DrawShapePiece,
-  bounds: ClientRect
-): SVGElement {
+function renderPiece(baseUrl: string, pos: cg.Pos, piece: DrawShapePiece, bounds: ClientRect): SVGElement {
   const o = pos2px(pos, bounds),
     size = (bounds.width / 8) * (piece.scale || 1),
-    name =
-      piece.color[0] +
-      (piece.role === 'knight' ? 'n' : piece.role[0]).toUpperCase();
+    name = piece.color[0] + (piece.role === 'knight' ? 'n' : piece.role[0]).toUpperCase();
   return setAttributes(createElement('image'), {
     className: `${piece.role} ${piece.color}`,
     x: o[0] - size / 2,
@@ -267,10 +247,7 @@ function renderMarker(brush: DrawBrush): SVGElement {
   return marker;
 }
 
-function setAttributes(
-  el: SVGElement,
-  attrs: { [key: string]: any }
-): SVGElement {
+function setAttributes(el: SVGElement, attrs: { [key: string]: any }): SVGElement {
   for (const key in attrs) el.setAttribute(key, attrs[key]);
   return el;
 }
@@ -284,7 +261,7 @@ function makeCustomBrush(base: DrawBrush, modifiers: DrawModifiers): DrawBrush {
     color: base.color,
     opacity: Math.round(base.opacity * 10) / 10,
     lineWidth: Math.round(modifiers.lineWidth || base.lineWidth),
-    key: [base.key, modifiers.lineWidth].filter((x) => x).join(''),
+    key: [base.key, modifiers.lineWidth].filter(x => x).join(''),
   };
 }
 
@@ -293,14 +270,8 @@ function circleWidth(bounds: ClientRect): [number, number] {
   return [3 * base, 4 * base];
 }
 
-function lineWidth(
-  brush: DrawBrush,
-  current: boolean,
-  bounds: ClientRect
-): number {
-  return (
-    (((brush.lineWidth || 10) * (current ? 0.85 : 1)) / 512) * bounds.width
-  );
+function lineWidth(brush: DrawBrush, current: boolean, bounds: ClientRect): number {
+  return (((brush.lineWidth || 10) * (current ? 0.85 : 1)) / 512) * bounds.width;
 }
 
 function opacity(brush: DrawBrush, current: boolean): number {
@@ -312,8 +283,5 @@ function arrowMargin(bounds: ClientRect, shorten: boolean): number {
 }
 
 function pos2px(pos: cg.Pos, bounds: ClientRect): cg.NumberPair {
-  return [
-    ((pos[0] + 0.5) * bounds.width) / 8,
-    ((7.5 - pos[1]) * bounds.height) / 8,
-  ];
+  return [((pos[0] + 0.5) * bounds.width) / 8, ((7.5 - pos[1]) * bounds.height) / 8];
 }

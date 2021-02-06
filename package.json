@@ -12,7 +12,6 @@
     "@typescript-eslint/eslint-plugin": "^4",
     "@typescript-eslint/parser": "^4",
     "eslint": "^7",
-    "eslint-config-prettier": "^7",
     "prettier": "^2",
     "rollup": "^2",
     "rollup-plugin-terser": "^7",
@@ -23,8 +22,8 @@
     "prepare": "npm run compile",
     "compile": "tsc --outDir . --sourceMap --declaration",
     "lint": "eslint src/*.ts",
-    "format": "prettier --write src/*.ts",
-    "check-format": "prettier --check src/*.ts",
+    "format": "prettier --write .",
+    "check-format": "prettier --check .",
     "dist": "rollup --config"
   },
   "files": [

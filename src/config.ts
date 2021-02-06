@@ -33,11 +33,7 @@ export interface Config {
     showDests?: boolean; // whether to add the move-dest class on squares
     events?: {
       after?: (orig: cg.Key, dest: cg.Key, metadata: cg.MoveMetadata) => void; // called after the move has been played
-      afterNewPiece?: (
-        role: cg.Role,
-        key: cg.Key,
-        metadata: cg.MoveMetadata
-      ) => void; // called after a new piece is dropped on the board
+      afterNewPiece?: (role: cg.Role, key: cg.Key, metadata: cg.MoveMetadata) => void; // called after a new piece is dropped on the board
     };
     rookCastle?: boolean; // castle by moving the king to the rook
   };
@@ -47,11 +43,7 @@ export interface Config {
     castle?: boolean; // whether to allow king castle premoves
     dests?: cg.Key[]; // premove destinations for the current selection
     events?: {
-      set?: (
-        orig: cg.Key,
-        dest: cg.Key,
-        metadata?: cg.SetPremoveMetadata
-      ) => void; // called after the premove has been set
+      set?: (orig: cg.Key, dest: cg.Key, metadata?: cg.SetPremoveMetadata) => void; // called after the premove has been set
       unset?: () => void; // called after the premove has been unset
     };
   };
@@ -111,8 +103,7 @@ export function configure(state: HeadlessState, config: Config): void {
 
   // apply config values that could be undefined yet meaningful
   if (config.hasOwnProperty('check')) setCheck(state, config.check || false);
-  if (config.hasOwnProperty('lastMove') && !config.lastMove)
-    state.lastMove = undefined;
+  if (config.hasOwnProperty('lastMove') && !config.lastMove) state.lastMove = undefined;
   // in case of ZH drop last move, there's a single square.
   // if the previous last move had two squares,
   // the merge algorithm will incorrectly keep the second square.
@@ -122,8 +113,7 @@ export function configure(state: HeadlessState, config: Config): void {
   if (state.selected) setSelected(state, state.selected);
 
   // no need for such short animations
-  if (!state.animation.duration || state.animation.duration < 100)
-    state.animation.enabled = false;
+  if (!state.animation.duration || state.animation.duration < 100) state.animation.enabled = false;
 
   if (!state.movable.rookCastle && state.movable.dests) {
     const rank = state.movable.color === 'white' ? '1' : '8',
@@ -134,7 +124,7 @@ export function configure(state: HeadlessState, config: Config): void {
     state.movable.dests.set(
       kingStartPos,
       dests.filter(
-        (d) =>
+        d =>
           !(d === 'a' + rank && dests.includes(('c' + rank) as cg.Key)) &&
           !(d === 'h' + rank && dests.includes(('g' + rank) as cg.Key))
       )
@@ -144,8 +134,7 @@ export function configure(state: HeadlessState, config: Config): void {
 
 function merge(base: any, extend: any): void {
   for (const key in extend) {
-    if (isObject(base[key]) && isObject(extend[key]))
-      merge(base[key], extend[key]);
+    if (isObject(base[key]) && isObject(extend[key])) merge(base[key], extend[key]);
     else base[key] = extend[key];
   }
 }

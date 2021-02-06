@@ -57,9 +57,9 @@ export function read(fen: cg.FEN): cg.Pieces {
 
 export function write(pieces: cg.Pieces): cg.FEN {
   return invRanks
-    .map((y) =>
+    .map(y =>
       cg.files
-        .map((x) => {
+        .map(x => {
           const piece = pieces.get((x + y) as cg.Key);
           if (piece) {
             const letter = letters[piece.role];
@@ -69,5 +69,5 @@ export function write(pieces: cg.Pieces): cg.FEN {
         .join('')
     )
     .join('/')
-    .replace(/1{2,}/g, (s) => s.length.toString());
+    .replace(/1{2,}/g, s => s.length.toString());
 }
