@@ -9,6 +9,7 @@ export interface DrawShape {
   brush: string;
   modifiers?: DrawModifiers;
   piece?: DrawShapePiece;
+  customSvg?: string;
 }
 
 export interface DrawShapePiece {

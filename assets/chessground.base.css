@@ -98,7 +98,8 @@ piece.fading {
   opacity: 0.5;
 }
 
-.cg-wrap svg {
+/* NOTE: Only direct descendent so that it won't affect nested svg from DrawShape.customSvg */
+cg-container > svg {
   overflow: hidden;
   position: relative;
   top: 0px;

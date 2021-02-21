@@ -108,7 +108,7 @@ function syncShapes(
 }
 
 function shapeHash(
-  { orig, dest, brush, piece, modifiers }: DrawShape,
+  { orig, dest, brush, piece, modifiers, customSvg }: DrawShape,
   arrowDests: ArrowDests,
   current: boolean,
   bounds: ClientRect
@@ -123,6 +123,7 @@ function shapeHash(
     dest && (arrowDests.get(dest) || 0) > 1,
     piece && pieceHash(piece),
     modifiers && modifiersHash(modifiers),
+    customSvg && customSvgHash(customSvg),
   ]
     .filter(x => x)
     .join(',');
@@ -136,6 +137,15 @@ function modifiersHash(m: DrawModifiers): Hash {
   return '' + (m.lineWidth || '');
 }
 
+function customSvgHash(s: string): Hash {
+  // Rolling hash with base 31 (cf. https://stackoverflow.com/questions/7616461/generate-a-hash-from-string-in-javascript)
+  let h = 0;
+  for (let i = 0; i < s.length; i++) {
+    h = (((h << 5) - h) + s.charCodeAt(i)) >>> 0;
+  }
+  return 'custom-' + h.toString();
+}
+
 function renderShape(
   state: State,
   { shape, current, hash }: Shape,
@@ -144,7 +154,11 @@ function renderShape(
   bounds: ClientRect
 ): SVGElement {
   let el: SVGElement;
-  if (shape.piece)
+  if (shape.customSvg) {
+    const orig = orient(key2pos(shape.orig), state.orientation)
+    el = renderCustomSvg(shape.customSvg, orig, bounds);
+  }
+  else if (shape.piece)
     el = renderPiece(
       state.drawable.pieces.baseUrl,
       orient(key2pos(shape.orig), state.orientation),
@@ -168,6 +182,26 @@ function renderShape(
   }
   el.setAttribute('cgHash', hash);
   return el;
+}
+
+function renderCustomSvg(customSvg: string, pos: cg.Pos, bounds: ClientRect): SVGElement {
+  const { width, height } = bounds;
+  const w = width / 8;
+  const h = height / 8;
+  const x = pos[0] * w;
+  const y = (7 - pos[1]) * h;
+
+  // Translate to top-left of `orig` square
+  const g = createElement('g');
+  setAttributes(g, { transform: `translate(${x},${y})` });
+
+  // Give 100x100 coordinate system to the user for `orig` square
+  const svg = createElement('svg');
+  setAttributes(svg, { width: w, height: h, viewBox: `0 0 100 100` });
+  g.appendChild(svg);
+  svg.innerHTML = customSvg;
+
+  return g;
 }
 
 function renderCircle(brush: DrawBrush, pos: cg.Pos, current: boolean, bounds: ClientRect): SVGElement {
