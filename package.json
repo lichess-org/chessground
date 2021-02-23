@@ -1,6 +1,6 @@
 {
   "name": "chessground",
-  "version": "",
+  "version": "7.10.0",
   "description": "lichess.org chess ui",
   "type": "commonjs",
   "main": "chessground.js",
