@@ -19,7 +19,7 @@ type ArrowDests = Map<cg.Key, number>; // how many arrows land on a square
 
 type Hash = string;
 
-export function renderSvg(state: State, root: SVGElement): void {
+export function renderSvg(state: State, svg: SVGElement, customSvg: SVGElement): void {
   const d = state.drawable,
     curD = d.current,
     cur = curD && curD.mouseSq ? (curD as DrawShape) : undefined,
@@ -48,10 +48,30 @@ export function renderSvg(state: State, root: SVGElement): void {
   if (fullHash === state.drawable.prevSvgHash) return;
   state.drawable.prevSvgHash = fullHash;
 
-  const defsEl = root.firstChild as SVGElement;
+  /*
+    -- DOM hierarchy --
+    <svg class="cg-shapes">      (<= svg)
+      <defs>
+        ...(for brushes)...
+      </defs>
+      <g>
+        ...(for arrows, circles, and pieces)...
+      </g>
+    </svg>
+    <svg class="cg-custom-svgs"> (<= customSvg)
+      <g>
+        ...(for custom svgs)...
+      </g>
+    </svg>
+  */
+
+  const defsEl = svg.querySelector('defs') as SVGElement;
+  const shapesEl = svg.querySelector('g') as SVGElement;
+  const customSvgsEl = customSvg.querySelector('g') as SVGElement;
 
   syncDefs(d, shapes, defsEl);
-  syncShapes(state, shapes, d.brushes, arrowDests, root, defsEl);
+  syncShapes(state, shapes.filter(s => !s.shape.customSvg), d.brushes, arrowDests, shapesEl);
+  syncShapes(state, shapes.filter(s =>  s.shape.customSvg), d.brushes, arrowDests, customSvgsEl);
 }
 
 // append only. Don't try to update/remove.
@@ -60,7 +80,7 @@ function syncDefs(d: Drawable, shapes: Shape[], defsEl: SVGElement) {
   let brush: DrawBrush;
   for (const s of shapes) {
     if (s.shape.dest) {
-      brush = d.brushes[s.shape.brush];
+      brush = d.brushes[s.shape.brush!];
       if (s.shape.modifiers) brush = makeCustomBrush(brush, s.shape.modifiers);
       brushes.set(brush.key, brush);
     }
@@ -83,13 +103,12 @@ function syncShapes(
   brushes: DrawBrushes,
   arrowDests: ArrowDests,
   root: SVGElement,
-  defsEl: SVGElement
 ): void {
   const bounds = state.dom.bounds(),
     hashesInDom = new Map(), // by hash
     toRemove: SVGElement[] = [];
   for (const sc of shapes) hashesInDom.set(sc.hash, false);
-  let el: SVGElement | undefined = defsEl.nextSibling as SVGElement,
+  let el: SVGElement | undefined = root.firstChild as SVGElement,
     elHash: Hash;
   while (el) {
     elHash = el.getAttribute('cgHash') as Hash;
@@ -168,7 +187,7 @@ function renderShape(
   else {
     const orig = orient(key2pos(shape.orig), state.orientation);
     if (shape.dest) {
-      let brush: DrawBrush = brushes[shape.brush];
+      let brush: DrawBrush = brushes[shape.brush!];
       if (shape.modifiers) brush = makeCustomBrush(brush, shape.modifiers);
       el = renderArrow(
         brush,
@@ -178,7 +197,7 @@ function renderShape(
         (arrowDests.get(shape.dest) || 0) > 1,
         bounds
       );
-    } else el = renderCircle(brushes[shape.brush], orig, current, bounds);
+    } else el = renderCircle(brushes[shape.brush!], orig, current, bounds);
   }
   el.setAttribute('cgHash', hash);
   return el;
@@ -192,15 +211,13 @@ function renderCustomSvg(customSvg: string, pos: cg.Pos, bounds: ClientRect): SV
   const y = (7 - pos[1]) * h;
 
   // Translate to top-left of `orig` square
-  const g = createElement('g');
-  setAttributes(g, { transform: `translate(${x},${y})` });
+  const g = setAttributes(createElement('g'), { transform: `translate(${x},${y})` });
 
   // Give 100x100 coordinate system to the user for `orig` square
-  const svg = createElement('svg');
-  setAttributes(svg, { width: w, height: h, viewBox: `0 0 100 100` });
+  const svg = setAttributes(createElement('svg'), { width: w, height: h, viewBox: '0 0 100 100' });
+
   g.appendChild(svg);
   svg.innerHTML = customSvg;
-
   return g;
 }
 
@@ -281,7 +298,7 @@ function renderMarker(brush: DrawBrush): SVGElement {
   return marker;
 }
 
-function setAttributes(el: SVGElement, attrs: { [key: string]: any }): SVGElement {
+export function setAttributes(el: SVGElement, attrs: { [key: string]: any }): SVGElement {
   for (const key in attrs) el.setAttribute(key, attrs[key]);
   return el;
 }
