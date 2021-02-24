@@ -48,10 +48,28 @@ export function renderSvg(state: State, root: SVGElement): void {
   if (fullHash === state.drawable.prevSvgHash) return;
   state.drawable.prevSvgHash = fullHash;
 
-  const defsEl = root.firstChild as SVGElement;
+  /*
+    -- DOM hierarchy --
+    <svg>
+      <defs>
+        ...(for brushes)...
+      </defs>
+      <g class="cg-shapes">
+        ...(for arrows, circles, and pieces)...
+      </g>
+      <g class="cg-custom-svgs">
+        ...(for custom svgs)...
+      </g>
+    </svg>
+  */
+
+  const defsEl = root.querySelector('defs') as SVGElement;
+  const shapesEl = root.querySelector('g.cg-shapes') as SVGElement;
+  const customSvgsEl = root.querySelector('g.cg-custom-svgs') as SVGElement;
 
   syncDefs(d, shapes, defsEl);
-  syncShapes(state, shapes, d.brushes, arrowDests, root, defsEl);
+  syncShapes(state, shapes.filter(s => !s.shape.customSvg), d.brushes, arrowDests, shapesEl);
+  syncShapes(state, shapes.filter(s =>  s.shape.customSvg), d.brushes, arrowDests, customSvgsEl);
 }
 
 // append only. Don't try to update/remove.
@@ -83,13 +101,12 @@ function syncShapes(
   brushes: DrawBrushes,
   arrowDests: ArrowDests,
   root: SVGElement,
-  defsEl: SVGElement
 ): void {
   const bounds = state.dom.bounds(),
     hashesInDom = new Map(), // by hash
     toRemove: SVGElement[] = [];
   for (const sc of shapes) hashesInDom.set(sc.hash, false);
-  let el: SVGElement | undefined = defsEl.nextSibling as SVGElement,
+  let el: SVGElement | undefined = root.firstChild as SVGElement,
     elHash: Hash;
   while (el) {
     elHash = el.getAttribute('cgHash') as Hash;
@@ -192,15 +209,13 @@ function renderCustomSvg(customSvg: string, pos: cg.Pos, bounds: ClientRect): SV
   const y = (7 - pos[1]) * h;
 
   // Translate to top-left of `orig` square
-  const g = createElement('g');
-  setAttributes(g, { transform: `translate(${x},${y})` });
+  const g = setAttributes(createElement('g'), { transform: `translate(${x},${y})` });
 
   // Give 100x100 coordinate system to the user for `orig` square
-  const svg = createElement('svg');
-  setAttributes(svg, { width: w, height: h, viewBox: `0 0 100 100` });
+  const svg = setAttributes(createElement('svg'), { width: w, height: h, viewBox: '0 0 100 100' });
+
   g.appendChild(svg);
   svg.innerHTML = customSvg;
-
   return g;
 }
 
@@ -281,7 +296,7 @@ function renderMarker(brush: DrawBrush): SVGElement {
   return marker;
 }
 
-function setAttributes(el: SVGElement, attrs: { [key: string]: any }): SVGElement {
+export function setAttributes(el: SVGElement, attrs: { [key: string]: any }): SVGElement {
   for (const key in attrs) el.setAttribute(key, attrs[key]);
   return el;
 }

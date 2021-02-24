@@ -108,6 +108,9 @@ cg-container > svg {
   height: 100%;
   pointer-events: none;
   z-index: 2;
+}
+
+cg-container > svg > .cg-shapes {
   opacity: 0.6;
 }
 

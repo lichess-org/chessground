@@ -1,7 +1,7 @@
 import { HeadlessState } from './state';
 import { setVisible, createEl } from './util';
 import { colors, files, ranks } from './types';
-import { createElement as createSVG } from './svg';
+import { createElement as createSVG, setAttributes } from './svg';
 import { Elements } from './types';
 
 export function renderWrap(element: HTMLElement, s: HeadlessState, relative: boolean): Elements {
@@ -10,6 +10,9 @@ export function renderWrap(element: HTMLElement, s: HeadlessState, relative: boo
   //     cg-container (800%)
   //       cg-board
   //       svg
+  //         defs
+  //         g.cg-shapes
+  //         g.cg-custom-svgs
   //       coords.ranks
   //       coords.files
   //       piece.ghost
@@ -37,6 +40,8 @@ export function renderWrap(element: HTMLElement, s: HeadlessState, relative: boo
   if (s.drawable.visible && !relative) {
     svg = createSVG('svg');
     svg.appendChild(createSVG('defs'));
+    svg.appendChild(setAttributes(createSVG('g'), { 'class': 'cg-shapes' }));
+    svg.appendChild(setAttributes(createSVG('g'), { 'class': 'cg-custom-svgs' }));
     container.appendChild(svg);
   }
 
