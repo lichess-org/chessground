@@ -20,13 +20,10 @@ var Chessground = (function () {
 	exports.computeSquareCenter = exports.createEl = exports.isRightButton = exports.eventPosition = exports.setVisible = exports.translateRel = exports.translateAbs = exports.posToTranslateRel = exports.posToTranslateAbs = exports.samePiece = exports.distanceSq = exports.opposite = exports.timer = exports.memo = exports.allPos = exports.key2pos = exports.pos2key = exports.allKeys = exports.invRanks = void 0;
 
 	exports.invRanks = [...types.ranks].reverse();
-	exports.allKeys = Array.prototype.concat(...types.files.map((c) => types.ranks.map((r) => c + r)));
+	exports.allKeys = Array.prototype.concat(...types.files.map(c => types.ranks.map(r => c + r)));
 	const pos2key = (pos) => exports.allKeys[8 * pos[0] + pos[1]];
 	exports.pos2key = pos2key;
-	const key2pos = (k) => [
-	    k.charCodeAt(0) - 97,
-	    k.charCodeAt(1) - 49,
-	];
+	const key2pos = (k) => [k.charCodeAt(0) - 97, k.charCodeAt(1) - 49];
 	exports.key2pos = key2pos;
 	exports.allPos = exports.allKeys.map(exports.key2pos);
 	function memo(f) {
@@ -61,7 +58,7 @@ var Chessground = (function () {
 	    };
 	};
 	exports.timer = timer;
-	const opposite = (c) => c === 'white' ? 'black' : 'white';
+	const opposite = (c) => (c === 'white' ? 'black' : 'white');
 	exports.opposite = opposite;
 	const distanceSq = (pos1, pos2) => {
 	    const dx = pos1[0] - pos2[0], dy = pos1[1] - pos2[1];
@@ -161,9 +158,7 @@ var Chessground = (function () {
 	        (canCastle &&
 	            y1 === y2 &&
 	            y1 === (color === 'white' ? 0 : 7) &&
-	            ((x1 === 4 &&
-	                ((x2 === 2 && rookFiles.includes(0)) ||
-	                    (x2 === 6 && rookFiles.includes(7)))) ||
+	            ((x1 === 4 && ((x2 === 2 && rookFiles.includes(0)) || (x2 === 6 && rookFiles.includes(7)))) ||
 	                rookFiles.includes(x2)));
 	}
 	function rookFilesOf(pieces, color) {
@@ -192,8 +187,7 @@ var Chessground = (function () {
 	                        ? exports.queen
 	                        : king(piece.color, rookFilesOf(pieces, piece.color), canCastle);
 	    return util.allPos
-	        .filter((pos2) => (pos[0] !== pos2[0] || pos[1] !== pos2[1]) &&
-	        mobility(pos[0], pos[1], pos2[0], pos2[1]))
+	        .filter(pos2 => (pos[0] !== pos2[0] || pos[1] !== pos2[1]) && mobility(pos[0], pos[1], pos2[0], pos2[1]))
 	        .map(util.pos2key);
 	}
 	exports.premove = premove;
@@ -431,34 +425,25 @@ var Chessground = (function () {
 	function isMovable(state, orig) {
 	    const piece = state.pieces.get(orig);
 	    return (!!piece &&
-	        (state.movable.color === 'both' ||
-	            (state.movable.color === piece.color && state.turnColor === piece.color)));
+	        (state.movable.color === 'both' || (state.movable.color === piece.color && state.turnColor === piece.color)));
 	}
 	function canMove(state, orig, dest) {
 	    var _a, _b;
-	    return (orig !== dest &&
-	        isMovable(state, orig) &&
-	        (state.movable.free || !!((_b = (_a = state.movable.dests) === null || _a === void 0 ? void 0 : _a.get(orig)) === null || _b === void 0 ? void 0 : _b.includes(dest))));
+	    return (orig !== dest && isMovable(state, orig) && (state.movable.free || !!((_b = (_a = state.movable.dests) === null || _a === void 0 ? void 0 : _a.get(orig)) === null || _b === void 0 ? void 0 : _b.includes(dest))));
 	}
 	exports.canMove = canMove;
 	function canDrop(state, orig, dest) {
 	    const piece = state.pieces.get(orig);
 	    return (!!piece &&
 	        (orig === dest || !state.pieces.has(dest)) &&
-	        (state.movable.color === 'both' ||
-	            (state.movable.color === piece.color && state.turnColor === piece.color)));
+	        (state.movable.color === 'both' || (state.movable.color === piece.color && state.turnColor === piece.color)));
 	}
 	function isPremovable(state, orig) {
 	    const piece = state.pieces.get(orig);
-	    return (!!piece &&
-	        state.premovable.enabled &&
-	        state.movable.color === piece.color &&
-	        state.turnColor !== piece.color);
+	    return !!piece && state.premovable.enabled && state.movable.color === piece.color && state.turnColor !== piece.color;
 	}
 	function canPremove(state, orig, dest) {
-	    return (orig !== dest &&
-	        isPremovable(state, orig) &&
-	        premove_1.premove(state.pieces, orig, state.premovable.castle).includes(dest));
+	    return (orig !== dest && isPremovable(state, orig) && premove_1.premove(state.pieces, orig, state.premovable.castle).includes(dest));
 	}
 	function canPredrop(state, orig, dest) {
 	    const piece = state.pieces.get(orig);
@@ -475,8 +460,7 @@ var Chessground = (function () {
 	    return (!!piece &&
 	        state.draggable.enabled &&
 	        (state.movable.color === 'both' ||
-	            (state.movable.color === piece.color &&
-	                (state.turnColor === piece.color || state.premovable.enabled))));
+	            (state.movable.color === piece.color && (state.turnColor === piece.color || state.premovable.enabled))));
 	}
 	exports.isDraggable = isDraggable;
 	function playPremove(state) {
@@ -539,20 +523,20 @@ var Chessground = (function () {
 	    let rank = 7 - Math.floor((8 * (pos[1] - bounds.top)) / bounds.height);
 	    if (!asWhite)
 	        rank = 7 - rank;
-	    return file >= 0 && file < 8 && rank >= 0 && rank < 8
-	        ? util.pos2key([file, rank])
-	        : undefined;
+	    return file >= 0 && file < 8 && rank >= 0 && rank < 8 ? util.pos2key([file, rank]) : undefined;
 	}
 	exports.getKeyAtDomPos = getKeyAtDomPos;
 	function getSnappedKeyAtDomPos(orig, pos, asWhite, bounds) {
 	    const origPos = util.key2pos(orig);
-	    const validSnapPos = util.allPos.filter((pos2) => {
-	        return (premove_1.queen(origPos[0], origPos[1], pos2[0], pos2[1]) ||
-	            premove_1.knight(origPos[0], origPos[1], pos2[0], pos2[1]));
+	    const validSnapPos = util.allPos.filter(pos2 => {
+	        return premove_1.queen(origPos[0], origPos[1], pos2[0], pos2[1]) || premove_1.knight(origPos[0], origPos[1], pos2[0], pos2[1]);
 	    });
-	    const validSnapCenters = validSnapPos.map((pos2) => util.computeSquareCenter(util.pos2key(pos2), asWhite, bounds));
-	    const validSnapDistances = validSnapCenters.map((pos2) => util.distanceSq(pos, pos2));
-	    const [, closestSnapIndex] = validSnapDistances.reduce((a, b, index) => (a[0] < b ? a : [b, index]), [validSnapDistances[0], 0]);
+	    const validSnapCenters = validSnapPos.map(pos2 => util.computeSquareCenter(util.pos2key(pos2), asWhite, bounds));
+	    const validSnapDistances = validSnapCenters.map(pos2 => util.distanceSq(pos, pos2));
+	    const [, closestSnapIndex] = validSnapDistances.reduce((a, b, index) => (a[0] < b ? a : [b, index]), [
+	        validSnapDistances[0],
+	        0,
+	    ]);
 	    return util.pos2key(validSnapPos[closestSnapIndex]);
 	}
 	exports.getSnappedKeyAtDomPos = getSnappedKeyAtDomPos;
@@ -624,8 +608,8 @@ var Chessground = (function () {
 	exports.read = read;
 	function write(pieces) {
 	    return util.invRanks
-	        .map((y) => types.files
-	        .map((x) => {
+	        .map(y => types.files
+	        .map(x => {
 	        const piece = pieces.get((x + y));
 	        if (piece) {
 	            const letter = letters[piece.role];
@@ -636,7 +620,7 @@ var Chessground = (function () {
 	    })
 	        .join(''))
 	        .join('/')
-	        .replace(/1{2,}/g, (s) => s.length.toString());
+	        .replace(/1{2,}/g, s => s.length.toString());
 	}
 	exports.write = write;
 
@@ -670,7 +654,7 @@ var Chessground = (function () {
 	        const rank = state.movable.color === 'white' ? '1' : '8', kingStartPos = ('e' + rank), dests = state.movable.dests.get(kingStartPos), king = state.pieces.get(kingStartPos);
 	        if (!dests || !king || king.role !== 'king')
 	            return;
-	        state.movable.dests.set(kingStartPos, dests.filter((d) => !(d === 'a' + rank && dests.includes(('c' + rank))) &&
+	        state.movable.dests.set(kingStartPos, dests.filter(d => !(d === 'a' + rank && dests.includes(('c' + rank))) &&
 	            !(d === 'h' + rank && dests.includes(('g' + rank)))));
 	    }
 	}
@@ -694,9 +678,7 @@ var Chessground = (function () {
 	exports.render = exports.anim = void 0;
 
 	function anim(mutation, state) {
-	    return state.animation.enabled
-	        ? animate(mutation, state)
-	        : render(mutation, state);
+	    return state.animation.enabled ? animate(mutation, state) : render(mutation, state);
 	}
 	exports.anim = anim;
 	function render(mutation, state) {
@@ -714,7 +696,7 @@ var Chessground = (function () {
 	}
 	function closer(piece, pieces) {
 	    return pieces.sort((p1, p2) => {
-	        return (util.distanceSq(piece.pos, p1.pos) - util.distanceSq(piece.pos, p2.pos));
+	        return util.distanceSq(piece.pos, p1.pos) - util.distanceSq(piece.pos, p2.pos);
 	    })[0];
 	}
 	function computePlan(prevPieces, current) {
@@ -740,7 +722,7 @@ var Chessground = (function () {
 	            missings.push(preP);
 	    }
 	    for (const newP of news) {
-	        preP = closer(newP, missings.filter((p) => util.samePiece(newP.piece, p.piece)));
+	        preP = closer(newP, missings.filter(p => util.samePiece(newP.piece, p.piece)));
 	        if (preP) {
 	            vector = [preP.pos[0] - newP.pos[0], preP.pos[1] - newP.pos[1]];
 	            anims.set(newP.key, vector.concat(vector));
@@ -887,7 +869,7 @@ var Chessground = (function () {
 	    const sameShape = (s) => s.orig === cur.orig && s.dest === cur.dest;
 	    const similar = drawable.shapes.find(sameShape);
 	    if (similar)
-	        drawable.shapes = drawable.shapes.filter((s) => !sameShape(s));
+	        drawable.shapes = drawable.shapes.filter(s => !sameShape(s));
 	    if (!similar || similar.brush !== cur.brush)
 	        drawable.shapes.push(cur);
 	    onChange(drawable);
@@ -916,22 +898,16 @@ var Chessground = (function () {
 	        return;
 	    const piece = s.pieces.get(orig);
 	    const previouslySelected = s.selected;
-	    if (!previouslySelected &&
-	        s.drawable.enabled &&
-	        (s.drawable.eraseOnClick || !piece || piece.color !== s.turnColor))
+	    if (!previouslySelected && s.drawable.enabled && (s.drawable.eraseOnClick || !piece || piece.color !== s.turnColor))
 	        draw.clear(s);
 	    if (e.cancelable !== false &&
-	        (!e.touches ||
-	            !s.movable.color ||
-	            piece ||
-	            previouslySelected ||
-	            pieceCloseTo(s, position)))
+	        (!e.touches || !s.movable.color || piece || previouslySelected || pieceCloseTo(s, position)))
 	        e.preventDefault();
 	    const hadPremove = !!s.premovable.current;
 	    const hadPredrop = !!s.predroppable.current;
 	    s.stats.ctrlKey = e.ctrlKey;
 	    if (s.selected && board.canMove(s, s.selected, orig)) {
-	        anim_1.anim((state) => board.selectSquare(state, orig), s);
+	        anim_1.anim(state => board.selectSquare(state, orig), s);
 	    }
 	    else {
 	        board.selectSquare(s, orig);
@@ -1008,9 +984,7 @@ var Chessground = (function () {
 	        if (!origPiece || !util.samePiece(origPiece, cur.piece))
 	            cancel(s);
 	        else {
-	            if (!cur.started &&
-	                util.distanceSq(cur.pos, cur.origPos) >=
-	                    Math.pow(s.draggable.distance, 2))
+	            if (!cur.started && util.distanceSq(cur.pos, cur.origPos) >= Math.pow(s.draggable.distance, 2))
 	                cur.started = true;
 	            if (cur.started) {
 	                if (typeof cur.element === 'function') {
@@ -1096,8 +1070,7 @@ var Chessground = (function () {
 	function pieceElementByKey(s, key) {
 	    let el = s.dom.elements.board.firstChild;
 	    while (el) {
-	        if (el.cgKey === key &&
-	            el.tagName === 'PIECE')
+	        if (el.cgKey === key && el.tagName === 'PIECE')
 	            return el;
 	        el = el.nextSibling;
 	    }
@@ -1148,27 +1121,27 @@ var Chessground = (function () {
 	        set(config$1) {
 	            if (config$1.orientation && config$1.orientation !== state.orientation)
 	                toggleOrientation();
-	            (config$1.fen ? anim_1.anim : anim_1.render)((state) => config.configure(state, config$1), state);
+	            (config$1.fen ? anim_1.anim : anim_1.render)(state => config.configure(state, config$1), state);
 	        },
 	        state,
 	        getFen: () => fen.write(state.pieces),
 	        toggleOrientation,
 	        setPieces(pieces) {
-	            anim_1.anim((state) => board.setPieces(state, pieces), state);
+	            anim_1.anim(state => board.setPieces(state, pieces), state);
 	        },
 	        selectSquare(key, force) {
 	            if (key)
-	                anim_1.anim((state) => board.selectSquare(state, key, force), state);
+	                anim_1.anim(state => board.selectSquare(state, key, force), state);
 	            else if (state.selected) {
 	                board.unselect(state);
 	                state.dom.redraw();
 	            }
 	        },
 	        move(orig, dest) {
-	            anim_1.anim((state) => board.baseMove(state, orig, dest), state);
+	            anim_1.anim(state => board.baseMove(state, orig, dest), state);
 	        },
 	        newPiece(piece, key) {
-	            anim_1.anim((state) => board.baseNewPiece(state, piece, key), state);
+	            anim_1.anim(state => board.baseNewPiece(state, piece, key), state);
 	        },
 	        playPremove() {
 	            if (state.premovable.current) {
@@ -1193,13 +1166,13 @@ var Chessground = (function () {
 	            anim_1.render(board.unsetPredrop, state);
 	        },
 	        cancelMove() {
-	            anim_1.render((state) => {
+	            anim_1.render(state => {
 	                board.cancelMove(state);
 	                drag.cancel(state);
 	            }, state);
 	        },
 	        stop() {
-	            anim_1.render((state) => {
+	            anim_1.render(state => {
 	                board.stop(state);
 	                drag.cancel(state);
 	            }, state);
@@ -1208,10 +1181,10 @@ var Chessground = (function () {
 	            explosion_1.explosion(state, keys);
 	        },
 	        setAutoShapes(shapes) {
-	            anim_1.render((state) => (state.drawable.autoShapes = shapes), state);
+	            anim_1.render(state => (state.drawable.autoShapes = shapes), state);
 	        },
 	        setShapes(shapes) {
-	            anim_1.render((state) => (state.drawable.shapes = shapes), state);
+	            anim_1.render(state => (state.drawable.shapes = shapes), state);
 	        },
 	        getKeyAtDomPos(pos) {
 	            return board.getKeyAtDomPos(pos, board.whitePov(state), state.dom.bounds());
@@ -1326,13 +1299,13 @@ var Chessground = (function () {
 
 	var svg = createCommonjsModule(function (module, exports) {
 	Object.defineProperty(exports, "__esModule", { value: true });
-	exports.renderSvg = exports.createElement = void 0;
+	exports.setAttributes = exports.renderSvg = exports.createElement = void 0;
 
 	function createElement(tagName) {
 	    return document.createElementNS('http://www.w3.org/2000/svg', tagName);
 	}
 	exports.createElement = createElement;
-	function renderSvg(state, root) {
+	function renderSvg(state, svg, customSvg) {
 	    const d = state.drawable, curD = d.current, cur = curD && curD.mouseSq ? curD : undefined, arrowDests = new Map(), bounds = state.dom.bounds();
 	    for (const s of d.shapes.concat(d.autoShapes).concat(cur ? [cur] : [])) {
 	        if (s.dest)
@@ -1351,13 +1324,16 @@ var Chessground = (function () {
 	            current: true,
 	            hash: shapeHash(cur, arrowDests, true, bounds),
 	        });
-	    const fullHash = shapes.map((sc) => sc.hash).join(';');
+	    const fullHash = shapes.map(sc => sc.hash).join(';');
 	    if (fullHash === state.drawable.prevSvgHash)
 	        return;
 	    state.drawable.prevSvgHash = fullHash;
-	    const defsEl = root.firstChild;
+	    const defsEl = svg.querySelector('defs');
+	    const shapesEl = svg.querySelector('g');
+	    const customSvgsEl = customSvg.querySelector('g');
 	    syncDefs(d, shapes, defsEl);
-	    syncShapes(state, shapes, d.brushes, arrowDests, root, defsEl);
+	    syncShapes(state, shapes.filter(s => !s.shape.customSvg), d.brushes, arrowDests, shapesEl);
+	    syncShapes(state, shapes.filter(s => s.shape.customSvg), d.brushes, arrowDests, customSvgsEl);
 	}
 	exports.renderSvg = renderSvg;
 	function syncDefs(d, shapes, defsEl) {
@@ -1382,11 +1358,11 @@ var Chessground = (function () {
 	            defsEl.appendChild(renderMarker(brush));
 	    }
 	}
-	function syncShapes(state, shapes, brushes, arrowDests, root, defsEl) {
+	function syncShapes(state, shapes, brushes, arrowDests, root) {
 	    const bounds = state.dom.bounds(), hashesInDom = new Map(), toRemove = [];
 	    for (const sc of shapes)
 	        hashesInDom.set(sc.hash, false);
-	    let el = defsEl.nextSibling, elHash;
+	    let el = root.firstChild, elHash;
 	    while (el) {
 	        elHash = el.getAttribute('cgHash');
 	        if (hashesInDom.has(elHash))
@@ -1402,7 +1378,7 @@ var Chessground = (function () {
 	            root.appendChild(renderShape(state, sc, brushes, arrowDests, bounds));
 	    }
 	}
-	function shapeHash({ orig, dest, brush, piece, modifiers }, arrowDests, current, bounds) {
+	function shapeHash({ orig, dest, brush, piece, modifiers, customSvg }, arrowDests, current, bounds) {
 	    return [
 	        bounds.width,
 	        bounds.height,
@@ -1413,19 +1389,31 @@ var Chessground = (function () {
 	        dest && (arrowDests.get(dest) || 0) > 1,
 	        piece && pieceHash(piece),
 	        modifiers && modifiersHash(modifiers),
+	        customSvg && customSvgHash(customSvg),
 	    ]
-	        .filter((x) => x)
+	        .filter(x => x)
 	        .join(',');
 	}
 	function pieceHash(piece) {
-	    return [piece.color, piece.role, piece.scale].filter((x) => x).join(',');
+	    return [piece.color, piece.role, piece.scale].filter(x => x).join(',');
 	}
 	function modifiersHash(m) {
 	    return '' + (m.lineWidth || '');
 	}
+	function customSvgHash(s) {
+	    let h = 0;
+	    for (let i = 0; i < s.length; i++) {
+	        h = (((h << 5) - h) + s.charCodeAt(i)) >>> 0;
+	    }
+	    return 'custom-' + h.toString();
+	}
 	function renderShape(state, { shape, current, hash }, brushes, arrowDests, bounds) {
 	    let el;
-	    if (shape.piece)
+	    if (shape.customSvg) {
+	        const orig = orient(util.key2pos(shape.orig), state.orientation);
+	        el = renderCustomSvg(shape.customSvg, orig, bounds);
+	    }
+	    else if (shape.piece)
 	        el = renderPiece(state.drawable.pieces.baseUrl, orient(util.key2pos(shape.orig), state.orientation), shape.piece, bounds);
 	    else {
 	        const orig = orient(util.key2pos(shape.orig), state.orientation);
@@ -1440,6 +1428,18 @@ var Chessground = (function () {
 	    }
 	    el.setAttribute('cgHash', hash);
 	    return el;
+	}
+	function renderCustomSvg(customSvg, pos, bounds) {
+	    const { width, height } = bounds;
+	    const w = width / 8;
+	    const h = height / 8;
+	    const x = pos[0] * w;
+	    const y = (7 - pos[1]) * h;
+	    const g = setAttributes(createElement('g'), { transform: `translate(${x},${y})` });
+	    const svg = setAttributes(createElement('svg'), { width: w, height: h, viewBox: '0 0 100 100' });
+	    g.appendChild(svg);
+	    svg.innerHTML = customSvg;
+	    return g;
 	}
 	function renderCircle(brush, pos, current, bounds) {
 	    const o = pos2px(pos, bounds), widths = circleWidth(bounds), radius = (bounds.width + bounds.height) / 32;
@@ -1468,8 +1468,7 @@ var Chessground = (function () {
 	    });
 	}
 	function renderPiece(baseUrl, pos, piece, bounds) {
-	    const o = pos2px(pos, bounds), size = (bounds.width / 8) * (piece.scale || 1), name = piece.color[0] +
-	        (piece.role === 'knight' ? 'n' : piece.role[0]).toUpperCase();
+	    const o = pos2px(pos, bounds), size = (bounds.width / 8) * (piece.scale || 1), name = piece.color[0] + (piece.role === 'knight' ? 'n' : piece.role[0]).toUpperCase();
 	    return setAttributes(createElement('image'), {
 	        className: `${piece.role} ${piece.color}`,
 	        x: o[0] - size / 2,
@@ -1500,6 +1499,7 @@ var Chessground = (function () {
 	        el.setAttribute(key, attrs[key]);
 	    return el;
 	}
+	exports.setAttributes = setAttributes;
 	function orient(pos, color) {
 	    return color === 'white' ? pos : [7 - pos[0], 7 - pos[1]];
 	}
@@ -1508,7 +1508,7 @@ var Chessground = (function () {
 	        color: base.color,
 	        opacity: Math.round(base.opacity * 10) / 10,
 	        lineWidth: Math.round(modifiers.lineWidth || base.lineWidth),
-	        key: [base.key, modifiers.lineWidth].filter((x) => x).join(''),
+	        key: [base.key, modifiers.lineWidth].filter(x => x).join(''),
 	    };
 	}
 	function circleWidth(bounds) {
@@ -1516,7 +1516,7 @@ var Chessground = (function () {
 	    return [3 * base, 4 * base];
 	}
 	function lineWidth(brush, current, bounds) {
-	    return ((((brush.lineWidth || 10) * (current ? 0.85 : 1)) / 512) * bounds.width);
+	    return (((brush.lineWidth || 10) * (current ? 0.85 : 1)) / 512) * bounds.width;
 	}
 	function opacity(brush, current) {
 	    return (brush.opacity || 1) * (current ? 0.9 : 1);
@@ -1525,10 +1525,7 @@ var Chessground = (function () {
 	    return ((shorten ? 20 : 10) / 512) * bounds.width;
 	}
 	function pos2px(pos, bounds) {
-	    return [
-	        ((pos[0] + 0.5) * bounds.width) / 8,
-	        ((7.5 - pos[1]) * bounds.height) / 8,
-	    ];
+	    return [((pos[0] + 0.5) * bounds.width) / 8, ((7.5 - pos[1]) * bounds.height) / 8];
 	}
 
 	});
@@ -1552,10 +1549,15 @@ var Chessground = (function () {
 	    const board = util.createEl('cg-board');
 	    container.appendChild(board);
 	    let svg$1;
+	    let customSvg;
 	    if (s.drawable.visible && !relative) {
-	        svg$1 = svg.createElement('svg');
+	        svg$1 = svg.setAttributes(svg.createElement('svg'), { 'class': 'cg-shapes' });
 	        svg$1.appendChild(svg.createElement('defs'));
+	        svg$1.appendChild(svg.createElement('g'));
+	        customSvg = svg.setAttributes(svg.createElement('svg'), { 'class': 'cg-custom-svgs' });
+	        customSvg.appendChild(svg.createElement('g'));
 	        container.appendChild(svg$1);
+	        container.appendChild(customSvg);
 	    }
 	    if (s.coordinates) {
 	        const orientClass = s.orientation === 'black' ? ' black' : '';
@@ -1573,6 +1575,7 @@ var Chessground = (function () {
 	        container,
 	        ghost,
 	        svg: svg$1,
+	        customSvg,
 	    };
 	}
 	exports.renderWrap = renderWrap;
@@ -1618,8 +1621,7 @@ var Chessground = (function () {
 	    if (piece) {
 	        s.pieces.set('a0', piece);
 	        const position = util.eventPosition(e);
-	        const dest = position &&
-	            board.getKeyAtDomPos(position, board.whitePov(s), s.dom.bounds());
+	        const dest = position && board.getKeyAtDomPos(position, board.whitePov(s), s.dom.bounds());
 	        if (dest)
 	            board.dropNewPiece(s, 'a0', dest);
 	    }
@@ -1652,7 +1654,7 @@ var Chessground = (function () {
 	        passive: false,
 	    });
 	    if (s.disableContextMenu || s.drawable.enabled) {
-	        boardEl.addEventListener('contextmenu', (e) => e.preventDefault());
+	        boardEl.addEventListener('contextmenu', e => e.preventDefault());
 	    }
 	}
 	exports.bindBoard = bindBoard;
@@ -1672,7 +1674,7 @@ var Chessground = (function () {
 	        unbinds.push(unbindable(document, 'scroll', onScroll, { capture: true, passive: true }));
 	        unbinds.push(unbindable(window, 'resize', onScroll, { passive: true }));
 	    }
-	    return () => unbinds.forEach((f) => f());
+	    return () => unbinds.forEach(f => f());
 	}
 	exports.bindDocument = bindDocument;
 	function unbindable(el, eventName, callback, options) {
@@ -1680,7 +1682,7 @@ var Chessground = (function () {
 	    return () => el.removeEventListener(eventName, callback, options);
 	}
 	function startDragOrDraw(s) {
-	    return (e) => {
+	    return e => {
 	        if (s.draggable.current)
 	            drag.cancel(s);
 	        else if (s.drawable.current)
@@ -1698,7 +1700,7 @@ var Chessground = (function () {
 	    };
 	}
 	function dragOrDraw(s, withDrag, withDraw) {
-	    return (e) => {
+	    return e => {
 	        if (s.drawable.current) {
 	            if (s.drawable.enabled)
 	                withDraw(s, e);
@@ -1717,9 +1719,7 @@ var Chessground = (function () {
 
 	const util$1 = util;
 	function render(s) {
-	    const asWhite = board.whitePov(s), posToTranslate = s.dom.relative
-	        ? util$1.posToTranslateRel
-	        : util$1.posToTranslateAbs(s.dom.bounds()), translate = s.dom.relative ? util$1.translateRel : util$1.translateAbs, boardEl = s.dom.elements.board, pieces = s.pieces, curAnim = s.animation.current, anims = curAnim ? curAnim.plan.anims : new Map(), fadings = curAnim ? curAnim.plan.fadings : new Map(), curDrag = s.draggable.current, squares = computeSquareClasses(s), samePieces = new Set(), sameSquares = new Set(), movedPieces = new Map(), movedSquares = new Map();
+	    const asWhite = board.whitePov(s), posToTranslate = s.dom.relative ? util$1.posToTranslateRel : util$1.posToTranslateAbs(s.dom.bounds()), translate = s.dom.relative ? util$1.translateRel : util$1.translateAbs, boardEl = s.dom.elements.board, pieces = s.pieces, curAnim = s.animation.current, anims = curAnim ? curAnim.plan.anims : new Map(), fadings = curAnim ? curAnim.plan.fadings : new Map(), curDrag = s.draggable.current, squares = computeSquareClasses(s), samePieces = new Set(), sameSquares = new Set(), movedPieces = new Map(), movedSquares = new Map();
 	    let k, el, pieceAtKey, elPieceName, anim, fading, pMvdset, pMvd, sMvdset, sMvd;
 	    el = boardEl.firstChild;
 	    while (el) {
@@ -1753,8 +1753,7 @@ var Chessground = (function () {
 	                    if (s.addPieceZIndex)
 	                        el.style.zIndex = posZIndex(util.key2pos(k), asWhite);
 	                }
-	                if (elPieceName === pieceNameOf(pieceAtKey) &&
-	                    (!fading || !el.cgFading)) {
+	                if (elPieceName === pieceNameOf(pieceAtKey) && (!fading || !el.cgFading)) {
 	                    samePieces.add(k);
 	                }
 	                else {
@@ -1945,12 +1944,12 @@ var Chessground = (function () {
 	        const relative = maybeState.viewOnly && !maybeState.drawable.visible, elements = wrap.renderWrap(element, maybeState, relative), bounds = util.memo(() => elements.board.getBoundingClientRect()), redrawNow = (skipSvg) => {
 	            render_1.render(state);
 	            if (!skipSvg && elements.svg)
-	                svg.renderSvg(state, elements.svg);
+	                svg.renderSvg(state, elements.svg, elements.customSvg);
 	        }, boundsUpdated = () => {
 	            bounds.clear();
 	            render_1.updateBounds(state);
 	            if (elements.svg)
-	                svg.renderSvg(state, elements.svg);
+	                svg.renderSvg(state, elements.svg, elements.customSvg);
 	        };
 	        const state = maybeState;
 	        state.dom = {

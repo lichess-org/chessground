@@ -33,7 +33,7 @@ Chessground is designed to fulfill all lichess.org web and mobile apps needs, so
 
 - Well typed with TypeScript
 - Fast. Uses a custom DOM diff algorithm to reduce DOM writes to the absolute minimum.
-- Small footprint: 10K gzipped (30K unzipped). No dependencies.
+- Small footprint: 10K gzipped (31K unzipped). No dependencies.
 - SVG drawing of circles, arrows, and custom user shapes on the board
 - Arrows snap to valid moves. Freehand arrows can be drawn by dragging the mouse off the board and back while drawing an arrow.
 - Entirely configurable and reconfigurable at any time
