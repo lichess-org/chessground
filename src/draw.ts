@@ -6,7 +6,7 @@ import * as cg from './types';
 export interface DrawShape {
   orig: cg.Key;
   dest?: cg.Key;
-  brush: string;
+  brush?: string;
   modifiers?: DrawModifiers;
   piece?: DrawShapePiece;
   customSvg?: string;

@@ -22,12 +22,12 @@ export function Chessground(element: HTMLElement, config?: Config): Api {
       bounds = util.memo(() => elements.board.getBoundingClientRect()),
       redrawNow = (skipSvg?: boolean): void => {
         render(state);
-        if (!skipSvg && elements.svg) svg.renderSvg(state, elements.svg);
+        if (!skipSvg && elements.svg) svg.renderSvg(state, elements.svg, elements.customSvg!);
       },
       boundsUpdated = (): void => {
         bounds.clear();
         updateBounds(state);
-        if (elements.svg) svg.renderSvg(state, elements.svg);
+        if (elements.svg) svg.renderSvg(state, elements.svg, elements.customSvg!);
       };
     const state = maybeState as State;
     state.dom = {
