@@ -27,7 +27,7 @@ export function start(s: State, e: cg.MouchEvent): void {
   if (!orig) return;
   const piece = s.pieces.get(orig);
   const previouslySelected = s.selected;
-  if (!previouslySelected && s.drawable.enabled && (s.drawable.eraseOnClick || !piece || piece.color !== s.turnColor))
+  if (!previouslySelected && s.drawable.enabled && s.drawable.eraseOnClick)
     drawClear(s);
   // Prevent touch scroll and create no corresponding mouse event, if there
   // is an intent to interact with the board. If no color is movable
