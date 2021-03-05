@@ -116,6 +116,11 @@ piece.fading {
 .cg-wrap .cg-custom-svgs {
   /* over piece.anim = 8, but under piece.dragging = 10 */
   z-index: 9;
+  overflow: overlay;
+}
+
+.cg-wrap .cg-custom-svgs svg {
+  overflow: overlay;
 }
 
 .cg-wrap coords {
