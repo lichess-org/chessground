@@ -1,27 +1,29 @@
 {
+  "root": true,
   "env": {
     "browser": true,
     "es2017": true
   },
   "parser": "@typescript-eslint/parser",
+  "parserOptions": {
+    "sourceType": "module",
+    "project": "./tsconfig.json"
+  },
+  "plugins": ["@typescript-eslint"],
   "extends": [
     "eslint:recommended",
     "plugin:@typescript-eslint/eslint-recommended",
     "plugin:@typescript-eslint/recommended"
   ],
-  "parserOptions": {
-    "sourceType": "module",
-    "project": "./tsconfig.json"
-  },
   "rules": {
-    "linebreak-style": ["warn", "unix"],
+    "linebreak-style": ["error", "unix"],
     "no-duplicate-imports": "error",
     "eqeqeq": ["error", "smart"],
+    "prefer-const": "error",
     "@typescript-eslint/no-explicit-any": "off",
     "@typescript-eslint/no-non-null-assertion": "off",
     "@typescript-eslint/explicit-function-return-type": "off",
     "@typescript-eslint/no-unused-vars": ["warn", { "argsIgnorePattern": "^_" }],
     "@typescript-eslint/no-unnecessary-condition": "warn"
-  },
-  "root": true
+  }
 }
