@@ -12,6 +12,7 @@
   },
   "rules": {
     "linebreak-style": ["warn", "unix"],
+    "no-duplicate-imports": "error",
     "eqeqeq": ["error", "smart"],
     "@typescript-eslint/no-explicit-any": "off",
     "@typescript-eslint/no-non-null-assertion": "off",
