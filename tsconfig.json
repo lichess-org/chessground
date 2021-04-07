@@ -3,13 +3,13 @@
   "exclude": [],
   "compilerOptions": {
     "noEmitOnError": false,
-    "removeComments": true,
     "strict": true,
     "noUnusedLocals": true,
     "noUnusedParameters": true,
+    "noImplicitThis": true,
     "noImplicitReturns": true,
     "module": "commonjs",
-    "target": "ES2016",
-    "lib": ["DOM", "ES2016"]
+    "target": "ES2017",
+    "lib": ["DOM", "ES2017"]
   }
 }
