@@ -102,8 +102,8 @@ export function configure(state: HeadlessState, config: Config): void {
   }
 
   // apply config values that could be undefined yet meaningful
-  if (config.hasOwnProperty('check')) setCheck(state, config.check || false);
-  if (config.hasOwnProperty('lastMove') && !config.lastMove) state.lastMove = undefined;
+  if ('check' in config) setCheck(state, config.check || false);
+  if ('lastMove' in config && !config.lastMove) state.lastMove = undefined;
   // in case of ZH drop last move, there's a single square.
   // if the previous last move had two squares,
   // the merge algorithm will incorrectly keep the second square.

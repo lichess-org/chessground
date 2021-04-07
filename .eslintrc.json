@@ -1,11 +1,14 @@
 {
   "env": {
     "browser": true,
-    "commonjs": true,
     "es6": true
   },
   "parser": "@typescript-eslint/parser",
-  "extends": ["plugin:@typescript-eslint/recommended"],
+  "extends": [
+    "eslint:recommended",
+    "plugin:@typescript-eslint/eslint-recommended",
+    "plugin:@typescript-eslint/recommended"
+  ],
   "parserOptions": {
     "sourceType": "module",
     "project": "./tsconfig.json"

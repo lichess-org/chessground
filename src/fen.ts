@@ -35,11 +35,12 @@ export function read(fen: cg.FEN): cg.Pieces {
         if (row < 0) return pieces;
         col = 0;
         break;
-      case '~':
+      case '~': {
         const piece = pieces.get(pos2key([col, row]));
         if (piece) piece.promoted = true;
         break;
-      default:
+      }
+      default: {
         const nb = c.charCodeAt(0);
         if (nb < 57) col += nb - 48;
         else {
@@ -50,6 +51,7 @@ export function read(fen: cg.FEN): cg.Pieces {
           });
           ++col;
         }
+      }
     }
   }
   return pieces;
