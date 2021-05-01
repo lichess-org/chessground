@@ -1,7 +1,7 @@
 import { HeadlessState } from './state';
 import { setCheck, setSelected } from './board';
 import { read as fenRead } from './fen';
-import { DrawShape, DrawBrush } from './draw';
+import { DrawShape, DrawBrushes } from './draw';
 import * as cg from './types';
 
 export interface Config {
@@ -81,7 +81,7 @@ export interface Config {
     eraseOnClick?: boolean;
     shapes?: DrawShape[];
     autoShapes?: DrawShape[];
-    brushes?: DrawBrush[];
+    brushes?: DrawBrushes;
     pieces?: {
       baseUrl?: string;
     };
