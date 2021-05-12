@@ -64,7 +64,7 @@ npm install --save chessground
 ### Usage
 
 ```js
-const Chessground = require('chessground').Chessground;
+import { Chessground } from 'chessground';
 
 const config = {};
 const ground = Chessground(document.body, config);
