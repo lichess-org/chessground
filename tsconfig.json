@@ -8,7 +8,7 @@
     "noUnusedParameters": true,
     "noImplicitThis": true,
     "noImplicitReturns": true,
-    "module": "commonjs",
+    "module": "esnext",
     "target": "ES2017",
     "lib": ["DOM", "ES2017"]
   }

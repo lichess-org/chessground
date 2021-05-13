@@ -1,9 +1,8 @@
-import commonjs from '@rollup/plugin-commonjs';
 import typescript from '@rollup/plugin-typescript';
 import { terser } from 'rollup-plugin-terser';
 
 export default {
-  input: 'src/index.js',
+  input: 'src/index.ts',
   output: [
     {
       file: 'dist/chessground.js',
@@ -15,16 +14,11 @@ export default {
       format: 'iife',
       name: 'Chessground',
       plugins: [
-        terser({
-          safari10: true,
-        }),
+        terser(),
       ],
     },
   ],
   plugins: [
     typescript(),
-    commonjs({
-      extensions: ['.js', '.ts'],
-    }),
   ],
 };
