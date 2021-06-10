@@ -34,6 +34,7 @@ export type Dests = Map<Key, Key[]>;
 
 export interface Elements {
   board: HTMLElement;
+  wrap: HTMLElement;
   container: HTMLElement;
   ghost?: HTMLElement;
   svg?: SVGElement;
