@@ -11,9 +11,8 @@ type StateMouchBind = (d: State, e: cg.MouchEvent) => void;
 export function bindBoard(s: State, boundsUpdated: () => void): void {
   const boardEl = s.dom.elements.board;
 
-  if (!s.dom.relative && s.resizable && 'ResizeObserver' in window) {
+  if (!s.dom.relative && s.resizable && 'ResizeObserver' in window)
     new ResizeObserver(boundsUpdated).observe(s.dom.elements.wrap);
-  }
 
   if (s.viewOnly) return;
 
@@ -38,9 +37,8 @@ export function bindDocument(s: State, boundsUpdated: () => void): cg.Unbind {
 
   // Old versions of Edge and Safari do not support ResizeObserver. Send
   // chessground.resize if a user action has changed the bounds of the board.
-  if (!s.dom.relative && s.resizable && !('ResizeObserver' in window)) {
+  if (!s.dom.relative && s.resizable && !('ResizeObserver' in window))
     unbinds.push(unbindable(document.body, 'chessground.resize', boundsUpdated));
-  }
 
   if (!s.viewOnly) {
     const onmove = dragOrDraw(s, drag.move, draw.move);
