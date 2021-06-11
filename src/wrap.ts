@@ -29,8 +29,7 @@ export function renderWrap(element: HTMLElement, s: HeadlessState, relative: boo
 
   const container = createEl('cg-container');
   const bounds = element.getBoundingClientRect();
-  container.style.width = (Math.floor(bounds.width / 8) * 8).toString();
-  container.style.height = (Math.floor(bounds.height / 8) * 8).toString();
+  container.style.width = container.style.height = (Math.floor(bounds.height / 8) * 8).toString() + 'px';
   element.appendChild(container);
 
   const board = createEl('cg-board');
