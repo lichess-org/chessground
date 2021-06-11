@@ -173,9 +173,8 @@ export function render(s: State): void {
 
 export function updateBounds(s: State): void {
   const bounds = s.dom.elements.wrap.getBoundingClientRect();
-  const container = s.dom.elements.container;
-  container.style.width = (Math.floor(bounds.width / 8) * 8).toString();
-  container.style.height = (Math.floor(bounds.height / 8) * 8).toString();
+  const containerStyle = s.dom.elements.container.style;
+  containerStyle.width = containerStyle.height = (Math.floor(bounds.width / 8) * 8).toString() + 'px';
 
   if (s.dom.relative) return;
 
