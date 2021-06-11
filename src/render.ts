@@ -172,7 +172,13 @@ export function render(s: State): void {
 }
 
 export function updateBounds(s: State): void {
+  const bounds = s.dom.elements.wrap.getBoundingClientRect();
+  const container = s.dom.elements.container;
+  container.style.width = (Math.floor(bounds.width / 8) * 8).toString();
+  container.style.height = (Math.floor(bounds.height / 8) * 8).toString();
+
   if (s.dom.relative) return;
+
   const asWhite: boolean = whitePov(s),
     posToTranslate = posToTranslateAbs(s.dom.bounds());
   let el = s.dom.elements.board.firstChild as cg.PieceNode | cg.SquareNode | undefined;

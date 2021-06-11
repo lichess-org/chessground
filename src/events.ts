@@ -12,8 +12,7 @@ export function bindBoard(s: State, boundsUpdated: () => void): void {
   const boardEl = s.dom.elements.board;
 
   if (!s.dom.relative && s.resizable && 'ResizeObserver' in window) {
-    const observer = new (window as any)['ResizeObserver'](boundsUpdated);
-    observer.observe(boardEl);
+    new ResizeObserver(boundsUpdated).observe(s.dom.elements.wrap);
   }
 
   if (s.viewOnly) return;
