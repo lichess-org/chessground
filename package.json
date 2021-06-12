@@ -1,6 +1,6 @@
 {
   "name": "chessground",
-  "version": "7.12.0",
+  "version": "8.0.0",
   "description": "lichess.org chess ui",
   "type": "module",
   "module": "chessground.js",
@@ -15,7 +15,7 @@
     "rollup": "^2",
     "rollup-plugin-terser": "^7",
     "tslib": "^2",
-    "typescript": "^4"
+    "typescript": "^4.3"
   },
   "scripts": {
     "prepare": "npm run compile",
