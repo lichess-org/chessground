@@ -28,12 +28,6 @@ export function renderWrap(element: HTMLElement, s: HeadlessState, relative: boo
   element.classList.toggle('manipulable', !s.viewOnly);
 
   const container = createEl('cg-container');
-  const bounds = element.getBoundingClientRect();
-  const ratio = bounds.height / bounds.width;
-  const width = Math.floor(bounds.width / 8) * 8;
-  const height = width * ratio;
-  container.style.width = width + 'px';
-  container.style.height = height + 'px';
   element.appendChild(container);
 
   const board = createEl('cg-board');

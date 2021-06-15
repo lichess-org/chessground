@@ -171,15 +171,7 @@ export function render(s: State): void {
   for (const nodes of movedSquares.values()) removeNodes(s, nodes);
 }
 
-export function updateBounds(s: State): void {
-  const bounds = s.dom.elements.wrap.getBoundingClientRect();
-  const container = s.dom.elements.container;
-  const ratio = bounds.height / bounds.width;
-  const width = Math.floor(bounds.width / 8) * 8;
-  const height = width * ratio;
-  container.style.width = width + 'px';
-  container.style.height = height + 'px';
-
+export function renderResized(s: State): void {
   if (s.dom.relative) return;
 
   const asWhite: boolean = whitePov(s),
@@ -191,6 +183,17 @@ export function updateBounds(s: State): void {
     }
     el = el.nextSibling as cg.PieceNode | cg.SquareNode | undefined;
   }
+}
+
+export function updateBounds(s: State) {
+  const bounds = s.dom.elements.wrap.getBoundingClientRect();
+  const container = s.dom.elements.container;
+  const ratio = bounds.height / bounds.width;
+  const width = Math.floor(bounds.width / 8) * 8;
+  const height = width * ratio;
+  container.style.width = width + 'px';
+  container.style.height = height + 'px';
+  s.dom.bounds.clear();
 }
 
 function isPieceNode(el: cg.PieceNode | cg.SquareNode): el is cg.PieceNode {

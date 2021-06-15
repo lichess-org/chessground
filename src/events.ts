@@ -8,11 +8,11 @@ import * as cg from './types';
 type MouchBind = (e: cg.MouchEvent) => void;
 type StateMouchBind = (d: State, e: cg.MouchEvent) => void;
 
-export function bindBoard(s: State, boundsUpdated: () => void): void {
+export function bindBoard(s: State, onResize: () => void): void {
   const boardEl = s.dom.elements.board;
 
   if (!s.dom.relative && s.resizable && 'ResizeObserver' in window) {
-    new ResizeObserver(boundsUpdated).observe(s.dom.elements.wrap);
+    new ResizeObserver(onResize).observe(s.dom.elements.wrap);
   }
 
   if (s.viewOnly) return;
@@ -33,13 +33,13 @@ export function bindBoard(s: State, boundsUpdated: () => void): void {
 }
 
 // returns the unbind function
-export function bindDocument(s: State, boundsUpdated: () => void): cg.Unbind {
+export function bindDocument(s: State, onResize: () => void): cg.Unbind {
   const unbinds: cg.Unbind[] = [];
 
   // Old versions of Edge and Safari do not support ResizeObserver. Send
   // chessground.resize if a user action has changed the bounds of the board.
   if (!s.dom.relative && s.resizable && !('ResizeObserver' in window)) {
-    unbinds.push(unbindable(document.body, 'chessground.resize', boundsUpdated));
+    unbinds.push(unbindable(document.body, 'chessground.resize', onResize));
   }
 
   if (!s.viewOnly) {
