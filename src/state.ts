@@ -16,7 +16,6 @@ export interface HeadlessState {
   autoCastle: boolean; // immediately complete the castle by moving the rook after king move
   viewOnly: boolean; // don't bind events: the user will never be able to move pieces around
   disableContextMenu: boolean; // because who needs a context menu on a chessboard
-  resizable: boolean; // listens to chessground.resize on document.body to clear bounds cache
   addPieceZIndex: boolean; // adds z-index values to pieces (for 3D)
   pieceKey: boolean; // add a data-key attribute to piece elements
   highlight: {
@@ -111,7 +110,6 @@ export function defaults(): HeadlessState {
     autoCastle: true,
     viewOnly: false,
     disableContextMenu: false,
-    resizable: true,
     addPieceZIndex: false,
     pieceKey: false,
     highlight: {
