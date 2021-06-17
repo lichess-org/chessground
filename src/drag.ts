@@ -65,7 +65,7 @@ export function start(s: State, e: cg.MouchEvent): void {
     const ghost = s.dom.elements.ghost;
     if (ghost) {
       ghost.className = `ghost ${piece.color} ${piece.role}`;
-      util.translateAbs(ghost, util.posToTranslateAbs(bounds)(util.key2pos(orig), board.whitePov(s)));
+      util.translate(ghost, util.posToTranslate(bounds)(util.key2pos(orig), board.whitePov(s)));
       util.setVisible(ghost, true);
     }
     processDrag(s);
@@ -131,7 +131,7 @@ function processDrag(s: State): void {
         }
 
         const bounds = s.dom.bounds();
-        util.translateAbs(cur.element, [
+        util.translate(cur.element, [
           cur.pos[0] - bounds.left - bounds.width / 16,
           cur.pos[1] - bounds.top - bounds.height / 16,
         ]);

@@ -3,7 +3,7 @@ import { setVisible, createEl } from './util';
 import { colors, files, ranks, Elements } from './types';
 import { createElement as createSVG, setAttributes } from './svg';
 
-export function renderWrap(element: HTMLElement, s: HeadlessState, relative: boolean): Elements {
+export function renderWrap(element: HTMLElement, s: HeadlessState): Elements {
   // .cg-wrap (element passed to Chessground)
   //   cg-container
   //     cg-board
@@ -35,7 +35,7 @@ export function renderWrap(element: HTMLElement, s: HeadlessState, relative: boo
 
   let svg: SVGElement | undefined;
   let customSvg: SVGElement | undefined;
-  if (s.drawable.visible && !relative) {
+  if (s.drawable.visible) {
     svg = setAttributes(createSVG('svg'), { class: 'cg-shapes' });
     svg.appendChild(createSVG('defs'));
     svg.appendChild(createSVG('g'));
@@ -52,7 +52,7 @@ export function renderWrap(element: HTMLElement, s: HeadlessState, relative: boo
   }
 
   let ghost: HTMLElement | undefined;
-  if (s.draggable.showGhost && !relative) {
+  if (s.draggable.showGhost) {
     ghost = createEl('piece', 'ghost');
     setVisible(ghost, false);
     container.appendChild(ghost);

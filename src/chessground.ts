@@ -17,8 +17,7 @@ export function Chessground(element: HTMLElement, config?: Config): Api {
     const prevUnbind = 'dom' in maybeState ? maybeState.dom.unbind : undefined;
     // compute bounds from existing board element if possible
     // this allows non-square boards from CSS to be handled (for 3D)
-    const relative = maybeState.viewOnly && !maybeState.drawable.visible,
-      elements = renderWrap(element, maybeState, relative),
+    const elements = renderWrap(element, maybeState),
       bounds = util.memo(() => elements.board.getBoundingClientRect()),
       redrawNow = (skipSvg?: boolean): void => {
         render(state);
@@ -36,7 +35,6 @@ export function Chessground(element: HTMLElement, config?: Config): Api {
       redraw: debounceRedraw(redrawNow),
       redrawNow,
       unbind: prevUnbind,
-      relative,
     };
     state.drawable.prevSvgHash = '';
     updateBounds(state);
