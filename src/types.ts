@@ -34,6 +34,7 @@ export type Dests = Map<Key, Key[]>;
 
 export interface Elements {
   board: HTMLElement;
+  wrap: HTMLElement;
   container: HTMLElement;
   ghost?: HTMLElement;
   svg?: SVGElement;
@@ -46,7 +47,6 @@ export interface Dom {
   redrawNow: (skipSvg?: boolean) => void;
   unbind?: Unbind;
   destroyed?: boolean;
-  relative?: boolean; // don't compute bounds, use relative % to place pieces
 }
 export interface Exploding {
   stage: number;

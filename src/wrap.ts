@@ -3,19 +3,18 @@ import { setVisible, createEl } from './util';
 import { colors, files, ranks, Elements } from './types';
 import { createElement as createSVG, setAttributes } from './svg';
 
-export function renderWrap(element: HTMLElement, s: HeadlessState, relative: boolean): Elements {
+export function renderWrap(element: HTMLElement, s: HeadlessState): Elements {
   // .cg-wrap (element passed to Chessground)
-  //   cg-helper (12.5%, display: table)
-  //     cg-container (800%)
-  //       cg-board
-  //       svg.cg-shapes
-  //         defs
-  //         g
-  //       svg.cg-custom-svgs
-  //         g
-  //       coords.ranks
-  //       coords.files
-  //       piece.ghost
+  //   cg-container
+  //     cg-board
+  //     svg.cg-shapes
+  //       defs
+  //       g
+  //     svg.cg-custom-svgs
+  //       g
+  //     coords.ranks
+  //     coords.files
+  //     piece.ghost
 
   element.innerHTML = '';
 
@@ -28,17 +27,15 @@ export function renderWrap(element: HTMLElement, s: HeadlessState, relative: boo
   for (const c of colors) element.classList.toggle('orientation-' + c, s.orientation === c);
   element.classList.toggle('manipulable', !s.viewOnly);
 
-  const helper = createEl('cg-helper');
-  element.appendChild(helper);
   const container = createEl('cg-container');
-  helper.appendChild(container);
+  element.appendChild(container);
 
   const board = createEl('cg-board');
   container.appendChild(board);
 
   let svg: SVGElement | undefined;
   let customSvg: SVGElement | undefined;
-  if (s.drawable.visible && !relative) {
+  if (s.drawable.visible) {
     svg = setAttributes(createSVG('svg'), { class: 'cg-shapes' });
     svg.appendChild(createSVG('defs'));
     svg.appendChild(createSVG('g'));
@@ -55,7 +52,7 @@ export function renderWrap(element: HTMLElement, s: HeadlessState, relative: boo
   }
 
   let ghost: HTMLElement | undefined;
-  if (s.draggable.showGhost && !relative) {
+  if (s.draggable.showGhost) {
     ghost = createEl('piece', 'ghost');
     setVisible(ghost, false);
     container.appendChild(ghost);
@@ -64,6 +61,7 @@ export function renderWrap(element: HTMLElement, s: HeadlessState, relative: boo
   return {
     board,
     container,
+    wrap: element,
     ghost,
     svg,
     customSvg,

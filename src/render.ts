@@ -1,5 +1,5 @@
 import { State } from './state';
-import { key2pos, createEl, posToTranslateRel, posToTranslateAbs, translateRel, translateAbs } from './util';
+import { key2pos, createEl, posToTranslate as posToTranslateFromBounds, translate } from './util';
 import { whitePov } from './board';
 import { AnimCurrent, AnimVectors, AnimVector, AnimFadings } from './anim';
 import { DragCurrent } from './drag';
@@ -13,8 +13,7 @@ type SquareClasses = Map<cg.Key, string>;
 // in case of bugs, blame @veloce
 export function render(s: State): void {
   const asWhite: boolean = whitePov(s),
-    posToTranslate = s.dom.relative ? posToTranslateRel : posToTranslateAbs(s.dom.bounds()),
-    translate = s.dom.relative ? translateRel : translateAbs,
+    posToTranslate = posToTranslateFromBounds(s.dom.bounds()),
     boardEl: HTMLElement = s.dom.elements.board,
     pieces: cg.Pieces = s.pieces,
     curAnim: AnimCurrent | undefined = s.animation.current,
@@ -171,17 +170,27 @@ export function render(s: State): void {
   for (const nodes of movedSquares.values()) removeNodes(s, nodes);
 }
 
-export function updateBounds(s: State): void {
-  if (s.dom.relative) return;
+export function renderResized(s: State): void {
   const asWhite: boolean = whitePov(s),
-    posToTranslate = posToTranslateAbs(s.dom.bounds());
+    posToTranslate = posToTranslateFromBounds(s.dom.bounds());
   let el = s.dom.elements.board.firstChild as cg.PieceNode | cg.SquareNode | undefined;
   while (el) {
     if ((isPieceNode(el) && !el.cgAnimating) || isSquareNode(el)) {
-      translateAbs(el, posToTranslate(key2pos(el.cgKey), asWhite));
+      translate(el, posToTranslate(key2pos(el.cgKey), asWhite));
     }
     el = el.nextSibling as cg.PieceNode | cg.SquareNode | undefined;
   }
+}
+
+export function updateBounds(s: State) {
+  const bounds = s.dom.elements.wrap.getBoundingClientRect();
+  const container = s.dom.elements.container;
+  const ratio = bounds.height / bounds.width;
+  const width = Math.floor(bounds.width / 8) * 8;
+  const height = width * ratio;
+  container.style.width = width + 'px';
+  container.style.height = height + 'px';
+  s.dom.bounds.clear();
 }
 
 function isPieceNode(el: cg.PieceNode | cg.SquareNode): el is cg.PieceNode {
