@@ -17,6 +17,7 @@ export interface HeadlessState {
   viewOnly: boolean; // don't bind events: the user will never be able to move pieces around
   disableContextMenu: boolean; // because who needs a context menu on a chessboard
   addPieceZIndex: boolean; // adds z-index values to pieces (for 3D)
+  addDimensionsCssVars: boolean; // add --cg-width and --cg-height CSS vars containing the board's dimensions to the document root
   pieceKey: boolean; // add a data-key attribute to piece elements
   highlight: {
     lastMove: boolean; // add last-move class to squares
@@ -111,6 +112,7 @@ export function defaults(): HeadlessState {
     viewOnly: false,
     disableContextMenu: false,
     addPieceZIndex: false,
+    addDimensionsCssVars: false,
     pieceKey: false,
     highlight: {
       lastMove: true,
