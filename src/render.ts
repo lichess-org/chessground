@@ -182,7 +182,7 @@ export function renderResized(s: State): void {
   }
 }
 
-export function updateBounds(s: State) {
+export function updateBounds(s: State): void {
   const bounds = s.dom.elements.wrap.getBoundingClientRect();
   const container = s.dom.elements.container;
   const ratio = bounds.height / bounds.width;
