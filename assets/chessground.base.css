@@ -90,7 +90,8 @@ piece.fading {
   opacity: 0.5;
 }
 
-.cg-wrap .cg-shapes, .cg-wrap .cg-custom-svgs {
+.cg-wrap .cg-shapes,
+.cg-wrap .cg-custom-svgs {
   overflow: hidden;
   position: absolute;
   top: 0px;

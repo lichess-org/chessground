@@ -341,10 +341,10 @@ export function getSnappedKeyAtDomPos(
   });
   const validSnapCenters = validSnapPos.map(pos2 => computeSquareCenter(pos2key(pos2), asWhite, bounds));
   const validSnapDistances = validSnapCenters.map(pos2 => distanceSq(pos, pos2));
-  const [, closestSnapIndex] = validSnapDistances.reduce((a, b, index) => (a[0] < b ? a : [b, index]), [
-    validSnapDistances[0],
-    0,
-  ]);
+  const [, closestSnapIndex] = validSnapDistances.reduce(
+    (a, b, index) => (a[0] < b ? a : [b, index]),
+    [validSnapDistances[0], 0]
+  );
   return pos2key(validSnapPos[closestSnapIndex]);
 }
 
