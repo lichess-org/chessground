@@ -16,6 +16,7 @@ export interface DragCurrent {
   force?: boolean; // can the new piece replace an existing one (editor)
   previouslySelected?: cg.Key;
   originTarget: EventTarget | null;
+  keyHasChanged: boolean; // whether the drag has left the orig key
 }
 
 export function start(s: State, e: cg.MouchEvent): void {
@@ -58,6 +59,7 @@ export function start(s: State, e: cg.MouchEvent): void {
       element,
       previouslySelected,
       originTarget: e.target,
+      keyHasChanged: false,
     };
     element.cgDragging = true;
     element.classList.add('dragging');
@@ -104,6 +106,7 @@ export function dragNewPiece(s: State, piece: cg.Piece, e: cg.MouchEvent, force?
     originTarget: e.target,
     newPiece: true,
     force: !!force,
+    keyHasChanged: false,
   };
   processDrag(s);
 }
@@ -135,6 +138,8 @@ function processDrag(s: State): void {
           cur.pos[0] - bounds.left - bounds.width / 16,
           cur.pos[1] - bounds.top - bounds.height / 16,
         ]);
+
+        cur.keyHasChanged ||= cur.orig !== board.getKeyAtDomPos(cur.pos, board.whitePov(s), bounds);
       }
     }
     processDrag(s);
@@ -176,7 +181,7 @@ export function end(s: State, e: cg.MouchEvent): void {
     s.pieces.delete(cur.orig);
     board.callUserFunction(s.events.change);
   }
-  if (cur.orig === cur.previouslySelected && (cur.orig === dest || !dest)) board.unselect(s);
+  if ((cur.orig === cur.previouslySelected || cur.keyHasChanged) && (cur.orig === dest || !dest)) board.unselect(s);
   else if (!s.selectable.enabled) board.unselect(s);
 
   removeDragElements(s);
