@@ -1,7 +1,7 @@
 import { State } from './state';
 import * as board from './board';
 import { write as fenWrite } from './fen';
-import { Config, configure } from './config';
+import { Config, configure, applyAnimation } from './config';
 import { anim, render } from './anim';
 import { cancel as dragCancel, dragNewPiece } from './drag';
 import { DrawShape } from './draw';
@@ -86,6 +86,7 @@ export function start(state: State, redrawAll: cg.Redraw): Api {
   return {
     set(config): void {
       if (config.orientation && config.orientation !== state.orientation) toggleOrientation();
+      applyAnimation(state, config);
       (config.fen ? anim : render)(state => configure(state, config), state);
     },
 

@@ -89,12 +89,20 @@ export interface Config {
   };
 }
 
+export function applyAnimation(state: HeadlessState, config: Config): void {
+  if (config.animation) {
+    deepMerge(state.animation, config.animation);
+    // no need for such short animations
+    if ((state.animation.duration || 0) < 70) state.animation.enabled = false;
+  }
+}
+
 export function configure(state: HeadlessState, config: Config): void {
   // don't merge destinations and autoShapes. Just override.
   if (config.movable?.dests) state.movable.dests = undefined;
   if (config.drawable?.autoShapes) state.drawable.autoShapes = [];
 
-  merge(state, config);
+  deepMerge(state, config);
 
   // if a fen was provided, replace the pieces
   if (config.fen) {
@@ -113,8 +121,7 @@ export function configure(state: HeadlessState, config: Config): void {
   // fix move/premove dests
   if (state.selected) setSelected(state, state.selected);
 
-  // no need for such short animations
-  if (!state.animation.duration || state.animation.duration < 70) state.animation.enabled = false;
+  applyAnimation(state, config);
 
   if (!state.movable.rookCastle && state.movable.dests) {
     const rank = state.movable.color === 'white' ? '1' : '8',
@@ -133,9 +140,9 @@ export function configure(state: HeadlessState, config: Config): void {
   }
 }
 
-function merge(base: any, extend: any): void {
+function deepMerge(base: any, extend: any): void {
   for (const key in extend) {
-    if (isObject(base[key]) && isObject(extend[key])) merge(base[key], extend[key]);
+    if (isObject(base[key]) && isObject(extend[key])) deepMerge(base[key], extend[key]);
     else base[key] = extend[key];
   }
 }
