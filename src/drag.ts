@@ -31,12 +31,10 @@ export function start(s: State, e: cg.MouchEvent): void {
   if (!previouslySelected && s.drawable.enabled && (s.drawable.eraseOnClick || !piece || piece.color !== s.turnColor))
     drawClear(s);
   // Prevent touch scroll and create no corresponding mouse event, if there
-  // is an intent to interact with the board. If no color is movable
-  // (and the board is not for viewing only), touches are likely intended to
-  // select squares.
+  // is an intent to interact with the board.
   if (
     e.cancelable !== false &&
-    (!e.touches || !s.movable.color || piece || previouslySelected || pieceCloseTo(s, position))
+    (!e.touches || s.blockTouchScroll || piece || previouslySelected || pieceCloseTo(s, position))
   )
     e.preventDefault();
   const hadPremove = !!s.premovable.current;
