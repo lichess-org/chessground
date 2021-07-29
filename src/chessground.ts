@@ -26,7 +26,6 @@ export function Chessground(element: HTMLElement, config?: Config): Api {
       onResize = (): void => {
         updateBounds(state);
         renderResized(state);
-        if (elements.svg) svg.renderSvg(state, elements.svg, elements.customSvg!);
       };
     const state = maybeState as State;
     state.dom = {

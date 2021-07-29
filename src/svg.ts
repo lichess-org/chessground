@@ -23,8 +23,7 @@ export function renderSvg(state: State, svg: SVGElement, customSvg: SVGElement):
   const d = state.drawable,
     curD = d.current,
     cur = curD && curD.mouseSq ? (curD as DrawShape) : undefined,
-    arrowDests: ArrowDests = new Map(),
-    bounds = state.dom.bounds();
+    arrowDests: ArrowDests = new Map();
 
   for (const s of d.shapes.concat(d.autoShapes).concat(cur ? [cur] : [])) {
     if (s.dest) arrowDests.set(s.dest, (arrowDests.get(s.dest) || 0) + 1);
@@ -34,14 +33,14 @@ export function renderSvg(state: State, svg: SVGElement, customSvg: SVGElement):
     return {
       shape: s,
       current: false,
-      hash: shapeHash(s, arrowDests, false, bounds),
+      hash: shapeHash(s, arrowDests, false),
     };
   });
   if (cur)
     shapes.push({
       shape: cur,
       current: true,
-      hash: shapeHash(cur, arrowDests, true, bounds),
+      hash: shapeHash(cur, arrowDests, true),
     });
 
   const fullHash = shapes.map(sc => sc.hash).join(';');
@@ -116,8 +115,7 @@ function syncShapes(
   arrowDests: ArrowDests,
   root: SVGElement
 ): void {
-  const bounds = state.dom.bounds(),
-    hashesInDom = new Map(), // by hash
+  const hashesInDom = new Map(), // by hash
     toRemove: SVGElement[] = [];
   for (const sc of shapes) hashesInDom.set(sc.hash, false);
   let el: SVGElement | undefined = root.firstChild as SVGElement,
@@ -134,19 +132,16 @@ function syncShapes(
   for (const el of toRemove) root.removeChild(el);
   // insert shapes that are not yet in dom
   for (const sc of shapes) {
-    if (!hashesInDom.get(sc.hash)) root.appendChild(renderShape(state, sc, brushes, arrowDests, bounds));
+    if (!hashesInDom.get(sc.hash)) root.appendChild(renderShape(state, sc, brushes, arrowDests));
   }
 }
 
 function shapeHash(
   { orig, dest, brush, piece, modifiers, customSvg }: DrawShape,
   arrowDests: ArrowDests,
-  current: boolean,
-  bounds: ClientRect
+  current: boolean
 ): Hash {
   return [
-    bounds.width,
-    bounds.height,
     current,
     orig,
     dest,
@@ -181,20 +176,14 @@ function renderShape(
   state: State,
   { shape, current, hash }: Shape,
   brushes: DrawBrushes,
-  arrowDests: ArrowDests,
-  bounds: ClientRect
+  arrowDests: ArrowDests
 ): SVGElement {
   let el: SVGElement;
   if (shape.customSvg) {
     const orig = orient(key2pos(shape.orig), state.orientation);
-    el = renderCustomSvg(shape.customSvg, orig, bounds);
+    el = renderCustomSvg(shape.customSvg, orig);
   } else if (shape.piece)
-    el = renderPiece(
-      state.drawable.pieces.baseUrl,
-      orient(key2pos(shape.orig), state.orientation),
-      shape.piece,
-      bounds
-    );
+    el = renderPiece(state.drawable.pieces.baseUrl, orient(key2pos(shape.orig), state.orientation), shape.piece);
   else {
     const orig = orient(key2pos(shape.orig), state.orientation);
     if (shape.dest) {
@@ -205,37 +194,32 @@ function renderShape(
         orig,
         orient(key2pos(shape.dest), state.orientation),
         current,
-        (arrowDests.get(shape.dest) || 0) > 1,
-        bounds
+        (arrowDests.get(shape.dest) || 0) > 1
       );
-    } else el = renderCircle(brushes[shape.brush!], orig, current, bounds);
+    } else el = renderCircle(brushes[shape.brush!], orig, current);
   }
   el.setAttribute('cgHash', hash);
   return el;
 }
 
-function renderCustomSvg(customSvg: string, pos: cg.Pos, bounds: ClientRect): SVGElement {
-  const { width, height } = bounds;
-  const w = width / 8;
-  const h = height / 8;
-  const x = pos[0] * w;
-  const y = (7 - pos[1]) * h;
+function renderCustomSvg(customSvg: string, pos: cg.Pos): SVGElement {
+  const [x, y] = pos2user(pos);
 
   // Translate to top-left of `orig` square
   const g = setAttributes(createElement('g'), { transform: `translate(${x},${y})` });
 
   // Give 100x100 coordinate system to the user for `orig` square
-  const svg = setAttributes(createElement('svg'), { width: w, height: h, viewBox: '0 0 100 100' });
+  const svg = setAttributes(createElement('svg'), { width: 1, height: 1, viewBox: '0 0 100 100' });
 
   g.appendChild(svg);
   svg.innerHTML = customSvg;
   return g;
 }
 
-function renderCircle(brush: DrawBrush, pos: cg.Pos, current: boolean, bounds: ClientRect): SVGElement {
-  const o = pos2px(pos, bounds),
-    widths = circleWidth(bounds),
-    radius = (bounds.width + bounds.height) / 32;
+function renderCircle(brush: DrawBrush, pos: cg.Pos, current: boolean): SVGElement {
+  const o = pos2user(pos),
+    widths = circleWidth(),
+    radius = 0.5;
   return setAttributes(createElement('circle'), {
     stroke: brush.color,
     'stroke-width': widths[current ? 0 : 1],
@@ -247,17 +231,10 @@ function renderCircle(brush: DrawBrush, pos: cg.Pos, current: boolean, bounds: C
   });
 }
 
-function renderArrow(
-  brush: DrawBrush,
-  orig: cg.Pos,
-  dest: cg.Pos,
-  current: boolean,
-  shorten: boolean,
-  bounds: ClientRect
-): SVGElement {
-  const m = arrowMargin(bounds, shorten && !current),
-    a = pos2px(orig, bounds),
-    b = pos2px(dest, bounds),
+function renderArrow(brush: DrawBrush, orig: cg.Pos, dest: cg.Pos, current: boolean, shorten: boolean): SVGElement {
+  const m = arrowMargin(shorten && !current),
+    a = pos2user(orig),
+    b = pos2user(dest),
     dx = b[0] - a[0],
     dy = b[1] - a[1],
     angle = Math.atan2(dy, dx),
@@ -265,7 +242,7 @@ function renderArrow(
     yo = Math.sin(angle) * m;
   return setAttributes(createElement('line'), {
     stroke: brush.color,
-    'stroke-width': lineWidth(brush, current, bounds),
+    'stroke-width': lineWidth(brush, current),
     'stroke-linecap': 'round',
     'marker-end': 'url(#arrowhead-' + brush.key + ')',
     opacity: opacity(brush, current),
@@ -276,9 +253,9 @@ function renderArrow(
   });
 }
 
-function renderPiece(baseUrl: string, pos: cg.Pos, piece: DrawShapePiece, bounds: ClientRect): SVGElement {
-  const o = pos2px(pos, bounds),
-    size = (bounds.width / 8) * (piece.scale || 1),
+function renderPiece(baseUrl: string, pos: cg.Pos, piece: DrawShapePiece): SVGElement {
+  const o = pos2user(pos),
+    size = piece.scale || 1,
     name = piece.color[0] + (piece.role === 'knight' ? 'n' : piece.role[0]).toUpperCase();
   return setAttributes(createElement('image'), {
     className: `${piece.role} ${piece.color}`,
@@ -327,23 +304,22 @@ function makeCustomBrush(base: DrawBrush, modifiers: DrawModifiers): DrawBrush {
   };
 }
 
-function circleWidth(bounds: ClientRect): [number, number] {
-  const base = bounds.width / 512;
-  return [3 * base, 4 * base];
+function circleWidth(): [number, number] {
+  return [3 / 64, 4 / 64];
 }
 
-function lineWidth(brush: DrawBrush, current: boolean, bounds: ClientRect): number {
-  return (((brush.lineWidth || 10) * (current ? 0.85 : 1)) / 512) * bounds.width;
+function lineWidth(brush: DrawBrush, current: boolean): number {
+  return (brush.lineWidth || 10) * (current ? 0.85 : 1) / 64;
 }
 
 function opacity(brush: DrawBrush, current: boolean): number {
   return (brush.opacity || 1) * (current ? 0.9 : 1);
 }
 
-function arrowMargin(bounds: ClientRect, shorten: boolean): number {
-  return ((shorten ? 20 : 10) / 512) * bounds.width;
+function arrowMargin(shorten: boolean): number {
+  return (shorten ? 20 : 10) / 64;
 }
 
-function pos2px(pos: cg.Pos, bounds: ClientRect): cg.NumberPair {
-  return [((pos[0] + 0.5) * bounds.width) / 8, ((7.5 - pos[1]) * bounds.height) / 8];
+function pos2user(pos: cg.Pos): cg.NumberPair {
+  return [pos[0], 7 - pos[1]];
 }
