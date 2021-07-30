@@ -255,15 +255,16 @@ function renderArrow(brush: DrawBrush, orig: cg.Pos, dest: cg.Pos, current: bool
 
 function renderPiece(baseUrl: string, pos: cg.Pos, piece: DrawShapePiece): SVGElement {
   const o = pos2user(pos),
-    size = piece.scale || 1,
     name = piece.color[0] + (piece.role === 'knight' ? 'n' : piece.role[0]).toUpperCase();
   return setAttributes(createElement('image'), {
     className: `${piece.role} ${piece.color}`,
-    x: o[0] - size / 2,
-    y: o[1] - size / 2,
-    width: size,
-    height: size,
+    x: o[0] - 0.5,
+    y: o[1] - 0.5,
+    width: 1,
+    height: 1,
     href: baseUrl + name + '.svg',
+    transform: `scale(${piece.scale || 1})`,
+    'transform-origin': `${o[0]} ${o[1]}`,
   });
 }
 
@@ -309,7 +310,7 @@ function circleWidth(): [number, number] {
 }
 
 function lineWidth(brush: DrawBrush, current: boolean): number {
-  return (brush.lineWidth || 10) * (current ? 0.85 : 1) / 64;
+  return ((brush.lineWidth || 10) * (current ? 0.85 : 1)) / 64;
 }
 
 function opacity(brush: DrawBrush, current: boolean): number {
