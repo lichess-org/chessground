@@ -231,7 +231,7 @@ function renderCustomSvg(customSvg: string, pos: cg.Pos, bounds: ClientRect): SV
 function renderCircle(brush: DrawBrush, pos: cg.Pos, current: boolean, bounds: ClientRect): SVGElement {
   const o = pos2user(pos, bounds),
     widths = circleWidth(),
-    radius = 0.5;
+    radius = (bounds.width + bounds.height) / (4 * Math.max(bounds.width, bounds.height));
   return setAttributes(createElement('circle'), {
     stroke: brush.color,
     'stroke-width': widths[current ? 0 : 1],
