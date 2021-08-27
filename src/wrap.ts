@@ -36,10 +36,18 @@ export function renderWrap(element: HTMLElement, s: HeadlessState): Elements {
   let svg: SVGElement | undefined;
   let customSvg: SVGElement | undefined;
   if (s.drawable.visible) {
-    svg = setAttributes(createSVG('svg'), { class: 'cg-shapes', viewBox: '-.5 -.5 8 8' });
+    svg = setAttributes(createSVG('svg'), {
+      class: 'cg-shapes',
+      viewBox: '-4 -4 8 8',
+      preserveAspectRatio: 'xMidYMid slice',
+    });
     svg.appendChild(createSVG('defs'));
     svg.appendChild(createSVG('g'));
-    customSvg = setAttributes(createSVG('svg'), { class: 'cg-custom-svgs', viewBox: '0 0 8 8' });
+    customSvg = setAttributes(createSVG('svg'), {
+      class: 'cg-custom-svgs',
+      viewBox: '-3.5 -3.5 8 8',
+      preserveAspectRatio: 'xMidYMid slice',
+    });
     customSvg.appendChild(createSVG('g'));
     container.appendChild(svg);
     container.appendChild(customSvg);
