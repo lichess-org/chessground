@@ -85,9 +85,6 @@ export interface Config {
     shapes?: DrawShape[];
     autoShapes?: DrawShape[];
     brushes?: DrawBrushes;
-    pieces?: {
-      baseUrl?: string;
-    };
     onChange?: (shapes: DrawShape[]) => void; // called after drawable shapes change
   };
 }
