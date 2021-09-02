@@ -86,10 +86,6 @@ piece.fading {
   opacity: 0.6;
 }
 
-.cg-wrap piece svg image {
-  opacity: 0.5;
-}
-
 .cg-wrap .cg-shapes,
 .cg-wrap .cg-custom-svgs {
   overflow: hidden;
@@ -104,6 +100,10 @@ piece.fading {
 .cg-wrap .cg-shapes {
   opacity: 0.6;
   z-index: 2;
+}
+
+.cg-wrap .cg-shapes .cg-shape-piece {
+  opacity: 0.5;
 }
 
 .cg-wrap .cg-custom-svgs {

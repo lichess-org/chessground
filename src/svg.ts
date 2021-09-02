@@ -1,5 +1,5 @@
 import { State } from './state';
-import { key2pos } from './util';
+import { key2pos, createEl } from './util';
 import { Drawable, DrawShape, DrawShapePiece, DrawBrush, DrawBrushes, DrawModifiers } from './draw';
 import * as cg from './types';
 
@@ -185,18 +185,13 @@ function renderShape(
   bounds: ClientRect
 ): SVGElement {
   let el: SVGElement;
+  const orig = orient(key2pos(shape.orig), state.orientation);
+
   if (shape.customSvg) {
-    const orig = orient(key2pos(shape.orig), state.orientation);
     el = renderCustomSvg(shape.customSvg, orig, bounds);
-  } else if (shape.piece)
-    el = renderPiece(
-      state.drawable.pieces.baseUrl,
-      orient(key2pos(shape.orig), state.orientation),
-      shape.piece,
-      bounds
-    );
-  else {
-    const orig = orient(key2pos(shape.orig), state.orientation);
+  } else if (shape.piece) {
+    el = renderPiece(orig, shape.piece, bounds);
+  } else {
     if (shape.dest) {
       let brush: DrawBrush = brushes[shape.brush!];
       if (shape.modifiers) brush = makeCustomBrush(brush, shape.modifiers);
@@ -272,19 +267,24 @@ function renderArrow(
   });
 }
 
-function renderPiece(baseUrl: string, pos: cg.Pos, piece: DrawShapePiece, bounds: ClientRect): SVGElement {
-  const o = pos2user(pos, bounds),
-    name = piece.color[0] + (piece.role === 'knight' ? 'n' : piece.role[0]).toUpperCase();
-  return setAttributes(createElement('image'), {
-    className: `${piece.role} ${piece.color}`,
+function renderPiece(pos: cg.Pos, piece: DrawShapePiece, bounds: ClientRect): SVGElement {
+  const o = pos2user(pos, bounds);
+  const el = setAttributes(createElement('foreignObject'), {
     x: o[0] - 0.5,
     y: o[1] - 0.5,
     width: 1,
     height: 1,
-    href: baseUrl + name + '.svg',
     transform: `scale(${piece.scale || 1})`,
     'transform-origin': `${o[0]} ${o[1]}`,
   });
+
+  const pieceEl = createEl('div', `cg-shape-piece ${piece.role} ${piece.color}`);
+  pieceEl.style.width = '100%';
+  pieceEl.style.height = '100%';
+  pieceEl.style.backgroundSize = 'cover';
+  el.appendChild(pieceEl);
+
+  return el;
 }
 
 function renderMarker(brush: DrawBrush): SVGElement {
