@@ -39,6 +39,7 @@ export interface Elements {
   ghost?: HTMLElement;
   svg?: SVGElement;
   customSvg?: SVGElement;
+  autoPieces?: HTMLElement;
 }
 export interface Dom {
   elements: Elements;
@@ -75,6 +76,7 @@ export interface PieceNode extends KeyedNode {
   cgAnimating?: boolean;
   cgFading?: boolean;
   cgDragging?: boolean;
+  cgScale?: number;
 }
 export interface SquareNode extends KeyedNode {
   tagName: 'SQUARE';

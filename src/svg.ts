@@ -1,36 +1,30 @@
 import { State } from './state';
-import { key2pos, createEl } from './util';
+import { key2pos } from './util';
 import { Drawable, DrawShape, DrawShapePiece, DrawBrush, DrawBrushes, DrawModifiers } from './draw';
+import { SyncableShape, Hash, syncShapes } from './sync';
 import * as cg from './types';
 
 export function createElement(tagName: string): SVGElement {
   return document.createElementNS('http://www.w3.org/2000/svg', tagName);
 }
 
-interface Shape {
-  shape: DrawShape;
-  current: boolean;
-  hash: Hash;
-}
-
 type CustomBrushes = Map<string, DrawBrush>; // by hash
 
 type ArrowDests = Map<cg.Key, number>; // how many arrows land on a square
-
-type Hash = string;
 
 export function renderSvg(state: State, svg: SVGElement, customSvg: SVGElement): void {
   const d = state.drawable,
     curD = d.current,
     cur = curD && curD.mouseSq ? (curD as DrawShape) : undefined,
     arrowDests: ArrowDests = new Map(),
-    bounds = state.dom.bounds();
+    bounds = state.dom.bounds(),
+    nonPieceAutoShapes = d.autoShapes.filter(autoShape => !autoShape.piece);
 
-  for (const s of d.shapes.concat(d.autoShapes).concat(cur ? [cur] : [])) {
+  for (const s of d.shapes.concat(nonPieceAutoShapes).concat(cur ? [cur] : [])) {
     if (s.dest) arrowDests.set(s.dest, (arrowDests.get(s.dest) || 0) + 1);
   }
 
-  const shapes: Shape[] = d.shapes.concat(d.autoShapes).map((s: DrawShape) => {
+  const shapes: SyncableShape[] = d.shapes.concat(nonPieceAutoShapes).map((s: DrawShape) => {
     return {
       shape: s,
       current: false,
@@ -55,7 +49,7 @@ export function renderSvg(state: State, svg: SVGElement, customSvg: SVGElement):
         ...(for brushes)...
       </defs>
       <g>
-        ...(for arrows, circles, and pieces)...
+        ...(for arrows and circles)...
       </g>
     </svg>
     <svg class="cg-custom-svgs"> (<= customSvg)
@@ -71,23 +65,19 @@ export function renderSvg(state: State, svg: SVGElement, customSvg: SVGElement):
 
   syncDefs(d, shapes, defsEl);
   syncShapes(
-    state,
     shapes.filter(s => !s.shape.customSvg),
-    d.brushes,
-    arrowDests,
-    shapesEl
+    shapesEl,
+    shape => renderShape(state, shape, d.brushes, arrowDests, bounds)
   );
   syncShapes(
-    state,
     shapes.filter(s => s.shape.customSvg),
-    d.brushes,
-    arrowDests,
-    customSvgsEl
+    customSvgsEl,
+    shape => renderShape(state, shape, d.brushes, arrowDests, bounds)
   );
 }
 
 // append only. Don't try to update/remove.
-function syncDefs(d: Drawable, shapes: Shape[], defsEl: SVGElement) {
+function syncDefs(d: Drawable, shapes: SyncableShape[], defsEl: SVGElement) {
   const brushes: CustomBrushes = new Map();
   let brush: DrawBrush;
   for (const s of shapes) {
@@ -105,36 +95,6 @@ function syncDefs(d: Drawable, shapes: Shape[], defsEl: SVGElement) {
   }
   for (const [key, brush] of brushes.entries()) {
     if (!keysInDom.has(key)) defsEl.appendChild(renderMarker(brush));
-  }
-}
-
-// append and remove only. No updates.
-function syncShapes(
-  state: State,
-  shapes: Shape[],
-  brushes: DrawBrushes,
-  arrowDests: ArrowDests,
-  root: SVGElement
-): void {
-  const bounds = state.dom.bounds(),
-    hashesInDom = new Map(), // by hash
-    toRemove: SVGElement[] = [];
-  for (const sc of shapes) hashesInDom.set(sc.hash, false);
-  let el: SVGElement | undefined = root.firstChild as SVGElement,
-    elHash: Hash;
-  while (el) {
-    elHash = el.getAttribute('cgHash') as Hash;
-    // found a shape element that's here to stay
-    if (hashesInDom.has(elHash)) hashesInDom.set(elHash, true);
-    // or remove it
-    else toRemove.push(el);
-    el = el.nextSibling as SVGElement | undefined;
-  }
-  // remove old shapes
-  for (const el of toRemove) root.removeChild(el);
-  // insert shapes that are not yet in dom
-  for (const sc of shapes) {
-    if (!hashesInDom.get(sc.hash)) root.appendChild(renderShape(state, sc, brushes, arrowDests, bounds));
   }
 }
 
@@ -179,7 +139,7 @@ function customSvgHash(s: string): Hash {
 
 function renderShape(
   state: State,
-  { shape, current, hash }: Shape,
+  { shape, current, hash }: SyncableShape,
   brushes: DrawBrushes,
   arrowDests: ArrowDests,
   bounds: ClientRect
@@ -189,8 +149,6 @@ function renderShape(
 
   if (shape.customSvg) {
     el = renderCustomSvg(shape.customSvg, orig, bounds);
-  } else if (shape.piece) {
-    el = renderPiece(orig, shape.piece, bounds);
   } else {
     if (shape.dest) {
       let brush: DrawBrush = brushes[shape.brush!];
@@ -265,26 +223,6 @@ function renderArrow(
     x2: b[0] - xo,
     y2: b[1] - yo,
   });
-}
-
-function renderPiece(pos: cg.Pos, piece: DrawShapePiece, bounds: ClientRect): SVGElement {
-  const o = pos2user(pos, bounds);
-  const el = setAttributes(createElement('foreignObject'), {
-    x: o[0] - 0.5,
-    y: o[1] - 0.5,
-    width: 1,
-    height: 1,
-    transform: `scale(${piece.scale || 1})`,
-    'transform-origin': `${o[0]} ${o[1]}`,
-  });
-
-  const pieceEl = createEl('div', `cg-shape-piece ${piece.role} ${piece.color}`);
-  pieceEl.style.width = '100%';
-  pieceEl.style.height = '100%';
-  pieceEl.style.backgroundSize = 'cover';
-  el.appendChild(pieceEl);
-
-  return el;
 }
 
 function renderMarker(brush: DrawBrush): SVGElement {

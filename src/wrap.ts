@@ -12,6 +12,7 @@ export function renderWrap(element: HTMLElement, s: HeadlessState): Elements {
   //       g
   //     svg.cg-custom-svgs
   //       g
+  //     cg-auto-pieces
   //     coords.ranks
   //     coords.files
   //     piece.ghost
@@ -35,6 +36,8 @@ export function renderWrap(element: HTMLElement, s: HeadlessState): Elements {
 
   let svg: SVGElement | undefined;
   let customSvg: SVGElement | undefined;
+  let autoPieces: HTMLElement | undefined;
+
   if (s.drawable.visible) {
     svg = setAttributes(createSVG('svg'), {
       class: 'cg-shapes',
@@ -43,14 +46,19 @@ export function renderWrap(element: HTMLElement, s: HeadlessState): Elements {
     });
     svg.appendChild(createSVG('defs'));
     svg.appendChild(createSVG('g'));
+
     customSvg = setAttributes(createSVG('svg'), {
       class: 'cg-custom-svgs',
       viewBox: '-3.5 -3.5 8 8',
       preserveAspectRatio: 'xMidYMid slice',
     });
     customSvg.appendChild(createSVG('g'));
+
+    autoPieces = createEl('cg-auto-pieces');
+
     container.appendChild(svg);
     container.appendChild(customSvg);
+    container.appendChild(autoPieces);
   }
 
   if (s.coordinates) {
@@ -73,6 +81,7 @@ export function renderWrap(element: HTMLElement, s: HeadlessState): Elements {
     ghost,
     svg,
     customSvg,
+    autoPieces,
   };
 }
 
