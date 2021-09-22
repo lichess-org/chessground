@@ -210,9 +210,11 @@ function removeNodes(s: State, nodes: HTMLElement[]): void {
 }
 
 function posZIndex(pos: cg.Pos, asWhite: boolean): string {
-  let z = 3 + pos[1] * 8 + (7 - pos[0]);
-  if (asWhite) z = 69 - z;
-  return z + '';
+  const minZ = 3;
+  const rank = pos[1];
+  const z = asWhite ? minZ + 7 - rank : minZ + rank;
+
+  return `${z}`;
 }
 
 function pieceNameOf(piece: cg.Piece): string {
