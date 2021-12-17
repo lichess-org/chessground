@@ -138,6 +138,11 @@ piece.fading {
   flex-flow: column;
 }
 
+.cg-wrap coords.ranks.left {
+  left: -15px;
+  align-items: flex-end;
+}
+
 .cg-wrap coords.files {
   bottom: -4px;
   left: 24px;
