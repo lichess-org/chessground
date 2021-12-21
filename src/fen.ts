@@ -1,5 +1,5 @@
-import { pos2key, invRanks } from './util';
-import * as cg from './types';
+import { pos2key, invRanks } from './util.js';
+import * as cg from './types.js';
 
 export const initial: cg.FEN = 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR';
 

@@ -1,7 +1,7 @@
-import { HeadlessState } from './state';
-import { pos2key, key2pos, opposite, distanceSq, allPos, computeSquareCenter } from './util';
-import { premove, queen, knight } from './premove';
-import * as cg from './types';
+import { HeadlessState } from './state.js';
+import { pos2key, key2pos, opposite, distanceSq, allPos, computeSquareCenter } from './util.js';
+import { premove, queen, knight } from './premove.js';
+import * as cg from './types.js';
 
 export function callUserFunction<T extends (...args: any[]) => void>(f: T | undefined, ...args: Parameters<T>): void {
   if (f) setTimeout(() => f(...args), 1);

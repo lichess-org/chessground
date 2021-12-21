@@ -1,12 +1,12 @@
-import { State } from './state';
-import * as board from './board';
-import { write as fenWrite } from './fen';
-import { Config, configure, applyAnimation } from './config';
-import { anim, render } from './anim';
-import { cancel as dragCancel, dragNewPiece } from './drag';
-import { DrawShape } from './draw';
-import { explosion } from './explosion';
-import * as cg from './types';
+import { State } from './state.js';
+import * as board from './board.js';
+import { write as fenWrite } from './fen.js';
+import { Config, configure, applyAnimation } from './config.js';
+import { anim, render } from './anim.js';
+import { cancel as dragCancel, dragNewPiece } from './drag.js';
+import { DrawShape } from './draw.js';
+import { explosion } from './explosion.js';
+import * as cg from './types.js';
 
 export interface Api {
   // reconfigure the instance. Accepts all config options, except for viewOnly & drawable.visible.
