@@ -1,12 +1,12 @@
-import { Api, start } from './api';
-import { Config, configure } from './config';
-import { HeadlessState, State, defaults } from './state';
+import { Api, start } from './api.js';
+import { Config, configure } from './config.js';
+import { HeadlessState, State, defaults } from './state.js';
 
-import { renderWrap } from './wrap';
-import * as events from './events';
-import { render, renderResized, updateBounds } from './render';
-import * as svg from './svg';
-import * as util from './util';
+import { renderWrap } from './wrap.js';
+import * as events from './events.js';
+import { render, renderResized, updateBounds } from './render.js';
+import * as svg from './svg.js';
+import * as util from './util.js';
 
 export function Chessground(element: HTMLElement, config?: Config): Api {
   const maybeState: State | HeadlessState = defaults();

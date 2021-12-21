@@ -1,7 +1,7 @@
-import { State } from './state';
-import { key2pos } from './util';
-import { Drawable, DrawShape, DrawShapePiece, DrawBrush, DrawBrushes, DrawModifiers } from './draw';
-import * as cg from './types';
+import { State } from './state.js';
+import { key2pos } from './util.js';
+import { Drawable, DrawShape, DrawShapePiece, DrawBrush, DrawBrushes, DrawModifiers } from './draw.js';
+import * as cg from './types.js';
 
 export function createElement(tagName: string): SVGElement {
   return document.createElementNS('http://www.w3.org/2000/svg', tagName);

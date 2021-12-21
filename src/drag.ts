@@ -1,9 +1,9 @@
-import { State } from './state';
-import * as board from './board';
-import * as util from './util';
-import { clear as drawClear } from './draw';
-import * as cg from './types';
-import { anim } from './anim';
+import { State } from './state.js';
+import * as board from './board.js';
+import * as util from './util.js';
+import { clear as drawClear } from './draw.js';
+import * as cg from './types.js';
+import { anim } from './anim.js';
 
 export interface DragCurrent {
   orig: cg.Key; // orig key of dragging piece
