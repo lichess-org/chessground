@@ -29,6 +29,7 @@ export function read(fen: cg.FEN): cg.Pieces {
   for (const c of fen) {
     switch (c) {
       case ' ':
+      case '[':
         return pieces;
       case '/':
         --row;
