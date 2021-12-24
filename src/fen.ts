@@ -65,8 +65,10 @@ export function write(pieces: cg.Pieces): cg.FEN {
         .map(x => {
           const piece = pieces.get((x + y) as cg.Key);
           if (piece) {
-            const letter = letters[piece.role];
-            return piece.color === 'white' ? letter.toUpperCase() : letter;
+            let p = letters[piece.role];
+            if (piece.color === 'white') p = p.toUpperCase();
+            if (piece.promoted) p += '~';
+            return p;
           } else return '1';
         })
         .join('')
