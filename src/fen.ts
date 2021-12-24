@@ -37,7 +37,7 @@ export function read(fen: cg.FEN): cg.Pieces {
         col = 0;
         break;
       case '~': {
-        const piece = pieces.get(pos2key([col, row]));
+        const piece = pieces.get(pos2key([col - 1, row]));
         if (piece) piece.promoted = true;
         break;
       }
