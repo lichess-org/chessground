@@ -43,10 +43,6 @@ export interface Drawable {
   autoShapes: DrawShape[]; // computer shapes
   current?: DrawCurrent;
   brushes: DrawBrushes;
-  // drawable SVG pieces; used for crazyhouse drop
-  pieces: {
-    baseUrl: string;
-  };
   prevSvgHash: string;
 }
 

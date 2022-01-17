@@ -59,6 +59,10 @@ export const translate = (el: HTMLElement, pos: cg.NumberPair): void => {
   el.style.transform = `translate(${pos[0]}px,${pos[1]}px)`;
 };
 
+export const translateAndScale = (el: HTMLElement, pos: cg.NumberPair, scale = 1): void => {
+  el.style.transform = `translate(${pos[0]}px,${pos[1]}px) scale(${scale})`;
+};
+
 export const setVisible = (el: HTMLElement, v: boolean): void => {
   el.style.visibility = v ? 'visible' : 'hidden';
 };

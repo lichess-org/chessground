@@ -5,6 +5,7 @@ import { HeadlessState, State, defaults } from './state.js';
 import { renderWrap } from './wrap.js';
 import * as events from './events.js';
 import { render, renderResized, updateBounds } from './render.js';
+import * as autoPieces from './autoPieces.js';
 import * as svg from './svg.js';
 import * as util from './util.js';
 
@@ -21,11 +22,13 @@ export function Chessground(element: HTMLElement, config?: Config): Api {
       bounds = util.memo(() => elements.board.getBoundingClientRect()),
       redrawNow = (skipSvg?: boolean): void => {
         render(state);
+        if (elements.autoPieces) autoPieces.render(state, elements.autoPieces);
         if (!skipSvg && elements.svg) svg.renderSvg(state, elements.svg, elements.customSvg!);
       },
       onResize = (): void => {
         updateBounds(state);
         renderResized(state);
+        if (elements.autoPieces) autoPieces.renderResized(state);
       };
     const state = maybeState as State;
     state.dom = {

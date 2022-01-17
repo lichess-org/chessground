@@ -184,9 +184,6 @@ export function defaults(): HeadlessState {
           lineWidth: 15,
         },
       },
-      pieces: {
-        baseUrl: 'https://lichess1.org/assets/piece/cburnett/',
-      },
       prevSvgHash: '',
     },
     hold: timer(),
