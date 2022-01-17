@@ -1,5 +1,5 @@
-import { pos2key, invRanks } from './util';
-import * as cg from './types';
+import { pos2key, invRanks } from './util.js';
+import * as cg from './types.js';
 
 export const initial: cg.FEN = 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR';
 
@@ -29,6 +29,7 @@ export function read(fen: cg.FEN): cg.Pieces {
   for (const c of fen) {
     switch (c) {
       case ' ':
+      case '[':
         return pieces;
       case '/':
         --row;
@@ -36,7 +37,7 @@ export function read(fen: cg.FEN): cg.Pieces {
         col = 0;
         break;
       case '~': {
-        const piece = pieces.get(pos2key([col, row]));
+        const piece = pieces.get(pos2key([col - 1, row]));
         if (piece) piece.promoted = true;
         break;
       }
@@ -64,8 +65,10 @@ export function write(pieces: cg.Pieces): cg.FEN {
         .map(x => {
           const piece = pieces.get((x + y) as cg.Key);
           if (piece) {
-            const letter = letters[piece.role];
-            return piece.color === 'white' ? letter.toUpperCase() : letter;
+            let p = letters[piece.role];
+            if (piece.color === 'white') p = p.toUpperCase();
+            if (piece.promoted) p += '~';
+            return p;
           } else return '1';
         })
         .join('')

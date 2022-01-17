@@ -72,9 +72,10 @@ const ground = Chessground(document.body, config);
 
 ### Wrappers
 
-- React: [ruilisi/react-chessground](https://github.com/ruilisi/react-chessground)
+- React: [react-chess/chessground](https://github.com/react-chess/chessground), [ruilisi/react-chessground](https://github.com/ruilisi/react-chessground)
 - Vue.js: [vitogit/vue-chessboard](https://github.com/vitogit/vue-chessboard)
 - Angular: [topce/ngx-chessground](https://github.com/topce/ngx-chessground)
+- Svelte: [gtm-nayan/svelte-use-chessground](https://github.com/gtm-nayan/svelte-use-chessground)
 
 More? Please make a pull request to include it here.
 

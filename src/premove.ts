@@ -1,5 +1,5 @@
-import * as util from './util';
-import * as cg from './types';
+import * as util from './util.js';
+import * as cg from './types.js';
 
 type Mobility = (x1: number, y1: number, x2: number, y2: number) => boolean;
 

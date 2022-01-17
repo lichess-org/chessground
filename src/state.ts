@@ -1,9 +1,9 @@
-import * as fen from './fen';
-import { AnimCurrent } from './anim';
-import { DragCurrent } from './drag';
-import { Drawable } from './draw';
-import { timer } from './util';
-import * as cg from './types';
+import * as fen from './fen.js';
+import { AnimCurrent } from './anim.js';
+import { DragCurrent } from './drag.js';
+import { Drawable } from './draw.js';
+import { timer } from './util.js';
+import * as cg from './types.js';
 
 export interface HeadlessState {
   pieces: cg.Pieces;
@@ -13,6 +13,7 @@ export interface HeadlessState {
   lastMove?: cg.Key[]; // squares part of the last move ["c3"; "c4"]
   selected?: cg.Key; // square currently selected "a1"
   coordinates: boolean; // include coords attributes
+  ranksPosition: cg.RanksPosition; // position ranks on either side. left | right
   autoCastle: boolean; // immediately complete the castle by moving the rook after king move
   viewOnly: boolean; // don't bind events: the user will never be able to move pieces around
   disableContextMenu: boolean; // because who needs a context menu on a chessboard
@@ -109,6 +110,7 @@ export function defaults(): HeadlessState {
     orientation: 'white',
     turnColor: 'white',
     coordinates: true,
+    ranksPosition: 'right',
     autoCastle: true,
     viewOnly: false,
     disableContextMenu: false,

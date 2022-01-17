@@ -1,9 +1,9 @@
-import { State } from './state';
-import * as drag from './drag';
-import * as draw from './draw';
-import { drop } from './drop';
-import { isRightButton } from './util';
-import * as cg from './types';
+import { State } from './state.js';
+import * as drag from './drag.js';
+import * as draw from './draw.js';
+import { drop } from './drop.js';
+import { isRightButton } from './util.js';
+import * as cg from './types.js';
 
 type MouchBind = (e: cg.MouchEvent) => void;
 type StateMouchBind = (d: State, e: cg.MouchEvent) => void;

@@ -1,4 +1,4 @@
-import * as cg from './types';
+import * as cg from './types.js';
 
 export const invRanks: readonly cg.Rank[] = [...cg.ranks].reverse();
 

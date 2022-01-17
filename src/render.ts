@@ -1,9 +1,9 @@
-import { State } from './state';
-import { key2pos, createEl, posToTranslate as posToTranslateFromBounds, translate } from './util';
-import { whitePov } from './board';
-import { AnimCurrent, AnimVectors, AnimVector, AnimFadings } from './anim';
-import { DragCurrent } from './drag';
-import * as cg from './types';
+import { State } from './state.js';
+import { key2pos, createEl, posToTranslate as posToTranslateFromBounds, translate } from './util.js';
+import { whitePov } from './board.js';
+import { AnimCurrent, AnimVectors, AnimVector, AnimFadings } from './anim.js';
+import { DragCurrent } from './drag.js';
+import * as cg from './types.js';
 
 type PieceName = string; // `$color $role`
 
@@ -210,9 +210,11 @@ function removeNodes(s: State, nodes: HTMLElement[]): void {
 }
 
 function posZIndex(pos: cg.Pos, asWhite: boolean): string {
-  let z = 3 + pos[1] * 8 + (7 - pos[0]);
-  if (asWhite) z = 69 - z;
-  return z + '';
+  const minZ = 3;
+  const rank = pos[1];
+  const z = asWhite ? minZ + 7 - rank : minZ + rank;
+
+  return `${z}`;
 }
 
 function pieceNameOf(piece: cg.Piece): string {

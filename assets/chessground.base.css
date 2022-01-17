@@ -58,7 +58,8 @@ cg-board square.last-move {
 
 cg-board piece.dragging {
   cursor: move;
-  z-index: 10;
+  /* !important to override z-index from 3D piece inline style */
+  z-index: 11 !important;
 }
 
 piece.anim {
@@ -113,7 +114,7 @@ piece.fading {
 }
 
 .cg-wrap .cg-custom-svgs {
-  /* over piece.anim = 8, but under piece.dragging = 10 */
+  /* over piece.anim = 8, but under piece.dragging = 11 */
   z-index: 9;
 }
 
@@ -140,6 +141,11 @@ piece.fading {
 
 .cg-wrap coords.ranks.black {
   flex-flow: column;
+}
+
+.cg-wrap coords.ranks.left {
+  left: -15px;
+  align-items: flex-end;
 }
 
 .cg-wrap coords.files {
