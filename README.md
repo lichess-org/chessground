@@ -1,6 +1,6 @@
 # Chessground
 
-[![Continuous Integration](https://github.com/ornicar/chessground/workflows/Continuous%20Integration/badge.svg)](https://github.com/ornicar/chessground/actions?query=workflow%3A%22Continuous+Integration%22)
+[![Continuous Integration](https://github.com/lichess-org/chessground/workflows/Continuous%20Integration/badge.svg)](https://github.com/lichess-org/chessground/actions?query=workflow%3A%22Continuous+Integration%22)
 [![npm](https://img.shields.io/npm/v/chessground)](https://www.npmjs.com/package/chessground)
 
 ![Chessground in 2D and 3D](/screenshot/twin.jpg)
@@ -81,11 +81,11 @@ More? Please make a pull request to include it here.
 
 ## Documentation
 
-- [Config types](https://github.com/ornicar/chessground/tree/master/src/config.ts)
-- [Default config values](https://github.com/ornicar/chessground/tree/master/src/state.ts)
-- [API type signatures](https://github.com/ornicar/chessground/tree/master/src/api.ts)
-- [Examples repo](https://github.com/ornicar/chessground-examples/tree/master/src/units)
-- [Base CSS](https://github.com/ornicar/chessground-examples/blob/master/assets/chessground.css)
+- [Config types](https://github.com/lichess-org/chessground/tree/master/src/config.ts)
+- [Default config values](https://github.com/lichess-org/chessground/tree/master/src/state.ts)
+- [API type signatures](https://github.com/lichess-org/chessground/tree/master/src/api.ts)
+- [Examples repo](https://github.com/lichess-org/chessground-examples/tree/master/src/units)
+- [Base CSS](https://github.com/lichess-org/chessground-examples/blob/master/assets/chessground.css)
 
 ## Development
 
