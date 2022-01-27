@@ -45,7 +45,7 @@
   "author": "Thibault Duplessis (https://github.com/ornicar)",
   "license": "GPL-3.0-or-later",
   "bugs": {
-    "url": "https://github.com/lichess-org/chessground"
+    "url": "https://github.com/lichess-org/chessground/issues"
   },
   "funding": "https://lichess.org/patron"
 }
