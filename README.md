@@ -17,7 +17,7 @@ When you use Chessground for your website, your combined work may be
 distributed only under the GPL. **You must release your source code** to the
 users of your website.
 
-Please read more about GPL for JavaScript on [greendrake.info/#nfy0](http://greendrake.info/#nfy0).
+Please read more about GPL for JavaScript on [greendrake.info](https://greendrake.info/publications/js-gpl).
 
 ## Demos
 
