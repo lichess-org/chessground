@@ -9,7 +9,7 @@ type PieceName = string; // `$color $role`
 
 type SquareClasses = Map<cg.Key, string>;
 
-// ported from https://github.com/veloce/lichobile/blob/master/src/js/chessground/view.js
+// ported from https://github.com/lichess-org/lichobile/blob/master/src/chessground/render.ts
 // in case of bugs, blame @veloce
 export function render(s: State): void {
   const asWhite: boolean = whitePov(s),
