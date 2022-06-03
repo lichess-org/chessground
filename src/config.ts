@@ -87,6 +87,8 @@ export interface Config {
     brushes?: DrawBrushes;
     onChange?: (shapes: DrawShape[]) => void; // called after drawable shapes change
   };
+  wFaction?: string;
+  bFaction?: string;
 }
 
 export function applyAnimation(state: HeadlessState, config: Config): void {
