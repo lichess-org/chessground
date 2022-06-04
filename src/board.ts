@@ -37,16 +37,14 @@ export function setCheck(state: HeadlessState, color: cg.Color | boolean): void 
     }
 }
 
-export function setFactions(state: HeadlessState, wFaction: cg.Faction, bFaction: cg.Faction): void {  
-  // for (const [k, p] of state.pieces) {
-  //   if (p.color === 'white') {
-  //     p.faction = wFaction;
-  //   }
-  //   if (p.color === 'black') {
-  //     p.faction = bFaction;
-  //   }
-  // }
-  console.log(state.pieces, wFaction, bFaction);
+export function setRoyalty(state: HeadlessState, square: cg.Key | undefined, color: string): void {
+  if (color === 'white') {
+    console.log('w', state.wRoyalty, square);
+    state.wRoyalty = square;
+  } else {
+    console.log('b', state.bRoyalty, square)
+    state.bRoyalty = square;
+  }
 }
 
 function setPremove(state: HeadlessState, orig: cg.Key, dest: cg.Key, meta: cg.SetPremoveMetadata): void {

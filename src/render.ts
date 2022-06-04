@@ -228,6 +228,8 @@ function computeSquareClasses(s: State): SquareClasses {
       addSquare(squares, k, 'last-move');
     }
   if (s.check && s.highlight.check) addSquare(squares, s.check, 'check');
+  if (s.wRoyalty) addSquare(squares, s.wRoyalty, 'royalty');
+  if (s.bRoyalty) addSquare(squares, s.bRoyalty, 'royalty');
   if (s.selected) {
     addSquare(squares, s.selected, 'selected');
     if (s.movable.showDests) {

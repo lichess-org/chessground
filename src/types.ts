@@ -1,6 +1,6 @@
 export type Color = typeof colors[number];
 export type Role = 'king' | 'queen' | 'rook' | 'bishop' | 'knight' | 'pawn' | 'spectre' | 'exile';
-export type Faction = '0' | '1' | '2' | '3' | '4' | '5' | '6';
+export type Faction = 'normal' | 'sigma' | 'omega' | 'lambda' | 'mu' | 'nu' | 'chi';
 export type File = typeof files[number];
 export type Rank = typeof ranks[number];
 export type Key = 'a0' | `${File}${Rank}`;

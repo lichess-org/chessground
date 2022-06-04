@@ -29,9 +29,6 @@ export interface Api {
   // add and/or remove arbitrary pieces on the board
   setPieces(pieces: cg.PiecesDiff): void;
 
-  // set factions
-  setFactions(wFaction: cg.Faction, bFaction: cg.Faction): void;
-
   // click a square programmatically
   selectSquare(key: cg.Key | null, force?: boolean): void;
 
@@ -101,10 +98,6 @@ export function start(state: State, redrawAll: cg.Redraw): Api {
 
     setPieces(pieces): void {
       anim(state => board.setPieces(state, pieces), state);
-    },
-
-    setFactions(wFaction, bFaction): void {
-      board.setFactions(state, wFaction, bFaction);
     },
 
     selectSquare(key, force): void {
