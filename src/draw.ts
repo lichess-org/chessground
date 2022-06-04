@@ -15,6 +15,7 @@ export interface DrawShape {
 export interface DrawShapePiece {
   role: cg.Role;
   color: cg.Color;
+  faction: cg.Faction;
   scale?: number;
 }
 

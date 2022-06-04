@@ -98,6 +98,8 @@ export interface HeadlessState {
   drawable: Drawable;
   exploding?: cg.Exploding;
   hold: cg.Timer;
+  wFaction: cg.Faction;
+  bFaction: cg.Faction;
 }
 
 export interface State extends HeadlessState {
@@ -106,7 +108,7 @@ export interface State extends HeadlessState {
 
 export function defaults(): HeadlessState {
   return {
-    pieces: fen.read(fen.initial),
+    pieces: fen.read(fen.initial, '0', '0'),
     orientation: 'white',
     turnColor: 'white',
     coordinates: true,
@@ -187,5 +189,7 @@ export function defaults(): HeadlessState {
       prevSvgHash: '',
     },
     hold: timer(),
+    wFaction: '0',
+    bFaction: '0',
   };
 }

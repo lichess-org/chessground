@@ -3,13 +3,15 @@ import * as cg from './types.js';
 
 export const initial: cg.FEN = 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR';
 
-const roles: { [letter: string]: cg.Role } = {
+const  roles: { [letter: string]: cg.Role } = {
   p: 'pawn',
   r: 'rook',
   n: 'knight',
   b: 'bishop',
   q: 'queen',
   k: 'king',
+  s: 'spectre',
+  e: 'exile',
 };
 
 const letters = {
@@ -19,9 +21,11 @@ const letters = {
   bishop: 'b',
   queen: 'q',
   king: 'k',
+  spectre: 's',
+  exile: 'e',
 };
 
-export function read(fen: cg.FEN): cg.Pieces {
+export function read(fen: cg.FEN, wFaction: cg.Faction | undefined, bFaction: cg.Faction | undefined): cg.Pieces {
   if (fen === 'start') fen = initial;
   const pieces: cg.Pieces = new Map();
   let row = 7,
@@ -49,6 +53,7 @@ export function read(fen: cg.FEN): cg.Pieces {
           pieces.set(pos2key([col, row]), {
             role: roles[role],
             color: c === role ? 'black' : 'white',
+            faction: c === role ? bFaction : wFaction,
           });
           ++col;
         }

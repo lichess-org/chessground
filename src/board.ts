@@ -37,6 +37,18 @@ export function setCheck(state: HeadlessState, color: cg.Color | boolean): void 
     }
 }
 
+export function setFactions(state: HeadlessState, wFaction: cg.Faction, bFaction: cg.Faction): void {  
+  // for (const [k, p] of state.pieces) {
+  //   if (p.color === 'white') {
+  //     p.faction = wFaction;
+  //   }
+  //   if (p.color === 'black') {
+  //     p.faction = bFaction;
+  //   }
+  // }
+  console.log(state.pieces, wFaction, bFaction);
+}
+
 function setPremove(state: HeadlessState, orig: cg.Key, dest: cg.Key, meta: cg.SetPremoveMetadata): void {
   unsetPredrop(state);
   state.premovable.current = [orig, dest];
@@ -337,6 +349,7 @@ export function getSnappedKeyAtDomPos(
 ): cg.Key | undefined {
   const origPos = key2pos(orig);
   const validSnapPos = allPos.filter(pos2 => {
+    // place spectre in here for some reason?
     return queen(origPos[0], origPos[1], pos2[0], pos2[1]) || knight(origPos[0], origPos[1], pos2[0], pos2[1]);
   });
   const validSnapCenters = validSnapPos.map(pos2 => computeSquareCenter(pos2key(pos2), asWhite, bounds));

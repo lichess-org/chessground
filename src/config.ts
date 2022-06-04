@@ -87,8 +87,8 @@ export interface Config {
     brushes?: DrawBrushes;
     onChange?: (shapes: DrawShape[]) => void; // called after drawable shapes change
   };
-  wFaction?: string;
-  bFaction?: string;
+  wFaction?: cg.Faction;
+  bFaction?: cg.Faction;
 }
 
 export function applyAnimation(state: HeadlessState, config: Config): void {
@@ -108,7 +108,7 @@ export function configure(state: HeadlessState, config: Config): void {
 
   // if a fen was provided, replace the pieces
   if (config.fen) {
-    state.pieces = fenRead(config.fen);
+    state.pieces = fenRead(config.fen, config.wFaction, config.bFaction);
     state.drawable.shapes = [];
   }
 

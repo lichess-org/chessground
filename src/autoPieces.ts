@@ -32,9 +32,10 @@ function renderShape(state: State, { shape, hash }: SyncableShape, bounds: Clien
   const orig = shape.orig;
   const role = shape.piece?.role;
   const color = shape.piece?.color;
+  const faction = shape.piece?.faction;
   const scale = shape.piece?.scale;
 
-  const pieceEl = createEl('piece', `${role} ${color}`) as cg.PieceNode;
+  const pieceEl = createEl('piece', `${role} ${color} ${faction}`) as cg.PieceNode;
   pieceEl.setAttribute('cgHash', hash);
   pieceEl.cgKey = orig;
   pieceEl.cgScale = scale;
@@ -44,5 +45,5 @@ function renderShape(state: State, { shape, hash }: SyncableShape, bounds: Clien
 }
 
 function hash(autoPiece: DrawShape): Hash {
-  return [autoPiece.orig, autoPiece.piece?.role, autoPiece.piece?.color, autoPiece.piece?.scale].join(',');
+  return [autoPiece.orig, autoPiece.piece?.role, autoPiece.piece?.color, autoPiece.piece?.faction, autoPiece.piece?.scale].join(',');
 }

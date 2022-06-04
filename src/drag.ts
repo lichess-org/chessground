@@ -64,7 +64,7 @@ export function start(s: State, e: cg.MouchEvent): void {
     // place ghost
     const ghost = s.dom.elements.ghost;
     if (ghost) {
-      ghost.className = `ghost ${piece.color} ${piece.role}`;
+      ghost.className = `ghost ${piece.color} ${piece.faction} ${piece.role}`;
       util.translate(ghost, util.posToTranslate(bounds)(util.key2pos(orig), board.whitePov(s)));
       util.setVisible(ghost, true);
     }
