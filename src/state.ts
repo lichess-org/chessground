@@ -100,8 +100,8 @@ export interface HeadlessState {
   hold: cg.Timer;
   wFaction: cg.Faction;
   bFaction: cg.Faction;
-  wRoyalty: cg.Key | undefined;
-  bRoyalty: cg.Key | undefined;
+  wRoyalty?: cg.Key;
+  bRoyalty?: cg.Key;
 }
 
 export interface State extends HeadlessState {
@@ -193,7 +193,5 @@ export function defaults(): HeadlessState {
     hold: timer(),
     wFaction: 'normal',
     bFaction: 'normal',
-    wRoyalty: 'a0',
-    bRoyalty: 'a0',
   };
 }
