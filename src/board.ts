@@ -39,10 +39,8 @@ export function setCheck(state: HeadlessState, color: cg.Color | boolean): void 
 
 export function setRoyalty(state: HeadlessState, square: cg.Key | undefined, color: string): void {
   if (color === 'white') {
-    console.log('w', state.wRoyalty, square);
     state.wRoyalty = square;
   } else {
-    console.log('b', state.bRoyalty, square)
     state.bRoyalty = square;
   }
 }
