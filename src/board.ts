@@ -50,12 +50,10 @@ export function setVisibility(color: string, visible: boolean | undefined): void
 
   for (let i = 0; i < cgPieces.length; i++) {
     if (cgPieces[i].classList.contains(color) && !visible) {
-      cgPieces[i].classList.remove(color);
-      cgPieces[i].classList.add(color === 'white' ? 'w' : 'b');
+      cgPieces[i].classList.add('invisible');
     }
     if (cgPieces[i].classList.contains(color) && visible) {
-      cgPieces[i].classList.remove(color === 'white' ? 'w' : 'b');
-      cgPieces[i].classList.add(color);
+      cgPieces[i].classList.remove('invisible');
     }
   }
 }
