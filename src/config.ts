@@ -1,5 +1,5 @@
 import { HeadlessState } from './state.js';
-import { setCheck, setRoyalty, setSelected } from './board.js';
+import { setCheck, setRoyalty, setVisibility, setSelected } from './board.js';
 import { read as fenRead } from './fen.js';
 import { DrawShape, DrawBrushes } from './draw.js';
 import * as cg from './types.js';
@@ -91,6 +91,8 @@ export interface Config {
   bFaction?: cg.Faction;
   wRoyalty?: cg.Key;
   bRoyalty?: cg.Key;
+  wVisible?: boolean;
+  bVisible?: boolean;
 }
 
 export function applyAnimation(state: HeadlessState, config: Config): void {
@@ -118,6 +120,8 @@ export function configure(state: HeadlessState, config: Config): void {
   if ('check' in config) setCheck(state, config.check || false);
   if ('wRoyalty' in config) setRoyalty(state, config.wRoyalty, 'white');
   if ('bRoyalty' in config) setRoyalty(state, config.bRoyalty, 'black');
+  if ('wVisible' in config) setVisibility('white', config.wVisible);
+  if ('bVisible' in config) setVisibility('black', config.bVisible);
   if ('lastMove' in config && !config.lastMove) state.lastMove = undefined;
   // in case of ZH drop last move, there's a single square.
   // if the previous last move had two squares,

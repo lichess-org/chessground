@@ -45,6 +45,21 @@ export function setRoyalty(state: HeadlessState, square: cg.Key | undefined, col
   }
 }
 
+export function setVisibility(color: string, visible: boolean | undefined): void {
+  const cgPieces = document.getElementsByTagName('piece');
+
+  for (let i = 0; i < cgPieces.length; i++) {
+    if (cgPieces[i].classList.contains(color) && !visible) {
+      cgPieces[i].classList.remove(color);
+      cgPieces[i].classList.add(color === 'white' ? 'w' : 'b');
+    }
+    if (cgPieces[i].classList.contains(color) && visible) {
+      cgPieces[i].classList.remove(color === 'white' ? 'w' : 'b');
+      cgPieces[i].classList.add(color);
+    }
+  }
+}
+
 function setPremove(state: HeadlessState, orig: cg.Key, dest: cg.Key, meta: cg.SetPremoveMetadata): void {
   unsetPredrop(state);
   state.premovable.current = [orig, dest];
