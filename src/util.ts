@@ -8,6 +8,12 @@ export const pos2key = (pos: cg.Pos): cg.Key => allKeys[8 * pos[0] + pos[1]];
 
 export const key2pos = (k: cg.Key): cg.Pos => [k.charCodeAt(0) - 97, k.charCodeAt(1) - 49];
 
+export const uciToMove = (uci: string | undefined): cg.Key[] | undefined => {
+  if (!uci) return undefined;
+  if (uci[1] === '@') return [uci.slice(2, 4) as cg.Key];
+  return [uci.slice(0, 2), uci.slice(2, 4)] as cg.Key[];
+};
+
 export const allPos: readonly cg.Pos[] = allKeys.map(key2pos);
 
 export function memo<A>(f: () => A): cg.Memo<A> {
