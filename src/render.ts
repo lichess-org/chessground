@@ -192,10 +192,8 @@ export function updateBounds(s: State): void {
   container.style.height = height + 'px';
   s.dom.bounds.clear();
 
-  if (s.addDimensionsCssVars) {
-    document.documentElement.style.setProperty('--cg-width', width + 'px');
-    document.documentElement.style.setProperty('--cg-height', height + 'px');
-  }
+  s.addDimensionsCssVarsTo?.style.setProperty('--cg-width', width + 'px');
+  s.addDimensionsCssVarsTo?.style.setProperty('--cg-height', height + 'px');
 }
 
 function isPieceNode(el: cg.PieceNode | cg.SquareNode): el is cg.PieceNode {
