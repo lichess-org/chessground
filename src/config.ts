@@ -142,11 +142,13 @@ export function configure(state: HeadlessState, config: Config): void {
 
 function deepMerge(base: any, extend: any): void {
   for (const key in extend) {
-    if (isObject(base[key]) && isObject(extend[key])) deepMerge(base[key], extend[key]);
+    if (isPlainObject(base[key]) && isPlainObject(extend[key])) deepMerge(base[key], extend[key]);
     else base[key] = extend[key];
   }
 }
 
-function isObject(o: unknown): boolean {
-  return typeof o === 'object';
+function isPlainObject(o: unknown): boolean {
+  if (typeof o !== 'object' || o === null) return false;
+  const proto = Object.getPrototypeOf(o);
+  return proto === Object.prototype || proto === null;
 }
