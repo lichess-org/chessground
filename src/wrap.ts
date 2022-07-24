@@ -69,7 +69,7 @@ export function renderWrap(element: HTMLElement, s: HeadlessState): Elements {
   }
 
   let ghost: HTMLElement | undefined;
-  if (s.draggable.showGhost) {
+  if (s.draggable.enabled && s.draggable.showGhost) {
     ghost = createEl('piece', 'ghost');
     setVisible(ghost, false);
     container.appendChild(ghost);
