@@ -21,6 +21,7 @@ Please read more about GPL for JavaScript on [greendrake.info](https://greendrak
 
 ## Demos
 
+- [Embedded PGN viewer](https://github.com/liches-org/pgn-viewer)
 - [Chess TV](https://lichess.org/tv)
 - [Board editor](https://lichess.org/editor)
 - [Puzzles](https://lichess.org/training)
