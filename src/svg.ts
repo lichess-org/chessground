@@ -245,7 +245,9 @@ function renderMarker(brush: DrawBrush): SVGElement {
 }
 
 export function setAttributes(el: SVGElement, attrs: { [key: string]: any }): SVGElement {
-  for (const key in attrs) el.setAttribute(key, attrs[key]);
+  for (const key in attrs) {
+    if (attrs.hasOwnProperty(key)) el.setAttribute(key, attrs[key]);
+  }
   return el;
 }
 
