@@ -13,10 +13,10 @@ jobs:
         with:
           node-version: '16'
           cache: yarn
-      - uses: github/codeql-action/init@v1
+      - uses: github/codeql-action/init@v2
         with:
           languages: javascript
-      - uses: github/codeql-action/analyse@v1
+      - uses: github/codeql-action/analyze@v2
       - run: yarn install
       - run: yarn run lint
       - run: yarn run dist
