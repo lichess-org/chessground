@@ -6,6 +6,9 @@ echo "Publishing $version"
 
 sed -i -e "s/\"version\": \".*\"/\"version\": \"$version\"/g" package.json;
 
+npm run compile
+npm run dist
+
 git add package.json
 
 git commit -m "Bump v$version"
