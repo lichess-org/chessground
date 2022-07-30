@@ -142,8 +142,8 @@ export function configure(state: HeadlessState, config: Config): void {
 
 function deepMerge(base: any, extend: any): void {
   for (const key in extend) {
-    if (extend.hasOwnProperty(key)) {
-      if (base.hasOwnProperty(key) && isPlainObject(base[key]) && isPlainObject(extend[key]))
+    if (Object.prototype.hasOwnProperty.call(extend, key)) {
+      if (Object.prototype.hasOwnProperty.call(base, key) && isPlainObject(base[key]) && isPlainObject(extend[key]))
         deepMerge(base[key], extend[key]);
       else base[key] = extend[key];
     }
