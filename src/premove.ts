@@ -3,18 +3,16 @@ import * as cg from './types.js';
 
 type Mobility = (x1: number, y1: number, x2: number, y2: number) => boolean;
 
-function diff(a: number, b: number): number {
-  return Math.abs(a - b);
-}
+const diff = (a: number, b: number): number => Math.abs(a - b);
 
-function pawn(color: cg.Color): Mobility {
-  return (x1, y1, x2, y2) =>
+const pawn =
+  (color: cg.Color): Mobility =>
+  (x1, y1, x2, y2) =>
     diff(x1, x2) < 2 &&
     (color === 'white'
       ? // allow 2 squares from first two ranks, for horde
         y2 === y1 + 1 || (y1 <= 1 && y2 === y1 + 2 && x1 === x2)
       : y2 === y1 - 1 || (y1 >= 6 && y2 === y1 - 2 && x1 === x2));
-}
 
 export const knight: Mobility = (x1, y1, x2, y2) => {
   const xd = diff(x1, x2);
@@ -34,15 +32,15 @@ export const queen: Mobility = (x1, y1, x2, y2) => {
   return bishop(x1, y1, x2, y2) || rook(x1, y1, x2, y2);
 };
 
-function king(color: cg.Color, rookFiles: number[], canCastle: boolean): Mobility {
-  return (x1, y1, x2, y2) =>
+const king =
+  (color: cg.Color, rookFiles: number[], canCastle: boolean): Mobility =>
+  (x1, y1, x2, y2) =>
     (diff(x1, x2) < 2 && diff(y1, y2) < 2) ||
     (canCastle &&
       y1 === y2 &&
       y1 === (color === 'white' ? 0 : 7) &&
       ((x1 === 4 && ((x2 === 2 && rookFiles.includes(0)) || (x2 === 6 && rookFiles.includes(7)))) ||
         rookFiles.includes(x2)));
-}
 
 function rookFilesOf(pieces: cg.Pieces, color: cg.Color) {
   const backrank = color === 'white' ? '1' : '8';

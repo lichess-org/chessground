@@ -221,11 +221,8 @@ function isMovable(state: HeadlessState, orig: cg.Key): boolean {
   );
 }
 
-export function canMove(state: HeadlessState, orig: cg.Key, dest: cg.Key): boolean {
-  return (
-    orig !== dest && isMovable(state, orig) && (state.movable.free || !!state.movable.dests?.get(orig)?.includes(dest))
-  );
-}
+export const canMove = (state: HeadlessState, orig: cg.Key, dest: cg.Key): boolean =>
+  orig !== dest && isMovable(state, orig) && (state.movable.free || !!state.movable.dests?.get(orig)?.includes(dest));
 
 function canDrop(state: HeadlessState, orig: cg.Key, dest: cg.Key): boolean {
   const piece = state.pieces.get(orig);
@@ -241,11 +238,8 @@ function isPremovable(state: HeadlessState, orig: cg.Key): boolean {
   return !!piece && state.premovable.enabled && state.movable.color === piece.color && state.turnColor !== piece.color;
 }
 
-function canPremove(state: HeadlessState, orig: cg.Key, dest: cg.Key): boolean {
-  return (
-    orig !== dest && isPremovable(state, orig) && premove(state.pieces, orig, state.premovable.castle).includes(dest)
-  );
-}
+const canPremove = (state: HeadlessState, orig: cg.Key, dest: cg.Key): boolean =>
+  orig !== dest && isPremovable(state, orig) && premove(state.pieces, orig, state.premovable.castle).includes(dest);
 
 function canPredrop(state: HeadlessState, orig: cg.Key, dest: cg.Key): boolean {
   const piece = state.pieces.get(orig);
@@ -336,9 +330,9 @@ export function getSnappedKeyAtDomPos(
   bounds: ClientRect
 ): cg.Key | undefined {
   const origPos = key2pos(orig);
-  const validSnapPos = allPos.filter(pos2 => {
-    return queen(origPos[0], origPos[1], pos2[0], pos2[1]) || knight(origPos[0], origPos[1], pos2[0], pos2[1]);
-  });
+  const validSnapPos = allPos.filter(
+    pos2 => queen(origPos[0], origPos[1], pos2[0], pos2[1]) || knight(origPos[0], origPos[1], pos2[0], pos2[1])
+  );
   const validSnapCenters = validSnapPos.map(pos2 => computeSquareCenter(pos2key(pos2), asWhite, bounds));
   const validSnapDistances = validSnapCenters.map(pos2 => distanceSq(pos, pos2));
   const [, closestSnapIndex] = validSnapDistances.reduce(
@@ -348,6 +342,4 @@ export function getSnappedKeyAtDomPos(
   return pos2key(validSnapPos[closestSnapIndex]);
 }
 
-export function whitePov(s: HeadlessState): boolean {
-  return s.orientation === 'white';
-}
+export const whitePov = (s: HeadlessState): boolean => s.orientation === 'white';

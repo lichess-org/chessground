@@ -23,9 +23,8 @@ export interface AnimCurrent {
   plan: AnimPlan;
 }
 
-export function anim<A>(mutation: Mutation<A>, state: State): A {
-  return state.animation.enabled ? animate(mutation, state) : render(mutation, state);
-}
+export const anim = <A>(mutation: Mutation<A>, state: State): A =>
+  state.animation.enabled ? animate(mutation, state) : render(mutation, state);
 
 export function render<A>(mutation: Mutation<A>, state: State): A {
   const result = mutation(state);
@@ -40,19 +39,14 @@ interface AnimPiece {
 }
 type AnimPieces = Map<cg.Key, AnimPiece>;
 
-function makePiece(key: cg.Key, piece: cg.Piece): AnimPiece {
-  return {
-    key: key,
-    pos: util.key2pos(key),
-    piece: piece,
-  };
-}
+const makePiece = (key: cg.Key, piece: cg.Piece): AnimPiece => ({
+  key: key,
+  pos: util.key2pos(key),
+  piece: piece,
+});
 
-function closer(piece: AnimPiece, pieces: AnimPiece[]): AnimPiece | undefined {
-  return pieces.sort((p1, p2) => {
-    return util.distanceSq(piece.pos, p1.pos) - util.distanceSq(piece.pos, p2.pos);
-  })[0];
-}
+const closer = (piece: AnimPiece, pieces: AnimPiece[]): AnimPiece | undefined =>
+  pieces.sort((p1, p2) => util.distanceSq(piece.pos, p1.pos) - util.distanceSq(piece.pos, p2.pos))[0];
 
 function computePlan(prevPieces: cg.Pieces, current: State): AnimPlan {
   const anims: AnimVectors = new Map(),
@@ -142,6 +136,4 @@ function animate<A>(mutation: Mutation<A>, state: State): A {
 }
 
 // https://gist.github.com/gre/1650294
-function easing(t: number): number {
-  return t < 0.5 ? 4 * t * t * t : (t - 1) * (2 * t - 2) * (2 * t - 2) + 1;
-}
+const easing = (t: number): number => (t < 0.5 ? 4 * t * t * t : (t - 1) * (2 * t - 2) * (2 * t - 2) + 1);

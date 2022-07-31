@@ -196,12 +196,8 @@ export function updateBounds(s: State): void {
   s.addDimensionsCssVarsTo?.style.setProperty('--cg-height', height + 'px');
 }
 
-function isPieceNode(el: cg.PieceNode | cg.SquareNode): el is cg.PieceNode {
-  return el.tagName === 'PIECE';
-}
-function isSquareNode(el: cg.PieceNode | cg.SquareNode): el is cg.SquareNode {
-  return el.tagName === 'SQUARE';
-}
+const isPieceNode = (el: cg.PieceNode | cg.SquareNode): el is cg.PieceNode => el.tagName === 'PIECE';
+const isSquareNode = (el: cg.PieceNode | cg.SquareNode): el is cg.SquareNode => el.tagName === 'SQUARE';
 
 function removeNodes(s: State, nodes: HTMLElement[]): void {
   for (const node of nodes) s.dom.elements.board.removeChild(node);
@@ -215,9 +211,7 @@ function posZIndex(pos: cg.Pos, asWhite: boolean): string {
   return `${z}`;
 }
 
-function pieceNameOf(piece: cg.Piece): string {
-  return `${piece.color} ${piece.role}`;
-}
+const pieceNameOf = (piece: cg.Piece): string => `${piece.color} ${piece.role}`;
 
 function computeSquareClasses(s: State): SquareClasses {
   const squares: SquareClasses = new Map();

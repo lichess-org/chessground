@@ -63,8 +63,9 @@ function unbindable(
   return () => el.removeEventListener(eventName, callback, options);
 }
 
-function startDragOrDraw(s: State): MouchBind {
-  return e => {
+const startDragOrDraw =
+  (s: State): MouchBind =>
+  e => {
     if (s.draggable.current) drag.cancel(s);
     else if (s.drawable.current) draw.cancel(s);
     else if (e.shiftKey || isRightButton(e)) {
@@ -74,12 +75,11 @@ function startDragOrDraw(s: State): MouchBind {
       else drag.start(s, e);
     }
   };
-}
 
-function dragOrDraw(s: State, withDrag: StateMouchBind, withDraw: StateMouchBind): MouchBind {
-  return e => {
+const dragOrDraw =
+  (s: State, withDrag: StateMouchBind, withDraw: StateMouchBind): MouchBind =>
+  e => {
     if (s.drawable.current) {
       if (s.drawable.enabled) withDraw(s, e);
     } else if (!s.viewOnly) withDrag(s, e);
   };
-}
