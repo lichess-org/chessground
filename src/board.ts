@@ -194,7 +194,7 @@ export function selectSquare(state: HeadlessState, key: cg.Key, force?: boolean)
       }
     }
   }
-  if (state.selectable.enabled && (isMovable(state, key) || isPremovable(state, key))) {
+  if ((state.selectable.enabled || state.draggable.enabled) && (isMovable(state, key) || isPremovable(state, key))) {
     setSelected(state, key);
     state.hold.start();
   }
