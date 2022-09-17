@@ -85,6 +85,7 @@ More? Please make a pull request to include it here.
 - [Config types](https://github.com/lichess-org/chessground/tree/master/src/config.ts)
 - [Default config values](https://github.com/lichess-org/chessground/tree/master/src/state.ts)
 - [API type signatures](https://github.com/lichess-org/chessground/tree/master/src/api.ts)
+- [Simple standalone example](https://github.com/lichess-org/chessground/blob/master/demo.html)
 - [Examples repo](https://github.com/lichess-org/chessground-examples/tree/master/src/units)
 - [Base CSS](https://github.com/lichess-org/chessground-examples/blob/master/assets/chessground.css)
 
