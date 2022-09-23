@@ -62,7 +62,7 @@ export function renderWrap(element: HTMLElement, s: HeadlessState): Elements {
   }
 
   if (s.coordinates) {
-    const orientClass = s.orientation === 'black' ? ' black' : '';
+    const orientClass = s.orientation === 'chessboard-black' ? 'chessboard-black' : '';
     const ranksPositionClass = s.ranksPosition === 'left' ? ' left' : '';
     container.appendChild(renderCoords(ranks, 'ranks' + orientClass + ranksPositionClass));
     container.appendChild(renderCoords(files, 'files' + orientClass));

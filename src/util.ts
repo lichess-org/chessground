@@ -46,7 +46,7 @@ export const timer = (): cg.Timer => {
   };
 };
 
-export const opposite = (c: cg.Color): cg.Color => (c === 'white' ? 'black' : 'white');
+export const opposite = (c: cg.Color): cg.Color => (c === 'chessboard-white' ? 'chessboard-black' : 'chessboard-white');
 
 export const distanceSq = (pos1: cg.Pos, pos2: cg.Pos): number => {
   const dx = pos1[0] - pos2[0],

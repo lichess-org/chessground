@@ -98,7 +98,7 @@ export type Unbind = () => void;
 export type Milliseconds = number;
 export type KHz = number;
 
-export const colors = ['white', 'black'] as const;
+export const colors = ['chessboard-white', 'chessboard-black'] as const;
 export const files = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h'] as const;
 export const ranks = ['1', '2', '3', '4', '5', '6', '7', '8'] as const;
 

@@ -124,7 +124,7 @@ export function configure(state: HeadlessState, config: Config): void {
   applyAnimation(state, config);
 
   if (!state.movable.rookCastle && state.movable.dests) {
-    const rank = state.movable.color === 'white' ? '1' : '8',
+    const rank = state.movable.color === 'chessboard-white' ? '1' : '8',
       kingStartPos = ('e' + rank) as cg.Key,
       dests = state.movable.dests.get(kingStartPos),
       king = state.pieces.get(kingStartPos);

@@ -9,7 +9,7 @@ const pawn =
   (color: cg.Color): Mobility =>
   (x1, y1, x2, y2) =>
     diff(x1, x2) < 2 &&
-    (color === 'white'
+    (color === 'chessboard-white'
       ? // allow 2 squares from first two ranks, for horde
         y2 === y1 + 1 || (y1 <= 1 && y2 === y1 + 2 && x1 === x2)
       : y2 === y1 - 1 || (y1 >= 6 && y2 === y1 - 2 && x1 === x2));
@@ -38,12 +38,12 @@ const king =
     (diff(x1, x2) < 2 && diff(y1, y2) < 2) ||
     (canCastle &&
       y1 === y2 &&
-      y1 === (color === 'white' ? 0 : 7) &&
+      y1 === (color === 'chessboard-white' ? 0 : 7) &&
       ((x1 === 4 && ((x2 === 2 && rookFiles.includes(0)) || (x2 === 6 && rookFiles.includes(7)))) ||
         rookFiles.includes(x2)));
 
 function rookFilesOf(pieces: cg.Pieces, color: cg.Color) {
-  const backrank = color === 'white' ? '1' : '8';
+  const backrank = color === 'chessboard-white' ? '1' : '8';
   const files = [];
   for (const [key, piece] of pieces) {
     if (key[1] === backrank && piece.color === color && piece.role === 'rook') {

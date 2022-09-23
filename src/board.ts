@@ -342,4 +342,4 @@ export function getSnappedKeyAtDomPos(
   return pos2key(validSnapPos[closestSnapIndex]);
 }
 
-export const whitePov = (s: HeadlessState): boolean => s.orientation === 'white';
+export const whitePov = (s: HeadlessState): boolean => s.orientation === 'chessboard-white';
