@@ -2,11 +2,12 @@ import { State } from './state.js';
 import { unselect, cancelMove, getKeyAtDomPos, getSnappedKeyAtDomPos, whitePov } from './board.js';
 import { eventPosition, isRightButton } from './util.js';
 import * as cg from './types.js';
+import { BrushColor } from './types.js';
 
 export interface DrawShape {
   orig: cg.Key;
   dest?: cg.Key;
-  brush?: string;
+  brush: BrushColor;
   modifiers?: DrawModifiers;
   piece?: DrawShapePiece;
   customSvg?: string;
@@ -138,7 +139,7 @@ function addShape(drawable: Drawable, cur: DrawCurrent): void {
     drawable.shapes.push({
       orig: cur.orig,
       dest: cur.dest,
-      brush: cur.brush,
+      brush: cur.brush as BrushColor,
     });
   onChange(drawable);
 }
