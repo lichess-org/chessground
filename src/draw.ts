@@ -51,11 +51,11 @@ export interface DrawCurrent {
   dest?: cg.Key; // shape dest, or undefined for circle
   mouseSq?: cg.Key; // square being moused over
   pos: cg.NumberPair; // relative current position
-  brush: string; // brush name for shape
+  brush: cg.BrushColor; // brush name for shape
   snapToValidMove: boolean; // whether to snap to valid piece moves
 }
 
-const brushes = ['green', 'red', 'blue', 'yellow'];
+const brushes: Partial<cg.BrushColor>[] = ['green', 'red', 'blue', 'yellow'];
 
 export function start(state: State, e: cg.MouchEvent): void {
   // support one finger touch only
@@ -124,7 +124,7 @@ export function clear(state: State): void {
   }
 }
 
-function eventBrush(e: cg.MouchEvent): string {
+function eventBrush(e: cg.MouchEvent): cg.BrushColor {
   const modA = (e.shiftKey || e.ctrlKey) && isRightButton(e);
   const modB = e.altKey || e.metaKey || e.getModifierState?.('AltGraph');
   return brushes[(modA ? 1 : 0) + (modB ? 2 : 0)];
@@ -138,7 +138,7 @@ function addShape(drawable: Drawable, cur: DrawCurrent): void {
     drawable.shapes.push({
       orig: cur.orig,
       dest: cur.dest,
-      brush: cur.brush as cg.BrushColor,
+      brush: cur.brush,
     });
   onChange(drawable);
 }
