@@ -6,7 +6,7 @@ import * as cg from './types.js';
 export interface DrawShape {
   orig: cg.Key;
   dest?: cg.Key;
-  brush: cg.BrushColor;
+  brush: string;
   modifiers?: DrawModifiers;
   piece?: DrawShapePiece;
   customSvg?: string;
@@ -26,7 +26,11 @@ export interface DrawBrush {
 }
 
 export interface DrawBrushes {
-  [name: string]: DrawBrush;
+  green: DrawBrush;
+  red: DrawBrush;
+  blue: DrawBrush;
+  yellow: DrawBrush;
+  [color: string]: DrawBrush;
 }
 
 export interface DrawModifiers {
@@ -55,7 +59,7 @@ export interface DrawCurrent {
   snapToValidMove: boolean; // whether to snap to valid piece moves
 }
 
-const brushes: Partial<cg.BrushColor>[] = ['green', 'red', 'blue', 'yellow'];
+const brushes: cg.BrushColor[] = ['green', 'red', 'blue', 'yellow'];
 
 export function start(state: State, e: cg.MouchEvent): void {
   // support one finger touch only

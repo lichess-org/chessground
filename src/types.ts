@@ -104,4 +104,4 @@ export const ranks = ['1', '2', '3', '4', '5', '6', '7', '8'] as const;
 
 export type RanksPosition = 'left' | 'right';
 
-export type BrushColor = 'red' | 'green' | 'blue' | 'paleBlue' | 'yellow' | 'paleGreen' | 'paleRed' | 'paleGrey';
+export type BrushColor = 'green' | 'red' | 'blue' | 'yellow';

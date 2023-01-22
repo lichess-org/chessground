@@ -82,7 +82,7 @@ function syncDefs(d: Drawable, shapes: SyncableShape[], defsEl: SVGElement) {
   let brush: DrawBrush;
   for (const s of shapes) {
     if (s.shape.dest) {
-      brush = d.brushes[s.shape.brush!];
+      brush = d.brushes[s.shape.brush];
       if (s.shape.modifiers) brush = makeCustomBrush(brush, s.shape.modifiers);
       brushes.set(brush.key, brush);
     }
@@ -151,7 +151,7 @@ function renderShape(
     el = renderCustomSvg(shape.customSvg, orig, bounds);
   } else {
     if (shape.dest) {
-      let brush: DrawBrush = brushes[shape.brush!];
+      let brush: DrawBrush = brushes[shape.brush];
       if (shape.modifiers) brush = makeCustomBrush(brush, shape.modifiers);
       el = renderArrow(
         brush,
@@ -161,7 +161,7 @@ function renderShape(
         (arrowDests.get(shape.dest) || 0) > 1,
         bounds
       );
-    } else el = renderCircle(brushes[shape.brush!], orig, current, bounds);
+    } else el = renderCircle(brushes[shape.brush], orig, current, bounds);
   }
   el.setAttribute('cgHash', hash);
   return el;
