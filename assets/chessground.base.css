@@ -24,6 +24,9 @@ cg-board {
   user-select: none;
   line-height: 0;
   background-size: cover;
+}
+
+.cg-wrap.manipulable cg-board {
   cursor: pointer;
 }
 

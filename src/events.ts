@@ -13,6 +13,10 @@ export function bindBoard(s: State, onResize: () => void): void {
 
   if ('ResizeObserver' in window) new ResizeObserver(onResize).observe(s.dom.elements.wrap);
 
+  if (s.disableContextMenu || s.drawable.enabled) {
+    boardEl.addEventListener('contextmenu', e => e.preventDefault());
+  }
+
   if (s.viewOnly) return;
 
   // Cannot be passive, because we prevent touch scrolling and dragging of
@@ -24,10 +28,6 @@ export function bindBoard(s: State, onResize: () => void): void {
   boardEl.addEventListener('mousedown', onStart as EventListener, {
     passive: false,
   });
-
-  if (s.disableContextMenu || s.drawable.enabled) {
-    boardEl.addEventListener('contextmenu', e => e.preventDefault());
-  }
 }
 
 // returns the unbind function
