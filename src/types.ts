@@ -103,3 +103,5 @@ export const files = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h'] as const;
 export const ranks = ['1', '2', '3', '4', '5', '6', '7', '8'] as const;
 
 export type RanksPosition = 'left' | 'right';
+
+export type BrushColor = 'red' | 'green' | 'blue' | 'paleBlue' | 'yellow' | 'paleGreen' | 'paleRed' | 'paleGrey';
