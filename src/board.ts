@@ -315,7 +315,7 @@ export function stop(state: HeadlessState): void {
   cancelMove(state);
 }
 
-export function getKeyAtDomPos(pos: cg.NumberPair, asWhite: boolean, bounds: ClientRect): cg.Key | undefined {
+export function getKeyAtDomPos(pos: cg.NumberPair, asWhite: boolean, bounds: DOMRectReadOnly): cg.Key | undefined {
   let file = Math.floor((8 * (pos[0] - bounds.left)) / bounds.width);
   if (!asWhite) file = 7 - file;
   let rank = 7 - Math.floor((8 * (pos[1] - bounds.top)) / bounds.height);
@@ -327,7 +327,7 @@ export function getSnappedKeyAtDomPos(
   orig: cg.Key,
   pos: cg.NumberPair,
   asWhite: boolean,
-  bounds: ClientRect
+  bounds: DOMRectReadOnly
 ): cg.Key | undefined {
   const origPos = key2pos(orig);
   const validSnapPos = allPos.filter(

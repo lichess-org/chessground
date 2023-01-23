@@ -28,7 +28,7 @@ export function renderResized(state: State): void {
   }
 }
 
-function renderShape(state: State, { shape, hash }: SyncableShape, bounds: ClientRect): cg.PieceNode {
+function renderShape(state: State, { shape, hash }: SyncableShape, bounds: DOMRectReadOnly): cg.PieceNode {
   const orig = shape.orig;
   const role = shape.piece?.role;
   const color = shape.piece?.color;

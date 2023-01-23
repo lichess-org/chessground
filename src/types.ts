@@ -43,7 +43,7 @@ export interface Elements {
 }
 export interface Dom {
   elements: Elements;
-  bounds: Memo<ClientRect>;
+  bounds: Memo<DOMRectReadOnly>;
   redraw: () => void;
   redrawNow: (skipSvg?: boolean) => void;
   unbind?: Unbind;

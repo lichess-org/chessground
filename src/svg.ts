@@ -102,7 +102,7 @@ function shapeHash(
   { orig, dest, brush, piece, modifiers, customSvg }: DrawShape,
   arrowDests: ArrowDests,
   current: boolean,
-  bounds: ClientRect
+  bounds: DOMRectReadOnly
 ): Hash {
   return [
     bounds.width,
@@ -142,7 +142,7 @@ function renderShape(
   { shape, current, hash }: SyncableShape,
   brushes: DrawBrushes,
   arrowDests: ArrowDests,
-  bounds: ClientRect
+  bounds: DOMRectReadOnly
 ): SVGElement {
   let el: SVGElement;
   const orig = orient(key2pos(shape.orig), state.orientation);
@@ -167,7 +167,7 @@ function renderShape(
   return el;
 }
 
-function renderCustomSvg(customSvg: string, pos: cg.Pos, bounds: ClientRect): SVGElement {
+function renderCustomSvg(customSvg: string, pos: cg.Pos, bounds: DOMRectReadOnly): SVGElement {
   const [x, y] = pos2user(pos, bounds);
 
   // Translate to top-left of `orig` square
@@ -181,7 +181,7 @@ function renderCustomSvg(customSvg: string, pos: cg.Pos, bounds: ClientRect): SV
   return g;
 }
 
-function renderCircle(brush: DrawBrush, pos: cg.Pos, current: boolean, bounds: ClientRect): SVGElement {
+function renderCircle(brush: DrawBrush, pos: cg.Pos, current: boolean, bounds: DOMRectReadOnly): SVGElement {
   const o = pos2user(pos, bounds),
     widths = circleWidth(),
     radius = (bounds.width + bounds.height) / (4 * Math.max(bounds.width, bounds.height));
@@ -202,7 +202,7 @@ function renderArrow(
   dest: cg.Pos,
   current: boolean,
   shorten: boolean,
-  bounds: ClientRect
+  bounds: DOMRectReadOnly
 ): SVGElement {
   const m = arrowMargin(shorten && !current),
     a = pos2user(orig, bounds),
@@ -280,7 +280,7 @@ function arrowMargin(shorten: boolean): number {
   return (shorten ? 20 : 10) / 64;
 }
 
-function pos2user(pos: cg.Pos, bounds: ClientRect): cg.NumberPair {
+function pos2user(pos: cg.Pos, bounds: DOMRectReadOnly): cg.NumberPair {
   const xScale = Math.min(1, bounds.width / bounds.height);
   const yScale = Math.min(1, bounds.height / bounds.width);
   return [(pos[0] - 3.5) * xScale, (3.5 - pos[1]) * yScale];

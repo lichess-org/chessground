@@ -57,7 +57,7 @@ export const distanceSq = (pos1: cg.Pos, pos2: cg.Pos): number => {
 export const samePiece = (p1: cg.Piece, p2: cg.Piece): boolean => p1.role === p2.role && p1.color === p2.color;
 
 export const posToTranslate =
-  (bounds: ClientRect): ((pos: cg.Pos, asWhite: boolean) => cg.NumberPair) =>
+  (bounds: DOMRectReadOnly): ((pos: cg.Pos, asWhite: boolean) => cg.NumberPair) =>
   (pos, asWhite) =>
     [((asWhite ? pos[0] : 7 - pos[0]) * bounds.width) / 8, ((asWhite ? 7 - pos[1] : pos[1]) * bounds.height) / 8];
 
@@ -87,7 +87,7 @@ export const createEl = (tagName: string, className?: string): HTMLElement => {
   return el;
 };
 
-export function computeSquareCenter(key: cg.Key, asWhite: boolean, bounds: ClientRect): cg.NumberPair {
+export function computeSquareCenter(key: cg.Key, asWhite: boolean, bounds: DOMRectReadOnly): cg.NumberPair {
   const pos = key2pos(key);
   if (!asWhite) {
     pos[0] = 7 - pos[0];
