@@ -107,7 +107,7 @@ export function configure(state: HeadlessState, config: Config): void {
   // if a fen was provided, replace the pieces
   if (config.fen) {
     state.pieces = fenRead(config.fen);
-    state.drawable.shapes = [];
+    state.drawable.shapes = config.drawable?.shapes || [];
   }
 
   // apply config values that could be undefined yet meaningful
