@@ -94,17 +94,17 @@ More? Please make a pull request to include it here.
 Install build dependencies:
 
 ```sh
-yarn install
+npm install
 ```
 
 To build the node module:
 
 ```sh
-yarn run compile -- --watch
+npm run compile -- --watch
 ```
 
 To build the standalone:
 
 ```sh
-yarn run dist -- --watch
+npm run dist -- --watch
 ```
