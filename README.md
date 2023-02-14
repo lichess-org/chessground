@@ -103,8 +103,3 @@ To build the node module:
 npm run compile -- --watch
 ```
 
-To build the standalone:
-
-```sh
-npm run bundle -- --watch
-```
