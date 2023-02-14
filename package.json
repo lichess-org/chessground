@@ -3,35 +3,29 @@
   "version": "8.3.7",
   "description": "lichess.org chess ui",
   "type": "module",
-  "module": "chessground.js",
-  "typings": "chessground.d.ts",
-  "dependencies": {},
+  "module": "dist/chessground.js",
+  "typings": "dist/chessground.d.ts",
   "devDependencies": {
-    "@rollup/plugin-typescript": "^8",
     "@typescript-eslint/eslint-plugin": "^5",
     "@typescript-eslint/parser": "^5",
+    "esbuild": "^0.17.8",
     "eslint": "^8",
     "prettier": "^2",
-    "rollup": "^2",
-    "rollup-plugin-terser": "^7",
     "tslib": "^2",
     "typescript": "^4"
   },
   "scripts": {
     "prepare": "$npm_execpath run compile",
-    "compile": "tsc --outDir . --sourceMap --declaration",
+    "compile": "tsc",
     "lint": "eslint src/*.ts",
     "format": "prettier --write .",
     "check-format": "prettier --check .",
-    "dist": "rollup --config"
+    "bundle": "esbuild --bundle src/index.ts > /dev/null"
   },
   "files": [
-    "/*.js",
-    "/*.d.ts",
-    "/*.js.map",
+    "/dist/*",
     "/assets/*.css",
-    "/src/*.ts",
-    "!/rollup.config.js"
+    "/src/*.ts"
   ],
   "repository": "https://github.com/lichess-org/chessground",
   "keywords": [

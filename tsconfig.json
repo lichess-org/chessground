@@ -6,11 +6,14 @@
     "strict": true,
     "noUnusedLocals": true,
     "noUnusedParameters": true,
+    "sourceMap": true,
+    "declaration": true,
     "noImplicitThis": true,
     "noImplicitReturns": true,
     "module": "esnext",
     "moduleResolution": "node",
     "target": "ES2017",
-    "lib": ["DOM", "ES2017"]
+    "lib": ["DOM", "ES2017"],
+    "outDir": "dist"
   }
 }

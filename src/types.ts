@@ -1,7 +1,7 @@
-export type Color = typeof colors[number];
+export type Color = (typeof colors)[number];
 export type Role = 'king' | 'queen' | 'rook' | 'bishop' | 'knight' | 'pawn';
-export type File = typeof files[number];
-export type Rank = typeof ranks[number];
+export type File = (typeof files)[number];
+export type Rank = (typeof ranks)[number];
 export type Key = 'a0' | `${File}${Rank}`;
 export type FEN = string;
 export type Pos = [number, number];

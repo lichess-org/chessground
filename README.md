@@ -106,5 +106,5 @@ npm run compile -- --watch
 To build the standalone:
 
 ```sh
-npm run dist -- --watch
+npm run bundle -- --watch
 ```
