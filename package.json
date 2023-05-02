@@ -5,6 +5,10 @@
   "type": "module",
   "module": "chessground.js",
   "typings": "chessground.d.ts",
+  "exports": {
+    ".": "./index.js",
+    "./*": "./*.js"
+  },
   "dependencies": {},
   "devDependencies": {
     "@rollup/plugin-typescript": "^8",
