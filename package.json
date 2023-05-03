@@ -6,8 +6,8 @@
   "module": "chessground.js",
   "typings": "chessground.d.ts",
   "exports": {
-    ".": "./index.js",
-    "./*": "./*.js"
+    ".": "./chessground.js",
+    "./*": "./*"
   },
   "dependencies": {},
   "devDependencies": {
