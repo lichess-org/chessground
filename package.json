@@ -1,25 +1,25 @@
 {
   "name": "chessground",
-  "version": "8.3.7",
+  "version": "8.3.8",
   "description": "lichess.org chess ui",
   "type": "module",
   "module": "chessground.js",
   "typings": "chessground.d.ts",
   "exports": {
     ".": "./chessground.js",
-    "./*": "./*"
+    "./*": "./*.js"
   },
-  "dependencies": {},
+  "dependencies": { },
   "devDependencies": {
-    "@rollup/plugin-typescript": "^8",
+    "@rollup/plugin-typescript": "^11.1.1",
     "@typescript-eslint/eslint-plugin": "^5",
     "@typescript-eslint/parser": "^5",
     "eslint": "^8",
     "prettier": "^2",
-    "rollup": "^2",
+    "rollup": "^2.14.0",
     "rollup-plugin-terser": "^7",
     "tslib": "^2",
-    "typescript": "^4"
+    "typescript": "^5.0.4"
   },
   "scripts": {
     "prepare": "$npm_execpath run compile",
