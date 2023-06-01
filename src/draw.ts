@@ -35,6 +35,7 @@ export interface DrawBrushes {
 
 export interface DrawModifiers {
   lineWidth?: number;
+  hilite?: boolean;
 }
 
 export interface Drawable {

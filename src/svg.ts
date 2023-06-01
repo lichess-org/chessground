@@ -84,6 +84,7 @@ function syncDefs(d: Drawable, shapes: SyncableShape[], defsEl: SVGElement) {
     if (s.shape.dest) {
       brush = d.brushes[s.shape.brush];
       if (s.shape.modifiers) brush = makeCustomBrush(brush, s.shape.modifiers);
+      if (s.shape.modifiers?.hilite) brushes.set('hilite', { key: 'hilite', color: 'white', opacity: 1, lineWidth: 1 });
       brushes.set(brush.key, brush);
     }
   }
@@ -125,7 +126,7 @@ function pieceHash(piece: DrawShapePiece): Hash {
 }
 
 function modifiersHash(m: DrawModifiers): Hash {
-  return '' + (m.lineWidth || '');
+  return [m.lineWidth, m.hilite].filter(x => x).join(',');
 }
 
 function customSvgHash(s: string): Hash {
@@ -159,7 +160,8 @@ function renderShape(
         orient(key2pos(shape.dest), state.orientation),
         current,
         (arrowDests.get(shape.dest) || 0) > 1,
-        bounds
+        bounds,
+        shape.modifiers?.hilite
       );
     } else el = renderCircle(brushes[shape.brush], orig, current, bounds);
   }
@@ -202,27 +204,33 @@ function renderArrow(
   dest: cg.Pos,
   current: boolean,
   shorten: boolean,
-  bounds: DOMRectReadOnly
+  bounds: DOMRectReadOnly,
+  hilited = false
 ): SVGElement {
-  const m = arrowMargin(shorten && !current),
-    a = pos2user(orig, bounds),
-    b = pos2user(dest, bounds),
-    dx = b[0] - a[0],
-    dy = b[1] - a[1],
-    angle = Math.atan2(dy, dx),
-    xo = Math.cos(angle) * m,
-    yo = Math.sin(angle) * m;
-  return setAttributes(createElement('line'), {
-    stroke: brush.color,
-    'stroke-width': lineWidth(brush, current),
-    'stroke-linecap': 'round',
-    'marker-end': 'url(#arrowhead-' + brush.key + ')',
-    opacity: opacity(brush, current),
-    x1: a[0],
-    y1: a[1],
-    x2: b[0] - xo,
-    y2: b[1] - yo,
-  });
+  function renderInner(isHilite: boolean) {
+    const m = arrowMargin(shorten && !current),
+      a = pos2user(orig, bounds),
+      b = pos2user(dest, bounds),
+      dx = b[0] - a[0],
+      dy = b[1] - a[1],
+      angle = Math.atan2(dy, dx),
+      xo = Math.cos(angle) * m,
+      yo = Math.sin(angle) * m;
+    return setAttributes(createElement('line'), {
+      stroke: isHilite ? 'white' : brush.color,
+      'stroke-width': lineWidth(brush, current) + (isHilite ? 0.04 : 0),
+      'stroke-linecap': 'round',
+      'marker-end': `url(#arrowhead-${isHilite ? 'hilite' : brush.key})`,
+      opacity: isHilite ? 1 : opacity(brush, current),
+      x1: a[0],
+      y1: a[1],
+      x2: b[0] - xo,
+      y2: b[1] - yo,
+    });
+  }
+  const el = hilited ? createElement('g') : renderInner(false);
+  if (hilited) [true, false].map(h => el.appendChild(renderInner(h)));
+  return el;
 }
 
 function renderMarker(brush: DrawBrush): SVGElement {
@@ -231,8 +239,8 @@ function renderMarker(brush: DrawBrush): SVGElement {
     orient: 'auto',
     markerWidth: 4,
     markerHeight: 8,
-    refX: 2.05,
-    refY: 2.01,
+    refX: brush.key === 'hilite' ? 1.86 : 2.05,
+    refY: 2,
   });
   marker.appendChild(
     setAttributes(createElement('path'), {
