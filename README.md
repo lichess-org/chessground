@@ -94,17 +94,17 @@ More? Please make a pull request to include it here.
 Install build dependencies:
 
 ```sh
-npm install
+pnpm install
 ```
 
 To build the node module:
 
 ```sh
-npm run compile -- --watch
+pnpm run compile -- --watch
 ```
 
 To build the standalone:
 
 ```sh
-npm run dist -- --watch
+pnpm run dist -- --watch
 ```
