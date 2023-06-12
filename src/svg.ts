@@ -151,7 +151,7 @@ function renderShape(
   if (shape.customSvg) {
     el = renderCustomSvg(shape.customSvg, orig, bounds);
   } else {
-    if (shape.dest) {
+    if (shape.dest && shape.dest != shape.orig) {
       let brush: DrawBrush = brushes[shape.brush];
       if (shape.modifiers) brush = makeCustomBrush(brush, shape.modifiers);
       el = renderArrow(
