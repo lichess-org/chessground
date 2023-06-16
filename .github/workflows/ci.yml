@@ -9,14 +9,13 @@ jobs:
       security-events: write
     steps:
       - uses: actions/checkout@v3
-      - uses: actions/setup-node@v3
+      - uses: pnpm/action-setup@v2
         with:
-          node-version: '16'
-          cache: 'npm'
+          version: 8.6.2
       - uses: github/codeql-action/init@v2
         with:
           languages: javascript
       - uses: github/codeql-action/analyze@v2
-      - run: npm install
-      - run: npm run lint
-      - run: npm run dist
+      - run: pnpm install
+      - run: pnpm run lint
+      - run: pnpm run dist
