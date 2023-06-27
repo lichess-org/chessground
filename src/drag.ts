@@ -37,6 +37,8 @@ export function start(s: State, e: cg.MouchEvent): void {
     (!e.touches || s.blockTouchScroll || piece || previouslySelected || pieceCloseTo(s, position))
   )
     e.preventDefault();
+  else if (e.touches) return; // Handle only corresponding mouse event
+
   const hadPremove = !!s.premovable.current;
   const hadPredrop = !!s.predroppable.current;
   s.stats.ctrlKey = e.ctrlKey;
