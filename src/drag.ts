@@ -37,7 +37,7 @@ export function start(s: State, e: cg.MouchEvent): void {
     (!e.touches || s.blockTouchScroll || piece || previouslySelected || pieceCloseTo(s, position))
   )
     e.preventDefault();
-  else if (e.touches) return; // Handle only corresponding mouse event
+  else if (e.touches) return; // Handle only corresponding mouse event https://github.com/lichess-org/chessground/pull/268
 
   const hadPremove = !!s.premovable.current;
   const hadPredrop = !!s.predroppable.current;
