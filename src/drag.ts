@@ -20,7 +20,8 @@ export interface DragCurrent {
 }
 
 export function start(s: State, e: cg.MouchEvent): void {
-  if (!e.isTrusted || (e.button !== undefined && e.button !== 0)) return; // only touch or left click
+  if (!(s.trustAllEvents || e.isTrusted)) return; // only trust when trustAllEvents is enabled
+  if (e.button !== undefined && e.button !== 0) return; // only touch or left click
   if (e.touches && e.touches.length > 1) return; // support one finger touch only
   const bounds = s.dom.bounds(),
     position = util.eventPosition(e)!,
