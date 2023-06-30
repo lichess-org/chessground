@@ -19,7 +19,7 @@ export interface Config {
   addDimensionsCssVarsTo?: HTMLElement; // add --cg-width and --cg-height CSS vars containing the board's dimensions to this element
   blockTouchScroll?: boolean; // block scrolling via touch dragging on the board, e.g. for coordinate training
   // pieceKey: boolean; // add a data-key attribute to piece elements
-  trustAllEvents?: boolean,
+  trustAllEvents?: boolean, // disable checking for human only input (e.isTrusted)
   highlight?: {
     lastMove?: boolean; // add last-move class to squares
     check?: boolean; // add check class to squares
