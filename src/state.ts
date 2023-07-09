@@ -47,6 +47,7 @@ export interface HeadlessState {
     showDests: boolean; // whether to add the premove-dest class on squares
     castle: boolean; // whether to allow king castle premoves
     dests?: cg.Key[]; // premove destinations for the current selection
+    customDests?: cg.Dests;
     current?: cg.KeyPair; // keys of the current saved premove ["e2" "e4"]
     events: {
       set?: (orig: cg.Key, dest: cg.Key, metadata?: cg.SetPremoveMetadata) => void; // called after the premove has been set

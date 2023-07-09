@@ -203,7 +203,10 @@ export function selectSquare(state: HeadlessState, key: cg.Key, force?: boolean)
 export function setSelected(state: HeadlessState, key: cg.Key): void {
   state.selected = key;
   if (isPremovable(state, key)) {
-    state.premovable.dests = premove(state.pieces, key, state.premovable.castle);
+    // calculate chess premoves if custom premoves are not passed
+    if(!(state.premovable.customDests)) {
+      state.premovable.dests = premove(state.pieces, key, state.premovable.castle);
+    }
   } else state.premovable.dests = undefined;
 }
 
