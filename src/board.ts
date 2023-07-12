@@ -203,7 +203,10 @@ export function selectSquare(state: HeadlessState, key: cg.Key, force?: boolean)
 export function setSelected(state: HeadlessState, key: cg.Key): void {
   state.selected = key;
   if (isPremovable(state, key)) {
-    state.premovable.dests = premove(state.pieces, key, state.premovable.castle);
+    // calculate chess premoves if custom premoves are not passed
+    if(!state.premovable.customDests) {
+      state.premovable.dests = premove(state.pieces, key, state.premovable.castle);
+    }
   } else state.premovable.dests = undefined;
 }
 
@@ -238,8 +241,10 @@ function isPremovable(state: HeadlessState, orig: cg.Key): boolean {
   return !!piece && state.premovable.enabled && state.movable.color === piece.color && state.turnColor !== piece.color;
 }
 
-const canPremove = (state: HeadlessState, orig: cg.Key, dest: cg.Key): boolean =>
-  orig !== dest && isPremovable(state, orig) && premove(state.pieces, orig, state.premovable.castle).includes(dest);
+function canPremove(state: HeadlessState, orig: cg.Key, dest: cg.Key): boolean {
+  const validPremoves: cg.Key[] = state.premovable.customDests?.get(orig) ?? premove(state.pieces, orig, state.premovable.castle);
+  return orig !== dest && isPremovable(state, orig) && validPremoves.includes(dest);
+}
 
 function canPredrop(state: HeadlessState, orig: cg.Key, dest: cg.Key): boolean {
   const piece = state.pieces.get(orig);

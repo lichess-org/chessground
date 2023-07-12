@@ -228,7 +228,7 @@ function computeSquareClasses(s: State): SquareClasses {
         for (const k of dests) {
           addSquare(squares, k, 'move-dest' + (s.pieces.has(k) ? ' oc' : ''));
         }
-      const pDests = s.premovable.dests;
+      const pDests = s.premovable.customDests?.get(s.selected) ?? s.premovable.dests;
       if (pDests)
         for (const k of pDests) {
           addSquare(squares, k, 'premove-dest' + (s.pieces.has(k) ? ' oc' : ''));
