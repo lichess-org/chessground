@@ -7,8 +7,6 @@ import * as cg from './types.js';
 
 type PieceName = string; // `$color $role`
 
-type SquareClasses = Map<cg.Key, string>;
-
 // ported from https://github.com/lichess-org/lichobile/blob/master/src/chessground/render.ts
 // in case of bugs, blame @veloce
 export function render(s: State): void {
@@ -20,7 +18,7 @@ export function render(s: State): void {
     anims: AnimVectors = curAnim ? curAnim.plan.anims : new Map(),
     fadings: AnimFadings = curAnim ? curAnim.plan.fadings : new Map(),
     curDrag: DragCurrent | undefined = s.draggable.current,
-    squares: SquareClasses = computeSquareClasses(s),
+    squares: cg.SquareClasses = computeSquareClasses(s),
     samePieces: Set<cg.Key> = new Set(),
     sameSquares: Set<cg.Key> = new Set(),
     movedPieces: Map<PieceName, cg.PieceNode[]> = new Map(),
@@ -213,8 +211,8 @@ function posZIndex(pos: cg.Pos, asWhite: boolean): string {
 
 const pieceNameOf = (piece: cg.Piece): string => `${piece.color} ${piece.role}`;
 
-function computeSquareClasses(s: State): SquareClasses {
-  const squares: SquareClasses = new Map();
+function computeSquareClasses(s: State): cg.SquareClasses {
+  const squares: cg.SquareClasses = new Map();
   if (s.lastMove && s.highlight.lastMove)
     for (const k of s.lastMove) {
       addSquare(squares, k, 'last-move');
@@ -242,10 +240,16 @@ function computeSquareClasses(s: State): SquareClasses {
   const o = s.exploding;
   if (o) for (const k of o.keys) addSquare(squares, k, 'exploding' + o.stage);
 
+  if (s.highlight.custom) {
+    s.highlight.custom.forEach((v: string, k: cg.Key) => {
+      addSquare(squares, k, v);
+    });
+  }
+
   return squares;
 }
 
-function addSquare(squares: SquareClasses, key: cg.Key, klass: string): void {
+function addSquare(squares: cg.SquareClasses, key: cg.Key, klass: string): void {
   const classes = squares.get(key);
   if (classes) squares.set(key, `${classes} ${klass}`);
   else squares.set(key, klass);
