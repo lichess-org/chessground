@@ -58,8 +58,10 @@ export const samePiece = (p1: cg.Piece, p2: cg.Piece): boolean => p1.role === p2
 
 export const posToTranslate =
   (bounds: DOMRectReadOnly): ((pos: cg.Pos, asWhite: boolean) => cg.NumberPair) =>
-  (pos, asWhite) =>
-    [((asWhite ? pos[0] : 7 - pos[0]) * bounds.width) / 8, ((asWhite ? 7 - pos[1] : pos[1]) * bounds.height) / 8];
+  (pos, asWhite) => [
+    ((asWhite ? pos[0] : 7 - pos[0]) * bounds.width) / 8,
+    ((asWhite ? 7 - pos[1] : pos[1]) * bounds.height) / 8,
+  ];
 
 export const translate = (el: HTMLElement, pos: cg.NumberPair): void => {
   el.style.transform = `translate(${pos[0]}px,${pos[1]}px)`;

@@ -12,7 +12,7 @@ export type Hash = string;
 export function syncShapes(
   shapes: SyncableShape[],
   root: HTMLElement | SVGElement,
-  renderShape: (shape: SyncableShape) => HTMLElement | SVGElement
+  renderShape: (shape: SyncableShape) => HTMLElement | SVGElement,
 ): void {
   const hashesInDom = new Map(), // by hash
     toRemove: SVGElement[] = [];

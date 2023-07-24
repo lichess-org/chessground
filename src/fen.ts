@@ -71,7 +71,7 @@ export function write(pieces: cg.Pieces): cg.FEN {
             return p;
           } else return '1';
         })
-        .join('')
+        .join(''),
     )
     .join('/')
     .replace(/1{2,}/g, s => s.length.toString());

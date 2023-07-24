@@ -67,12 +67,12 @@ export function renderSvg(state: State, svg: SVGElement, customSvg: SVGElement):
   syncShapes(
     shapes.filter(s => !s.shape.customSvg),
     shapesEl,
-    shape => renderShape(state, shape, d.brushes, arrowDests, bounds)
+    shape => renderShape(state, shape, d.brushes, arrowDests, bounds),
   );
   syncShapes(
     shapes.filter(s => s.shape.customSvg),
     customSvgsEl,
-    shape => renderShape(state, shape, d.brushes, arrowDests, bounds)
+    shape => renderShape(state, shape, d.brushes, arrowDests, bounds),
   );
 }
 
@@ -103,7 +103,7 @@ function shapeHash(
   { orig, dest, brush, piece, modifiers, customSvg }: DrawShape,
   arrowDests: ArrowDests,
   current: boolean,
-  bounds: DOMRectReadOnly
+  bounds: DOMRectReadOnly,
 ): Hash {
   return [
     bounds.width,
@@ -143,7 +143,7 @@ function renderShape(
   { shape, current, hash }: SyncableShape,
   brushes: DrawBrushes,
   arrowDests: ArrowDests,
-  bounds: DOMRectReadOnly
+  bounds: DOMRectReadOnly,
 ): SVGElement {
   let el: SVGElement;
   const orig = orient(key2pos(shape.orig), state.orientation);
@@ -161,7 +161,7 @@ function renderShape(
         current,
         (arrowDests.get(shape.dest) || 0) > 1,
         bounds,
-        shape.modifiers?.hilite
+        shape.modifiers?.hilite,
       );
     } else el = renderCircle(brushes[shape.brush], orig, current, bounds);
   }
@@ -205,7 +205,7 @@ function renderArrow(
   current: boolean,
   shorten: boolean,
   bounds: DOMRectReadOnly,
-  hilited = false
+  hilited = false,
 ): SVGElement {
   function renderInner(isHilite: boolean) {
     const m = arrowMargin(shorten && !current),
@@ -246,7 +246,7 @@ function renderMarker(brush: DrawBrush): SVGElement {
     setAttributes(createElement('path'), {
       d: 'M0,0 V4 L3,2 Z',
       fill: brush.color,
-    })
+    }),
   );
   marker.setAttribute('cgKey', brush.key);
   return marker;
