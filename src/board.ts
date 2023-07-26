@@ -204,7 +204,7 @@ export function setSelected(state: HeadlessState, key: cg.Key): void {
   state.selected = key;
   if (isPremovable(state, key)) {
     // calculate chess premoves if custom premoves are not passed
-    if(!state.premovable.customDests) {
+    if (!state.premovable.customDests) {
       state.premovable.dests = premove(state.pieces, key, state.premovable.castle);
     }
   } else state.premovable.dests = undefined;
@@ -242,7 +242,8 @@ function isPremovable(state: HeadlessState, orig: cg.Key): boolean {
 }
 
 function canPremove(state: HeadlessState, orig: cg.Key, dest: cg.Key): boolean {
-  const validPremoves: cg.Key[] = state.premovable.customDests?.get(orig) ?? premove(state.pieces, orig, state.premovable.castle);
+  const validPremoves: cg.Key[] =
+    state.premovable.customDests?.get(orig) ?? premove(state.pieces, orig, state.premovable.castle);
   return orig !== dest && isPremovable(state, orig) && validPremoves.includes(dest);
 }
 
@@ -332,17 +333,17 @@ export function getSnappedKeyAtDomPos(
   orig: cg.Key,
   pos: cg.NumberPair,
   asWhite: boolean,
-  bounds: DOMRectReadOnly
+  bounds: DOMRectReadOnly,
 ): cg.Key | undefined {
   const origPos = key2pos(orig);
   const validSnapPos = allPos.filter(
-    pos2 => queen(origPos[0], origPos[1], pos2[0], pos2[1]) || knight(origPos[0], origPos[1], pos2[0], pos2[1])
+    pos2 => queen(origPos[0], origPos[1], pos2[0], pos2[1]) || knight(origPos[0], origPos[1], pos2[0], pos2[1]),
   );
   const validSnapCenters = validSnapPos.map(pos2 => computeSquareCenter(pos2key(pos2), asWhite, bounds));
   const validSnapDistances = validSnapCenters.map(pos2 => distanceSq(pos, pos2));
   const [, closestSnapIndex] = validSnapDistances.reduce(
     (a, b, index) => (a[0] < b ? a : [b, index]),
-    [validSnapDistances[0], 0]
+    [validSnapDistances[0], 0],
   );
   return pos2key(validSnapPos[closestSnapIndex]);
 }

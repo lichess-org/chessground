@@ -57,7 +57,7 @@ function unbindable(
   el: EventTarget,
   eventName: string,
   callback: EventListener,
-  options?: AddEventListenerOptions
+  options?: AddEventListenerOptions,
 ): cg.Unbind {
   el.addEventListener(eventName, callback, options);
   return () => el.removeEventListener(eventName, callback, options);

@@ -74,7 +74,7 @@ function computePlan(prevPieces: cg.Pieces, current: State): AnimPlan {
   for (const newP of news) {
     preP = closer(
       newP,
-      missings.filter(p => util.samePiece(newP.piece, p.piece))
+      missings.filter(p => util.samePiece(newP.piece, p.piece)),
     );
     if (preP) {
       vector = [preP.pos[0] - newP.pos[0], preP.pos[1] - newP.pos[1]];
