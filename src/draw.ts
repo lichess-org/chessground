@@ -36,7 +36,8 @@ export interface DrawBrushes {
 
 export interface DrawModifiers {
   lineWidth?: number;
-  hilite?: boolean;
+  hilite?: boolean; // for arrows
+  svgDecorates?: 'label' | 'orig' | 'dest'; // customSvg decorates a shape rather than defines it
 }
 
 export interface Drawable {

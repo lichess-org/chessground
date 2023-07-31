@@ -1,18 +1,17 @@
 import { State } from './state.js';
 import { key2pos } from './util.js';
 import { Drawable, DrawShape, DrawShapePiece, DrawBrush, DrawBrushes, DrawModifiers } from './draw.js';
-import { SyncableShape, Hash, syncShapes } from './sync.js';
+import { SyncableShape, Hash } from './sync.js';
 import * as cg from './types.js';
 
-export function createElement(tagName: string): SVGElement {
-  return document.createElementNS('http://www.w3.org/2000/svg', tagName);
-}
-
 type CustomBrushes = Map<string, DrawBrush>; // by hash
+type Syncable = { shape?: SVGElement; custom?: SVGElement };
 
 type ArrowDests = Map<cg.Key, number>; // how many arrows land on a square
 type AngleSlots = Set<number>; // angle slots from 0 to 15, for label adjustments
 type ArrowSlots = Map<cg.Key | undefined, AngleSlots>; // angle slots per dest
+
+export { createElement, setAttributes };
 
 export function renderSvg(state: State, svg: SVGElement, customSvg: SVGElement): void {
   const d = state.drawable,
@@ -69,23 +68,42 @@ export function renderSvg(state: State, svg: SVGElement, customSvg: SVGElement):
   */
 
   const defsEl = svg.querySelector('defs') as SVGElement;
-  const shapesEl = svg.querySelector('g') as SVGElement;
-  const customSvgsEl = customSvg.querySelector('g') as SVGElement;
 
   syncDefs(d, shapes, defsEl);
-  const renderer = (s: SyncableShape) =>
-    renderShape(state, s, d.brushes, arrowDests, bounds, arrowSlots.get(s.shape.dest));
+  syncShapes(shapes, svg, customSvg, s =>
+    renderShape(state, s, d.brushes, arrowDests, bounds, arrowSlots.get(s.shape.dest)),
+  );
+}
 
-  syncShapes(
-    shapes.filter(s => !s.shape.customSvg),
-    shapesEl,
-    renderer,
-  );
-  syncShapes(
-    shapes.filter(s => s.shape.customSvg),
-    customSvgsEl,
-    renderer,
-  );
+function syncShapes(
+  shapes: SyncableShape[],
+  svg: SVGElement,
+  customSvg: SVGElement,
+  renderShape: (shape: SyncableShape) => Syncable,
+): void {
+  const shapesEl = svg.querySelector('g') as SVGElement;
+  const customEl = customSvg.querySelector('g') as SVGElement;
+  const hashesInDom = new Map();
+
+  for (const sc of shapes) hashesInDom.set(sc.hash, false);
+  for (const root of [shapesEl, customEl]) {
+    const toRemove: SVGElement[] = [];
+    let el: SVGElement | undefined = root.firstChild as SVGElement,
+      elHash: Hash | null;
+    while (el) {
+      elHash = el.getAttribute('cgHash') as Hash;
+      if (hashesInDom.has(elHash)) hashesInDom.set(elHash, true);
+      else toRemove.push(el);
+      el = el.nextSibling as SVGElement | undefined;
+    }
+    for (const el of toRemove) root.removeChild(el);
+  }
+  // insert shapes that are not yet in dom
+  for (const sc of shapes.filter(s => !hashesInDom.get(s.hash))) {
+    const { shape, custom } = renderShape(sc);
+    if (shape) shapesEl.appendChild(shape);
+    if (custom) customEl.appendChild(custom);
+  }
 }
 
 // append only. Don't try to update/remove.
@@ -117,6 +135,7 @@ function shapeHash(
   current: boolean,
   bounds: DOMRectReadOnly,
 ): Hash {
+  // a shape and its decorator svg will have the same hash in DOM
   return [
     bounds.width,
     bounds.height,
@@ -139,7 +158,7 @@ function pieceHash(piece: DrawShapePiece): Hash {
 }
 
 function modifiersHash(m: DrawModifiers): Hash {
-  return [m.lineWidth, m.hilite && '*'].filter(x => x).join(',');
+  return [m.lineWidth, m.hilite && '*', m.svgDecorates].filter(x => x).join(',');
 }
 
 function customSvgHash(s: string): Hash {
@@ -155,66 +174,55 @@ function renderShape(
   state: State,
   { shape, current, hash }: SyncableShape,
   brushes: DrawBrushes,
-  arrowDests: ArrowDests,
+  dests: ArrowDests,
   bounds: DOMRectReadOnly,
   slots?: AngleSlots,
-): SVGElement {
-  let el: SVGElement;
-  const orig = orient(key2pos(shape.orig), state.orientation);
+): Syncable {
+  const from = pos2user(orient(key2pos(shape.orig), state.orientation), bounds);
+  const to = shape.dest ? pos2user(orient(key2pos(shape.dest), state.orientation), bounds) : from;
+  const brush = makeCustomBrush(brushes[shape.brush], shape.modifiers);
+  const syncable: Syncable = {};
 
-  if (shape.customSvg) {
-    el = renderCustomSvg(shape.customSvg, orig, bounds);
-  } else {
-    const from = pos2user(orig, bounds);
-    const to = shape.dest ? pos2user(orient(key2pos(shape.dest), state.orientation), bounds) : from;
-    if (shape.dest && shape.dest !== shape.orig) {
-      let brush: DrawBrush = brushes[shape.brush];
-      if (shape.modifiers) brush = makeCustomBrush(brush, shape.modifiers);
-      el = renderArrow(brush, shape, from, to, current, arrowDests);
-    } else el = renderCircle(brushes[shape.brush], orig, current, bounds);
-    if (shape.label) {
-      const g = createElement('g');
-      g.appendChild(el);
-      g.appendChild(renderLabel(shape, from, to, slots));
-      el = g;
-    }
+  if (!shape.customSvg || shape.modifiers?.svgDecorates) {
+    syncable.shape = setAttributes(createElement('g'), { cgHash: hash });
+    if (shape.dest && shape.dest !== shape.orig)
+      syncable.shape.appendChild(renderArrow(shape, brush, from, to, current, dests));
+    else syncable.shape.appendChild(renderCircle(brushes[shape.brush], from, current, bounds));
+    if (shape.label) syncable.shape.appendChild(renderLabel(shape, from, to, slots));
   }
-  el.setAttribute('cgHash', hash);
-  return el;
+  if (shape.customSvg) {
+    const [x, y] =
+      shape.modifiers?.svgDecorates === 'label'
+        ? labelCoords(from, to, slots)
+        : shape.modifiers?.svgDecorates === 'dest'
+        ? to
+        : from;
+    syncable.custom = setAttributes(createElement('g'), {
+      transform: `translate(${x},${y})`,
+      cgHash: hash + '~',
+    });
+    syncable.custom.innerHTML = `<svg width="1" height="1" viewBox="0 0 100 100">${shape.customSvg}</svg>`;
+  }
+  return syncable;
 }
 
-function renderCustomSvg(customSvg: string, pos: cg.Pos, bounds: DOMRectReadOnly): SVGElement {
-  const [x, y] = pos2user(pos, bounds);
-
-  // Translate to top-left of `orig` square
-  const g = setAttributes(createElement('g'), { transform: `translate(${x},${y})` });
-
-  // Give 100x100 coordinate system to the user for `orig` square
-  const svg = setAttributes(createElement('svg'), { width: 1, height: 1, viewBox: '0 0 100 100' });
-
-  g.appendChild(svg);
-  svg.innerHTML = customSvg;
-  return g;
-}
-
-function renderCircle(brush: DrawBrush, pos: cg.Pos, current: boolean, bounds: DOMRectReadOnly): SVGElement {
-  const o = pos2user(pos, bounds),
-    widths = circleWidth(),
+function renderCircle(brush: DrawBrush, at: cg.NumberPair, current: boolean, bounds: DOMRectReadOnly): SVGElement {
+  const widths = circleWidth(),
     radius = (bounds.width + bounds.height) / (4 * Math.max(bounds.width, bounds.height));
   return setAttributes(createElement('circle'), {
     stroke: brush.color,
     'stroke-width': widths[current ? 0 : 1],
     fill: 'none',
     opacity: opacity(brush, current),
-    cx: o[0],
-    cy: o[1],
+    cx: at[0],
+    cy: at[1],
     r: radius - widths[1] / 2,
   });
 }
 
 function renderArrow(
-  brush: DrawBrush,
   s: DrawShape,
+  brush: DrawBrush,
   from: cg.NumberPair,
   to: cg.NumberPair,
   current: boolean,
@@ -241,10 +249,12 @@ function renderArrow(
       y2: b[1] - yo,
     });
   }
-  if (!s.modifiers?.hilite) return renderInner(false);
+  const arrow = renderInner(false);
+  if (!s.modifiers?.hilite) return arrow;
 
   const g = createElement('g');
-  [true, false].map(h => g.appendChild(renderInner(h)));
+  g.appendChild(renderInner(true));
+  g.appendChild(arrow);
   return g;
 }
 
@@ -267,24 +277,46 @@ function renderMarker(brush: DrawBrush): SVGElement {
   return marker;
 }
 
-export function setAttributes(el: SVGElement, attrs: { [key: string]: any }): SVGElement {
-  for (const key in attrs) {
-    if (Object.prototype.hasOwnProperty.call(attrs, key)) el.setAttribute(key, attrs[key]);
-  }
-  return el;
+function renderLabel(shape: DrawShape, from: cg.NumberPair, to: cg.NumberPair, slots?: AngleSlots): Element {
+  if (shape.label!.length > 4) throw new Error(`Label text '${shape.label}' too big`);
+  const labsyncableize = 0.4;
+  const fontSize = labsyncableize * 0.8 ** shape.label!.length;
+  const r = labsyncableize / 2;
+  const strokeW = 0.03;
+  const [x, y] = labelCoords(from, to, slots);
+  const g = setAttributes(createElement('g'), { transform: `translate(${x},${y})` });
+  g.innerHTML = `
+    <circle r="${r}" fill-opacity="1.0" stroke-opacity="0.9" stroke="white" fill="#666666"
+      stroke-width="${strokeW}"/>
+    <text font-size="${fontSize}" fill="white" font-family="Noto Sans" text-anchor="middle"
+      fill-opacity="1.0" y="${fontSize * 0.34}">${shape.label}</text>`;
+  return g;
 }
 
 function orient(pos: cg.Pos, color: cg.Color): cg.Pos {
   return color === 'white' ? pos : [7 - pos[0], 7 - pos[1]];
 }
 
-function makeCustomBrush(base: DrawBrush, modifiers: DrawModifiers): DrawBrush {
-  return {
-    color: base.color,
-    opacity: Math.round(base.opacity * 10) / 10,
-    lineWidth: Math.round(modifiers.lineWidth || base.lineWidth),
-    key: [base.key, modifiers.lineWidth].filter(x => x).join(''),
-  };
+function createElement(tagName: string): SVGElement {
+  return document.createElementNS('http://www.w3.org/2000/svg', tagName);
+}
+
+function setAttributes(el: SVGElement, attrs: { [key: string]: any }): SVGElement {
+  for (const key in attrs) {
+    if (Object.prototype.hasOwnProperty.call(attrs, key)) el.setAttribute(key, attrs[key]);
+  }
+  return el;
+}
+
+function makeCustomBrush(base: DrawBrush, modifiers: DrawModifiers | undefined): DrawBrush {
+  return !modifiers
+    ? base
+    : {
+        color: base.color,
+        opacity: Math.round(base.opacity * 10) / 10,
+        lineWidth: Math.round(modifiers.lineWidth || base.lineWidth),
+        key: [base.key, modifiers.lineWidth].filter(x => x).join(''),
+      };
 }
 
 function circleWidth(): [number, number] {
@@ -309,37 +341,27 @@ function pos2user(pos: cg.Pos, bounds: DOMRectReadOnly): cg.NumberPair {
   return [(pos[0] - 3.5) * xScale, (3.5 - pos[1]) * yScale];
 }
 
-const LABEL_SIZE = 0.4; // size of arrow labels in pos units, 1 is the width of a board square
-
-function renderLabel(shape: DrawShape, from: cg.NumberPair, to: cg.NumberPair, slots?: AngleSlots): Element {
-  if (shape.label!.length > 5) throw new Error(`Label '${shape.label}' too long`);
-
-  const fontSize = LABEL_SIZE * 0.8 ** shape.label!.length;
-  const r = LABEL_SIZE / 2;
-  const strokeW = 0.03;
-  const [x, y] = labelOffset(from, to, slots);
-  const g = setAttributes(createElement('g'), { transform: `translate(${x},${y})` });
-
-  g.innerHTML = `
-      <circle r="${r}" fill-opacity="1.0" stroke-opacity="0.9" stroke="white" fill="#666666"
-        stroke-width="${strokeW}"/>
-      <text font-size="${fontSize}" fill="white" font-family="Noto Sans" text-anchor="middle"
-        fill-opacity="1.0" y="${fontSize * 0.34}">${shape.label}</text>`;
-  return g;
-}
-
 function moveAngle(from: cg.NumberPair, to: cg.NumberPair, asSlot = true) {
   const angle = Math.atan2(to[1] - from[1], to[0] - from[0]) + Math.PI;
   return asSlot ? (Math.round((angle * 8) / Math.PI) + 16) % 16 : angle;
 }
 
-function length(from: cg.NumberPair, to: cg.NumberPair): number {
+function dist(from: cg.NumberPair, to: cg.NumberPair): number {
   return Math.sqrt([from[0] - to[0], from[1] - to[1]].reduce((acc, x) => acc + x * x, 0));
 }
 
-function labelOffset(from: cg.NumberPair, to: cg.NumberPair, slots?: AngleSlots): cg.NumberPair {
-  let mag = length(from, to);
-  if (mag === 0) return [0, 0];
+/*
+ try to place labsyncable at the junction of the destination shaft and arrowhead. if there's more than
+ 1 arrow pointing to a square, the arrow shortens by 10 / 64 units so the label must move as well. 
+ 
+ if the angle between two incoming arrows is pi / 8, such as when an adjacent knight and bishop
+ attack the same square, the knight's label is slid further down the shaft by an amount equal to
+ our label size to avoid collision
+*/
+
+function labelCoords(from: cg.NumberPair, to: cg.NumberPair, slots?: AngleSlots): cg.NumberPair {
+  let mag = dist(from, to);
+  if (mag === 0) return from;
   const angle = moveAngle(from, to, false);
   if (slots) {
     mag -= 33 / 64; // reduce by arrowhead length
@@ -347,20 +369,10 @@ function labelOffset(from: cg.NumberPair, to: cg.NumberPair, slots?: AngleSlots)
       mag -= 10 / 64; // reduce by shortening factor
       const slot = moveAngle(from, to);
       if (slots.has((slot + 1) % 16) || slots.has((slot + 15) % 16)) {
-        if (slot & 1) mag -= LABEL_SIZE;
-        // and by label size for the knight if the another arrow is pi / 8 away.
+        if (slot & 1) mag -= 0.4;
+        // and by label size for the knight if another arrow is within pi / 8.
       }
     }
   }
   return [from[0] - Math.cos(angle) * mag, from[1] - Math.sin(angle) * mag];
 }
-
-/*
- we try to place labels at the junction of the destination shaft and arrowhead.
- if there's more than 1 arrow pointing to a square, the arrow shortens by 10 / 64 units so
- the label must move as well. 
- 
- if the angle between two incoming arrows is pi / 8, such as when an adjacent knight and
- bishop attack the same square, the knight's label is slid further down the shaft by an
- amount equal to our label size to avoid collision
-*/
