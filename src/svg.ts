@@ -135,7 +135,7 @@ function shapeHash(
   current: boolean,
   bounds: DOMRectReadOnly,
 ): Hash {
-  // a shape and its decorator svg will have the same hash in DOM
+  // a shape and any decorator svg will have the same cgHash in DOM
   return [
     bounds.width,
     bounds.height,
@@ -197,10 +197,7 @@ function renderShape(
         : shape.modifiers?.svgDecorates === 'dest'
         ? to
         : from;
-    syncable.custom = setAttributes(createElement('g'), {
-      transform: `translate(${x},${y})`,
-      cgHash: hash + '~',
-    });
+    syncable.custom = setAttributes(createElement('g'), { transform: `translate(${x},${y})`, cgHash: hash });
     syncable.custom.innerHTML = `<svg width="1" height="1" viewBox="0 0 100 100">${shape.customSvg}</svg>`;
   }
   return syncable;
