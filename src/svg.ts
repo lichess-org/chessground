@@ -11,17 +11,26 @@ export function createElement(tagName: string): SVGElement {
 type CustomBrushes = Map<string, DrawBrush>; // by hash
 
 type ArrowDests = Map<cg.Key, number>; // how many arrows land on a square
+type AngleSlots = Set<number>; // angle slots from 0 to 15, for label adjustments
+type ArrowSlots = Map<cg.Key | undefined, AngleSlots>; // angle slots per dest
 
 export function renderSvg(state: State, svg: SVGElement, customSvg: SVGElement): void {
   const d = state.drawable,
     curD = d.current,
     cur = curD && curD.mouseSq ? (curD as DrawShape) : undefined,
     arrowDests: ArrowDests = new Map(),
+    arrowSlots: ArrowSlots = new Map(),
     bounds = state.dom.bounds(),
     nonPieceAutoShapes = d.autoShapes.filter(autoShape => !autoShape.piece);
 
   for (const s of d.shapes.concat(nonPieceAutoShapes).concat(cur ? [cur] : [])) {
-    if (s.dest) arrowDests.set(s.dest, (arrowDests.get(s.dest) || 0) + 1);
+    if (!s.dest) continue;
+    const sources = arrowSlots.get(s.dest) ?? new Set();
+    const from = pos2user(orient(key2pos(s.orig), state.orientation), bounds),
+      to = pos2user(orient(key2pos(s.dest), state.orientation), bounds);
+    sources.add(moveAngle(from, to, state.orientation === 'white'));
+    arrowSlots.set(s.dest, sources);
+    arrowDests.set(s.dest, (arrowDests.get(s.dest) ?? 0) + 1);
   }
 
   const shapes: SyncableShape[] = d.shapes.concat(nonPieceAutoShapes).map((s: DrawShape) => {
@@ -64,15 +73,18 @@ export function renderSvg(state: State, svg: SVGElement, customSvg: SVGElement):
   const customSvgsEl = customSvg.querySelector('g') as SVGElement;
 
   syncDefs(d, shapes, defsEl);
+  const renderer = (s: SyncableShape) =>
+    renderShape(state, s, d.brushes, arrowDests, bounds, arrowSlots.get(s.shape.dest));
+
   syncShapes(
     shapes.filter(s => !s.shape.customSvg),
     shapesEl,
-    shape => renderShape(state, shape, d.brushes, arrowDests, bounds),
+    renderer,
   );
   syncShapes(
     shapes.filter(s => s.shape.customSvg),
     customSvgsEl,
-    shape => renderShape(state, shape, d.brushes, arrowDests, bounds),
+    renderer,
   );
 }
 
@@ -100,7 +112,7 @@ function syncDefs(d: Drawable, shapes: SyncableShape[], defsEl: SVGElement) {
 }
 
 function shapeHash(
-  { orig, dest, brush, piece, modifiers, customSvg }: DrawShape,
+  { orig, dest, brush, piece, modifiers, customSvg, label }: DrawShape,
   arrowDests: ArrowDests,
   current: boolean,
   bounds: DOMRectReadOnly,
@@ -112,10 +124,11 @@ function shapeHash(
     orig,
     dest,
     brush,
-    dest && (arrowDests.get(dest) || 0) > 1,
+    dest && (arrowDests.get(dest) || 0) > 1 && '-',
     piece && pieceHash(piece),
     modifiers && modifiersHash(modifiers),
     customSvg && customSvgHash(customSvg),
+    label,
   ]
     .filter(x => x)
     .join(',');
@@ -126,7 +139,7 @@ function pieceHash(piece: DrawShapePiece): Hash {
 }
 
 function modifiersHash(m: DrawModifiers): Hash {
-  return [m.lineWidth, m.hilite].filter(x => x).join(',');
+  return [m.lineWidth, m.hilite && '*'].filter(x => x).join(',');
 }
 
 function customSvgHash(s: string): Hash {
@@ -144,6 +157,7 @@ function renderShape(
   brushes: DrawBrushes,
   arrowDests: ArrowDests,
   bounds: DOMRectReadOnly,
+  slots?: AngleSlots,
 ): SVGElement {
   let el: SVGElement;
   const orig = orient(key2pos(shape.orig), state.orientation);
@@ -151,19 +165,19 @@ function renderShape(
   if (shape.customSvg) {
     el = renderCustomSvg(shape.customSvg, orig, bounds);
   } else {
+    const from = pos2user(orig, bounds);
+    const to = shape.dest ? pos2user(orient(key2pos(shape.dest), state.orientation), bounds) : from;
     if (shape.dest && shape.dest !== shape.orig) {
       let brush: DrawBrush = brushes[shape.brush];
       if (shape.modifiers) brush = makeCustomBrush(brush, shape.modifiers);
-      el = renderArrow(
-        brush,
-        orig,
-        orient(key2pos(shape.dest), state.orientation),
-        current,
-        (arrowDests.get(shape.dest) || 0) > 1,
-        bounds,
-        shape.modifiers?.hilite,
-      );
+      el = renderArrow(brush, shape, from, to, current, arrowDests);
     } else el = renderCircle(brushes[shape.brush], orig, current, bounds);
+    if (shape.label) {
+      const g = createElement('g');
+      g.appendChild(el);
+      g.appendChild(renderLabel(shape, from, to, slots));
+      el = g;
+    }
   }
   el.setAttribute('cgHash', hash);
   return el;
@@ -200,17 +214,16 @@ function renderCircle(brush: DrawBrush, pos: cg.Pos, current: boolean, bounds: D
 
 function renderArrow(
   brush: DrawBrush,
-  orig: cg.Pos,
-  dest: cg.Pos,
+  s: DrawShape,
+  from: cg.NumberPair,
+  to: cg.NumberPair,
   current: boolean,
-  shorten: boolean,
-  bounds: DOMRectReadOnly,
-  hilited = false,
+  arrowDests: ArrowDests,
 ): SVGElement {
   function renderInner(isHilite: boolean) {
-    const m = arrowMargin(shorten && !current),
-      a = pos2user(orig, bounds),
-      b = pos2user(dest, bounds),
+    const m = arrowMargin((arrowDests.get(s.dest!) || 0) > 1 && !current),
+      a = from,
+      b = to,
       dx = b[0] - a[0],
       dy = b[1] - a[1],
       angle = Math.atan2(dy, dx),
@@ -228,9 +241,11 @@ function renderArrow(
       y2: b[1] - yo,
     });
   }
-  const el = hilited ? createElement('g') : renderInner(false);
-  if (hilited) [true, false].map(h => el.appendChild(renderInner(h)));
-  return el;
+  if (!s.modifiers?.hilite) return renderInner(false);
+
+  const g = createElement('g');
+  [true, false].map(h => g.appendChild(renderInner(h)));
+  return g;
 }
 
 function renderMarker(brush: DrawBrush): SVGElement {
@@ -293,3 +308,59 @@ function pos2user(pos: cg.Pos, bounds: DOMRectReadOnly): cg.NumberPair {
   const yScale = Math.min(1, bounds.height / bounds.width);
   return [(pos[0] - 3.5) * xScale, (3.5 - pos[1]) * yScale];
 }
+
+const LABEL_SIZE = 0.4; // size of arrow labels in pos units, 1 is the width of a board square
+
+function renderLabel(shape: DrawShape, from: cg.NumberPair, to: cg.NumberPair, slots?: AngleSlots): Element {
+  if (shape.label!.length > 5) throw new Error(`Label '${shape.label}' too long`);
+
+  const fontSize = LABEL_SIZE * 0.8 ** shape.label!.length;
+  const r = LABEL_SIZE / 2;
+  const strokeW = 0.03;
+  const [x, y] = labelOffset(from, to, slots);
+  const g = setAttributes(createElement('g'), { transform: `translate(${x},${y})` });
+
+  g.innerHTML = `
+      <circle r="${r}" fill-opacity="1.0" stroke-opacity="0.9" stroke="white" fill="#666666"
+        stroke-width="${strokeW}"/>
+      <text font-size="${fontSize}" fill="white" font-family="Noto Sans" text-anchor="middle"
+        fill-opacity="1.0" y="${fontSize * 0.34}">${shape.label}</text>`;
+  return g;
+}
+
+function moveAngle(from: cg.NumberPair, to: cg.NumberPair, asSlot = true) {
+  const angle = Math.atan2(to[1] - from[1], to[0] - from[0]) + Math.PI;
+  return asSlot ? (Math.round((angle * 8) / Math.PI) + 16) % 16 : angle;
+}
+
+function length(from: cg.NumberPair, to: cg.NumberPair): number {
+  return Math.sqrt([from[0] - to[0], from[1] - to[1]].reduce((acc, x) => acc + x * x, 0));
+}
+
+function labelOffset(from: cg.NumberPair, to: cg.NumberPair, slots?: AngleSlots): cg.NumberPair {
+  let mag = length(from, to);
+  if (mag === 0) return [0, 0];
+  const angle = moveAngle(from, to, false);
+  if (slots) {
+    mag -= 33 / 64; // reduce by arrowhead length
+    if (slots.size > 1) {
+      mag -= 10 / 64; // reduce by shortening factor
+      const slot = moveAngle(from, to);
+      if (slots.has((slot + 1) % 16) || slots.has((slot + 15) % 16)) {
+        if (slot & 1) mag -= LABEL_SIZE;
+        // and by label size for the knight if the another arrow is pi / 8 away.
+      }
+    }
+  }
+  return [from[0] - Math.cos(angle) * mag, from[1] - Math.sin(angle) * mag];
+}
+
+/*
+ we try to place labels at the junction of the destination shaft and arrowhead.
+ if there's more than 1 arrow pointing to a square, the arrow shortens by 10 / 64 units so
+ the label must move as well. 
+ 
+ if the angle between two incoming arrows is pi / 8, such as when an adjacent knight and
+ bishop attack the same square, the knight's label is slid further down the shaft by an
+ amount equal to our label size to avoid collision
+*/

@@ -10,6 +10,7 @@ export interface DrawShape {
   modifiers?: DrawModifiers;
   piece?: DrawShapePiece;
   customSvg?: string;
+  label?: string;
 }
 
 export interface DrawShapePiece {
