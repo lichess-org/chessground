@@ -78,7 +78,7 @@ function syncDefs(d: Drawable, shapes: SyncableShape[], defsEl: SVGElement) {
     if (s.shape.dest) {
       brush = d.brushes[s.shape.brush];
       if (s.shape.modifiers) brush = makeCustomBrush(brush, s.shape.modifiers);
-      if (s.shape.modifiers?.hilite) brushes.set('hilite', { key: 'hilite', color: 'white', opacity: 1, lineWidth: 1 });
+      if (s.shape.modifiers?.hilite) brushes.set('hilite', d.brushes.hilite);
       brushes.set(brush.key, brush);
     }
   }
@@ -90,6 +90,11 @@ function syncDefs(d: Drawable, shapes: SyncableShape[], defsEl: SVGElement) {
   }
   for (const [key, brush] of brushes.entries()) {
     if (!keysInDom.has(key)) defsEl.appendChild(renderMarker(brush));
+    if (key === 'hilite') {
+      const filter = setAttributes(createElement('filter'), { id: 'cg-arrow-blur' });
+      filter.innerHTML = '<feGaussianBlur in="SourceGraphic" stdDeviation="1" />';
+      defsEl.appendChild(filter);
+    }
   }
 }
 
@@ -123,7 +128,7 @@ function syncShapes(
 }
 
 function shapeHash(
-  { orig, dest, brush, piece, modifiers, customSvg, overlay, label }: DrawShape,
+  { orig, dest, brush, piece, modifiers, customSvg, label }: DrawShape,
   shorten: boolean,
   current: boolean,
   bounds: DOMRectReadOnly,
@@ -140,7 +145,6 @@ function shapeHash(
     piece && pieceHash(piece),
     modifiers && modifiersHash(modifiers),
     customSvg && textHash(customSvg, 'custom-'),
-    overlay && textHash(overlay.svg + overlay.on, 'over-'),
     label && textHash(label.text),
   ]
     .filter(x => x)
@@ -152,7 +156,7 @@ function pieceHash(piece: DrawShapePiece): Hash {
 }
 
 function modifiersHash(m: DrawModifiers): Hash {
-  return [m.lineWidth, m.hilite && '*'].filter(x => x).join(',');
+  return [m.lineWidth, m.hilite && '*', m.overlayCustomSvg?.[0]].filter(x => x).join(',');
 }
 
 function textHash(s: string, prefix = ''): Hash {
@@ -177,7 +181,7 @@ function renderShape(
     slots = dests.get(shape.dest),
     syncable: Syncable = {};
 
-  if (!shape.customSvg) {
+  if (!shape.customSvg || shape.modifiers?.overlayCustomSvg) {
     syncable.shape = setAttributes(createElement('g'), { cgHash: hash });
 
     if (from[0] !== to[0] || from[1] !== to[1])
@@ -186,16 +190,21 @@ function renderShape(
 
     if (shape.label) syncable.shape.appendChild(renderLabel(shape.label.text, from, to, slots));
   }
-  if (shape.customSvg || shape.overlay) {
-    const [svg, on] = shape.customSvg ? [shape.customSvg, 'orig'] : [shape.overlay!.svg, shape.overlay!.on];
+  if (shape.customSvg) {
+    const on = shape.modifiers?.overlayCustomSvg ?? 'orig';
     const [x, y] = on === 'label' ? labelCoords(from, to, slots) : on === 'dest' ? to : from;
     syncable.custom = setAttributes(createElement('g'), { transform: `translate(${x},${y})`, cgHash: hash });
-    syncable.custom.innerHTML = `<svg width="1" height="1" viewBox="0 0 100 100">${svg}</svg>`;
+    syncable.custom.innerHTML = `<svg width="1" height="1" viewBox="0 0 100 100">${shape.customSvg}</svg>`;
   }
   return syncable;
 }
 
-function renderCircle(brush: DrawBrush, at: cg.NumberPair, current: boolean, bounds: DOMRectReadOnly): SVGElement {
+function renderCircle(
+  brush: DrawBrush,
+  at: cg.NumberPair,
+  current: boolean,
+  bounds: DOMRectReadOnly,
+): SVGElement {
   const widths = circleWidth(),
     radius = (bounds.width + bounds.height) / (4 * Math.max(bounds.width, bounds.height));
   return setAttributes(createElement('circle'), {
@@ -217,7 +226,7 @@ function renderArrow(
   current: boolean,
   shorten: boolean,
 ): SVGElement {
-  function renderInner(isHilite: boolean) {
+  function renderLine(isHilite: boolean) {
     const m = arrowMargin(shorten && !current),
       a = from,
       b = to,
@@ -238,12 +247,13 @@ function renderArrow(
       y2: b[1] - yo,
     });
   }
-  const arrow = renderInner(false);
-  if (!s.modifiers?.hilite) return arrow;
+  if (!s.modifiers?.hilite) return renderLine(false);
 
   const g = createElement('g');
-  g.appendChild(renderInner(true));
-  g.appendChild(arrow);
+  const blurred = renderLine(false);
+  blurred.setAttribute('filter', 'url(#cg-arrow-blur)');
+  g.appendChild(renderLine(true));
+  g.appendChild(blurred);
   return g;
 }
 

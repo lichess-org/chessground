@@ -10,19 +10,19 @@ export interface DrawShape {
   modifiers?: DrawModifiers;
   piece?: DrawShapePiece;
   customSvg?: string; // 100 x 100 viewbox with 50,50 centered on 'orig' square
-  overlay?: DrawOverlay;
   label?: { text: string };
+}
+
+export interface DrawModifiers {
+  lineWidth?: number;
+  hilite?: boolean;
+  overlayCustomSvg?: 'orig' | 'dest' | 'label'; // superimpose on shape, center viewbox
 }
 
 export interface DrawShapePiece {
   role: cg.Role;
   color: cg.Color;
   scale?: number;
-}
-
-export interface DrawOverlay {
-  svg: string;
-  on: 'orig' | 'dest' | 'label';
 }
 
 export interface DrawBrush {
@@ -38,11 +38,6 @@ export interface DrawBrushes {
   blue: DrawBrush;
   yellow: DrawBrush;
   [color: string]: DrawBrush;
-}
-
-export interface DrawModifiers {
-  lineWidth?: number;
-  hilite?: boolean;
 }
 
 export interface Drawable {
