@@ -188,7 +188,7 @@ export function defaults(): HeadlessState {
         },
         purple: { key: 'purp', color: '#68217a', opacity: 0.65, lineWidth: 10 },
         pink: { key: 'pink', color: '#ee2080', opacity: 0.5, lineWidth: 10 },
-        hilite: { key: '*', color: '#fff', opacity: 1, lineWidth: 1 },
+        hilite: { key: 'hilite', color: '#fff', opacity: 1, lineWidth: 1 },
       },
       prevSvgHash: '',
     },

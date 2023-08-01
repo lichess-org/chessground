@@ -90,11 +90,6 @@ function syncDefs(d: Drawable, shapes: SyncableShape[], defsEl: SVGElement) {
   }
   for (const [key, brush] of brushes.entries()) {
     if (!keysInDom.has(key)) defsEl.appendChild(renderMarker(brush));
-    if (key === 'hilite') {
-      const filter = setAttributes(createElement('filter'), { id: 'cg-arrow-blur' });
-      filter.innerHTML = '<feGaussianBlur in="SourceGraphic" stdDeviation="1" />';
-      defsEl.appendChild(filter);
-    }
   }
 }
 
@@ -240,7 +235,7 @@ function renderArrow(
       'stroke-width': lineWidth(brush, current) + (isHilite ? 0.04 : 0),
       'stroke-linecap': 'round',
       'marker-end': `url(#arrowhead-${isHilite ? 'hilite' : brush.key})`,
-      opacity: isHilite ? 1 : opacity(brush, current),
+      opacity: s.modifiers?.hilite ? 1 : opacity(brush, current),
       x1: a[0],
       y1: a[1],
       x2: b[0] - xo,
