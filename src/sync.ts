@@ -17,7 +17,7 @@ export function syncShapes(
   const hashesInDom = new Map(), // by hash
     toRemove: SVGElement[] = [];
   for (const sc of shapes) hashesInDom.set(sc.hash, false);
-  let el: SVGElement | undefined = root.firstChild as SVGElement,
+  let el: SVGElement | undefined = root.firstElementChild as SVGElement,
     elHash: Hash | null;
   while (el) {
     elHash = el.getAttribute('cgHash') as Hash;
@@ -25,7 +25,7 @@ export function syncShapes(
     if (hashesInDom.has(elHash)) hashesInDom.set(elHash, true);
     // or remove it
     else toRemove.push(el);
-    el = el.nextSibling as SVGElement | undefined;
+    el = el.nextElementSibling as SVGElement | undefined;
   }
   // remove old shapes
   for (const el of toRemove) root.removeChild(el);

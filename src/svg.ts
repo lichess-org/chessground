@@ -11,6 +11,15 @@ type ArrowDests = Map<cg.Key | undefined, AngleSlots>; // angle slots per dest
 
 export { createElement, setAttributes };
 
+export function createDefs(): Element {
+  const defs = createElement('defs');
+  defs.innerHTML = `
+    <filter id="cg-filter-blur" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="0.022"></feGaussianBlur>
+    </filter>`;
+  return defs;
+}
+
 export function renderSvg(state: State, shapesEl: SVGElement, customsEl: SVGElement): void {
   const d = state.drawable,
     curD = d.current,
@@ -83,10 +92,10 @@ function syncDefs(d: Drawable, shapes: SyncableShape[], defsEl: SVGElement) {
     }
   }
   const keysInDom = new Set();
-  let el: SVGElement | undefined = defsEl.firstChild as SVGElement;
+  let el: SVGElement | undefined = defsEl.firstElementChild as SVGElement;
   while (el) {
-    keysInDom.add(el.getAttribute('cgKey'));
-    el = el.nextSibling as SVGElement | undefined;
+    if (el.hasAttribute('cgHash')) keysInDom.add(el.getAttribute('cgKey'));
+    el = el.nextElementSibling as SVGElement | undefined;
   }
   for (const [key, brush] of brushes.entries()) {
     if (!keysInDom.has(key)) defsEl.appendChild(renderMarker(brush));
@@ -104,13 +113,13 @@ function syncShapes(
   for (const sc of shapes) hashesInDom.set(sc.hash, false);
   for (const root of [shapesGroup, customsGroup]) {
     const toRemove: SVGElement[] = [];
-    let el: SVGElement | undefined = root.firstChild as SVGElement,
+    let el: SVGElement | undefined = root.firstElementChild as SVGElement,
       elHash: Hash | null;
     while (el) {
       elHash = el.getAttribute('cgHash') as Hash;
       if (hashesInDom.has(elHash)) hashesInDom.set(elHash, true);
       else toRemove.push(el);
-      el = el.nextSibling as SVGElement | undefined;
+      el = el.nextElementSibling as SVGElement | undefined;
     }
     for (const el of toRemove) root.removeChild(el);
   }
@@ -245,9 +254,10 @@ function renderArrow(
   if (!s.modifiers?.hilite) return renderLine(false);
 
   const g = createElement('g');
-  const blurred = renderLine(false);
-  blurred.setAttribute('filter', 'url(#cg-arrow-blur)');
   g.appendChild(renderLine(true));
+  const blurred = setAttributes(createElement('g'), { filter: 'url(#cg-filter-blur)' });
+  blurred.appendChild(forceBox(from, to));
+  blurred.appendChild(renderLine(false));
   g.appendChild(blurred);
   return g;
 }
@@ -256,8 +266,9 @@ function renderMarker(brush: DrawBrush): SVGElement {
   const marker = setAttributes(createElement('marker'), {
     id: 'arrowhead-' + brush.key,
     orient: 'auto',
+    overflow: 'visible',
     markerWidth: 4,
-    markerHeight: 8,
+    markerHeight: 4,
     refX: brush.key === 'hilite' ? 1.86 : 2.05,
     refY: 2,
   });
@@ -280,7 +291,7 @@ function renderLabel(text: string, from: cg.NumberPair, to: cg.NumberPair, slots
     <circle r="${labelSize / 2}" fill-opacity="1.0" stroke-opacity="0.9" stroke="white" fill="#666666"
       stroke-width="${0.03}"/>
     <text font-size="${fontSize}" fill="white" font-family="Noto Sans" text-anchor="middle"
-      fill-opacity="1.0" y="${fontSize * 0.34}">${text}</text>`;
+      fill-opacity="1.0" y="${fontSize * 0.34}">${text}</text>`.replace(/\s+/g, ' ');
   return g;
 }
 
@@ -334,6 +345,25 @@ function pos2user(pos: cg.Pos, bounds: DOMRectReadOnly): cg.NumberPair {
   const xScale = Math.min(1, bounds.width / bounds.height);
   const yScale = Math.min(1, bounds.height / bounds.width);
   return [(pos[0] - 3.5) * xScale, (3.5 - pos[1]) * yScale];
+}
+
+function forceBox(from: cg.NumberPair, to: cg.NumberPair): SVGElement {
+  const box = boundingBox(from, to);
+  return setAttributes(createElement('rect'), {
+    x: box.from[0],
+    y: box.from[1],
+    width: box.to[0] - box.from[0],
+    height: box.to[1] - box.from[1],
+    fill: 'none',
+    stroke: 'none',
+  });
+}
+
+function boundingBox(from: cg.NumberPair, to: cg.NumberPair): { from: cg.NumberPair; to: cg.NumberPair } {
+  return {
+    from: [Math.floor(Math.min(from[0], to[0])), Math.floor(Math.min(from[1], to[1]))],
+    to: [Math.ceil(Math.max(from[0], to[0])), Math.ceil(Math.max(from[1], to[1]))],
+  };
 }
 
 function moveAngle(from: cg.NumberPair, to: cg.NumberPair, asSlot = true) {
