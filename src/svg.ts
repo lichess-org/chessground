@@ -11,6 +11,14 @@ type ArrowDests = Map<cg.Key | undefined, AngleSlots>; // angle slots per dest
 
 export { createElement, setAttributes };
 
+export function createDefs(): Element {
+  const defs = createElement('defs');
+  const filter = setAttributes(createElement('filter'), { id: 'cg-filter-blur' });
+  filter.appendChild(setAttributes(createElement('feGaussianBlur'), { stdDeviation: '0.022' }));
+  defs.appendChild(filter);
+  return defs;
+}
+
 export function renderSvg(state: State, shapesEl: SVGElement, customsEl: SVGElement): void {
   const d = state.drawable,
     curD = d.current,
@@ -76,17 +84,16 @@ function syncDefs(d: Drawable, shapes: SyncableShape[], defsEl: SVGElement) {
   let brush: DrawBrush;
   for (const s of shapes) {
     if (s.shape.dest) {
-      brush = d.brushes[s.shape.brush];
-      if (s.shape.modifiers) brush = makeCustomBrush(brush, s.shape.modifiers);
-      if (s.shape.modifiers?.hilite) brushes.set('hilite', d.brushes.hilite);
+      brush = makeCustomBrush(d.brushes[s.shape.brush], s.shape.modifiers);
+      if (s.shape.modifiers?.hilite) brushes.set('hilite', d.brushes['hilite']);
       brushes.set(brush.key, brush);
     }
   }
   const keysInDom = new Set();
-  let el: SVGElement | undefined = defsEl.firstChild as SVGElement;
+  let el: SVGElement | undefined = defsEl.firstElementChild as SVGElement;
   while (el) {
     keysInDom.add(el.getAttribute('cgKey'));
-    el = el.nextSibling as SVGElement | undefined;
+    el = el.nextElementSibling as SVGElement | undefined;
   }
   for (const [key, brush] of brushes.entries()) {
     if (!keysInDom.has(key)) defsEl.appendChild(renderMarker(brush));
@@ -94,36 +101,36 @@ function syncDefs(d: Drawable, shapes: SyncableShape[], defsEl: SVGElement) {
 }
 
 function syncShapes(
-  shapes: SyncableShape[],
-  shapesGroup: Element,
-  customsGroup: Element,
+  syncables: SyncableShape[],
+  shapes: Element,
+  customs: Element,
   renderShape: (shape: SyncableShape) => Syncable,
 ): void {
   const hashesInDom = new Map();
 
-  for (const sc of shapes) hashesInDom.set(sc.hash, false);
-  for (const root of [shapesGroup, customsGroup]) {
+  for (const sc of syncables) hashesInDom.set(sc.hash, false);
+  for (const root of [shapes, customs]) {
     const toRemove: SVGElement[] = [];
-    let el: SVGElement | undefined = root.firstChild as SVGElement,
+    let el: SVGElement | undefined = root.firstElementChild as SVGElement,
       elHash: Hash | null;
     while (el) {
       elHash = el.getAttribute('cgHash') as Hash;
       if (hashesInDom.has(elHash)) hashesInDom.set(elHash, true);
       else toRemove.push(el);
-      el = el.nextSibling as SVGElement | undefined;
+      el = el.nextElementSibling as SVGElement | undefined;
     }
     for (const el of toRemove) root.removeChild(el);
   }
   // insert shapes that are not yet in dom
-  for (const sc of shapes.filter(s => !hashesInDom.get(s.hash))) {
+  for (const sc of syncables.filter(s => !hashesInDom.get(s.hash))) {
     const { shape, custom } = renderShape(sc);
-    if (shape) shapesGroup.appendChild(shape);
-    if (custom) customsGroup.appendChild(custom);
+    if (shape) shapes.appendChild(shape);
+    if (custom) customs.appendChild(custom);
   }
 }
 
 function shapeHash(
-  { orig, dest, brush, piece, modifiers, customSvg, label }: DrawShape,
+  { orig, dest, brush, piece, modifiers, customSvg }: DrawShape,
   shorten: boolean,
   current: boolean,
   bounds: DOMRectReadOnly,
@@ -139,8 +146,7 @@ function shapeHash(
     shorten && '-',
     piece && pieceHash(piece),
     modifiers && modifiersHash(modifiers),
-    customSvg && textHash(customSvg, 'custom-'),
-    label && textHash(label.text),
+    customSvg && `custom-${textHash(customSvg)}`,
   ]
     .filter(x => x)
     .join(',');
@@ -154,13 +160,13 @@ function modifiersHash(m: DrawModifiers): Hash {
   return [m.lineWidth, m.hilite && '*', m.overlayCustomSvg?.[0]].filter(x => x).join(',');
 }
 
-function textHash(s: string, prefix = ''): Hash {
+function textHash(s: string): Hash {
   // Rolling hash with base 31 (cf. https://stackoverflow.com/questions/7616461/generate-a-hash-from-string-in-javascript)
   let h = 0;
   for (let i = 0; i < s.length; i++) {
     h = ((h << 5) - h + s.charCodeAt(i)) >>> 0;
   }
-  return prefix + h.toString();
+  return h.toString();
 }
 
 function renderShape(
@@ -183,7 +189,7 @@ function renderShape(
       syncable.shape.appendChild(renderArrow(shape, brush, from, to, current, isShort(shape.dest, dests)));
     else syncable.shape.appendChild(renderCircle(brushes[shape.brush], from, current, bounds));
 
-    if (shape.label) syncable.shape.appendChild(renderLabel(shape.label.text, from, to, slots));
+    if (shape.label) syncable.custom = renderLabel(shape.label.text, from, to, slots);
   }
   if (shape.customSvg) {
     const on = shape.modifiers?.overlayCustomSvg ?? 'orig';
@@ -238,7 +244,10 @@ function renderArrow(
   if (!s.modifiers?.hilite) return renderLine(false);
 
   const g = createElement('g');
-  g.appendChild(renderLine(true));
+  const blurred = setAttributes(createElement('g'), { filter: 'url(#cg-filter-blur)' });
+  blurred.appendChild(filterBox(from, to));
+  blurred.appendChild(renderLine(true));
+  g.appendChild(blurred);
   g.appendChild(renderLine(false));
   return g;
 }
@@ -247,8 +256,9 @@ function renderMarker(brush: DrawBrush): SVGElement {
   const marker = setAttributes(createElement('marker'), {
     id: 'arrowhead-' + brush.key,
     orient: 'auto',
+    overflow: 'visible',
     markerWidth: 4,
-    markerHeight: 8,
+    markerHeight: 4,
     refX: brush.key === 'hilite' ? 1.86 : 2.05,
     refY: 2,
   });
@@ -262,11 +272,14 @@ function renderMarker(brush: DrawBrush): SVGElement {
   return marker;
 }
 
-function renderLabel(text: string, from: cg.NumberPair, to: cg.NumberPair, slots?: AngleSlots): Element {
+function renderLabel(text: string, from: cg.NumberPair, to: cg.NumberPair, slots?: AngleSlots): SVGElement {
   const labelSize = 0.4;
   const fontSize = labelSize * 0.8 ** text.length;
   const [x, y] = labelCoords(from, to, slots);
-  const g = setAttributes(createElement('g'), { transform: `translate(${x},${y})` });
+  const g = setAttributes(createElement('g'), {
+    transform: `translate(${x},${y})`,
+    cgHash: `label-${textHash(text)}`,
+  });
   g.appendChild(
     setAttributes(createElement('circle'), {
       r: labelSize / 2,
@@ -342,6 +355,23 @@ function pos2user(pos: cg.Pos, bounds: DOMRectReadOnly): cg.NumberPair {
   return [(pos[0] - 3.5) * xScale, (3.5 - pos[1]) * yScale];
 }
 
+function filterBox(from: cg.NumberPair, to: cg.NumberPair): SVGElement {
+  // lines/arrows are considered to be one dimensional for the purposes of SVG filters,
+  // so we add a transparent bounding box to ensure they apply to the 2nd dimension
+  const box = {
+    from: [Math.floor(Math.min(from[0], to[0])), Math.floor(Math.min(from[1], to[1]))],
+    to: [Math.ceil(Math.max(from[0], to[0])), Math.ceil(Math.max(from[1], to[1]))],
+  };
+  return setAttributes(createElement('rect'), {
+    x: box.from[0],
+    y: box.from[1],
+    width: box.to[0] - box.from[0],
+    height: box.to[1] - box.from[1],
+    fill: 'none',
+    stroke: 'none',
+  });
+}
+
 function moveAngle(from: cg.NumberPair, to: cg.NumberPair, asSlot = true) {
   const angle = Math.atan2(to[1] - from[1], to[0] - from[0]) + Math.PI;
   return asSlot ? (Math.round((angle * 8) / Math.PI) + 16) % 16 : angle;
@@ -362,7 +392,7 @@ function dist(from: cg.NumberPair, to: cg.NumberPair): number {
 
 function labelCoords(from: cg.NumberPair, to: cg.NumberPair, slots?: AngleSlots): cg.NumberPair {
   let mag = dist(from, to);
-  if (mag === 0) return from;
+  if (mag === 0) return [0.5 + from[0], 0.5 + from[1]];
   const angle = moveAngle(from, to, false);
   if (slots) {
     mag -= 33 / 64; // reduce by arrowhead length
@@ -375,5 +405,5 @@ function labelCoords(from: cg.NumberPair, to: cg.NumberPair, slots?: AngleSlots)
       }
     }
   }
-  return [from[0] - Math.cos(angle) * mag, from[1] - Math.sin(angle) * mag];
+  return [0.5 + from[0] - Math.cos(angle) * mag, 0.5 + from[1] - Math.sin(angle) * mag];
 }

@@ -1,7 +1,7 @@
 import { HeadlessState } from './state.js';
 import { setVisible, createEl } from './util.js';
 import { colors, files, ranks, Elements } from './types.js';
-import { createElement as createSVG, setAttributes } from './svg.js';
+import { createElement as createSVG, setAttributes, createDefs } from './svg.js';
 
 export function renderWrap(element: HTMLElement, s: HeadlessState): Elements {
   // .cg-wrap (element passed to Chessground)
@@ -44,7 +44,7 @@ export function renderWrap(element: HTMLElement, s: HeadlessState): Elements {
       viewBox: '-4 -4 8 8',
       preserveAspectRatio: 'xMidYMid slice',
     });
-    svg.appendChild(createSVG('defs'));
+    svg.appendChild(createDefs());
     svg.appendChild(createSVG('g'));
 
     customSvg = setAttributes(createSVG('svg'), {
