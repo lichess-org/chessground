@@ -94,7 +94,7 @@ function syncDefs(d: Drawable, shapes: SyncableShape[], defsEl: SVGElement) {
   const keysInDom = new Set();
   let el: SVGElement | undefined = defsEl.firstElementChild as SVGElement;
   while (el) {
-    if (el.hasAttribute('cgHash')) keysInDom.add(el.getAttribute('cgKey'));
+    keysInDom.add(el.getAttribute('cgKey'));
     el = el.nextElementSibling as SVGElement | undefined;
   }
   for (const [key, brush] of brushes.entries()) {
@@ -203,12 +203,7 @@ function renderShape(
   return syncable;
 }
 
-function renderCircle(
-  brush: DrawBrush,
-  at: cg.NumberPair,
-  current: boolean,
-  bounds: DOMRectReadOnly,
-): SVGElement {
+function renderCircle(brush: DrawBrush, at: cg.NumberPair, current: boolean, bounds: DOMRectReadOnly): SVGElement {
   const widths = circleWidth(),
     radius = (bounds.width + bounds.height) / (4 * Math.max(bounds.width, bounds.height));
   return setAttributes(createElement('circle'), {
@@ -254,11 +249,11 @@ function renderArrow(
   if (!s.modifiers?.hilite) return renderLine(false);
 
   const g = createElement('g');
-  g.appendChild(renderLine(true));
   const blurred = setAttributes(createElement('g'), { filter: 'url(#cg-filter-blur)' });
   blurred.appendChild(forceBox(from, to));
-  blurred.appendChild(renderLine(false));
+  blurred.appendChild(renderLine(true));
   g.appendChild(blurred);
+  g.appendChild(renderLine(false));
   return g;
 }
 
@@ -321,7 +316,7 @@ function makeCustomBrush(base: DrawBrush, modifiers: DrawModifiers | undefined):
         color: base.color,
         opacity: Math.round(base.opacity * 10) / 10,
         lineWidth: Math.round(modifiers.lineWidth || base.lineWidth),
-        key: [base.key, modifiers.lineWidth].filter(x => x).join(''),
+        key: [base.key, modifiers.lineWidth, modifiers.hilite && '*'].filter(x => x).join(''),
       };
 }
 
