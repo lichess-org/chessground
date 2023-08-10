@@ -32,7 +32,7 @@ export function renderSvg(state: State, shapesEl: SVGElement, customsEl: SVGElem
     const sources = dests.get(s.dest) ?? new Set(),
       from = pos2user(orient(key2pos(s.orig), state.orientation), bounds),
       to = pos2user(orient(key2pos(s.dest), state.orientation), bounds);
-    sources.add(moveAngle(from, to, state.orientation === 'white'));
+    sources.add(moveAngle(from, to));
     dests.set(s.dest, sources);
   }
   const shapes: SyncableShape[] = d.shapes.concat(nonPieceAutoShapes).map((s: DrawShape) => {
@@ -200,7 +200,12 @@ function renderShape(
   return syncable;
 }
 
-function renderCircle(brush: DrawBrush, at: cg.NumberPair, current: boolean, bounds: DOMRectReadOnly): SVGElement {
+function renderCircle(
+  brush: DrawBrush,
+  at: cg.NumberPair,
+  current: boolean,
+  bounds: DOMRectReadOnly,
+): SVGElement {
   const widths = circleWidth(),
     radius = (bounds.width + bounds.height) / (4 * Math.max(bounds.width, bounds.height));
   return setAttributes(createElement('circle'), {
