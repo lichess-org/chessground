@@ -5,7 +5,7 @@ import { SyncableShape, Hash } from './sync.js';
 import * as cg from './types.js';
 
 type CustomBrushes = Map<string, DrawBrush>; // by hash
-type Syncable = { shape?: SVGElement; custom?: SVGElement };
+type Svg = { el: SVGElement; isCustom?: boolean };
 type AngleSlots = Set<number>; // arrow angle slots for label positioning
 type ArrowDests = Map<cg.Key | undefined, AngleSlots>; // angle slots per dest
 
@@ -104,7 +104,7 @@ function syncShapes(
   syncables: SyncableShape[],
   shapes: Element,
   customs: Element,
-  renderShape: (shape: SyncableShape) => Syncable,
+  renderShape: (shape: SyncableShape) => Svg[],
 ): void {
   const hashesInDom = new Map();
 
@@ -123,9 +123,10 @@ function syncShapes(
   }
   // insert shapes that are not yet in dom
   for (const sc of syncables.filter(s => !hashesInDom.get(s.hash))) {
-    const { shape, custom } = renderShape(sc);
-    if (shape) shapes.appendChild(shape);
-    if (custom) customs.appendChild(custom);
+    for (const g of renderShape(sc)) {
+      if (g.isCustom) customs.appendChild(g.el);
+      else shapes.appendChild(g.el);
+    }
   }
 }
 
@@ -175,37 +176,34 @@ function renderShape(
   brushes: DrawBrushes,
   dests: ArrowDests,
   bounds: DOMRectReadOnly,
-): Syncable {
+): Svg[] {
   const from = pos2user(orient(key2pos(shape.orig), state.orientation), bounds),
     to = shape.dest ? pos2user(orient(key2pos(shape.dest), state.orientation), bounds) : from,
     brush = makeCustomBrush(brushes[shape.brush], shape.modifiers),
     slots = dests.get(shape.dest),
-    syncable: Syncable = {};
+    svgs: Svg[] = [];
 
   if (!shape.customSvg || shape.modifiers?.overlayCustomSvg) {
-    syncable.shape = setAttributes(createElement('g'), { cgHash: hash });
+    const el = setAttributes(createElement('g'), { cgHash: hash });
+    svgs.push({ el });
 
     if (from[0] !== to[0] || from[1] !== to[1])
-      syncable.shape.appendChild(renderArrow(shape, brush, from, to, current, isShort(shape.dest, dests)));
-    else syncable.shape.appendChild(renderCircle(brushes[shape.brush], from, current, bounds));
+      el.appendChild(renderArrow(shape, brush, from, to, current, isShort(shape.dest, dests)));
+    else el.appendChild(renderCircle(brushes[shape.brush], from, current, bounds));
 
-    if (shape.label) syncable.custom = renderLabel(shape.label.text, from, to, slots);
+    if (shape.label) svgs.push({ el: renderLabel(shape.label.text, from, to, slots), isCustom: true });
   }
   if (shape.customSvg) {
     const on = shape.modifiers?.overlayCustomSvg ?? 'orig';
     const [x, y] = on === 'label' ? labelCoords(from, to, slots) : on === 'dest' ? to : from;
-    syncable.custom = setAttributes(createElement('g'), { transform: `translate(${x},${y})`, cgHash: hash });
-    syncable.custom.innerHTML = `<svg width="1" height="1" viewBox="0 0 100 100">${shape.customSvg}</svg>`;
+    const el = setAttributes(createElement('g'), { transform: `translate(${x},${y})`, cgHash: hash });
+    el.innerHTML = `<svg width="1" height="1" viewBox="0 0 100 100">${shape.customSvg}</svg>`;
+    svgs.push({ el, isCustom: true });
   }
-  return syncable;
+  return svgs;
 }
 
-function renderCircle(
-  brush: DrawBrush,
-  at: cg.NumberPair,
-  current: boolean,
-  bounds: DOMRectReadOnly,
-): SVGElement {
+function renderCircle(brush: DrawBrush, at: cg.NumberPair, current: boolean, bounds: DOMRectReadOnly): SVGElement {
   const widths = circleWidth(),
     radius = (bounds.width + bounds.height) / (4 * Math.max(bounds.width, bounds.height));
   return setAttributes(createElement('circle'), {
@@ -282,7 +280,7 @@ function renderLabel(text: string, from: cg.NumberPair, to: cg.NumberPair, slots
   const fontSize = labelSize * 0.8 ** text.length;
   const [x, y] = labelCoords(from, to, slots);
   const g = setAttributes(createElement('g'), {
-    transform: `translate(${x},${y})`,
+    transform: `translate(${x + 0.5},${y + 0.5})`,
     cgHash: `label-${textHash(text)}`,
   });
   g.appendChild(
@@ -410,5 +408,5 @@ function labelCoords(from: cg.NumberPair, to: cg.NumberPair, slots?: AngleSlots)
       }
     }
   }
-  return [0.5 + from[0] - Math.cos(angle) * mag, 0.5 + from[1] - Math.sin(angle) * mag];
+  return [from[0] - Math.cos(angle) * mag, from[1] - Math.sin(angle) * mag];
 }
