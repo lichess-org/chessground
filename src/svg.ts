@@ -123,15 +123,15 @@ function syncShapes(
   }
   // insert shapes that are not yet in dom
   for (const sc of syncables.filter(s => !hashesInDom.get(s.hash))) {
-    for (const g of renderShape(sc)) {
-      if (g.isCustom) customs.appendChild(g.el);
-      else shapes.appendChild(g.el);
+    for (const svg of renderShape(sc)) {
+      if (svg.isCustom) customs.appendChild(svg.el);
+      else shapes.appendChild(svg.el);
     }
   }
 }
 
 function shapeHash(
-  { orig, dest, brush, piece, modifiers, customSvg }: DrawShape,
+  { orig, dest, brush, piece, modifiers, customSvg, label }: DrawShape,
   shorten: boolean,
   current: boolean,
   bounds: DOMRectReadOnly,
@@ -148,6 +148,7 @@ function shapeHash(
     piece && pieceHash(piece),
     modifiers && modifiersHash(modifiers),
     customSvg && `custom-${textHash(customSvg)}`,
+    label && `label-${textHash(label.text)}`,
   ]
     .filter(x => x)
     .join(',');
@@ -191,7 +192,8 @@ function renderShape(
       el.appendChild(renderArrow(shape, brush, from, to, current, isShort(shape.dest, dests)));
     else el.appendChild(renderCircle(brushes[shape.brush], from, current, bounds));
 
-    if (shape.label) svgs.push({ el: renderLabel(shape.label.text, from, to, slots), isCustom: true });
+    if (shape.label)
+      svgs.push({ el: renderLabel(shape.label.text, brush.color, hash, from, to, slots), isCustom: true });
   }
   if (shape.customSvg) {
     const on = shape.modifiers?.overlayCustomSvg ?? 'orig';
@@ -275,21 +277,28 @@ function renderMarker(brush: DrawBrush): SVGElement {
   return marker;
 }
 
-function renderLabel(text: string, from: cg.NumberPair, to: cg.NumberPair, slots?: AngleSlots): SVGElement {
+function renderLabel(
+  text: string,
+  color: string,
+  hash: string,
+  from: cg.NumberPair,
+  to: cg.NumberPair,
+  slots?: AngleSlots,
+): SVGElement {
   const labelSize = 0.4;
   const fontSize = labelSize * 0.8 ** text.length;
   const [x, y] = labelCoords(from, to, slots);
   const g = setAttributes(createElement('g'), {
     transform: `translate(${x + 0.5},${y + 0.5})`,
-    cgHash: `label-${textHash(text)}`,
+    cgHash: hash,
   });
   g.appendChild(
     setAttributes(createElement('circle'), {
       r: labelSize / 2,
-      'fill-opacity': 1.0,
-      'stroke-opacity': 0.9,
+      'fill-opacity': 0.8,
+      'stroke-opacity': 0.7,
       'stroke-width': 0.03,
-      fill: '#666',
+      fill: color,
       stroke: 'white',
     }),
   );
