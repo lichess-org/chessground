@@ -2,6 +2,8 @@
   "include": ["src/*.ts"],
   "exclude": [],
   "compilerOptions": {
+    "outDir": "dist",
+    "rootDir": "src",
     "noEmitOnError": false,
     "strict": true,
     "noUnusedLocals": true,
