@@ -205,7 +205,12 @@ function renderShape(
   return svgs;
 }
 
-function renderCircle(brush: DrawBrush, at: cg.NumberPair, current: boolean, bounds: DOMRectReadOnly): SVGElement {
+function renderCircle(
+  brush: DrawBrush,
+  at: cg.NumberPair,
+  current: boolean,
+  bounds: DOMRectReadOnly,
+): SVGElement {
   const widths = circleWidth(),
     radius = (bounds.width + bounds.height) / (4 * Math.max(bounds.width, bounds.height));
   return setAttributes(createElement('circle'), {

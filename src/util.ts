@@ -2,7 +2,9 @@ import * as cg from './types.js';
 
 export const invRanks: readonly cg.Rank[] = [...cg.ranks].reverse();
 
-export const allKeys: readonly cg.Key[] = Array.prototype.concat(...cg.files.map(c => cg.ranks.map(r => c + r)));
+export const allKeys: readonly cg.Key[] = Array.prototype.concat(
+  ...cg.files.map(c => cg.ranks.map(r => c + r)),
+);
 
 export const pos2key = (pos: cg.Pos): cg.Key => allKeys[8 * pos[0] + pos[1]];
 
@@ -54,7 +56,8 @@ export const distanceSq = (pos1: cg.Pos, pos2: cg.Pos): number => {
   return dx * dx + dy * dy;
 };
 
-export const samePiece = (p1: cg.Piece, p2: cg.Piece): boolean => p1.role === p2.role && p1.color === p2.color;
+export const samePiece = (p1: cg.Piece, p2: cg.Piece): boolean =>
+  p1.role === p2.role && p1.color === p2.color;
 
 export const posToTranslate =
   (bounds: DOMRectReadOnly): ((pos: cg.Pos, asWhite: boolean) => cg.NumberPair) =>
