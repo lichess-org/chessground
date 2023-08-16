@@ -6,17 +6,16 @@ import * as cg from './types.js';
 export interface DrawShape {
   orig: cg.Key;
   dest?: cg.Key;
-  brush: string;
+  brush?: string; // if no brush, no shape. label moved to top right of square
   modifiers?: DrawModifiers;
   piece?: DrawShapePiece;
-  customSvg?: string; // 100 x 100 viewbox with 50,50 centered on 'orig' square
-  label?: { text: string };
+  customSvg?: { html: string; center?: 'orig' | 'dest' | 'label' }; // 100 x 100 viewbox cenetered at [50,50]
+  label?: { text: string; fill?: string }; // fill is in '#rrggbb' format
 }
 
 export interface DrawModifiers {
   lineWidth?: number;
   hilite?: boolean;
-  overlayCustomSvg?: 'orig' | 'dest' | 'label'; // superimpose on shape, center viewbox
 }
 
 export interface DrawShapePiece {

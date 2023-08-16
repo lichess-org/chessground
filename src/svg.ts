@@ -82,12 +82,10 @@ export function renderSvg(state: State, shapesEl: SVGElement, customsEl: SVGElem
 function syncDefs(d: Drawable, shapes: SyncableShape[], defsEl: SVGElement) {
   const brushes: CustomBrushes = new Map();
   let brush: DrawBrush;
-  for (const s of shapes) {
-    if (s.shape.dest) {
-      brush = makeCustomBrush(d.brushes[s.shape.brush], s.shape.modifiers);
-      if (s.shape.modifiers?.hilite) brushes.set('hilite', d.brushes['hilite']);
-      brushes.set(brush.key, brush);
-    }
+  for (const s of shapes.filter(s => s.shape.dest && s.shape.brush)) {
+    brush = makeCustomBrush(d.brushes[s.shape.brush!], s.shape.modifiers);
+    if (s.shape.modifiers?.hilite) brushes.set('hilite', d.brushes['hilite']);
+    brushes.set(brush.key, brush);
   }
   const keysInDom = new Set();
   let el: SVGElement | undefined = defsEl.firstElementChild as SVGElement;
@@ -147,7 +145,7 @@ function shapeHash(
     shorten && '-',
     piece && pieceHash(piece),
     modifiers && modifiersHash(modifiers),
-    customSvg && `custom-${textHash(customSvg)}`,
+    customSvg && `custom-${textHash(customSvg.html)},${customSvg.center?.[0] ?? 'o'}`,
     label && `label-${textHash(label.text)}`,
   ]
     .filter(x => x)
@@ -159,7 +157,7 @@ function pieceHash(piece: DrawShapePiece): Hash {
 }
 
 function modifiersHash(m: DrawModifiers): Hash {
-  return [m.lineWidth, m.hilite && '*', m.overlayCustomSvg?.[0]].filter(x => x).join(',');
+  return [m.lineWidth, m.hilite && '*'].filter(x => x).join(',');
 }
 
 function textHash(s: string): Hash {
@@ -180,23 +178,26 @@ function renderShape(
 ): Svg[] {
   const from = pos2user(orient(key2pos(shape.orig), state.orientation), bounds),
     to = shape.dest ? pos2user(orient(key2pos(shape.dest), state.orientation), bounds) : from,
-    brush = makeCustomBrush(brushes[shape.brush], shape.modifiers),
+    brush = shape.brush && makeCustomBrush(brushes[shape.brush], shape.modifiers),
     slots = dests.get(shape.dest),
     svgs: Svg[] = [];
 
-  if (!shape.customSvg || shape.modifiers?.overlayCustomSvg) {
+  if (brush) {
     const el = setAttributes(createElement('g'), { cgHash: hash });
     svgs.push({ el });
 
     if (from[0] !== to[0] || from[1] !== to[1])
       el.appendChild(renderArrow(shape, brush, from, to, current, isShort(shape.dest, dests)));
-    else el.appendChild(renderCircle(brushes[shape.brush], from, current, bounds));
-
-    if (shape.label)
-      svgs.push({ el: renderLabel(shape.label.text, brush.color, hash, from, to, slots), isCustom: true });
+    else el.appendChild(renderCircle(brushes[shape.brush!], from, current, bounds));
+  }
+  if (shape.label) {
+    const label = shape.label;
+    label.fill ??= shape.brush && brushes[shape.brush].color;
+    const corner = shape.brush ? undefined : 'tr';
+    svgs.push({ el: renderLabel(label, hash, from, to, slots, corner), isCustom: true });
   }
   if (shape.customSvg) {
-    const on = shape.modifiers?.overlayCustomSvg ?? 'orig';
+    const on = shape.customSvg.center ?? 'orig';
     const [x, y] = on === 'label' ? labelCoords(from, to, slots) : on === 'dest' ? to : from;
     const el = setAttributes(createElement('g'), { transform: `translate(${x},${y})`, cgHash: hash });
     el.innerHTML = `<svg width="1" height="1" viewBox="0 0 100 100">${shape.customSvg}</svg>`;
@@ -283,40 +284,40 @@ function renderMarker(brush: DrawBrush): SVGElement {
 }
 
 function renderLabel(
-  text: string,
-  color: string,
+  label: { text: string; fill?: string },
   hash: string,
   from: cg.NumberPair,
   to: cg.NumberPair,
   slots?: AngleSlots,
+  corner?: 'tr',
 ): SVGElement {
   const labelSize = 0.4;
-  const fontSize = labelSize * 0.8 ** text.length;
-  const [x, y] = labelCoords(from, to, slots);
+  const fontSize = labelSize * 0.75 ** label.text.length;
+  const at = labelCoords(from, to, slots);
+  const by = corner === 'tr' ? [0.4, -0.4] : [0.5, 0.5];
   const g = setAttributes(createElement('g'), {
-    transform: `translate(${x + 0.5},${y + 0.5})`,
+    transform: `translate(${at[0] + by[0]},${at[1] + by[1]})`,
     cgHash: hash,
   });
   g.appendChild(
     setAttributes(createElement('circle'), {
       r: labelSize / 2,
-      'fill-opacity': 0.8,
+      'fill-opacity': corner ? 1.0 : 0.8,
       'stroke-opacity': 0.7,
       'stroke-width': 0.03,
-      fill: color,
+      fill: label.fill ?? '#666',
       stroke: 'white',
     }),
   );
-  const label = setAttributes(createElement('text'), {
+  const labelEl = setAttributes(createElement('text'), {
     'font-size': fontSize,
     'font-family': 'Noto Sans',
     'text-anchor': 'middle',
     fill: 'white',
-    y: fontSize * 0.34,
-    innerHTML: text,
+    y: 0.13 * 0.75 ** label.text.length,
   });
-  label.innerHTML = text;
-  g.appendChild(label);
+  labelEl.innerHTML = label.text;
+  g.appendChild(labelEl);
   return g;
 }
 
