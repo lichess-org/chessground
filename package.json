@@ -36,7 +36,8 @@
     "lint": "eslint src/*.ts",
     "format": "prettier --write .",
     "check-format": "prettier --check .",
-    "bundle": "esbuild src/chessground.ts --bundle --format=esm --outfile=dist/chessground.min.js --minify --platform=browser"
+    "bundle": "esbuild src/chessground.ts --bundle --format=esm --outfile=dist/chessground.min.js --minify",
+    "dist": "$npm_execpath run compile && $npm_execpath run bundle"
   },
   "files": [
     "/dist/*.js",
