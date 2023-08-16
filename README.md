@@ -100,11 +100,11 @@ pnpm install
 To build the node module:
 
 ```sh
-pnpm run compile -- --watch
+pnpm run compile --watch
 ```
 
 To build the standalone:
 
 ```sh
-pnpm run dist -- --watch
+pnpm run dist
 ```
