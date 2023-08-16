@@ -9,7 +9,7 @@ import * as autoPieces from './autoPieces.js';
 import * as svg from './svg.js';
 import * as util from './util.js';
 
-export function initModule({el, config}: {el: HTMLElement, config?: Config}): Api {
+export function initModule({ el, config }: { el: HTMLElement; config?: Config }): Api {
   return Chessground(el, config);
 }
 

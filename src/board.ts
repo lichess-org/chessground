@@ -3,7 +3,10 @@ import { pos2key, key2pos, opposite, distanceSq, allPos, computeSquareCenter } f
 import { premove, queen, knight } from './premove.js';
 import * as cg from './types.js';
 
-export function callUserFunction<T extends (...args: any[]) => void>(f: T | undefined, ...args: Parameters<T>): void {
+export function callUserFunction<T extends (...args: any[]) => void>(
+  f: T | undefined,
+  ...args: Parameters<T>
+): void {
   if (f) setTimeout(() => f(...args), 1);
 }
 
@@ -194,7 +197,10 @@ export function selectSquare(state: HeadlessState, key: cg.Key, force?: boolean)
       }
     }
   }
-  if ((state.selectable.enabled || state.draggable.enabled) && (isMovable(state, key) || isPremovable(state, key))) {
+  if (
+    (state.selectable.enabled || state.draggable.enabled) &&
+    (isMovable(state, key) || isPremovable(state, key))
+  ) {
     setSelected(state, key);
     state.hold.start();
   }
@@ -220,25 +226,34 @@ function isMovable(state: HeadlessState, orig: cg.Key): boolean {
   const piece = state.pieces.get(orig);
   return (
     !!piece &&
-    (state.movable.color === 'both' || (state.movable.color === piece.color && state.turnColor === piece.color))
+    (state.movable.color === 'both' ||
+      (state.movable.color === piece.color && state.turnColor === piece.color))
   );
 }
 
 export const canMove = (state: HeadlessState, orig: cg.Key, dest: cg.Key): boolean =>
-  orig !== dest && isMovable(state, orig) && (state.movable.free || !!state.movable.dests?.get(orig)?.includes(dest));
+  orig !== dest &&
+  isMovable(state, orig) &&
+  (state.movable.free || !!state.movable.dests?.get(orig)?.includes(dest));
 
 function canDrop(state: HeadlessState, orig: cg.Key, dest: cg.Key): boolean {
   const piece = state.pieces.get(orig);
   return (
     !!piece &&
     (orig === dest || !state.pieces.has(dest)) &&
-    (state.movable.color === 'both' || (state.movable.color === piece.color && state.turnColor === piece.color))
+    (state.movable.color === 'both' ||
+      (state.movable.color === piece.color && state.turnColor === piece.color))
   );
 }
 
 function isPremovable(state: HeadlessState, orig: cg.Key): boolean {
   const piece = state.pieces.get(orig);
-  return !!piece && state.premovable.enabled && state.movable.color === piece.color && state.turnColor !== piece.color;
+  return (
+    !!piece &&
+    state.premovable.enabled &&
+    state.movable.color === piece.color &&
+    state.turnColor !== piece.color
+  );
 }
 
 function canPremove(state: HeadlessState, orig: cg.Key, dest: cg.Key): boolean {
@@ -321,7 +336,11 @@ export function stop(state: HeadlessState): void {
   cancelMove(state);
 }
 
-export function getKeyAtDomPos(pos: cg.NumberPair, asWhite: boolean, bounds: DOMRectReadOnly): cg.Key | undefined {
+export function getKeyAtDomPos(
+  pos: cg.NumberPair,
+  asWhite: boolean,
+  bounds: DOMRectReadOnly,
+): cg.Key | undefined {
   let file = Math.floor((8 * (pos[0] - bounds.left)) / bounds.width);
   if (!asWhite) file = 7 - file;
   let rank = 7 - Math.floor((8 * (pos[1] - bounds.top)) / bounds.height);
@@ -337,7 +356,8 @@ export function getSnappedKeyAtDomPos(
 ): cg.Key | undefined {
   const origPos = key2pos(orig);
   const validSnapPos = allPos.filter(
-    pos2 => queen(origPos[0], origPos[1], pos2[0], pos2[1]) || knight(origPos[0], origPos[1], pos2[0], pos2[1]),
+    pos2 =>
+      queen(origPos[0], origPos[1], pos2[0], pos2[1]) || knight(origPos[0], origPos[1], pos2[0], pos2[1]),
   );
   const validSnapCenters = validSnapPos.map(pos2 => computeSquareCenter(pos2key(pos2), asWhite, bounds));
   const validSnapDistances = validSnapCenters.map(pos2 => distanceSq(pos, pos2));

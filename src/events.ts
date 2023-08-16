@@ -42,7 +42,8 @@ export function bindDocument(s: State, onResize: () => void): cg.Unbind {
     const onmove = dragOrDraw(s, drag.move, draw.move);
     const onend = dragOrDraw(s, drag.end, draw.end);
 
-    for (const ev of ['touchmove', 'mousemove']) unbinds.push(unbindable(document, ev, onmove as EventListener));
+    for (const ev of ['touchmove', 'mousemove'])
+      unbinds.push(unbindable(document, ev, onmove as EventListener));
     for (const ev of ['touchend', 'mouseup']) unbinds.push(unbindable(document, ev, onend as EventListener));
 
     const onScroll = () => s.dom.bounds.clear();
