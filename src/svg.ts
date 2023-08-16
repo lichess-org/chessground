@@ -198,9 +198,10 @@ function renderShape(
   }
   if (shape.customSvg) {
     const on = shape.customSvg.center ?? 'orig';
-    const [x, y] = on === 'label' ? labelCoords(from, to, slots) : on === 'dest' ? to : from;
+    const [x, y] =
+      on === 'label' ? labelCoords(from, to, slots).map(c => c - 0.5) : on === 'dest' ? to : from;
     const el = setAttributes(createElement('g'), { transform: `translate(${x},${y})`, cgHash: hash });
-    el.innerHTML = `<svg width="1" height="1" viewBox="0 0 100 100">${shape.customSvg}</svg>`;
+    el.innerHTML = `<svg width="1" height="1" viewBox="0 0 100 100">${shape.customSvg.html}</svg>`;
     svgs.push({ el, isCustom: true });
   }
   return svgs;
@@ -291,19 +292,19 @@ function renderLabel(
   slots?: AngleSlots,
   corner?: 'tr',
 ): SVGElement {
-  const labelSize = 0.4;
-  const fontSize = labelSize * 0.75 ** label.text.length;
-  const at = labelCoords(from, to, slots);
-  const by = corner === 'tr' ? [0.4, -0.4] : [0.5, 0.5];
-  const g = setAttributes(createElement('g'), {
-    transform: `translate(${at[0] + by[0]},${at[1] + by[1]})`,
-    cgHash: hash,
-  });
+  const labelSize = 0.4,
+    fontSize = labelSize * 0.75 ** label.text.length,
+    at = labelCoords(from, to, slots),
+    cornerOff = corner === 'tr' ? 0.4 : 0,
+    g = setAttributes(createElement('g'), {
+      transform: `translate(${at[0] + cornerOff},${at[1] - cornerOff})`,
+      cgHash: hash,
+    });
   g.appendChild(
     setAttributes(createElement('circle'), {
       r: labelSize / 2,
       'fill-opacity': corner ? 1.0 : 0.8,
-      'stroke-opacity': 0.7,
+      'stroke-opacity': corner ? 1.0 : 0.7,
       'stroke-width': 0.03,
       fill: label.fill ?? '#666',
       stroke: 'white',
@@ -410,7 +411,7 @@ function dist(from: cg.NumberPair, to: cg.NumberPair): number {
 
 function labelCoords(from: cg.NumberPair, to: cg.NumberPair, slots?: AngleSlots): cg.NumberPair {
   let mag = dist(from, to);
-  if (mag === 0) return [0.5 + from[0], 0.5 + from[1]];
+  //if (mag === 0) return [from[0], from[1]];
   const angle = moveAngle(from, to, false);
   if (slots) {
     mag -= 33 / 64; // reduce by arrowhead length
@@ -423,5 +424,7 @@ function labelCoords(from: cg.NumberPair, to: cg.NumberPair, slots?: AngleSlots)
       }
     }
   }
-  return [from[0] - Math.cos(angle) * mag, from[1] - Math.sin(angle) * mag];
+  return [from[0] - Math.cos(angle) * mag, from[1] - Math.sin(angle) * mag].map(
+    c => c + 0.5,
+  ) as cg.NumberPair;
 }
