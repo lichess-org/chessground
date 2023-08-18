@@ -8,6 +8,9 @@ import { render, renderResized, updateBounds } from './render.js';
 import * as autoPieces from './autoPieces.js';
 import * as svg from './svg.js';
 import * as util from './util.js';
+import { version } from './package.json';
+
+export const packageVersion = version;
 
 export function initModule({ el, config }: { el: HTMLElement; config?: Config }): Api {
   return Chessground(el, config);

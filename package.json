@@ -1,19 +1,13 @@
 {
   "name": "chessground",
-  "version": "9.0.0",
+  "version": "9.0.1",
   "description": "lichess.org chess ui",
   "type": "module",
   "main": "dist/chessground.js",
   "types": "chessground.d.ts",
   "exports": {
-    ".": {
-      "types": "./dist/chessground.d.ts",
-      "default": "./dist/chessground.js"
-    },
-    "./*": {
-      "types": "./dist/*.d.ts",
-      "default": "./dist/*.js"
-    }
+    ".": "./dist/chessground.js",
+    "./*": "./dist/*.js"
   },
   "typesVersions": {
     "*": {
