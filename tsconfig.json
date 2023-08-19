@@ -12,7 +12,6 @@
     "noImplicitReturns": true,
     "module": "esnext",
     "moduleResolution": "node",
-    "resolveJsonModule": true,
     "target": "ES2017",
     "lib": ["DOM", "ES2017"]
   }
