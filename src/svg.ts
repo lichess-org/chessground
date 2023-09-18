@@ -9,12 +9,17 @@ type Svg = { el: SVGElement; isCustom?: boolean };
 type AngleSlots = Set<number>; // arrow angle slots for label positioning
 type ArrowDests = Map<cg.Key | undefined, AngleSlots>; // angle slots per dest
 
+const hilites: { [name: string]: DrawBrush } = {
+  hilitePrimary: { key: 'hilitePrimary', color: '#3291ff', opacity: 1, lineWidth: 1 },
+  hiliteWhite: { key: 'hiliteWhite', color: '#ffffff', opacity: 1, lineWidth: 1 },
+};
+
 export { createElement, setAttributes };
 
 export function createDefs(): Element {
   const defs = createElement('defs');
   const filter = setAttributes(createElement('filter'), { id: 'cg-filter-blur' });
-  filter.appendChild(setAttributes(createElement('feGaussianBlur'), { stdDeviation: '0.022' }));
+  filter.appendChild(setAttributes(createElement('feGaussianBlur'), { stdDeviation: '0.019' }));
   defs.appendChild(filter);
   return defs;
 }
@@ -84,7 +89,7 @@ function syncDefs(d: Drawable, shapes: SyncableShape[], defsEl: SVGElement) {
   let brush: DrawBrush;
   for (const s of shapes.filter(s => s.shape.dest && s.shape.brush)) {
     brush = makeCustomBrush(d.brushes[s.shape.brush!], s.shape.modifiers);
-    if (s.shape.modifiers?.hilite) brushes.set('hilite', d.brushes['hilite']);
+    if (s.shape.modifiers?.hilite) brushes.set(hilite(brush).key, hilite(brush));
     brushes.set(brush.key, brush);
   }
   const keysInDom = new Set();
@@ -226,6 +231,12 @@ function renderCircle(
   });
 }
 
+function hilite(brush: DrawBrush): DrawBrush {
+  return ['#ffffff', '#fff', 'white'].includes(brush.color)
+    ? hilites['hilitePrimary']
+    : hilites['hiliteWhite'];
+}
+
 function renderArrow(
   s: DrawShape,
   brush: DrawBrush,
@@ -242,10 +253,10 @@ function renderArrow(
       xo = Math.cos(angle) * m,
       yo = Math.sin(angle) * m;
     return setAttributes(createElement('line'), {
-      stroke: isHilite ? 'white' : brush.color,
+      stroke: isHilite ? hilite(brush).color : brush.color,
       'stroke-width': lineWidth(brush, current) + (isHilite ? 0.04 : 0),
       'stroke-linecap': 'round',
-      'marker-end': `url(#arrowhead-${isHilite ? 'hilite' : brush.key})`,
+      'marker-end': `url(#arrowhead-${isHilite ? hilite(brush).key : brush.key})`,
       opacity: s.modifiers?.hilite ? 1 : opacity(brush, current),
       x1: from[0],
       y1: from[1],
@@ -271,7 +282,7 @@ function renderMarker(brush: DrawBrush): SVGElement {
     overflow: 'visible',
     markerWidth: 4,
     markerHeight: 4,
-    refX: brush.key === 'hilite' ? 1.86 : 2.05,
+    refX: brush.key.startsWith('hilite') ? 1.86 : 2.05,
     refY: 2,
   });
   marker.appendChild(
