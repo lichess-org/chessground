@@ -84,7 +84,7 @@ export const eventPosition = (e: cg.MouchEvent): cg.NumberPair | undefined => {
   return; // touchend has no position!
 };
 
-export const isRightButton = (e: cg.MouchEvent): boolean => e.buttons === 2 || e.button === 2;
+export const isRightButton = (e: cg.MouchEvent): boolean => ((e.buttons ?? 0) & 2) === 2;
 
 export const createEl = (tagName: string, className?: string): HTMLElement => {
   const el = document.createElement(tagName);
