@@ -194,8 +194,7 @@ export function selectNewPieceToDrop(
 ): void {
   if (state.selected || state.selectedToDrop) unselect(state);
   callUserFunction(state.events.select, 'a0');
-  (originTarget as HTMLElement).classList.add('selected-pocket');
-
+  (originTarget as HTMLElement).classList.add('selected-to-drop');
   state.selectedToDrop = { piece, originTarget };
 }
 
@@ -238,7 +237,7 @@ export function setSelected(state: HeadlessState, key: cg.Key): void {
 
 export function unselect(state: HeadlessState): void {
   if (state.selectedToDrop) {
-    (state.selectedToDrop.originTarget as HTMLElement).classList.remove('selected-pocket');
+    (state.selectedToDrop.originTarget as HTMLElement).classList.remove('selected-to-drop');
     state.selectedToDrop = undefined;
   }
   state.selected = undefined;
