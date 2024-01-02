@@ -23,6 +23,15 @@
         height: 500px;
       }
 
+      .selected-to-drop {
+        background-color: rgba(20, 85, 30, 0.5);
+      }
+
+      #pocket {
+        display: flex;
+        flex-direction: row;
+      }
+
       cg-board {
         background-color: #bfcfdd;
       }
@@ -30,6 +39,7 @@
 
     <script type="module">
       import { Chessground } from './dist/chessground.js';
+      import { setDropMode } from './dist/drop.js';
 
       Chessground(document.getElementById('board-1'), {});
       Chessground(document.getElementById('board-2'), {
@@ -83,6 +93,20 @@
           ],
         },
       });
+      const dropBoard = Chessground(document.getElementById('board-4'), {
+        draggable: { enabled: true },
+        selectable: { enabled: true },
+      });
+      window.cgState = dropBoard.state;
+      ['white', 'black'].forEach(color => {
+        ['pawn', 'knight', 'bishop'].forEach(role => {
+          const el = document.getElementById(`drop-${color}-${role}`);
+          el.addEventListener('mousedown', event => {
+            event.preventDefault();
+            dropBoard.dragNewPiece({ role, color }, event, false);
+          });
+        });
+      });
     </script>
   </head>
   <body>
@@ -97,6 +121,30 @@
     <div>
       board with fixed arrows + labels
       <div class="chessground" id="board-3"></div>
+    </div>
+    <div>
+      board with droppable pieces
+      <div class="chessground" id="board-4"></div>
+      <div id="pocket">
+        <div id="drop-white-pawn" class="cg-wrap" style="width: 50px; height: 50px">
+          <piece style="width: 50px; height: 50px" class="white pawn"></piece>
+        </div>
+        <div id="drop-white-knight" class="cg-wrap" style="width: 50px; height: 50px">
+          <piece style="width: 50px; height: 50px" class="white knight"></piece>
+        </div>
+        <div id="drop-white-bishop" class="cg-wrap" style="width: 50px; height: 50px">
+          <piece style="width: 50px; height: 50px" class="white bishop"></piece>
+        </div>
+        <div id="drop-black-pawn" class="cg-wrap" style="width: 50px; height: 50px">
+          <piece style="width: 50px; height: 50px" class="black pawn"></piece>
+        </div>
+        <div id="drop-black-knight" class="cg-wrap" style="width: 50px; height: 50px">
+          <piece style="width: 50px; height: 50px" class="black knight"></piece>
+        </div>
+        <div id="drop-black-bishop" class="cg-wrap" style="width: 50px; height: 50px">
+          <piece style="width: 50px; height: 50px" class="black bishop"></piece>
+        </div>
+      </div>
     </div>
   </body>
 </html>

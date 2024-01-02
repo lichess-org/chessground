@@ -164,8 +164,9 @@ export function userMove(state: HeadlessState, orig: cg.Key, dest: cg.Key): bool
   return false;
 }
 
-export function dropNewPiece(state: HeadlessState, orig: cg.Key, dest: cg.Key, force?: boolean): void {
+export function dropNewPiece(state: HeadlessState, orig: cg.Key, dest: cg.Key, force?: boolean): boolean {
   const piece = state.pieces.get(orig);
+  let dropped = false;
   if (piece && (canDrop(state, orig, dest) || force)) {
     state.pieces.delete(orig);
     baseNewPiece(state, piece, dest, force);
@@ -173,6 +174,8 @@ export function dropNewPiece(state: HeadlessState, orig: cg.Key, dest: cg.Key, f
       premove: false,
       predrop: false,
     });
+
+    dropped = true;
   } else if (piece && canPredrop(state, orig, dest)) {
     setPredrop(state, piece.role, dest);
   } else {
@@ -181,6 +184,18 @@ export function dropNewPiece(state: HeadlessState, orig: cg.Key, dest: cg.Key, f
   }
   state.pieces.delete(orig);
   unselect(state);
+  return dropped;
+}
+
+export function selectNewPieceToDrop(
+  state: HeadlessState,
+  piece: cg.Piece,
+  originTarget: EventTarget | null,
+): void {
+  if (state.selected || state.selectedToDrop) unselect(state);
+  callUserFunction(state.events.select, 'a0');
+  (originTarget as HTMLElement).classList.add('selected-to-drop');
+  state.selectedToDrop = { piece, originTarget };
 }
 
 export function selectSquare(state: HeadlessState, key: cg.Key, force?: boolean): void {
@@ -196,6 +211,10 @@ export function selectSquare(state: HeadlessState, key: cg.Key, force?: boolean)
         return;
       }
     }
+  }
+  if (state.selectedToDrop) {
+    state.pieces.set('a0', state.selectedToDrop.piece);
+    if (dropNewPiece(state, 'a0', key)) return;
   }
   if (
     (state.selectable.enabled || state.draggable.enabled) &&
@@ -217,6 +236,10 @@ export function setSelected(state: HeadlessState, key: cg.Key): void {
 }
 
 export function unselect(state: HeadlessState): void {
+  if (state.selectedToDrop) {
+    (state.selectedToDrop.originTarget as HTMLElement).classList.remove('selected-to-drop');
+    state.selectedToDrop = undefined;
+  }
   state.selected = undefined;
   state.premovable.dests = undefined;
   state.hold.cancel();
