@@ -312,7 +312,7 @@ function renderLabel(
       cgHash: hash,
     }),
     shadow = setAttributes(createElement('filter'), {
-      id: "shadow"
+      id: 'shadow',
     });
 
   shadow.appendChild(
@@ -320,18 +320,18 @@ function renderLabel(
       dx: 4,
       dy: 7,
       stdDeviation: 5,
-      'flood-opacity': 0.5
+      'flood-opacity': 0.5,
     }),
   );
 
-  g.appendChild(shadow)
-  
+  g.appendChild(shadow);
+
   g.appendChild(
     setAttributes(createElement('circle'), {
       r: labelSize / 2,
       'fill-opacity': corner ? 1.0 : 0.8,
       fill: label.fill ?? '#666',
-      filter: "url(#shadow)"
+      filter: 'url(#shadow)',
     }),
   );
   const labelEl = setAttributes(createElement('text'), {
