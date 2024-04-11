@@ -331,7 +331,7 @@ function renderLabel(
       r: labelSize / 2,
       'fill-opacity': corner ? 1.0 : 0.8,
       fill: label.fill ?? '#666',
-      filter="url(#shadow)"
+      filter: "url(#shadow)"
     }),
   );
   const labelEl = setAttributes(createElement('text'), {
