@@ -310,15 +310,28 @@ function renderLabel(
     g = setAttributes(createElement('g'), {
       transform: `translate(${at[0] + cornerOff},${at[1] - cornerOff})`,
       cgHash: hash,
+    }),
+    shadow = setAttributes(createElement('filter'), {
+      id: "shadow"
     });
+
+  shadow.appendChild(
+    setAttributes(createElement('feDropShadow'), {
+      dx: 4,
+      dy: 7,
+      stdDeviation: 5,
+      'flood-opacity': 0.5
+    }),
+  );
+
+  g.appendChild(shadow)
+  
   g.appendChild(
     setAttributes(createElement('circle'), {
       r: labelSize / 2,
       'fill-opacity': corner ? 1.0 : 0.8,
-      'stroke-opacity': corner ? 1.0 : 0.7,
-      'stroke-width': 0.03,
       fill: label.fill ?? '#666',
-      stroke: 'white',
+      filter="url(#shadow)"
     }),
   );
   const labelEl = setAttributes(createElement('text'), {
