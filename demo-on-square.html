@@ -1,0 +1,43 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Chessground Demo On Square</title>
+
+    <link rel="stylesheet" type="text/css" href="assets/chessground.base.css" />
+    <link rel="stylesheet" type="text/css" href="assets/chessground.brown.css" />
+    <link rel="stylesheet" type="text/css" href="assets/chessground.cburnett.css" />
+    <style>
+      body {
+        display: flex;
+        flex-wrap: wrap;
+      }
+
+      body > div {
+        margin: 10px;
+      }
+
+      .chessground {
+        width: 700px;
+        height: 700px;
+      }
+
+      cg-board {
+        background-color: #bfcfdd;
+      }
+    </style>
+
+    <script type="module">
+      import { Chessground } from './dist/chessground.js';
+
+      Chessground(document.getElementById('board-1'), {});
+    </script>
+  </head>
+  <body>
+    <div>
+      basic board, default config
+      <div class="chessground" id="board-1"></div>
+    </div>
+  </body>
+</html>
