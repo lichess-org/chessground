@@ -110,10 +110,10 @@ export interface State extends HeadlessState {
 export function defaults(): HeadlessState {
   return {
     pieces: fen.read(fen.initial),
-    orientation: 'white',
+    orientation: 'black', // default: 'white'
     turnColor: 'white',
     coordinates: true,
-    ranksPosition: 'on-square', // 'right',
+    ranksPosition: 'on-square', // default: 'right',
     autoCastle: true,
     viewOnly: false,
     disableContextMenu: false,

@@ -63,9 +63,27 @@ export function renderWrap(element: HTMLElement, s: HeadlessState): Elements {
 
   if (s.coordinates) {
     const orientClass = s.orientation === 'black' ? ' black' : '';
+    console.log('orientClass', orientClass)
     const ranksPositionClass = s.ranksPosition === 'left' ? ' left' : s.ranksPosition === 'on-square' ? ' on-square' : '';
     container.appendChild(renderCoords(ranks, 'ranks' + orientClass + ranksPositionClass));
-    container.appendChild(renderCoords(files, 'files' + orientClass));
+    container.appendChild(renderCoords(files, 'files' + orientClass ));
+    // console.log('➡️ ranks', ranks)
+    // console.log('⬆️ files', files)
+    ranks.forEach((rank) => {
+      // console.log('rank', rank)
+      const currentFile = files[parseInt(rank)-1];
+        const cases: string[] = [];
+      ranks.forEach((rank) => {
+        cases.push(currentFile + rank);
+      })
+      container.appendChild(renderCoords(cases, 'ranks file-'+ currentFile + orientClass + ranksPositionClass));
+    })
+    // ranks.forEach((rank) => {
+    //   // console.log('rank', rank)
+    //   container.appendChild(renderCoordsOnSquare(files, 'ranks' + orientClass + ranksPositionClass));
+    // })
+    // container.appendChild(renderCoords(ranks, 'ranks' + orientClass + ranksPositionClass));
+    // container.appendChild(renderCoords(files, 'files' + orientClass));
   }
 
   let ghost: HTMLElement | undefined;
@@ -90,9 +108,23 @@ function renderCoords(elems: readonly string[], className: string): HTMLElement 
   const el = createEl('coords', className);
   let f: HTMLElement;
   for (const elem of elems) {
+    // console.log('elem', elem)
     f = createEl('coord');
     f.textContent = elem;
+    // console.log(f)
     el.appendChild(f);
   }
   return el;
 }
+// function renderCoordsOnSquare(elems: readonly string[], className: string): HTMLElement {
+//   const el = createEl('coords', className);
+//   let f: HTMLElement;
+//   for (const elem of elems) {
+//     console.log('elem', elem)
+//     f = createEl('coord');
+//     f.textContent = elem;
+//     console.log(f)
+//     el.appendChild(f);
+//   }
+//   return el;
+// }

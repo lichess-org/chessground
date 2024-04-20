@@ -151,6 +151,51 @@ piece.fading {
   align-items: flex-end;
 }
 
+.cg-wrap coords.on-square {
+  flex-flow: column-reverse;
+  text-align: right;
+  left: auto;
+  top: -30px;
+  opacity: .7;
+  /*text-transform: uppercase;*/
+}
+
+.cg-wrap coords.on-square.black {
+  flex-flow: column;
+}
+
+.cg-wrap coords.ranks.file-a {
+  right: calc(12.5% * 7 + 4px);
+}
+
+.cg-wrap coords.ranks.file-b {
+  right: calc(12.5% * 6 + 4px);
+}
+
+.cg-wrap coords.ranks.file-c {
+  right: calc(12.5% * 5 + 4px);
+}
+
+.cg-wrap coords.ranks.file-d {
+  right: calc(12.5% * 4 + 4px);
+}
+
+.cg-wrap coords.ranks.file-e {
+  right: calc(12.5% * 3 + 4px);
+}
+
+.cg-wrap coords.ranks.file-f {
+  right: calc(12.5% * 2 + 4px);
+}
+
+.cg-wrap coords.ranks.file-g {
+  right: calc(12.5% * 1 + 4px);
+}
+
+.cg-wrap coords.ranks.file-h {
+  right: calc(4px);
+}
+
 .cg-wrap coords.files {
   bottom: -4px;
   left: 24px;
