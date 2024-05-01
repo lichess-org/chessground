@@ -197,34 +197,30 @@ piece.fading {
   padding: 6% 4%;
 }
 
-.cg-wrap coords.squares.rank1 coord {
-  transform: translateX(0%);
-}
-
-.cg-wrap coords.squares.rank2 coord {
+.cg-wrap coords.squares.rank2 {
   transform: translateX(100%);
 }
 
-.cg-wrap coords.squares.rank3 coord {
+.cg-wrap coords.squares.rank3 {
   transform: translateX(200%);
 }
 
-.cg-wrap coords.squares.rank4 coord {
+.cg-wrap coords.squares.rank4 {
   transform: translateX(300%);
 }
 
-.cg-wrap coords.squares.rank5 coord {
+.cg-wrap coords.squares.rank5 {
   transform: translateX(400%);
 }
 
-.cg-wrap coords.squares.rank6 coord {
+.cg-wrap coords.squares.rank6 {
   transform: translateX(500%);
 }
 
-.cg-wrap coords.squares.rank7 coord {
+.cg-wrap coords.squares.rank7 {
   transform: translateX(600%);
 }
 
-.cg-wrap coords.squares.rank8 coord {
+.cg-wrap coords.squares.rank8 {
   transform: translateX(700%);
 }
