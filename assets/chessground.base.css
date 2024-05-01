@@ -176,10 +176,8 @@ piece.fading {
 .cg-wrap coords.squares {
   bottom: 0;
   left: 0;
-  flex-flow: column;
   text-transform: uppercase;
   text-align: right;
-
   flex-flow: column-reverse;
   height: 100%;
   width: 12.5%;
