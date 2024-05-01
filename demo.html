@@ -83,6 +83,15 @@
           ],
         },
       });
+      Chessground(document.getElementById('board-4'), {
+        orientation: 'black',
+        coordinatesOnSquares: true,
+        ranksPosition: 'left'
+      });
+      Chessground(document.getElementById('board-5'), {
+        orientation: 'white',
+        coordinatesOnSquares: true
+      });
     </script>
   </head>
   <body>
@@ -97,6 +106,14 @@
     <div>
       board with fixed arrows + labels
       <div class="chessground" id="board-3"></div>
+    </div>
+    <div>
+      board with coordinates on-square, ranks position left
+      <div class="chessground" id="board-4"></div>
+    </div>
+    <div>
+      board with coordinates on-square
+      <div class="chessground" id="board-5"></div>
     </div>
   </body>
 </html>

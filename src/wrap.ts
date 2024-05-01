@@ -1,6 +1,6 @@
 import { HeadlessState } from './state.js';
 import { setVisible, createEl } from './util.js';
-import { colors, files, ranks, Elements } from './types.js';
+import { colors, files, ranks, squares, Elements } from './types.js';
 import { createElement as createSVG, setAttributes, createDefs } from './svg.js';
 
 export function renderWrap(element: HTMLElement, s: HeadlessState): Elements {
@@ -64,8 +64,18 @@ export function renderWrap(element: HTMLElement, s: HeadlessState): Elements {
   if (s.coordinates) {
     const orientClass = s.orientation === 'black' ? ' black' : '';
     const ranksPositionClass = s.ranksPosition === 'left' ? ' left' : '';
-    container.appendChild(renderCoords(ranks, 'ranks' + orientClass + ranksPositionClass));
-    container.appendChild(renderCoords(files, 'files' + orientClass));
+
+    if (s.coordinatesOnSquares) {
+      let rank = 1;
+      Object.keys(squares).forEach((file) => {
+        const rankClass = ' rank' + rank;
+        container.appendChild(renderCoords(squares[file], 'squares' + rankClass + orientClass + ranksPositionClass));
+        rank++;
+      });
+    } else {
+      container.appendChild(renderCoords(ranks, 'ranks' + orientClass + ranksPositionClass));
+      container.appendChild(renderCoords(files, 'files' + orientClass));
+    }
   }
 
   let ghost: HTMLElement | undefined;

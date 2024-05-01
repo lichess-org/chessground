@@ -190,8 +190,8 @@ export function updateBounds(s: State): void {
   container.style.height = height + 'px';
   s.dom.bounds.clear();
 
-  s.addDimensionsCssVarsTo?.style.setProperty('--cg-width', width + 'px');
-  s.addDimensionsCssVarsTo?.style.setProperty('--cg-height', height + 'px');
+  s.addDimensionsCssVarsTo?.style.setProperty('---cg-width', width + 'px');
+  s.addDimensionsCssVarsTo?.style.setProperty('---cg-height', height + 'px');
 }
 
 const isPieceNode = (el: cg.PieceNode | cg.SquareNode): el is cg.PieceNode => el.tagName === 'PIECE';
