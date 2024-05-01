@@ -47,8 +47,8 @@ cg-board square.current-premove {
 .cg-wrap.orientation-white coords.files coord:nth-child(2n),
 .cg-wrap.orientation-black coords.ranks coord:nth-child(2n + 1),
 .cg-wrap.orientation-black coords.files coord:nth-child(2n + 1),
-.cg-wrap coords.squares:nth-child(2n+2) coord:nth-child(2n + 1),
-.cg-wrap coords.squares:nth-child(2n+1) coord:nth-child(2n) {
+.cg-wrap coords.squares:nth-child(2n + 2) coord:nth-child(2n + 1),
+.cg-wrap coords.squares:nth-child(2n + 1) coord:nth-child(2n) {
   color: rgba(72, 72, 72, 0.8);
 }
 
@@ -56,7 +56,7 @@ cg-board square.current-premove {
 .cg-wrap.orientation-black coords.files coord:nth-child(2n),
 .cg-wrap.orientation-white coords.ranks coord:nth-child(2n + 1),
 .cg-wrap.orientation-white coords.files coord:nth-child(2n + 1),
-.cg-wrap coords.squares:nth-child(2n+1) coord:nth-child(2n + 1),
-.cg-wrap coords.squares:nth-child(2n+2) coord:nth-child(2n) {
+.cg-wrap coords.squares:nth-child(2n + 1) coord:nth-child(2n + 1),
+.cg-wrap coords.squares:nth-child(2n + 2) coord:nth-child(2n) {
   color: rgba(255, 255, 255, 0.8);
 }

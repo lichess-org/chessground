@@ -67,9 +67,11 @@ export function renderWrap(element: HTMLElement, s: HeadlessState): Elements {
 
     if (s.coordinatesOnSquares) {
       let rank = 1;
-      Object.keys(squares).forEach((file) => {
+      Object.keys(squares).forEach(file => {
         const rankClass = ' rank' + rank;
-        container.appendChild(renderCoords(squares[file], 'squares' + rankClass + orientClass + ranksPositionClass));
+        container.appendChild(
+          renderCoords(squares[file], 'squares' + rankClass + orientClass + ranksPositionClass),
+        );
         rank++;
       });
     } else {

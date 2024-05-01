@@ -208,7 +208,7 @@ piece.fading {
 }
 
 .cg-wrap coords.squares.rank3 coord,
-.cg-wrap coords.squares.black.rank6 coord{
+.cg-wrap coords.squares.black.rank6 coord {
   transform: translateX(200%);
 }
 

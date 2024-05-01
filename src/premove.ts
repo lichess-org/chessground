@@ -62,14 +62,14 @@ export function premove(pieces: cg.Pieces, key: cg.Key, canCastle: boolean): cg.
       r === 'pawn'
         ? pawn(piece.color)
         : r === 'knight'
-          ? knight
-          : r === 'bishop'
-            ? bishop
-            : r === 'rook'
-              ? rook
-              : r === 'queen'
-                ? queen
-                : king(piece.color, rookFilesOf(pieces, piece.color), canCastle);
+        ? knight
+        : r === 'bishop'
+        ? bishop
+        : r === 'rook'
+        ? rook
+        : r === 'queen'
+        ? queen
+        : king(piece.color, rookFilesOf(pieces, piece.color), canCastle);
   return util.allPos
     .filter(pos2 => (pos[0] !== pos2[0] || pos[1] !== pos2[1]) && mobility(pos[0], pos[1], pos2[0], pos2[1]))
     .map(util.pos2key);
