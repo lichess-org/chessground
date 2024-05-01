@@ -13,7 +13,7 @@ export interface HeadlessState {
   lastMove?: cg.Key[]; // squares part of the last move ["c3"; "c4"]
   selected?: cg.Key; // square currently selected "a1"
   coordinates: boolean; // include coords attributes
-  coordinatesOnSquare: boolean; // include coords attributes on every square
+  coordinatesOnSquares: boolean; // include coords attributes on every square
   ranksPosition: cg.RanksPosition; // position ranks on either side. left | right
   autoCastle: boolean; // immediately complete the castle by moving the rook after king move
   viewOnly: boolean; // don't bind events: the user will never be able to move pieces around
@@ -114,7 +114,7 @@ export function defaults(): HeadlessState {
     orientation: 'white',
     turnColor: 'white',
     coordinates: true,
-    coordinatesOnSquare: false,
+    coordinatesOnSquares: false,
     ranksPosition: 'right',
     autoCastle: true,
     viewOnly: false,
