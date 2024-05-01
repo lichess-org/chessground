@@ -56,4 +56,3 @@ cg-board square.current-premove {
 .cg-wrap coords.files:nth-child(even) coord:nth-child(odd) {
   color: rgba(255, 255, 255, 0.8);
 }
-
