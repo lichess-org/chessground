@@ -45,14 +45,18 @@ cg-board square.current-premove {
 /** Alternating colors in rank/file labels */
 .cg-wrap.orientation-white coords.ranks coord:nth-child(2n),
 .cg-wrap.orientation-white coords.files coord:nth-child(2n),
+.cg-wrap.orientation-white coords.squares coord:nth-child(2n),
 .cg-wrap.orientation-black coords.ranks coord:nth-child(2n + 1),
-.cg-wrap.orientation-black coords.files coord:nth-child(2n + 1) {
+.cg-wrap.orientation-black coords.files coord:nth-child(2n + 1),
+.cg-wrap.orientation-white coords.squares coord:nth-child(2n + 1) {
   color: rgba(72, 72, 72, 0.8);
 }
 
 .cg-wrap.orientation-black coords.ranks coord:nth-child(2n),
 .cg-wrap.orientation-black coords.files coord:nth-child(2n),
+.cg-wrap.orientation-black coords.squares coord:nth-child(2n),
 .cg-wrap.orientation-white coords.ranks coord:nth-child(2n + 1),
-.cg-wrap.orientation-white coords.files coord:nth-child(2n + 1) {
+.cg-wrap.orientation-white coords.files coord:nth-child(2n + 1),
+.cg-wrap.orientation-white coords.squares coord:nth-child(2n + 1) {
   color: rgba(255, 255, 255, 0.8);
 }
