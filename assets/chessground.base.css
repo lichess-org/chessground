@@ -197,42 +197,34 @@ piece.fading {
   padding: 6% 4%;
 }
 
-.cg-wrap coords.squares.rank1 coord,
-.cg-wrap coords.squares.black.rank8 coord {
+.cg-wrap coords.squares.rank1 coord {
   transform: translateX(0%);
 }
 
-.cg-wrap coords.squares.rank2 coord,
-.cg-wrap coords.squares.black.rank7 coord {
+.cg-wrap coords.squares.rank2 coord {
   transform: translateX(100%);
 }
 
-.cg-wrap coords.squares.rank3 coord,
-.cg-wrap coords.squares.black.rank6 coord {
+.cg-wrap coords.squares.rank3 coord {
   transform: translateX(200%);
 }
 
-.cg-wrap coords.squares.rank4 coord,
-.cg-wrap coords.squares.black.rank5 coord {
+.cg-wrap coords.squares.rank4 coord {
   transform: translateX(300%);
 }
 
-.cg-wrap coords.squares.rank5 coord,
-.cg-wrap coords.squares.black.rank4 coord {
+.cg-wrap coords.squares.rank5 coord {
   transform: translateX(400%);
 }
 
-.cg-wrap coords.squares.rank6 coord,
-.cg-wrap coords.squares.black.rank3 coord {
+.cg-wrap coords.squares.rank6 coord {
   transform: translateX(500%);
 }
 
-.cg-wrap coords.squares.rank7 coord,
-.cg-wrap coords.squares.black.rank2 coord {
+.cg-wrap coords.squares.rank7 coord {
   transform: translateX(600%);
 }
 
-.cg-wrap coords.squares.rank8 coord,
-.cg-wrap coords.squares.black.rank1 coord {
+.cg-wrap coords.squares.rank8 coord {
   transform: translateX(700%);
 }
