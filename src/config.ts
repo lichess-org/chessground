@@ -16,7 +16,7 @@ export interface Config {
   viewOnly?: boolean; // don't bind events: the user will never be able to move pieces around
   disableContextMenu?: boolean; // because who needs a context menu on a chessboard
   addPieceZIndex?: boolean; // adds z-index values to pieces (for 3D)
-  addDimensionsCssVarsTo?: HTMLElement; // add --cg-width and --cg-height CSS vars containing the board's dimensions to this element
+  addDimensionsCssVarsTo?: HTMLElement; // add ---cg-width and ---cg-height CSS vars containing the board's dimensions to this element
   blockTouchScroll?: boolean; // block scrolling via touch dragging on the board, e.g. for coordinate training
   // pieceKey: boolean; // add a data-key attribute to piece elements
   trustAllEvents?: boolean; // disable checking for human only input (e.isTrusted)
