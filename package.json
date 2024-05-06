@@ -1,6 +1,6 @@
 {
   "name": "chessground",
-  "version": "9.1.0",
+  "version": "9.1.1",
   "description": "lichess.org chess ui",
   "type": "module",
   "main": "dist/chessground.js",
