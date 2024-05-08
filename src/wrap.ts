@@ -66,12 +66,14 @@ export function renderWrap(element: HTMLElement, s: HeadlessState): Elements {
     const ranksPositionClass = s.ranksPosition === 'left' ? ' left' : '';
 
     if (s.coordinatesOnSquares) {
-      const rankN: (i: number) => number = s.orientation === 'white' ? i => i + 1 : i => 8 - i;
-      files.forEach((f, i) =>
-        container.appendChild(
+      // const rankN: (i: number) => number = s.orientation === 'white' ? i => i + 1 : i => 8 - i;
+      const coordsContainer = createEl('coords-container')
+      container.appendChild(coordsContainer)
+      files.forEach(f =>
+        coordsContainer.appendChild(
           renderCoords(
             ranks.map(r => f + r),
-            'squares rank' + rankN(i) + orientClass + ranksPositionClass,
+            'ranks' + orientClass + ranksPositionClass,
           ),
         ),
       );
