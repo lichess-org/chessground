@@ -87,9 +87,7 @@ export function processDraw(state: State): void {
     const cur = state.drawable.current;
     if (cur) {
       const keyAtDomPos = getKeyAtDomPos(cur.pos, whitePov(state), state.dom.bounds());
-      if (!keyAtDomPos) {
-        cur.snapToValidMove = false;
-      }
+      cur.snapToValidMove = !!keyAtDomPos;
       const mouseSq = cur.snapToValidMove
         ? getSnappedKeyAtDomPos(cur.orig, cur.pos, whitePov(state), state.dom.bounds())
         : keyAtDomPos;
