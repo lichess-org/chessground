@@ -7,6 +7,7 @@
   "types": "chessground.d.ts",
   "exports": {
     ".": "./dist/chessground.js",
+    "./assets/*": "./assets/*",
     "./*": "./dist/*.js"
   },
   "typesVersions": {
