@@ -1,12 +1,13 @@
 {
   "name": "chessground",
-  "version": "9.1.1",
+  "version": "9.2.0",
   "description": "lichess.org chess ui",
   "type": "module",
   "main": "dist/chessground.js",
   "types": "chessground.d.ts",
   "exports": {
     ".": "./dist/chessground.js",
+    "./assets/*": "./assets/*",
     "./*": "./dist/*.js"
   },
   "typesVersions": {
@@ -19,10 +20,10 @@
   "devDependencies": {
     "@typescript-eslint/eslint-plugin": "^7.7.0",
     "@typescript-eslint/parser": "^7.7.0",
-    "esbuild": "^0.20.2",
+    "esbuild": "^0.24.0",
     "eslint": "^8.57.0",
     "prettier": "^3.2.5",
-    "typescript": "^5.4.5"
+    "typescript": "^5.6.3"
   },
   "scripts": {
     "prepare": "$npm_execpath run compile",
@@ -54,5 +55,6 @@
   "bugs": {
     "url": "https://github.com/lichess-org/chessground/issues"
   },
-  "funding": "https://lichess.org/patron"
+  "funding": "https://lichess.org/patron",
+  "packageManager": "pnpm@9.9.0+sha512.60c18acd138bff695d339be6ad13f7e936eea6745660d4cc4a776d5247c540d0edee1a563695c183a66eb917ef88f2b4feb1fc25f32a7adcadc7aaf3438e99c1"
 }
