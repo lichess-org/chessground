@@ -15,6 +15,7 @@ export type AnimFadings = Map<cg.Key, cg.Piece>;
 export interface AnimPlan {
   anims: AnimVectors;
   fadings: AnimFadings;
+  enPassantFading?: cg.Key; // Track en passant fade
 }
 
 export interface AnimCurrent {
@@ -56,9 +57,12 @@ function computePlan(prevPieces: cg.Pieces, current: State): AnimPlan {
     news: AnimPiece[] = [],
     prePieces: AnimPieces = new Map();
   let curP: cg.Piece | undefined, preP: AnimPiece | undefined, vector: cg.NumberPair;
+  let enPassantFading: cg.Key | undefined;
+
   for (const [k, p] of prevPieces) {
     prePieces.set(k, makePiece(k, p));
   }
+
   for (const key of util.allKeys) {
     curP = current.pieces.get(key);
     preP = prePieces.get(key);
@@ -69,8 +73,16 @@ function computePlan(prevPieces: cg.Pieces, current: State): AnimPlan {
           news.push(makePiece(key, curP));
         }
       } else news.push(makePiece(key, curP));
-    } else if (preP) missings.push(preP);
+    } else if (preP) {
+      // Handle en passant capture animation
+      if (preP.piece.role === 'pawn' && current.lastMove?.includes(key)) {
+        enPassantFading = key;
+      } else {
+        missings.push(preP);
+      }
+    }
   }
+
   for (const newP of news) {
     preP = closer(
       newP,
@@ -82,26 +94,33 @@ function computePlan(prevPieces: cg.Pieces, current: State): AnimPlan {
       animedOrigs.push(preP.key);
     }
   }
+
   for (const p of missings) {
-    if (!animedOrigs.includes(p.key)) fadings.set(p.key, p.piece);
+    if (!animedOrigs.includes(p.key)) {
+      fadings.set(p.key, p.piece);
+    }
   }
 
   return {
     anims: anims,
     fadings: fadings,
+    enPassantFading: enPassantFading, // Track en passant piece to fade
   };
 }
 
 function step(state: State, now: DOMHighResTimeStamp): void {
   const cur = state.animation.current;
-  if (cur === undefined) {
-    // animation was canceled :(
+  if (!cur) {
     if (!state.dom.destroyed) state.dom.redrawNow();
     return;
   }
+
   const rest = 1 - (now - cur.start) * cur.frequency;
   if (rest <= 0) {
     state.animation.current = undefined;
+    if (cur.plan.enPassantFading) {
+      state.pieces.delete(cur.plan.enPassantFading);
+    }
     state.dom.redrawNow();
   } else {
     const ease = easing(rest);
@@ -109,19 +128,18 @@ function step(state: State, now: DOMHighResTimeStamp): void {
       cfg[2] = cfg[0] * ease;
       cfg[3] = cfg[1] * ease;
     }
-    state.dom.redrawNow(true); // optimisation: don't render SVG changes during animations
+    state.dom.redrawNow(true);
     requestAnimationFrame((now = performance.now()) => step(state, now));
   }
 }
 
 function animate<A>(mutation: Mutation<A>, state: State): A {
-  // clone state before mutating it
   const prevPieces: cg.Pieces = new Map(state.pieces);
-
   const result = mutation(state);
   const plan = computePlan(prevPieces, state);
-  if (plan.anims.size || plan.fadings.size) {
-    const alreadyRunning = state.animation.current && state.animation.current.start;
+
+  if (plan.anims.size || plan.fadings.size || plan.enPassantFading) {
+    const alreadyRunning = state.animation.current?.start;
     state.animation.current = {
       start: performance.now(),
       frequency: 1 / state.animation.duration,
@@ -129,11 +147,12 @@ function animate<A>(mutation: Mutation<A>, state: State): A {
     };
     if (!alreadyRunning) step(state, performance.now());
   } else {
-    // don't animate, just render right away
     state.dom.redraw();
   }
+
   return result;
 }
 
 // https://gist.github.com/gre/1650294
-const easing = (t: number): number => (t < 0.5 ? 4 * t * t * t : (t - 1) * (2 * t - 2) * (2 * t - 2) + 1);
+const easing = (t: number): number =>
+  t < 0.5 ? 4 * t * t * t : (t - 1) * (2 * t - 2) * (2 * t - 2) + 1;
