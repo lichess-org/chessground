@@ -154,5 +154,4 @@ function animate<A>(mutation: Mutation<A>, state: State): A {
 }
 
 // https://gist.github.com/gre/1650294
-const easing = (t: number): number =>
-  t < 0.5 ? 4 * t * t * t : (t - 1) * (2 * t - 2) * (2 * t - 2) + 1;
+const easing = (t: number): number => (t < 0.5 ? 4 * t * t * t : (t - 1) * (2 * t - 2) * (2 * t - 2) + 1);
