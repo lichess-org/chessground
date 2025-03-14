@@ -113,6 +113,12 @@ export function baseMove(state: HeadlessState, orig: cg.Key, dest: cg.Key): cg.P
   return captured || true;
 }
 
+export function shadowMove(state: HeadlessState, orig: cg.Key, dest: cg.Key): cg.Piece | boolean {
+  if (dest === state.selected) unselect(state);
+  callUserFunction(state.events.move, orig, dest);
+  return true;
+}
+
 export function baseNewPiece(state: HeadlessState, piece: cg.Piece, key: cg.Key, force?: boolean): boolean {
   if (state.pieces.has(key)) {
     if (force) state.pieces.delete(key);
@@ -129,7 +135,7 @@ export function baseNewPiece(state: HeadlessState, piece: cg.Piece, key: cg.Key,
 }
 
 function baseUserMove(state: HeadlessState, orig: cg.Key, dest: cg.Key): cg.Piece | boolean {
-  const result = baseMove(state, orig, dest);
+  const result = state.movable.shadowMove ? shadowMove(state, orig, dest) : baseMove(state, orig, dest);
   if (result) {
     state.movable.dests = undefined;
     state.turnColor = opposite(state.turnColor);
@@ -184,6 +190,7 @@ export function dropNewPiece(state: HeadlessState, orig: cg.Key, dest: cg.Key, f
 }
 
 export function selectSquare(state: HeadlessState, key: cg.Key, force?: boolean): void {
+  console.log("selectSquare 1")
   callUserFunction(state.events.select, key);
   if (state.selected) {
     if (state.selected === key && !state.draggable.enabled) {
@@ -191,6 +198,7 @@ export function selectSquare(state: HeadlessState, key: cg.Key, force?: boolean)
       state.hold.cancel();
       return;
     } else if ((state.selectable.enabled || force) && state.selected !== key) {
+      console.log("selectSquare 2")
       if (userMove(state, state.selected, key)) {
         state.stats.dragged = false;
         return;
@@ -223,6 +231,7 @@ export function unselect(state: HeadlessState): void {
 }
 
 function isMovable(state: HeadlessState, orig: cg.Key): boolean {
+  if (state.movable.shadowMove) return true;
   const piece = state.pieces.get(orig);
   return (
     !!piece &&
@@ -232,9 +241,14 @@ function isMovable(state: HeadlessState, orig: cg.Key): boolean {
 }
 
 export const canMove = (state: HeadlessState, orig: cg.Key, dest: cg.Key): boolean =>
-  orig !== dest &&
+{console.log(orig !== dest);
+  console.log(isMovable(state, orig))
+  console.log(state.movable.free)
+  console.log(!!state.movable.dests?.get(orig)?.includes(dest))
+  return (orig !== dest &&
   isMovable(state, orig) &&
-  (state.movable.free || !!state.movable.dests?.get(orig)?.includes(dest));
+  (state.movable.free || !!state.movable.dests?.get(orig)?.includes(dest)));
+}
 
 function canDrop(state: HeadlessState, orig: cg.Key, dest: cg.Key): boolean {
   const piece = state.pieces.get(orig);

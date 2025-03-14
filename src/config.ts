@@ -40,6 +40,7 @@ export interface Config {
       afterNewPiece?: (role: cg.Role, key: cg.Key, metadata: cg.MoveMetadata) => void; // called after a new piece is dropped on the board
     };
     rookCastle?: boolean; // castle by moving the king to the rook
+    shadowMove?: boolean; //allow move without moving pieces on the board (just selecting squares)
   };
   premovable?: {
     enabled?: boolean; // allow premoves for color that can not move
