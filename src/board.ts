@@ -238,11 +238,10 @@ function isMovable(state: HeadlessState, orig: cg.Key): boolean {
   );
 }
 
-export const canMove = (state: HeadlessState, orig: cg.Key, dest: cg.Key): boolean => (
-    orig !== dest &&
-    isMovable(state, orig) &&
-    (state.movable.free || !!state.movable.dests?.get(orig)?.includes(dest))
-  );
+export const canMove = (state: HeadlessState, orig: cg.Key, dest: cg.Key): boolean =>
+  orig !== dest &&
+  isMovable(state, orig) &&
+  (state.movable.free || !!state.movable.dests?.get(orig)?.includes(dest));
 
 function canDrop(state: HeadlessState, orig: cg.Key, dest: cg.Key): boolean {
   const piece = state.pieces.get(orig);
