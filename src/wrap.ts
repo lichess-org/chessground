@@ -64,6 +64,10 @@ export function renderWrap(element: HTMLElement, s: HeadlessState): Elements {
   if (s.coordinates) {
     const orientClass = s.orientation === 'black' ? ' black' : '';
     const ranksPositionClass = s.ranksPosition === 'left' ? ' left' : '';
+    let maybeLargeCoords = "";
+    if(s.largerCoordinates) {
+      maybeLargeCoords = " largerCoordinates ";
+    }
 
     if (s.coordinatesOnSquares) {
       const rankN: (i: number) => number = s.orientation === 'white' ? i => i + 1 : i => 8 - i;
@@ -71,13 +75,13 @@ export function renderWrap(element: HTMLElement, s: HeadlessState): Elements {
         container.appendChild(
           renderCoords(
             ranks.map(r => f + r),
-            'squares rank' + rankN(i) + orientClass + ranksPositionClass,
+            'squares rank' + rankN(i) + maybeLargeCoords + orientClass + ranksPositionClass,
           ),
         ),
       );
     } else {
-      container.appendChild(renderCoords(ranks, 'ranks' + orientClass + ranksPositionClass));
-      container.appendChild(renderCoords(files, 'files' + orientClass));
+      container.appendChild(renderCoords(ranks, 'ranks' + orientClass + ranksPositionClass + maybeLargeCoords));
+      container.appendChild(renderCoords(files, 'files' + orientClass + maybeLargeCoords));
     }
   }
 
@@ -109,3 +113,11 @@ function renderCoords(elems: readonly string[], className: string): HTMLElement 
   }
   return el;
 }
+
+//function maybeLargerCoordinates(s: HeadlessState): string {
+  //if(s.largerCoordinates) {
+    //return " largerCoordinates "
+  //}// else
+  //return ""
+//}
+//

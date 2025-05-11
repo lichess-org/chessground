@@ -133,7 +133,12 @@ piece.fading {
   font-family: sans-serif;
   font-size: 9px;
 }
+/* -------------- */
+.largerCoordinates coord {
+  font-size: 25px;
+}
 
+/* --- */
 .cg-wrap coords.ranks {
   left: 4px;
   top: -20px;
@@ -152,7 +157,7 @@ piece.fading {
 }
 
 .cg-wrap coords.files {
-  bottom: -4px;
+  bottom: 4px;
   left: 24px;
   flex-flow: row;
   width: 100%;
