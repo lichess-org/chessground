@@ -133,12 +133,17 @@ piece.fading {
   font-family: sans-serif;
   font-size: 9px;
 }
-/* -------------- */
+
 .largerCoordinates coord {
   font-size: 25px;
+  transform: translate(-1px, -10px);
 }
 
-/* --- */
+.ranks.largerCoordinates {
+    top: -30px !important;
+    left: 2px !important;
+}
+
 .cg-wrap coords.ranks {
   left: 4px;
   top: -20px;
