@@ -64,7 +64,7 @@ export function renderWrap(element: HTMLElement, s: HeadlessState): Elements {
   if (s.coordinates) {
     const orientClass = s.orientation === 'black' ? ' black' : '';
     const ranksPositionClass = s.ranksPosition === 'left' ? ' left' : '';
-    const maybeLargeCoords = s.largerCoordinates ?  " largerCoordinates" : "";
+    const maybeLargeCoords = s.largerCoordinates ? ' largerCoordinates' : '';
 
     if (s.coordinatesOnSquares) {
       const rankN: (i: number) => number = s.orientation === 'white' ? i => i + 1 : i => 8 - i;
@@ -77,7 +77,9 @@ export function renderWrap(element: HTMLElement, s: HeadlessState): Elements {
         ),
       );
     } else {
-      container.appendChild(renderCoords(ranks, 'ranks' + orientClass + ranksPositionClass + maybeLargeCoords));
+      container.appendChild(
+        renderCoords(ranks, 'ranks' + orientClass + ranksPositionClass + maybeLargeCoords),
+      );
       container.appendChild(renderCoords(files, 'files' + orientClass + maybeLargeCoords));
     }
   }

@@ -1,122 +1,120 @@
 <!doctype html>
 <html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Chessground Demo</title>
 
-<head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Chessground Demo</title>
+    <link rel="stylesheet" type="text/css" href="assets/chessground.base.css" />
+    <link rel="stylesheet" type="text/css" href="assets/chessground.brown.css" />
+    <link rel="stylesheet" type="text/css" href="assets/chessground.cburnett.css" />
+    <style>
+      body {
+        display: flex;
+        flex-wrap: wrap;
+      }
 
-  <link rel="stylesheet" type="text/css" href="assets/chessground.base.css" />
-  <link rel="stylesheet" type="text/css" href="assets/chessground.brown.css" />
-  <link rel="stylesheet" type="text/css" href="assets/chessground.cburnett.css" />
-  <style>
-    body {
-      display: flex;
-      flex-wrap: wrap;
-    }
+      body > div {
+        margin: 10px;
+      }
 
-    body>div {
-      margin: 10px;
-    }
+      .chessground {
+        width: 500px;
+        height: 500px;
+      }
 
-    .chessground {
-      width: 500px;
-      height: 500px;
-    }
+      cg-board {
+        background-color: #bfcfdd;
+      }
+    </style>
 
-    cg-board {
-      background-color: #bfcfdd;
-    }
-  </style>
+    <script type="module">
+      import { Chessground } from './dist/chessground.js';
 
-  <script type="module">
-    import {Chessground} from './dist/chessground.js';
-
-    Chessground(document.getElementById('board-1'), {});
-    Chessground(document.getElementById('board-2'), {
-      fen: 'r2q2k1/1p6/p2p4/2pN1rp1/N1Pb2Q1/8/PP1B4/R6K b - - 2 25',
-    });
-    Chessground(document.getElementById('board-3'), {
-      drawable: {
-        autoShapes: [
-          {
-            orig: 'a2',
-            dest: 'a2',
-            brush: 'green',
-            label: {text: 'a2'},
-            modifiers: {
-              hilite: true,
+      Chessground(document.getElementById('board-1'), {});
+      Chessground(document.getElementById('board-2'), {
+        fen: 'r2q2k1/1p6/p2p4/2pN1rp1/N1Pb2Q1/8/PP1B4/R6K b - - 2 25',
+      });
+      Chessground(document.getElementById('board-3'), {
+        drawable: {
+          autoShapes: [
+            {
+              orig: 'a2',
+              dest: 'a2',
+              brush: 'green',
+              label: { text: 'a2' },
+              modifiers: {
+                hilite: true,
+              },
             },
-          },
-          {
-            orig: 'b2',
-            dest: 'b6',
-            brush: 'blue',
-            label: {text: 'B'},
-            modifiers: {
-              lineWidth: 6,
+            {
+              orig: 'b2',
+              dest: 'b6',
+              brush: 'blue',
+              label: { text: 'B' },
+              modifiers: {
+                lineWidth: 6,
+              },
             },
-          },
-          {
-            orig: 'c2',
-            dest: 'c4',
-            brush: 'red',
-            label: {text: 'C'},
-          },
-          {
-            orig: 'd2',
-            dest: 'd3',
-            brush: 'green',
-            label: {text: 'D'},
-          },
-          {
-            orig: 'f1',
-            dest: 'h3',
-            brush: 'blue',
-            label: {text: 'F'},
-          },
-          {
-            orig: 'g1',
-            dest: 'f3',
-            brush: 'yellow',
-            label: {text: 'E'},
-          },
-        ],
-      },
-    });
-    Chessground(document.getElementById('board-4'), {
-      orientation: 'black',
-      coordinatesOnSquares: true,
-      ranksPosition: 'left',
-    });
-    Chessground(document.getElementById('board-5'), {
-      orientation: 'white',
-      coordinatesOnSquares: true,
-    });
-  </script>
-</head>
+            {
+              orig: 'c2',
+              dest: 'c4',
+              brush: 'red',
+              label: { text: 'C' },
+            },
+            {
+              orig: 'd2',
+              dest: 'd3',
+              brush: 'green',
+              label: { text: 'D' },
+            },
+            {
+              orig: 'f1',
+              dest: 'h3',
+              brush: 'blue',
+              label: { text: 'F' },
+            },
+            {
+              orig: 'g1',
+              dest: 'f3',
+              brush: 'yellow',
+              label: { text: 'E' },
+            },
+          ],
+        },
+      });
+      Chessground(document.getElementById('board-4'), {
+        orientation: 'black',
+        coordinatesOnSquares: true,
+        ranksPosition: 'left',
+      });
+      Chessground(document.getElementById('board-5'), {
+        orientation: 'white',
+        coordinatesOnSquares: true,
+      });
+    </script>
+  </head>
 
-<body>
-  <div>
-    basic board, default config
-    <div class="chessground" id="board-1"></div>
-  </div>
-  <div>
-    board with a fen
-    <div class="chessground" id="board-2"></div>
-  </div>
-  <div>
-    board with fixed arrows + labels
-    <div class="chessground" id="board-3"></div>
-  </div>
-  <div>
-    board with coordinates on-square, ranks position left
-    <div class="chessground" id="board-4"></div>
-  </div>
-  <div>
-    board with coordinates on-square
-    <div class="chessground" id="board-5"></div>
-  </div>
-</body>
-
+  <body>
+    <div>
+      basic board, default config
+      <div class="chessground" id="board-1"></div>
+    </div>
+    <div>
+      board with a fen
+      <div class="chessground" id="board-2"></div>
+    </div>
+    <div>
+      board with fixed arrows + labels
+      <div class="chessground" id="board-3"></div>
+    </div>
+    <div>
+      board with coordinates on-square, ranks position left
+      <div class="chessground" id="board-4"></div>
+    </div>
+    <div>
+      board with coordinates on-square
+      <div class="chessground" id="board-5"></div>
+    </div>
+  </body>
 </html>

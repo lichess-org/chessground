@@ -140,8 +140,8 @@ piece.fading {
 }
 
 .ranks.largerCoordinates {
-    top: -30px !important;
-    left: 2px !important;
+  top: -30px !important;
+  left: 2px !important;
 }
 
 .cg-wrap coords.ranks {
