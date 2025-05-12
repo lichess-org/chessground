@@ -115,7 +115,7 @@ export function defaults(): HeadlessState {
     orientation: 'white',
     turnColor: 'white',
     coordinates: true,
-    largerCoordinates: true, // false,
+    largerCoordinates: false,
     coordinatesOnSquares: false,
     ranksPosition: 'right',
     autoCastle: true,

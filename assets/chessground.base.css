@@ -141,7 +141,11 @@ piece.fading {
 
 .ranks.largerCoordinates {
   top: -30px !important;
-  left: 2px !important;
+  left: 4px !important;
+}
+
+.files.largerCoordinates {
+  bottom: 4px !important;
 }
 
 .cg-wrap coords.ranks {
@@ -162,7 +166,7 @@ piece.fading {
 }
 
 .cg-wrap coords.files {
-  bottom: 4px;
+  bottom: -4px;
   left: 24px;
   flex-flow: row;
   width: 100%;
