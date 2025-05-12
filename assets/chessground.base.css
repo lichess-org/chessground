@@ -136,7 +136,7 @@ piece.fading {
 
 .largerCoordinates coord {
   font-size: 25px;
-  transform: translate(-1px, -10px);
+  transform: translate(-2px, -10px);
 }
 
 .ranks.largerCoordinates {
