@@ -137,7 +137,7 @@ piece.fading {
 .largerCoordinates coord {
   font-size: 25px;
 }
-
+/*
 .ranks.largerCoordinates {
   top: -20px !important;
   left: 4px !important;
@@ -145,6 +145,16 @@ piece.fading {
 
 .files.largerCoordinates {
   bottom: 10px !important;
+}
+*/
+.ranks.largerCoordinates {
+  top: -20px !important;
+  left: 4px !important;
+}
+
+.files.largerCoordinates {
+  bottom: 20px !important;
+  left: 15px !important;
 }
 
 .cg-wrap coords.ranks {
