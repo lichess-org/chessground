@@ -64,7 +64,7 @@ export function renderWrap(element: HTMLElement, s: HeadlessState): Elements {
   if (s.coordinates) {
     const orientClass = s.orientation === 'black' ? ' black' : '';
     const ranksPositionClass = s.ranksPosition === 'left' ? ' left' : '';
-    const maybeLargeCoords = s.largerCoordinates ? ' larger-coordinates' : '';
+    const maybeLargeCoords = s.largerCoordinates ? ' larger-coords' : '';
 
     if (s.coordinatesOnSquares) {
       const rankN: (i: number) => number = s.orientation === 'white' ? i => i + 1 : i => 8 - i;

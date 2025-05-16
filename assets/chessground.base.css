@@ -134,16 +134,16 @@ piece.fading {
   font-size: 9px;
 }
 
-.larger-coordinates coord {
+.larger-coords coord {
   font-size: 25px;
 }
 
-.ranks.larger-coordinates {
+.ranks.larger-coords {
   top: -20px !important;
   left: 4px !important;
 }
 
-.files.larger-coordinates {
+.files.larger-coords {
   bottom: 20px !important;
   left: 15px !important;
 }
