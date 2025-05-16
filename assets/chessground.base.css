@@ -134,17 +134,32 @@ piece.fading {
   font-size: 9px;
 }
 
-.larger-coords coord {
-  font-size: 25px;
+
+.large-coords coord {
+  font-size: 20px;
 }
 
-.ranks.larger-coords {
+.ranks.large-coords {
   top: -20px !important;
   left: 4px !important;
 }
 
-.files.larger-coords {
+.files.large-coords {
   bottom: 20px !important;
+  left: 15px !important;
+}
+
+.larger-coords coord {
+  font-size: 35px;
+}
+
+.ranks.larger-coords {
+  top: -25px !important;
+  left: 6px !important;
+}
+
+.files.larger-coords {
+  bottom: 33px !important;
   left: 15px !important;
 }
 

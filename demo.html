@@ -40,7 +40,7 @@
           autoShapes: [
             {
               orig: 'a2',
-              dest: 'a2',
+              dest: 'a7',
               brush: 'green',
               label: { text: 'a2' },
               modifiers: {
@@ -92,21 +92,38 @@
         orientation: 'white',
         coordinatesOnSquares: true,
       });
-      //larger coordinates
+      //large coordinates
       Chessground(document.getElementById('board-6'), {
         orientation: 'white',
-        largerCoordinates: true,
+        coordinateSize: 'large',
       });
       Chessground(document.getElementById('board-7'), {
         orientation: 'black',
         coordinatesOnSquares: true,
-        largerCoordinates: true,
+        coordinateSize: 'large',
         ranksPosition: 'left',
       });
       Chessground(document.getElementById('board-8'), {
         orientation: 'black',
         coordinatesOnSquares: true,
-        largerCoordinates: true,
+        coordinateSize: 'large',
+      });
+
+      // largest coordinates
+      Chessground(document.getElementById('board-9'), {
+        orientation: 'white',
+        coordinateSize: 'larger',
+      });
+      Chessground(document.getElementById('board-10'), {
+        orientation: 'black',
+        coordinatesOnSquares: true,
+        ranksPosition: 'left',
+        coordinateSize: 'larger',
+      });
+      Chessground(document.getElementById('board-11'), {
+        orientation: 'black',
+        coordinatesOnSquares: true,
+        coordinateSize: 'larger',
       });
     </script>
   </head>
@@ -133,19 +150,40 @@
       <div class="chessground" id="board-5"></div>
     </div>
     <div style="width: 100%">
+      <h3>Large coordinates<br /></h3>
+    </div>
+
+    <div>
+      basic board, large coordinates
+      <div class="chessground" id="board-6"></div>
+    </div>
+
+    <div>
+      board with large coordinates on-square, ranks position left
+      <div class="chessground" id="board-7"></div>
+    </div>
+
+    <div>
+      board with large coordinates on-square
+      <div class="chessground" id="board-8"></div>
+    </div>
+
+    <div style="width: 100%">
       <h3>Larger coordinates<br /></h3>
     </div>
     <div>
       basic board, larger coordinates
-      <div class="chessground" id="board-6"></div>
+      <div class="chessground" id="board-9"></div>
     </div>
+
     <div>
       board with larger coordinates on-square, ranks position left
-      <div class="chessground" id="board-7"></div>
+      <div class="chessground" id="board-10"></div>
     </div>
+
     <div>
       board with larger coordinates on-square
-      <div class="chessground" id="board-8"></div>
+      <div class="chessground" id="board-11"></div>
     </div>
   </body>
 </html>

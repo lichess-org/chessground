@@ -64,7 +64,16 @@ export function renderWrap(element: HTMLElement, s: HeadlessState): Elements {
   if (s.coordinates) {
     const orientClass = s.orientation === 'black' ? ' black' : '';
     const ranksPositionClass = s.ranksPosition === 'left' ? ' left' : '';
-    const maybeLargeCoords = s.largerCoordinates ? ' larger-coords' : '';
+
+    let coordSizeClass: string = " normal-coords";
+    switch(s.coordinateSize) {
+            case 'large':
+              coordSizeClass = " large-coords";
+              break;
+            case 'larger':
+              coordSizeClass = " larger-coords";
+              break;
+            }
 
     if (s.coordinatesOnSquares) {
       const rankN: (i: number) => number = s.orientation === 'white' ? i => i + 1 : i => 8 - i;
@@ -72,15 +81,15 @@ export function renderWrap(element: HTMLElement, s: HeadlessState): Elements {
         container.appendChild(
           renderCoords(
             ranks.map(r => f + r),
-            'squares rank' + rankN(i) + maybeLargeCoords + orientClass + ranksPositionClass,
+            'squares rank' + rankN(i) + coordSizeClass + orientClass + ranksPositionClass,
           ),
         ),
       );
     } else {
       container.appendChild(
-        renderCoords(ranks, 'ranks' + orientClass + ranksPositionClass + maybeLargeCoords),
+        renderCoords(ranks, 'ranks' + orientClass + ranksPositionClass + coordSizeClass),
       );
-      container.appendChild(renderCoords(files, 'files' + orientClass + maybeLargeCoords));
+      container.appendChild(renderCoords(files, 'files' + orientClass + coordSizeClass));
     }
   }
 
