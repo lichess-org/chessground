@@ -134,35 +134,6 @@ piece.fading {
   font-size: 9px;
 }
 
-
-.large-coords coord {
-  font-size: 20px;
-}
-
-.ranks.large-coords {
-  top: -20px !important;
-  left: 4px !important;
-}
-
-.files.large-coords {
-  bottom: 20px !important;
-  left: 15px !important;
-}
-
-.larger-coords coord {
-  font-size: 35px;
-}
-
-.ranks.larger-coords {
-  top: -25px !important;
-  left: 6px !important;
-}
-
-.files.larger-coords {
-  bottom: 33px !important;
-  left: 15px !important;
-}
-
 .cg-wrap coords.ranks {
   left: 4px;
   top: -20px;
@@ -181,7 +152,7 @@ piece.fading {
 }
 
 .cg-wrap coords.files {
-  bottom: -4px;
+  bottom: -2px;
   left: 24px;
   flex-flow: row;
   width: 100%;
@@ -208,6 +179,37 @@ piece.fading {
   flex-flow: column-reverse;
   height: 100%;
   width: 12.5%;
+}
+
+.normal-coords coord {
+    font-size: 9px;
+}
+
+.large-coords coord {
+  font-size: 20px;
+}
+
+.larger-coords coord {
+  font-size: 35px;
+}
+
+.cg-wrap .ranks.large-coords {
+  top: -20px;
+  left: 4px;
+}
+.cg-wrap .ranks.larger-coords {
+  top: -25px;
+  left: 6px;
+}
+
+.cg-wrap .files.large-coords {
+  bottom: 20px;
+  left: 15px;
+}
+
+.cg-wrap .files.larger-coords {
+  bottom: 33px;
+  left: 15px;
 }
 
 .cg-wrap coords.squares.black {
