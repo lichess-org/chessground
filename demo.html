@@ -100,31 +100,28 @@
       Chessground(document.getElementById('board-7'), {
         orientation: 'black',
         coordinatesOnSquares: true,
-        coordinateSize: 'large',
         ranksPosition: 'left',
       });
       Chessground(document.getElementById('board-8'), {
         orientation: 'black',
         coordinatesOnSquares: true,
-        coordinateSize: 'large',
       });
 
       // largest coordinates
       Chessground(document.getElementById('board-9'), {
         orientation: 'white',
-        coordinateSize: 'larger',
       });
       Chessground(document.getElementById('board-10'), {
         orientation: 'black',
         coordinatesOnSquares: true,
         ranksPosition: 'left',
-        coordinateSize: 'larger',
       });
       Chessground(document.getElementById('board-11'), {
         orientation: 'black',
         coordinatesOnSquares: true,
-        coordinateSize: 'larger',
       });
+
+      document.getElementById("board-11").classList.add("large-coords");
     </script>
   </head>
 

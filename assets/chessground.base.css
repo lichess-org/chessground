@@ -181,33 +181,33 @@ piece.fading {
   width: 12.5%;
 }
 
-.normal-coords coord {
+.cg-wrap.normal-coords coord {
     font-size: 9px;
 }
 
-.large-coords coord {
+.cg-wrap.large-coords coord {
   font-size: 20px;
 }
 
-.larger-coords coord {
+.cg-wrap.larger-coords coord {
   font-size: 35px;
 }
 
-.cg-wrap .ranks.large-coords {
+.cg-wrap.large-coords .ranks {
   top: -20px;
   left: 4px;
 }
-.cg-wrap .ranks.larger-coords {
+.cg-wrap .ranks {
   top: -25px;
   left: 6px;
 }
 
-.cg-wrap .files.large-coords {
+.cg-wrap.large-coords .files {
   bottom: 20px;
   left: 15px;
 }
 
-.cg-wrap .files.larger-coords {
+.cg-wrap.larger-coords .files {
   bottom: 33px;
   left: 15px;
 }
@@ -220,6 +220,9 @@ piece.fading {
   text-align: left;
 }
 
+.cg-wrap coords.squares coord {
+  padding: 6% 4%;
+}
 .cg-wrap coords.squares coord {
   padding: 6% 4%;
 }

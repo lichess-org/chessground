@@ -12,7 +12,6 @@ export interface HeadlessState {
   check?: cg.Key; // square currently in check "a2"
   lastMove?: cg.Key[]; // squares part of the last move ["c3"; "c4"]
   selected?: cg.Key; // square currently selected "a1"
-  coordinateSize: cg.CoordinateSize; // coordinate label size
   coordinates: boolean; // include coords attributes
   coordinatesOnSquares: boolean; // include coords attributes on every square
   ranksPosition: cg.RanksPosition; // position ranks on either side. left | right
@@ -115,7 +114,6 @@ export function defaults(): HeadlessState {
     orientation: 'white',
     turnColor: 'white',
     coordinates: true,
-    coordinateSize: 'normal',
     coordinatesOnSquares: false,
     ranksPosition: 'right',
     autoCastle: true,

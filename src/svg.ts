@@ -413,8 +413,8 @@ function dist(from: cg.NumberPair, to: cg.NumberPair): number {
 
 /*
  try to place label at the junction of the destination shaft and arrowhead. if there's more than
- 1 arrow pointing to a square, the arrow shortens by 10 / 64 units so the label must move as well.
-
+ 1 arrow pointing to a square, the arrow shortens by 10 / 64 units so the label must move as well. 
+ 
  if the angle between two incoming arrows is pi / 8, such as when an adjacent knight and bishop
  attack the same square, the knight's label is slid further down the shaft by an amount equal to
  our label size to avoid collision
