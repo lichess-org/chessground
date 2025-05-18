@@ -181,10 +181,6 @@ piece.fading {
   width: 12.5%;
 }
 
-.cg-wrap.normal-coords coord {
-    font-size: 9px;
-}
-
 .cg-wrap.large-coords coord {
   font-size: 20px;
 }
@@ -197,13 +193,19 @@ piece.fading {
   top: -20px;
   left: 4px;
 }
+
+.cg-wrap.larger-coords .ranks {
+  top: -25px;
+  left: 6px;
+}
+
 .cg-wrap .ranks {
   top: -25px;
   left: 6px;
 }
 
 .cg-wrap.large-coords .files {
-  bottom: 20px;
+  bottom: 15px;
   left: 15px;
 }
 
@@ -220,9 +222,6 @@ piece.fading {
   text-align: left;
 }
 
-.cg-wrap coords.squares coord {
-  padding: 6% 4%;
-}
 .cg-wrap coords.squares coord {
   padding: 6% 4%;
 }
