@@ -165,7 +165,7 @@ export function start(state: State, redrawAll: cg.Redraw): Api {
     },
 
     setShapes(shapes: DrawShape[]): void {
-      render(state => (state.drawable.shapes = shapes), state);
+      render(state => (state.drawable.shapes = shapes.slice()), state);
     },
 
     getKeyAtDomPos(pos): cg.Key | undefined {
