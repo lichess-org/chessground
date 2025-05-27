@@ -1,6 +1,6 @@
 {
   "name": "@lichess-org/chessground",
-  "version": "9.2.1",
+  "version": "9.2.2",
   "description": "lichess.org chess ui",
   "type": "module",
   "main": "dist/chessground.js",
@@ -50,7 +50,7 @@
     "ui",
     "typescript"
   ],
-  "author": "Thibault Duplessis (https://github.com/ornicar)",
+  "author": "Lichess Team <contact@lichess.org>",
   "license": "GPL-3.0-or-later",
   "bugs": {
     "url": "https://github.com/lichess-org/chessground/issues"
