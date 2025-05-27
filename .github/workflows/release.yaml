@@ -1,0 +1,53 @@
+name: Release
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Version tag (e.g. v1.2.3)'
+        required: true
+      description:
+        description: 'Description'
+        required: false
+        default: ''
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - run: |
+          [[ "${{ github.event.inputs.version }}" =~ ^v[0-9]+\.[0-9]+\.[0-9]+(-.*)?$ ]] || \
+          (echo "Version must start with 'v' and match 'v<major>.<minor>.<patch>'" && exit 1)
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          ref: ${{ github.ref }}
+      - uses: actions/setup-node@v4
+        with:
+          registry-url: https://registry.npmjs.org/
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NODE_AUTH_TOKEN }}
+      - uses: pnpm/action-setup@v4
+        with:
+          run_install: true
+      - run: |
+          pnpm run dist
+          git config user.name "github-actions"
+          git config user.email "github-actions@github.com"
+          NPM_VERSION="${GITHUB_VERSION#v}"
+          pnpm version "$NPM_VERSION"
+          git push origin HEAD --follow-tags
+        env:
+          GITHUB_VERSION: ${{ github.event.inputs.version }}
+
+      - name: Publish to npm
+        run: pnpm publish --provenance --access public
+
+      - name: Publish to github
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ github.event.inputs.version }}
+          name: Release ${{ github.event.inputs.version }}
+          body: ${{ github.event.inputs.description }}
