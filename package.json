@@ -1,5 +1,5 @@
 {
-  "name": "chessground",
+  "name": "@lichess-org/chessground",
   "version": "9.2.1",
   "description": "lichess.org chess ui",
   "type": "module",

@@ -1,7 +1,7 @@
 # Chessground
 
 [![Continuous Integration](https://github.com/lichess-org/chessground/workflows/Continuous%20Integration/badge.svg)](https://github.com/lichess-org/chessground/actions?query=workflow%3A%22Continuous+Integration%22)
-[![npm](https://img.shields.io/npm/v/chessground)](https://www.npmjs.com/package/chessground)
+[![npm](https://img.shields.io/npm/v/@lichess-org/chessground)](https://www.npmjs.com/package/@lichess-org/chessground)
 
 ![Chessground in 2D and 3D](/screenshot/twin.jpg)
 
@@ -59,13 +59,13 @@ Chessground is designed to fulfill all lichess.org web and mobile apps needs, so
 ## Installation
 
 ```sh
-npm install --save chessground
+npm install --save @lichess-org/chessground
 ```
 
 ### Usage
 
 ```js
-import { Chessground } from 'chessground';
+import { Chessground } from '@lichess-org/chessground';
 
 const config = {};
 const ground = Chessground(document.body, config);
