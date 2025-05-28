@@ -16,6 +16,7 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: write
+      id-token: write
     steps:
       - run: |
           [[ "${{ github.event.inputs.version }}" =~ ^v[0-9]+\.[0-9]+\.[0-9]+(-.*)?$ ]] || \
@@ -38,12 +39,13 @@ jobs:
           git config user.email "github-actions@github.com"
           NPM_VERSION="${GITHUB_VERSION#v}"
           pnpm version "$NPM_VERSION"
-          git push origin HEAD --follow-tags
         env:
           GITHUB_VERSION: ${{ github.event.inputs.version }}
 
       - name: Publish to npm
-        run: pnpm publish --provenance --access public
+        run: |
+          pnpm publish --provenance --access public
+          git push origin HEAD --follow-tags
 
       - name: Publish to github
         uses: softprops/action-gh-release@v2
