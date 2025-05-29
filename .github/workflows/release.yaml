@@ -38,7 +38,7 @@ jobs:
           git config user.name "github-actions"
           git config user.email "github-actions@github.com"
           NPM_VERSION="${GITHUB_VERSION#v}"
-          pnpm version "$NPM_VERSION"
+          pnpm version "$NPM_VERSION" --allow-same-version
         env:
           GITHUB_VERSION: ${{ github.event.inputs.version }}
 
