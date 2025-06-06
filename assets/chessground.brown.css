@@ -6,16 +6,16 @@ cg-board {
 
 /** Interactive board square colors */
 cg-board square.move-dest {
-  background: radial-gradient(rgba(20, 85, 30, 0.5) 22%, #208530 0, rgba(0, 0, 0, 0.3) 0, rgba(0, 0, 0, 0) 0);
+  background: radial-gradient(rgba(20, 85, 30, 0.5) calc(22% - 0.5px), rgba(20, 85, 30, 0) calc(22% + 0.5px));
 }
 cg-board square.premove-dest {
-  background: radial-gradient(rgba(20, 30, 85, 0.5) 22%, #203085 0, rgba(0, 0, 0, 0.3) 0, rgba(0, 0, 0, 0) 0);
+  background: radial-gradient(rgba(20, 30, 85, 0.5) calc(22% - 0.5px), rgba(20, 30, 85, 0) calc(22% + 0.5px));
 }
 cg-board square.oc.move-dest {
-  background: radial-gradient(transparent 0%, transparent 80%, rgba(20, 85, 0, 0.3) 80%);
+  background: radial-gradient(transparent 0%, rgba(20, 85, 0, 0) calc(80% - 0.5px), rgba(20, 85, 0, 0.3) calc(80% + 0.5px));
 }
 cg-board square.oc.premove-dest {
-  background: radial-gradient(transparent 0%, transparent 80%, rgba(20, 30, 85, 0.2) 80%);
+  background: radial-gradient(transparent 0%, rgba(20, 30, 85, 0.2) calc(80% - 0.5px), rgba(20, 30, 85, 0.2) calc(80% + 0.5px));
 }
 cg-board square.move-dest:hover {
   background: rgba(20, 85, 30, 0.3);
