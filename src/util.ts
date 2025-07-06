@@ -103,3 +103,28 @@ export function computeSquareCenter(key: cg.Key, asWhite: boolean, bounds: DOMRe
     bounds.top + (bounds.height * (7 - pos[1])) / 8 + bounds.height / 16,
   ];
 }
+
+/** Return all board coordinates between (x1, y1) and (x2, y2) exclusive,
+ *  along a straight line (rook or bishop path). Returns [] if not aligned.
+ */
+export const coordsBetween = (x1: number, y1: number, x2: number, y2: number): cg.Pos[] => {
+  const dx = x2 - x1;
+  const dy = y2 - y1;
+
+  // Must be a straight or diagonal line
+  if (dx && dy && Math.abs(dx) !== Math.abs(dy)) return [];
+
+  // Determine step direction
+  const stepX = dx === 0 ? 0 : dx > 0 ? 1 : -1;
+  const stepY = dy === 0 ? 0 : dy > 0 ? 1 : -1;
+
+  const squares: cg.Pos[] = [];
+  let x = x1 + stepX,
+    y = y1 + stepY;
+  while (x !== x2 || y !== y2) {
+    squares.push([x, y]);
+    x += stepX;
+    y += stepY;
+  }
+  return squares;
+};
