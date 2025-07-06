@@ -13,6 +13,7 @@
     "module": "esnext",
     "moduleResolution": "node",
     "target": "ES2017",
-    "lib": ["DOM", "ES2017"]
+    "lib": ["DOM", "ES2017"],
+    "types": ["vitest"]
   }
 }
