@@ -211,7 +211,12 @@ export function setSelected(state: HeadlessState, key: cg.Key): void {
   if (isPremovable(state, key)) {
     // calculate chess premoves if custom premoves are not passed
     if (!state.premovable.customDests) {
-      state.premovable.dests = premove(state.pieces, key, state.premovable.castle, !!state.premovable.useFriendliesToTrimPremoves);
+      state.premovable.dests = premove(
+        state.pieces,
+        key,
+        state.premovable.castle,
+        !!state.premovable.useFriendliesToTrimPremoves,
+      );
     }
   } else state.premovable.dests = undefined;
 }
@@ -258,7 +263,8 @@ function isPremovable(state: HeadlessState, orig: cg.Key): boolean {
 
 function canPremove(state: HeadlessState, orig: cg.Key, dest: cg.Key): boolean {
   const validPremoves: cg.Key[] =
-    state.premovable.customDests?.get(orig) ?? premove(state.pieces, orig, state.premovable.castle, !!state.premovable.useFriendliesToTrimPremoves);
+    state.premovable.customDests?.get(orig) ??
+    premove(state.pieces, orig, state.premovable.castle, !!state.premovable.useFriendliesToTrimPremoves);
   return orig !== dest && isPremovable(state, orig) && validPremoves.includes(dest);
 }
 
@@ -348,20 +354,22 @@ export function getKeyAtDomPos(
   return file >= 0 && file < 8 && rank >= 0 && rank < 8 ? pos2key([file, rank]) : undefined;
 }
 
-export function getSnappedKeyAtDomPos(
-  orig: cg.Key,
-  pos: cg.NumberPair,
-  state: State
-): cg.Key | undefined {
+export function getSnappedKeyAtDomPos(orig: cg.Key, pos: cg.NumberPair, state: State): cg.Key | undefined {
   const origPos = key2pos(orig);
   const color = state.pieces.get(orig)?.color;
   if (!color) return undefined;
   const validSnapPos = allPos.filter(
     pos2 =>
-      queen(state.pieces, color, !!state.premovable.useFriendliesToTrimPremoves)(origPos[0], origPos[1], pos2[0], pos2[1]) || 
-      knight(origPos[0], origPos[1], pos2[0], pos2[1]),
+      queen(state.pieces, color, !!state.premovable.useFriendliesToTrimPremoves)(
+        origPos[0],
+        origPos[1],
+        pos2[0],
+        pos2[1],
+      ) || knight(origPos[0], origPos[1], pos2[0], pos2[1]),
   );
-  const validSnapCenters = validSnapPos.map(pos2 => computeSquareCenter(pos2key(pos2), whitePov(state), state.dom.bounds()));
+  const validSnapCenters = validSnapPos.map(pos2 =>
+    computeSquareCenter(pos2key(pos2), whitePov(state), state.dom.bounds()),
+  );
   const validSnapDistances = validSnapCenters.map(pos2 => distanceSq(pos, pos2));
   const [, closestSnapIndex] = validSnapDistances.reduce(
     (a, b, index) => (a[0] < b ? a : [b, index]),
