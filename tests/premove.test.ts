@@ -1,5 +1,5 @@
-import { premove } from './premove';
-import * as cg from './types';
+import { premove } from '../src/premove';
+import * as cg from '../src/types';
 
 function createMockPieces(): cg.Pieces {
   return new Map<cg.Key, cg.Piece>([
