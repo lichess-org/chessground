@@ -3,8 +3,6 @@ import * as cg from './types.js';
 
 type Mobility = (x1: number, y1: number, x2: number, y2: number) => boolean;
 
-const diff = (a: number, b: number): number => Math.abs(a - b);
-
 const friendlyPieceBetween = (
   x1: number,
   y1: number,
@@ -14,11 +12,10 @@ const friendlyPieceBetween = (
   color: cg.Color,
 ): boolean => util.coordsBetween(x1, y1, x2, y2).some(sq => pieces.get(util.pos2key(sq))?.color === color);
 
-const pawn =
-  (pieces: cg.Pieces, color: cg.Color, useFriendliesToTrimPremoves: boolean): Mobility =>
+const pawn = (pieces: cg.Pieces, color: cg.Color, useFriendliesToTrimPremoves: boolean): Mobility =>
   (x1, y1, x2, y2) => {
     const step = color === 'white' ? 1 : -1;
-    if (diff(x1, x2) === 1) return y2 === y1 + step;
+    if (util.diff(x1, x2) === 1) return y2 === y1 + step;
     return (
       x1 === x2 &&
       (y2 === y1 + step ||
@@ -28,25 +25,21 @@ const pawn =
     );
   };
 
-export const knight: Mobility = (x1, y1, x2, y2) => {
-  const xd = diff(x1, x2);
-  const yd = diff(y1, y2);
-  return (xd === 1 && yd === 2) || (xd === 2 && yd === 1);
-};
+const knight: Mobility = (x1, y1, x2, y2) => util.knight_dir(x1, y1, x2, y2);
 
 const bishop =
   (pieces: cg.Pieces, color: cg.Color, useFriendliesToTrimPremoves: boolean): Mobility =>
   (x1, y1, x2, y2) =>
-    diff(x1, x2) === diff(y1, y2) &&
+    util.bishop_dir(x1, y1, x2, y2) &&
     (!useFriendliesToTrimPremoves || !friendlyPieceBetween(x1, y1, x2, y2, pieces, color));
 
 const rook =
   (pieces: cg.Pieces, color: cg.Color, useFriendliesToTrimPremoves: boolean): Mobility =>
   (x1, y1, x2, y2) =>
-    (x1 === x2 || y1 === y2) &&
+    util.rook_dir(x1, y1, x2, y2) &&
     (!useFriendliesToTrimPremoves || !friendlyPieceBetween(x1, y1, x2, y2, pieces, color));
 
-export const queen =
+const queen =
   (pieces: cg.Pieces, color: cg.Color, useFriendliesToTrimPremoves: boolean = false): Mobility =>
   (x1, y1, x2, y2) =>
     bishop(pieces, color, useFriendliesToTrimPremoves)(x1, y1, x2, y2) ||
@@ -55,14 +48,14 @@ export const queen =
 const king =
   (color: cg.Color, rookFiles: number[], canCastle: boolean): Mobility =>
   (x1, y1, x2, y2) =>
-    (diff(x1, x2) < 2 && diff(y1, y2) < 2) ||
+    (util.diff(x1, x2) < 2 && util.diff(y1, y2) < 2) ||
     (canCastle &&
       y1 === y2 &&
       y1 === (color === 'white' ? 0 : 7) &&
       ((x1 === 4 && ((x2 === 2 && rookFiles.includes(0)) || (x2 === 6 && rookFiles.includes(7)))) ||
         rookFiles.includes(x2)));
 
-function rookFilesOf(pieces: cg.Pieces, color: cg.Color) {
+const rookFilesOf = (pieces: cg.Pieces, color: cg.Color) => {
   const backrank = color === 'white' ? '1' : '8';
   const files = [];
   for (const [key, piece] of pieces) {
