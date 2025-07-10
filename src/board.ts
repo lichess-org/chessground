@@ -209,17 +209,9 @@ export function selectSquare(state: HeadlessState, key: cg.Key, force?: boolean)
 
 export function setSelected(state: HeadlessState, key: cg.Key): void {
   state.selected = key;
-  if (isPremovable(state, key)) {
-    // calculate chess premoves if custom premoves are not passed
-    if (!state.premovable.customDests) {
-      state.premovable.dests = premove(
-        state.pieces,
-        key,
-        state.premovable.castle,
-        !!state.premovable.useFriendliesToTrimPremoves,
-      );
-    }
-  } else state.premovable.dests = undefined;
+  if (!isPremovable(state, key)) state.premovable.dests = undefined;
+  else if (!state.premovable.customDests) state.premovable.dests = premove(state, key);
+  // calculate chess premoves if custom premoves are not passed
 }
 
 export function unselect(state: HeadlessState): void {
@@ -263,9 +255,7 @@ function isPremovable(state: HeadlessState, orig: cg.Key): boolean {
 }
 
 function canPremove(state: HeadlessState, orig: cg.Key, dest: cg.Key): boolean {
-  const validPremoves: cg.Key[] =
-    state.premovable.customDests?.get(orig) ??
-    premove(state.pieces, orig, state.premovable.castle, !!state.premovable.useFriendliesToTrimPremoves);
+  const validPremoves: cg.Key[] = state.premovable.customDests?.get(orig) ?? premove(state, orig);
   return orig !== dest && isPremovable(state, orig) && validPremoves.includes(dest);
 }
 

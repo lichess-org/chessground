@@ -119,10 +119,10 @@ export const bishop_dir: cg.DirectionalCheck = (x1, y1, x2, y2) => diff(x1, x2) 
 export const queen_dir: cg.DirectionalCheck = (x1, y1, x2, y2) => 
   rook_dir(x1, y1, x2, y2) || bishop_dir(x1, y1, x2, y2);
 
-/** Return all board coordinates between (x1, y1) and (x2, y2) exclusive,
- *  along a straight line (rook or bishop path). Returns [] if not aligned.
+/** Return all board squares between (x1, y1) and (x2, y2) exclusive,
+ *  along a straight line (rook or bishop path). Returns [] if not aligned, or none between.
  */
-export const coordsBetween = (x1: number, y1: number, x2: number, y2: number): cg.Pos[] => {
+export const squaresBetween = (x1: number, y1: number, x2: number, y2: number): cg.Key[] => {
   const dx = x2 - x1;
   const dy = y2 - y1;
 
@@ -141,5 +141,5 @@ export const coordsBetween = (x1: number, y1: number, x2: number, y2: number): c
     x += stepX;
     y += stepY;
   }
-  return squares;
+  return squares.map(sq => pos2key(sq));
 };
