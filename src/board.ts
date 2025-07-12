@@ -262,10 +262,10 @@ function isPremovable(state: HeadlessState, orig: cg.Key): boolean {
   );
 }
 
-function canPremove(state: HeadlessState, orig: cg.Key, dest: cg.Key): boolean {
-  const validPremoves: cg.Key[] = state.premovable.customDests?.get(orig) ?? premove(state, orig);
-  return orig !== dest && isPremovable(state, orig) && validPremoves.includes(dest);
-}
+const canPremove = (state: HeadlessState, orig: cg.Key, dest: cg.Key): boolean =>
+  orig !== dest &&
+  isPremovable(state, orig) &&
+  (state.premovable.customDests?.get(orig) ?? premove(state, orig)).includes(dest);
 
 function canPredrop(state: HeadlessState, orig: cg.Key, dest: cg.Key): boolean {
   const piece = state.pieces.get(orig);
