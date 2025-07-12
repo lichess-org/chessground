@@ -41,7 +41,7 @@ const noFriendliesBetweenOrJustOneEnPassantTarget = (
 };
 
 const pawn =
-  (pieces: cg.Pieces, color: cg.Color, useFriendliesToTrimPremoves: boolean): Mobility =>
+  (pieces: cg.Pieces, color: cg.Color, premoveThroughFriendlies: boolean): Mobility =>
   (x1, y1, x2, y2) => {
     const step = color === 'white' ? 1 : -1;
     if (util.diff(x1, x2) === 1) return y2 === y1 + step;
@@ -50,10 +50,7 @@ const pawn =
       (y2 === y1 + step ||
         // allow 2 squares from first two ranks, for horde
         (y2 === y1 + 2 * step && (color === 'white' ? y1 <= 1 : y1 >= 6))) &&
-      !(
-        useFriendliesToTrimPremoves &&
-        squaresFriendlyPiecesBetween(x1, y1, x2, y2 + step, pieces, color).length
-      )
+      (premoveThroughFriendlies || !squaresFriendlyPiecesBetween(x1, y1, x2, y2 + step, pieces, color).length)
     );
   };
 
@@ -63,36 +60,36 @@ const bishop =
   (
     pieces: cg.Pieces,
     color: cg.Color,
-    useFriendliesToTrimPremoves: boolean,
+    premoveThroughFriendlies: boolean,
     lastMove: cg.Key[] | undefined,
   ): Mobility =>
   (x1, y1, x2, y2) =>
     util.bishop_dir(x1, y1, x2, y2) &&
-    (!useFriendliesToTrimPremoves ||
+    (premoveThroughFriendlies ||
       noFriendliesBetweenOrJustOneEnPassantTarget(x1, y1, x2, y2, pieces, color, lastMove));
 
 const rook =
   (
     pieces: cg.Pieces,
     color: cg.Color,
-    useFriendliesToTrimPremoves: boolean,
+    premoveThroughFriendlies: boolean,
     lastMove: cg.Key[] | undefined,
   ): Mobility =>
   (x1, y1, x2, y2) =>
     util.rook_dir(x1, y1, x2, y2) &&
-    (!useFriendliesToTrimPremoves ||
+    (premoveThroughFriendlies ||
       noFriendliesBetweenOrJustOneEnPassantTarget(x1, y1, x2, y2, pieces, color, lastMove));
 
 const queen =
   (
     pieces: cg.Pieces,
     color: cg.Color,
-    useFriendliesToTrimPremoves: boolean = false,
+    premoveThroughFriendlies: boolean,
     lastMove: cg.Key[] | undefined,
   ): Mobility =>
   (x1, y1, x2, y2) =>
-    bishop(pieces, color, useFriendliesToTrimPremoves, lastMove)(x1, y1, x2, y2) ||
-    rook(pieces, color, useFriendliesToTrimPremoves, lastMove)(x1, y1, x2, y2);
+    bishop(pieces, color, premoveThroughFriendlies, lastMove)(x1, y1, x2, y2) ||
+    rook(pieces, color, premoveThroughFriendlies, lastMove)(x1, y1, x2, y2);
 
 const king =
   (color: cg.Color, rookFiles: number[], canCastle: boolean): Mobility =>
@@ -118,22 +115,22 @@ const rookFilesOf = (pieces: cg.Pieces, color: cg.Color) => {
 export function premove(state: HeadlessState, key: cg.Key): cg.Key[] {
   const pieces = state.pieces,
     canCastle = state.premovable.castle,
-    useFriendliesToTrimPremoves = !!state.premovable.useFriendliesToTrimPremoves;
+    premoveThroughFriendlies = !!state.premovable.premoveThroughFriendlies;
   const piece = pieces.get(key);
   if (!piece) return [];
   const pos = util.key2pos(key),
     r = piece.role,
     mobility: Mobility =
       r === 'pawn'
-        ? pawn(pieces, piece.color, useFriendliesToTrimPremoves)
+        ? pawn(pieces, piece.color, premoveThroughFriendlies)
         : r === 'knight'
           ? knight
           : r === 'bishop'
-            ? bishop(pieces, piece.color, useFriendliesToTrimPremoves, state.lastMove)
+            ? bishop(pieces, piece.color, premoveThroughFriendlies, state.lastMove)
             : r === 'rook'
-              ? rook(pieces, piece.color, useFriendliesToTrimPremoves, state.lastMove)
+              ? rook(pieces, piece.color, premoveThroughFriendlies, state.lastMove)
               : r === 'queen'
-                ? queen(pieces, piece.color, useFriendliesToTrimPremoves, state.lastMove)
+                ? queen(pieces, piece.color, premoveThroughFriendlies, state.lastMove)
                 : king(piece.color, rookFilesOf(pieces, piece.color), canCastle);
   return util.allPos
     .filter(pos2 => (pos[0] !== pos2[0] || pos[1] !== pos2[1]) && mobility(pos[0], pos[1], pos2[0], pos2[1]))
