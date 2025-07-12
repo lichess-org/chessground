@@ -1,6 +1,14 @@
 import { HeadlessState } from './state.js';
-import { pos2key, key2pos, opposite, distanceSq, allPos, computeSquareCenter, 
-         queen_dir, knight_dir} from './util.js';
+import {
+  pos2key,
+  key2pos,
+  opposite,
+  distanceSq,
+  allPos,
+  computeSquareCenter,
+  queen_dir,
+  knight_dir,
+} from './util.js';
 import { premove } from './premove.js';
 import * as cg from './types.js';
 
@@ -345,17 +353,19 @@ export function getKeyAtDomPos(
   return file >= 0 && file < 8 && rank >= 0 && rank < 8 ? pos2key([file, rank]) : undefined;
 }
 
-export function getSnappedKeyAtDomPos(orig: cg.Key, pos: cg.NumberPair, asWhite: boolean,
-  bounds: DOMRectReadOnly): cg.Key | undefined {
+export function getSnappedKeyAtDomPos(
+  orig: cg.Key,
+  pos: cg.NumberPair,
+  asWhite: boolean,
+  bounds: DOMRectReadOnly,
+): cg.Key | undefined {
   const origPos = key2pos(orig);
   const validSnapPos = allPos.filter(
     pos2 =>
       queen_dir(origPos[0], origPos[1], pos2[0], pos2[1]) ||
       knight_dir(origPos[0], origPos[1], pos2[0], pos2[1]),
   );
-  const validSnapCenters = validSnapPos.map(pos2 =>
-    computeSquareCenter(pos2key(pos2), asWhite, bounds),
-  );
+  const validSnapCenters = validSnapPos.map(pos2 => computeSquareCenter(pos2key(pos2), asWhite, bounds));
   const validSnapDistances = validSnapCenters.map(pos2 => distanceSq(pos, pos2));
   const [, closestSnapIndex] = validSnapDistances.reduce(
     (a, b, index) => (a[0] < b ? a : [b, index]),
