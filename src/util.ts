@@ -106,18 +106,18 @@ export function computeSquareCenter(key: cg.Key, asWhite: boolean, bounds: DOMRe
 
 export const diff = (a: number, b: number): number => Math.abs(a - b);
 
-export const knight_dir: cg.DirectionalCheck = (x1, y1, x2, y2) => {
+export const knightDir: cg.DirectionalCheck = (x1, y1, x2, y2) => {
   const xd = diff(x1, x2);
   const yd = diff(y1, y2);
   return (xd === 1 && yd === 2) || (xd === 2 && yd === 1);
 };
 
-export const rook_dir: cg.DirectionalCheck = (x1, y1, x2, y2) => x1 === x2 || y1 === y2;
+export const rookDir: cg.DirectionalCheck = (x1, y1, x2, y2) => x1 === x2 || y1 === y2;
 
-export const bishop_dir: cg.DirectionalCheck = (x1, y1, x2, y2) => diff(x1, x2) === diff(y1, y2);
+export const bishopDir: cg.DirectionalCheck = (x1, y1, x2, y2) => diff(x1, x2) === diff(y1, y2);
 
-export const queen_dir: cg.DirectionalCheck = (x1, y1, x2, y2) =>
-  rook_dir(x1, y1, x2, y2) || bishop_dir(x1, y1, x2, y2);
+export const queenDir: cg.DirectionalCheck = (x1, y1, x2, y2) =>
+  rookDir(x1, y1, x2, y2) || bishopDir(x1, y1, x2, y2);
 
 /** Return all board squares between (x1, y1) and (x2, y2) exclusive,
  *  along a straight line (rook or bishop path). Returns [] if not aligned, or none between.

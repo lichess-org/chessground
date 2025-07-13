@@ -54,7 +54,7 @@ const pawn =
     );
   };
 
-const knight: Mobility = (x1, y1, x2, y2) => util.knight_dir(x1, y1, x2, y2);
+const knight: Mobility = (x1, y1, x2, y2) => util.knightDir(x1, y1, x2, y2);
 
 const bishop =
   (
@@ -64,7 +64,7 @@ const bishop =
     lastMove: cg.Key[] | undefined,
   ): Mobility =>
   (x1, y1, x2, y2) =>
-    util.bishop_dir(x1, y1, x2, y2) &&
+    util.bishopDir(x1, y1, x2, y2) &&
     (premoveThroughFriendlies ||
       noFriendliesBetweenOrJustOneEnPassantTarget(x1, y1, x2, y2, pieces, color, lastMove));
 
@@ -76,7 +76,7 @@ const rook =
     lastMove: cg.Key[] | undefined,
   ): Mobility =>
   (x1, y1, x2, y2) =>
-    util.rook_dir(x1, y1, x2, y2) &&
+    util.rookDir(x1, y1, x2, y2) &&
     (premoveThroughFriendlies ||
       noFriendliesBetweenOrJustOneEnPassantTarget(x1, y1, x2, y2, pieces, color, lastMove));
 
