@@ -50,7 +50,9 @@ const pawn =
       (y2 === y1 + step ||
         // allow 2 squares from first two ranks, for horde
         (y2 === y1 + 2 * step && (color === 'white' ? y1 <= 1 : y1 >= 6))) &&
-      (premoveThroughFriendlies || !squaresFriendlyPiecesBetween(x1, y1, x2, y2 + step, pieces, color).length)
+      (premoveThroughFriendlies ||
+        (!squaresFriendlyPiecesBetween(x1, y1, x2, y2 + step, pieces, color).length &&
+          squaresFriendlyPiecesBetween(x1, y1, x2, y2 + step, pieces, util.opposite(color)).length <= 1))
     );
   };
 
@@ -66,7 +68,8 @@ const bishop =
   (x1, y1, x2, y2) =>
     util.bishopDir(x1, y1, x2, y2) &&
     (premoveThroughFriendlies ||
-      noFriendliesBetweenOrJustOneEnPassantTarget(x1, y1, x2, y2, pieces, color, lastMove));
+      (noFriendliesBetweenOrJustOneEnPassantTarget(x1, y1, x2, y2, pieces, color, lastMove) &&
+        squaresFriendlyPiecesBetween(x1, y1, x2, y2, pieces, util.opposite(color)).length <= 1));
 
 const rook =
   (
@@ -78,7 +81,8 @@ const rook =
   (x1, y1, x2, y2) =>
     util.rookDir(x1, y1, x2, y2) &&
     (premoveThroughFriendlies ||
-      noFriendliesBetweenOrJustOneEnPassantTarget(x1, y1, x2, y2, pieces, color, lastMove));
+      (noFriendliesBetweenOrJustOneEnPassantTarget(x1, y1, x2, y2, pieces, color, lastMove) &&
+        squaresFriendlyPiecesBetween(x1, y1, x2, y2, pieces, util.opposite(color)).length <= 1));
 
 const queen =
   (
