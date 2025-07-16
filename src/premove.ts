@@ -92,14 +92,27 @@ const queen =
     rook(pieces, color, premoveThroughFriendlies, lastMove)(x1, y1, x2, y2);
 
 const king =
-  (color: cg.Color, rookFiles: number[], canCastle: boolean): Mobility =>
+  (
+    pieces: cg.Pieces,
+    color: cg.Color,
+    premoveThroughFriendlies: boolean,
+    rookFiles: number[],
+    canCastle: boolean,
+  ): Mobility =>
   (x1, y1, x2, y2) =>
     (util.diff(x1, x2) < 2 && util.diff(y1, y2) < 2) ||
     (canCastle &&
       y1 === y2 &&
       y1 === (color === 'white' ? 0 : 7) &&
       ((x1 === 4 && ((x2 === 2 && rookFiles.includes(0)) || (x2 === 6 && rookFiles.includes(7)))) ||
-        rookFiles.includes(x2)));
+        rookFiles.includes(x2)) &&
+      (premoveThroughFriendlies ||
+        /* The following checks if no non-rook friendly piece is in the way between the king and its castling destination.
+         Note that for the Chess960 edge case of Kb1 "long castling", the check passes even if there is a piece in the way
+         on c1. But this is fine, since the king can always premove recapturing Ra1. */
+        squaresFriendlyPiecesBetween(x1, y1, x2 > x1 ? 7 : 1, y2, pieces, color).every(
+          s => pieces.get(s)!.role === 'rook',
+        )));
 
 const rookFilesOf = (pieces: cg.Pieces, color: cg.Color) => {
   const backrank = color === 'white' ? '1' : '8';
@@ -131,7 +144,13 @@ export function premove(state: HeadlessState, key: cg.Key): cg.Key[] {
               ? rook(pieces, piece.color, premoveThroughFriendlies, state.lastMove)
               : r === 'queen'
                 ? queen(pieces, piece.color, premoveThroughFriendlies, state.lastMove)
-                : king(piece.color, rookFilesOf(pieces, piece.color), canCastle);
+                : king(
+                    pieces,
+                    piece.color,
+                    premoveThroughFriendlies,
+                    rookFilesOf(pieces, piece.color),
+                    canCastle,
+                  );
   return util.allPos
     .filter(pos2 => (pos[0] !== pos2[0] || pos[1] !== pos2[1]) && mobility(pos[0], pos[1], pos2[0], pos2[1]))
     .map(util.pos2key);
