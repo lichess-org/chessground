@@ -108,3 +108,9 @@ To build the standalone:
 ```sh
 pnpm run dist
 ```
+
+To run tests:
+
+```sh
+pnpm test
+```

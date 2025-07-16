@@ -108,3 +108,5 @@ export type RanksPosition = 'left' | 'right';
 export type BrushColor = 'green' | 'red' | 'blue' | 'yellow';
 
 export type SquareClasses = Map<Key, string>;
+
+export type DirectionalCheck = (x1: number, y1: number, x2: number, y2: number) => boolean;

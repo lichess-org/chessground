@@ -23,8 +23,10 @@
     "@typescript-eslint/parser": "^7.7.0",
     "esbuild": "^0.25.0",
     "eslint": "^8.57.0",
+    "jsdom": "^26.1.0",
     "prettier": "^3.2.5",
-    "typescript": "^5.6.3"
+    "typescript": "^5.6.3",
+    "vitest": "^3.2.4"
   },
   "scripts": {
     "prepare": "$npm_execpath run compile",
@@ -33,7 +35,8 @@
     "format": "prettier --write .",
     "check-format": "prettier --check .",
     "bundle": "esbuild src/chessground.ts --bundle --format=esm --outfile=dist/chessground.min.js --minify",
-    "dist": "$npm_execpath run compile && $npm_execpath run bundle"
+    "dist": "$npm_execpath run compile && $npm_execpath run bundle",
+    "test": "vitest"
   },
   "files": [
     "/dist/*.js",

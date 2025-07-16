@@ -1,6 +1,15 @@
 import { HeadlessState } from './state.js';
-import { pos2key, key2pos, opposite, distanceSq, allPos, computeSquareCenter } from './util.js';
-import { premove, queen, knight } from './premove.js';
+import {
+  pos2key,
+  key2pos,
+  opposite,
+  distanceSq,
+  allPos,
+  computeSquareCenter,
+  queenDir,
+  knightDir,
+} from './util.js';
+import { premove } from './premove.js';
 import * as cg from './types.js';
 
 export function callUserFunction<T extends (...args: any[]) => void>(
@@ -208,12 +217,9 @@ export function selectSquare(state: HeadlessState, key: cg.Key, force?: boolean)
 
 export function setSelected(state: HeadlessState, key: cg.Key): void {
   state.selected = key;
-  if (isPremovable(state, key)) {
-    // calculate chess premoves if custom premoves are not passed
-    if (!state.premovable.customDests) {
-      state.premovable.dests = premove(state.pieces, key, state.premovable.castle);
-    }
-  } else state.premovable.dests = undefined;
+  if (!isPremovable(state, key)) state.premovable.dests = undefined;
+  else if (!state.premovable.customDests) state.premovable.dests = premove(state, key);
+  // calculate chess premoves if custom premoves are not passed
 }
 
 export function unselect(state: HeadlessState): void {
@@ -256,11 +262,10 @@ function isPremovable(state: HeadlessState, orig: cg.Key): boolean {
   );
 }
 
-function canPremove(state: HeadlessState, orig: cg.Key, dest: cg.Key): boolean {
-  const validPremoves: cg.Key[] =
-    state.premovable.customDests?.get(orig) ?? premove(state.pieces, orig, state.premovable.castle);
-  return orig !== dest && isPremovable(state, orig) && validPremoves.includes(dest);
-}
+const canPremove = (state: HeadlessState, orig: cg.Key, dest: cg.Key): boolean =>
+  orig !== dest &&
+  isPremovable(state, orig) &&
+  (state.premovable.customDests?.get(orig) ?? premove(state, orig)).includes(dest);
 
 function canPredrop(state: HeadlessState, orig: cg.Key, dest: cg.Key): boolean {
   const piece = state.pieces.get(orig);
@@ -357,7 +362,8 @@ export function getSnappedKeyAtDomPos(
   const origPos = key2pos(orig);
   const validSnapPos = allPos.filter(
     pos2 =>
-      queen(origPos[0], origPos[1], pos2[0], pos2[1]) || knight(origPos[0], origPos[1], pos2[0], pos2[1]),
+      queenDir(origPos[0], origPos[1], pos2[0], pos2[1]) ||
+      knightDir(origPos[0], origPos[1], pos2[0], pos2[1]),
   );
   const validSnapCenters = validSnapPos.map(pos2 => computeSquareCenter(pos2key(pos2), asWhite, bounds));
   const validSnapDistances = validSnapCenters.map(pos2 => distanceSq(pos, pos2));
