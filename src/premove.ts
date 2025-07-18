@@ -16,11 +16,14 @@ const isPathClearEnoughForPremove = (
 ): boolean => {
   if (premoveThroughFriendlies) return true;
   const squares = util.squaresBetween(x1, y1, x2, y2);
-  if (squares.filter(s => pieces.get(s)?.color === util.opposite(color)).length > 1) return false;
   const squaresOfFriendliesBetween = squares.filter(s => pieces.get(s)?.color === color);
-  if (!squaresOfFriendliesBetween.length) return true;
-  if (squaresOfFriendliesBetween.length > 1 || !lastMove || squaresOfFriendliesBetween[0] !== lastMove[1])
+  if (
+    squaresOfFriendliesBetween.length > 1 ||
+    squares.filter(s => pieces.get(s)?.color === util.opposite(color)).length > 1
+  )
     return false;
+  if (!squaresOfFriendliesBetween.length) return true;
+  if (!lastMove || squaresOfFriendliesBetween[0] !== lastMove[1]) return false;
   const destKey = lastMove[1],
     srcPos = util.key2pos(lastMove[0]),
     destPos = util.key2pos(destKey),
