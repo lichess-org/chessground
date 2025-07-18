@@ -4,27 +4,22 @@ import { HeadlessState } from './state.js';
 
 type Mobility = (x1: number, y1: number, x2: number, y2: number) => boolean;
 
-const squaresFriendlyPiecesBetween = (
+const isPathClearEnoughForPremove = (
   x1: number,
   y1: number,
   x2: number,
   y2: number,
   pieces: cg.Pieces,
   color: cg.Color,
-): cg.Key[] => util.squaresBetween(x1, y1, x2, y2).filter(sq => pieces.get(sq)?.color === color);
-
-const noFriendliesBetweenOrJustOneEnPassantTarget = (
-  x1: number,
-  y1: number,
-  x2: number,
-  y2: number,
-  pieces: cg.Pieces,
-  color: cg.Color,
-  lastMove: cg.Key[] | undefined,
+  premoveThroughFriendlies: boolean,
+  lastMove?: cg.Key[],
 ): boolean => {
-  const squaresFriendliesBetween = squaresFriendlyPiecesBetween(x1, y1, x2, y2, pieces, color);
-  if (!squaresFriendliesBetween.length) return true;
-  if (squaresFriendliesBetween.length > 1 || !lastMove || squaresFriendliesBetween[0] !== lastMove[1])
+  if (premoveThroughFriendlies) return true;
+  const squares = util.squaresBetween(x1, y1, x2, y2);
+  if (squares.filter(s => pieces.get(s)?.color === util.opposite(color)).length > 1) return false;
+  const squaresOfFriendliesBetween = squares.filter(s => pieces.get(s)?.color === color);
+  if (!squaresOfFriendliesBetween.length) return true;
+  if (squaresOfFriendliesBetween.length > 1 || !lastMove || squaresOfFriendliesBetween[0] !== lastMove[1])
     return false;
   const destKey = lastMove[1],
     srcPos = util.key2pos(lastMove[0]),
@@ -50,9 +45,7 @@ const pawn =
       (y2 === y1 + step ||
         // allow 2 squares from first two ranks, for horde
         (y2 === y1 + 2 * step && (color === 'white' ? y1 <= 1 : y1 >= 6))) &&
-      (premoveThroughFriendlies ||
-        (!squaresFriendlyPiecesBetween(x1, y1, x2, y2 + step, pieces, color).length &&
-          squaresFriendlyPiecesBetween(x1, y1, x2, y2 + step, pieces, util.opposite(color)).length <= 1))
+      isPathClearEnoughForPremove(x1, y1, x2, y2 + step, pieces, color, premoveThroughFriendlies)
     );
   };
 
@@ -67,9 +60,7 @@ const bishop =
   ): Mobility =>
   (x1, y1, x2, y2) =>
     util.bishopDir(x1, y1, x2, y2) &&
-    (premoveThroughFriendlies ||
-      (noFriendliesBetweenOrJustOneEnPassantTarget(x1, y1, x2, y2, pieces, color, lastMove) &&
-        squaresFriendlyPiecesBetween(x1, y1, x2, y2, pieces, util.opposite(color)).length <= 1));
+    isPathClearEnoughForPremove(x1, y1, x2, y2, pieces, color, premoveThroughFriendlies, lastMove);
 
 const rook =
   (
@@ -80,9 +71,7 @@ const rook =
   ): Mobility =>
   (x1, y1, x2, y2) =>
     util.rookDir(x1, y1, x2, y2) &&
-    (premoveThroughFriendlies ||
-      (noFriendliesBetweenOrJustOneEnPassantTarget(x1, y1, x2, y2, pieces, color, lastMove) &&
-        squaresFriendlyPiecesBetween(x1, y1, x2, y2, pieces, util.opposite(color)).length <= 1));
+    isPathClearEnoughForPremove(x1, y1, x2, y2, pieces, color, premoveThroughFriendlies, lastMove);
 
 const queen =
   (
@@ -113,10 +102,11 @@ const king =
       (premoveThroughFriendlies ||
         /* The following checks if no non-rook friendly piece is in the way between the king and its castling destination.
          Note that for the Chess960 edge case of Kb1 "long castling", the check passes even if there is a piece in the way
-         on c1. But this is fine, since the king can always premove recapturing Ra1. */
-        squaresFriendlyPiecesBetween(x1, y1, x2 > x1 ? 7 : 1, y2, pieces, color).every(
-          s => pieces.get(s)!.role === 'rook',
-        )));
+         on c1. But this is fine, since premoving from b1 to a1 as a normal move would have already returned true. */
+        util
+          .squaresBetween(x1, y1, x2 > x1 ? 7 : 1, y2)
+          .map(s => pieces.get(s))
+          .every(p => !p || util.samePiece(p, { role: 'rook', color: color }))));
 
 const rookFilesOf = (pieces: cg.Pieces, color: cg.Color) => {
   const backrank = color === 'white' ? '1' : '8';
