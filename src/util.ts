@@ -48,7 +48,7 @@ export const timer = (): cg.Timer => {
   };
 };
 
-export const opposite = (c: cg.Color): cg.Color => c === 'white' ? 'black' : 'white';
+export const opposite = (c: cg.Color): cg.Color => (c === 'white' ? 'black' : 'white');
 
 export const distanceSq = (pos1: cg.Pos, pos2: cg.Pos): number =>
   (pos1[0] - pos2[0]) ** 2 + (pos1[1] - pos2[1]) ** 2;
@@ -56,8 +56,7 @@ export const distanceSq = (pos1: cg.Pos, pos2: cg.Pos): number =>
 export const samePiece = (p1: cg.Piece, p2: cg.Piece): boolean =>
   p1.role === p2.role && p1.color === p2.color;
 
-export const samePos = (p1: cg.Pos, p2: cg.Pos): boolean =>
-  p1[0] === p2[0] && p1[1] === p2[1]
+export const samePos = (p1: cg.Pos, p2: cg.Pos): boolean => p1[0] === p2[0] && p1[1] === p2[1];
 
 export const posToTranslate =
   (bounds: DOMRectReadOnly): ((pos: cg.Pos, asWhite: boolean) => cg.NumberPair) =>
@@ -125,7 +124,8 @@ export const squaresBetween = (x1: number, y1: number, x2: number, y2: number): 
   // Must be a straight or diagonal line
   if (dx && dy && Math.abs(dx) !== Math.abs(dy)) return [];
 
-  const stepX = Math.sign(dx), stepY = Math.sign(dy);
+  const stepX = Math.sign(dx),
+    stepY = Math.sign(dy);
   const squares: cg.Pos[] = [];
   let x = x1 + stepX,
     y = y1 + stepY;
