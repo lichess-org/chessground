@@ -93,7 +93,7 @@ const king =
     canCastle: boolean,
   ): Mobility =>
   (x1, y1, x2, y2) =>
-    (util.diff(x1, x2) < 2 && util.diff(y1, y2) < 2) ||
+    Math.max(util.diff(x1, x2), util.diff(y1, y2)) === 1 ||
     (canCastle &&
       y1 === y2 &&
       y1 === (color === 'white' ? 0 : 7) &&
@@ -145,7 +145,5 @@ export function premove(state: HeadlessState, key: cg.Key): cg.Key[] {
                     rookFilesOf(pieces, piece.color),
                     canCastle,
                   );
-  return util.allPos
-    .filter(pos2 => (pos[0] !== pos2[0] || pos[1] !== pos2[1]) && mobility(pos[0], pos[1], pos2[0], pos2[1]))
-    .map(util.pos2key);
+  return util.allPos.filter(pos2 => mobility(pos[0], pos[1], pos2[0], pos2[1])).map(util.pos2key);
 }

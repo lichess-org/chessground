@@ -48,16 +48,16 @@ export const timer = (): cg.Timer => {
   };
 };
 
-export const opposite = (c: cg.Color): cg.Color => (c === 'white' ? 'black' : 'white');
+export const opposite = (c: cg.Color): cg.Color => c === 'white' ? 'black' : 'white';
 
-export const distanceSq = (pos1: cg.Pos, pos2: cg.Pos): number => {
-  const dx = pos1[0] - pos2[0],
-    dy = pos1[1] - pos2[1];
-  return dx * dx + dy * dy;
-};
+export const distanceSq = (pos1: cg.Pos, pos2: cg.Pos): number =>
+  (pos1[0] - pos2[0]) ** 2 + (pos1[1] - pos2[1]) ** 2;
 
 export const samePiece = (p1: cg.Piece, p2: cg.Piece): boolean =>
   p1.role === p2.role && p1.color === p2.color;
+
+export const samePos = (p1: cg.Pos, p2: cg.Pos): boolean =>
+  p1[0] === p2[0] && p1[1] === p2[1]
 
 export const posToTranslate =
   (bounds: DOMRectReadOnly): ((pos: cg.Pos, asWhite: boolean) => cg.NumberPair) =>
@@ -106,20 +106,16 @@ export function computeSquareCenter(key: cg.Key, asWhite: boolean, bounds: DOMRe
 
 export const diff = (a: number, b: number): number => Math.abs(a - b);
 
-export const knightDir: cg.DirectionalCheck = (x1, y1, x2, y2) => {
-  const xd = diff(x1, x2);
-  const yd = diff(y1, y2);
-  return (xd === 1 && yd === 2) || (xd === 2 && yd === 1);
-};
+export const knightDir: cg.DirectionalCheck = (x1, y1, x2, y2) => diff(x1, x2) * diff(y1, y2) === 2;
 
-export const rookDir: cg.DirectionalCheck = (x1, y1, x2, y2) => x1 === x2 || y1 === y2;
+export const rookDir: cg.DirectionalCheck = (x1, y1, x2, y2) => (x1 === x2) !== (y1 === y2);
 
-export const bishopDir: cg.DirectionalCheck = (x1, y1, x2, y2) => diff(x1, x2) === diff(y1, y2);
+export const bishopDir: cg.DirectionalCheck = (x1, y1, x2, y2) => diff(x1, x2) === diff(y1, y2) && x1 !== x2;
 
 export const queenDir: cg.DirectionalCheck = (x1, y1, x2, y2) =>
   rookDir(x1, y1, x2, y2) || bishopDir(x1, y1, x2, y2);
 
-/** Return all board squares between (x1, y1) and (x2, y2) exclusive,
+/** Returns all board squares between (x1, y1) and (x2, y2) exclusive,
  *  along a straight line (rook or bishop path). Returns [] if not aligned, or none between.
  */
 export const squaresBetween = (x1: number, y1: number, x2: number, y2: number): cg.Key[] => {
@@ -129,10 +125,7 @@ export const squaresBetween = (x1: number, y1: number, x2: number, y2: number): 
   // Must be a straight or diagonal line
   if (dx && dy && Math.abs(dx) !== Math.abs(dy)) return [];
 
-  // Determine step direction
-  const stepX = dx === 0 ? 0 : dx > 0 ? 1 : -1;
-  const stepY = dy === 0 ? 0 : dy > 0 ? 1 : -1;
-
+  const stepX = Math.sign(dx), stepY = Math.sign(dy);
   const squares: cg.Pos[] = [];
   let x = x1 + stepX,
     y = y1 + stepY;
