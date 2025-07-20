@@ -8,6 +8,7 @@ import {
   computeSquareCenter,
   queenDir,
   knightDir,
+  samePos,
 } from './util.js';
 import { premove } from './premove.js';
 import * as cg from './types.js';
@@ -362,6 +363,7 @@ export function getSnappedKeyAtDomPos(
   const origPos = key2pos(orig);
   const validSnapPos = allPos.filter(
     pos2 =>
+      samePos(origPos, pos2) ||
       queenDir(origPos[0], origPos[1], pos2[0], pos2[1]) ||
       knightDir(origPos[0], origPos[1], pos2[0], pos2[1]),
   );
