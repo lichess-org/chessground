@@ -41,7 +41,23 @@ test('premoves are trimmed appropriately', () => {
   expect(new Set(premove(state, 'd6'))).toEqual(
     new Set(['e6', 'f6', 'g6', 'c6', 'b6', 'a6', 'd7', 'd8', 'd5', 'd4', 'd3', 'd2', 'd1']),
   );
-  // todo - test other pieces
+  expect(new Set(premove(state, 'h1'))).toEqual(
+    new Set(['h2', 'h3', 'h4', 'g1', 'f1', 'g2', 'f3', 'e4', 'd5', 'c6', 'b7']),
+  );
+  expect(new Set(premove(state, 'a4'))).toEqual(
+    new Set(['b3', 'b4', 'c4', 'd4', 'e4', 'f4', 'a5', 'a6', 'a3']),
+  );
+  expect(new Set(premove(state, 'c5'))).toEqual(
+    new Set(['c4', 'c3', 'd4', 'e3', 'd5', 'e5', 'f5', 'c6', 'b6', 'a7', 'b4']),
+  );
+  expect(new Set(premove(state, 'a8'))).toEqual(new Set(['b8', 'b7', 'a7']));
+  expect(new Set(premove(state, 'c8'))).toEqual(new Set(['e7', 'b6', 'a7']));
+  expect(new Set(premove(state, 'g4'))).toEqual(new Set(['h2', 'f6', 'e5', 'e3', 'f2']));
+  expect(new Set(premove(state, 'c2'))).toEqual(new Set(['e1', 'e3', 'd4', 'b4', 'a3', 'a1']));
+  expect(new Set(premove(state, 'b2'))).toEqual(new Set(['c1', 'a1', 'c3', 'd4', 'e5', 'f6', 'a3']));
+  expect(new Set(premove(state, 'c7'))).toEqual(new Set(['d8', 'b8', 'b6', 'a5']));
+
+  // todo - test more pieces
 
   expect(
     util.allKeys
