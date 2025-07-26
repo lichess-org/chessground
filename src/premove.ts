@@ -122,12 +122,15 @@ const isPathClearEnoughOfEnemiesForPremove = (ctx: MobilityContext): boolean => 
   const enemySquare = squaresOfEnemiesBetween[0];
   const enemy = ctx.enemies.get(enemySquare)!;
   if (enemy.role !== 'pawn') return true;
-  const squareAbove = util.squareShiftedVertically(enemySquare, enemy.color === 'white' ? 1 : -1);
-  const enemyPawnDests: cg.Key[] = [];
-  if (canEnemyPawnAdvanceToSquare(enemySquare, squareAbove, ctx)) enemyPawnDests.push(squareAbove);
-  enemyPawnDests.push(
+
+  const enemyStep = enemy.color === 'white' ? 1 : -1;
+  const squareAbove = util.squareShiftedVertically(enemySquare, enemyStep);
+  const enemyPawnDests: cg.Key[] = [
     ...util.adjacentSquares(squareAbove).filter(s => canEnemyPawnCaptureOnSquare(enemySquare, s, ctx)),
-  );
+    ...[squareAbove, util.squareShiftedVertically(squareAbove, enemyStep)].filter(s =>
+      canEnemyPawnAdvanceToSquare(enemySquare, s, ctx),
+    ),
+  ];
   const badSquares = [...squaresBetween, util.pos2key(ctx.pos1)];
   return enemyPawnDests.some(square => !badSquares.includes(square));
 };
