@@ -8,8 +8,10 @@ type MobilityContext = {
   allPieces: cg.Pieces;
   friendlies: cg.Pieces;
   enemies: cg.Pieces;
-  premoveThroughFriendlies: boolean;
+  unrestrictedPremoves: boolean;
   color: cg.Color;
+  canCastle: boolean;
+  rookFilesFriendlies: number[];
   lastMove: cg.Key[] | undefined;
 };
 
@@ -88,15 +90,12 @@ const canBeCapturedBySomeEnemyEnPassant = (
   return (
     piece.role === 'pawn' &&
     util.diff(srcPos[1], destPos[1]) === 2 &&
-    [1, -1].some(delta => {
-      const enemyPiece = enemies.get(util.pos2key([destPos[0] + delta, destPos[1]]));
-      return enemyPiece?.role === 'pawn';
-    })
+    [1, -1].some(delta => enemies.get(util.pos2key([destPos[0] + delta, destPos[1]]))?.role === 'pawn')
   );
 };
 
 const isPathClearEnoughOfFriendliesForPremove = (ctx: MobilityContext): boolean => {
-  if (ctx.premoveThroughFriendlies) return true;
+  if (ctx.unrestrictedPremoves) return true;
   const squaresBetween = util.squaresBetween(...ctx.pos1, ...ctx.pos2);
   const squaresOfFriendliesBetween = squaresBetween.filter(s => ctx.friendlies.get(s));
   return (
@@ -115,7 +114,7 @@ const isPathClearEnoughOfFriendliesForPremove = (ctx: MobilityContext): boolean 
 };
 
 const isPathClearEnoughOfEnemiesForPremove = (ctx: MobilityContext): boolean => {
-  if (ctx.premoveThroughFriendlies) return true;
+  if (ctx.unrestrictedPremoves) return true;
   const squaresBetween = util.squaresBetween(...ctx.pos1, ...ctx.pos2);
   const squaresOfEnemiesBetween = squaresBetween.filter(s => ctx.enemies.get(s));
   if (squaresOfEnemiesBetween.length > 1) return false;
@@ -146,8 +145,7 @@ const pawn: Mobility = (ctx: MobilityContext) => {
     );
   }
   if (ctx.pos2[1] !== ctx.pos1[1] + step) return false;
-  // todo - change name of premoveThroughFriendlies, since concept has expanded
-  if (ctx.premoveThroughFriendlies || isDestOccupiedByEnemy(ctx)) return true;
+  if (ctx.unrestrictedPremoves || isDestOccupiedByEnemy(ctx)) return true;
   if (isDestOccupiedByFriendly(ctx)) return isDestControlledByEnemy(ctx);
   else
     return (
@@ -164,73 +162,50 @@ const pawn: Mobility = (ctx: MobilityContext) => {
 
 const knight: Mobility = (ctx: MobilityContext) =>
   util.knightDir(...ctx.pos1, ...ctx.pos2) &&
-  (ctx.premoveThroughFriendlies || !isDestOccupiedByFriendly(ctx) || isFriendlyOnDestAndAttacked(ctx));
+  (ctx.unrestrictedPremoves || !isDestOccupiedByFriendly(ctx) || isFriendlyOnDestAndAttacked(ctx));
 
 const bishop: Mobility = (ctx: MobilityContext) =>
   util.bishopDir(...ctx.pos1, ...ctx.pos2) &&
   isPathClearEnoughForPremove(ctx) &&
-  (ctx.premoveThroughFriendlies || !isDestOccupiedByFriendly(ctx) || isFriendlyOnDestAndAttacked(ctx));
+  (ctx.unrestrictedPremoves || !isDestOccupiedByFriendly(ctx) || isFriendlyOnDestAndAttacked(ctx));
 
 const rook: Mobility = (ctx: MobilityContext) =>
   util.rookDir(...ctx.pos1, ...ctx.pos2) &&
   isPathClearEnoughForPremove(ctx) &&
-  (ctx.premoveThroughFriendlies || !isDestOccupiedByFriendly(ctx) || isFriendlyOnDestAndAttacked(ctx));
+  (ctx.unrestrictedPremoves || !isDestOccupiedByFriendly(ctx) || isFriendlyOnDestAndAttacked(ctx));
 
 const queen: Mobility = (ctx: MobilityContext) => bishop(ctx) || rook(ctx);
 
-const king =
-  (rookFiles: number[], canCastle: boolean): Mobility =>
-  (ctx: MobilityContext) =>
-    (util.kingDirNonCastling(...ctx.pos1, ...ctx.pos2) &&
-      (ctx.premoveThroughFriendlies || !isDestOccupiedByFriendly(ctx) || isFriendlyOnDestAndAttacked(ctx))) ||
-    (canCastle &&
-      ctx.pos1[1] === ctx.pos2[1] &&
-      ctx.pos1[1] === (ctx.color === 'white' ? 0 : 7) &&
-      ((ctx.pos1[0] === 4 &&
-        ((ctx.pos2[0] === 2 && rookFiles.includes(0)) || (ctx.pos2[0] === 6 && rookFiles.includes(7)))) ||
-        rookFiles.includes(ctx.pos2[0])) &&
-      (ctx.premoveThroughFriendlies ||
-        /* The following checks if no non-rook friendly piece is in the way between the king and its castling destination.
+const king: Mobility = (ctx: MobilityContext) =>
+  (util.kingDirNonCastling(...ctx.pos1, ...ctx.pos2) &&
+    (ctx.unrestrictedPremoves || !isDestOccupiedByFriendly(ctx) || isFriendlyOnDestAndAttacked(ctx))) ||
+  (ctx.canCastle &&
+    ctx.pos1[1] === ctx.pos2[1] &&
+    ctx.pos1[1] === (ctx.color === 'white' ? 0 : 7) &&
+    ((ctx.pos1[0] === 4 &&
+      ((ctx.pos2[0] === 2 && ctx.rookFilesFriendlies.includes(0)) ||
+        (ctx.pos2[0] === 6 && ctx.rookFilesFriendlies.includes(7)))) ||
+      ctx.rookFilesFriendlies.includes(ctx.pos2[0])) &&
+    (ctx.unrestrictedPremoves ||
+      /* The following checks if no non-rook friendly piece is in the way between the king and its castling destination.
          Note that for the Chess960 edge case of Kb1 "long castling", the check passes even if there is a piece in the way
          on c1. But this is fine, since premoving from b1 to a1 as a normal move would have already returned true. */
-        util
-          .squaresBetween(...ctx.pos1, ctx.pos2[0] > ctx.pos1[0] ? 7 : 1, ctx.pos2[1])
-          .map(s => ctx.allPieces.get(s))
-          .every(p => !p || util.samePiece(p, { role: 'rook', color: ctx.color }))));
-
-const rookFilesOf = (pieces: cg.Pieces, color: cg.Color) => {
-  const backrank = color === 'white' ? '1' : '8';
-  const files = [];
-  for (const [key, piece] of pieces) {
-    if (key[1] === backrank && piece.color === color && piece.role === 'rook') {
-      files.push(util.key2pos(key)[0]);
-    }
-  }
-  return files;
-};
+      util
+        .squaresBetween(...ctx.pos1, ctx.pos2[0] > ctx.pos1[0] ? 7 : 1, ctx.pos2[1])
+        .map(s => ctx.allPieces.get(s))
+        .every(p => !p || util.samePiece(p, { role: 'rook', color: ctx.color }))));
 
 export function premove(state: HeadlessState, key: cg.Key): cg.Key[] {
   const pieces = state.pieces,
     canCastle = state.premovable.castle,
-    premoveThroughFriendlies = !!state.premovable.premoveThroughFriendlies;
+    unrestrictedPremoves = !!state.premovable.unrestrictedPremoves;
   const piece = pieces.get(key);
   if (!piece || piece.color === state.turnColor) return [];
-  const friendlies = new Map([...pieces].filter(([_, p]) => p.color === piece.color));
-  const enemies = new Map([...pieces].filter(([_, p]) => p.color === util.opposite(piece.color)));
-  const pos = util.key2pos(key),
-    r = piece.role,
-    mobility: Mobility =
-      r === 'pawn'
-        ? pawn
-        : r === 'knight'
-          ? knight
-          : r === 'bishop'
-            ? bishop
-            : r === 'rook'
-              ? rook
-              : r === 'queen'
-                ? queen
-                : king(rookFilesOf(pieces, piece.color), canCastle);
+  const color = piece.color,
+    friendlies = new Map([...pieces].filter(([_, p]) => p.color === color)),
+    enemies = new Map([...pieces].filter(([_, p]) => p.color === util.opposite(color))),
+    pos = util.key2pos(key),
+    mobility: Mobility = { pawn, knight, bishop, rook, queen, king }[piece.role];
   return util.allPos
     .filter(pos2 =>
       mobility({
@@ -239,8 +214,14 @@ export function premove(state: HeadlessState, key: cg.Key): cg.Key[] {
         allPieces: pieces,
         friendlies: friendlies,
         enemies: enemies,
-        premoveThroughFriendlies: premoveThroughFriendlies,
-        color: piece.color,
+        unrestrictedPremoves: unrestrictedPremoves,
+        color: color,
+        canCastle: canCastle,
+        rookFilesFriendlies: Array.from(pieces)
+          .filter(
+            ([k, p]) => k[1] === (color === 'white' ? '1' : '8') && p.color === color && p.role === 'rook',
+          )
+          .map(([k]) => util.key2pos(k)[0]),
         lastMove: state.lastMove,
       }),
     )
