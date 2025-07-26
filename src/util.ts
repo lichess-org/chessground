@@ -2,9 +2,7 @@ import * as cg from './types.js';
 
 export const invRanks: readonly cg.Rank[] = [...cg.ranks].reverse();
 
-export const allKeys: readonly cg.Key[] = Array.prototype.concat(
-  ...cg.files.map(c => cg.ranks.map(r => c + r)),
-);
+export const allKeys: readonly cg.Key[] = cg.files.flatMap(f => cg.ranks.map(r => (f + r) as cg.Key));
 
 export const pos2key = (pos: cg.Pos): cg.Key => allKeys[8 * pos[0] + pos[1]];
 
@@ -114,6 +112,22 @@ export const bishopDir: cg.DirectionalCheck = (x1, y1, x2, y2) => diff(x1, x2) =
 export const queenDir: cg.DirectionalCheck = (x1, y1, x2, y2) =>
   rookDir(x1, y1, x2, y2) || bishopDir(x1, y1, x2, y2);
 
+export const kingDirNonCastling: cg.DirectionalCheck = (x1, y1, x2, y2) =>
+  Math.max(diff(x1, x2), diff(y1, y2)) === 1;
+
+export const pawnDirCapture = (x1: number, y1: number, x2: number, y2: number, isDirectionUp: boolean) =>
+  diff(x1, x2) === 1 && y2 === y1 + (isDirectionUp ? 1 : -1);
+
+export const pawnDirAdvance = (x1: number, y1: number, x2: number, y2: number, isDirectionUp: boolean) => {
+  const step = isDirectionUp ? 1 : -1;
+  return (
+    x1 === x2 &&
+    (y2 === y1 + step ||
+      // allow 2 squares from first two ranks, for horde
+      (y2 === y1 + 2 * step && (isDirectionUp ? y1 <= 1 : y1 >= 6)))
+  );
+};
+
 /** Returns all board squares between (x1, y1) and (x2, y2) exclusive,
  *  along a straight line (rook or bishop path). Returns [] if not aligned, or none between.
  */
@@ -135,4 +149,18 @@ export const squaresBetween = (x1: number, y1: number, x2: number, y2: number): 
     y += stepY;
   }
   return squares.map(sq => pos2key(sq));
+};
+
+export const adjacentSquares = (square: cg.Key): cg.Key[] => {
+  const pos = key2pos(square);
+  const adjacentSquares: cg.Pos[] = [];
+  if (pos[0] > 0) adjacentSquares.push([pos[0] - 1, pos[1]]);
+  if (pos[0] < 7) adjacentSquares.push([pos[0] + 1, pos[1]]);
+  return adjacentSquares.map(pos2key);
+};
+
+export const squareShiftedVertically = (square: cg.Key, delta: number): cg.Key => {
+  const pos = key2pos(square);
+  pos[1] += delta;
+  return pos2key(pos);
 };
