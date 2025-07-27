@@ -4,31 +4,58 @@ import { defaults, HeadlessState } from '../src/state';
 import * as fen from '../src/fen';
 import * as util from '../src/util';
 
+const diagonallyOpposite = (square: cg.Key): cg.Key =>
+  util.pos2key(util.key2pos(square).map(n => 7 - n) as cg.Pos);
+
+const invertPieces = (pieces: cg.Pieces): cg.Pieces =>
+  new Map(
+    [...pieces].map(([key, piece]) => [
+      diagonallyOpposite(key),
+      { role: piece.role, color: util.opposite(piece.color) },
+    ]),
+  );
+
 const makeState = (
-  fenOfPos: cg.FEN,
+  pieces: cg.Pieces,
   trimPremoves: boolean,
   lastMove: cg.Key[] | undefined,
+  turnColor: cg.Color,
 ): HeadlessState => {
   const state = defaults();
-  state.pieces = fen.read(fenOfPos);
+  state.pieces = pieces;
   if (!trimPremoves) state.premovable.unrestrictedPremoves = true;
   state.lastMove = lastMove;
-  state.turnColor = fenOfPos.includes(' w ') ? 'white' : 'black';
+  state.turnColor = turnColor;
   return state;
 };
 
 const testPosition = (
-  fenOfPos: cg.FEN,
+  pieces: cg.Pieces,
+  turnColor: cg.Color,
   lastMove: cg.Key[] | undefined,
   expectedPremoves: Map<cg.Key, Set<cg.Key>>,
+  checkInverseToo: boolean,
 ): void => {
-  const state = makeState(fenOfPos, true, lastMove);
+  const state = makeState(pieces, true, lastMove, turnColor);
   for (const [from, expectedDests] of expectedPremoves) {
     expect(new Set(premove(state, from))).toEqual(expectedDests);
   }
   expect(
     util.allKeys.filter(sq => !expectedPremoves.has(sq)).every(sq => !premove(state, sq as cg.Key).length),
   ).toEqual(true);
+  if (checkInverseToo)
+    testPosition(
+      invertPieces(pieces),
+      util.opposite(turnColor),
+      lastMove?.map(sq => diagonallyOpposite(sq)),
+      new Map(
+        [...expectedPremoves].map(([start, dests]) => [
+          diagonallyOpposite(start),
+          new Set(Array.from(dests, diagonallyOpposite)),
+        ]),
+      ),
+      false,
+    );
 };
 
 test('premoves are trimmed appropriately', () => {
@@ -55,8 +82,10 @@ test('premoves are trimmed appropriately', () => {
     ['a3', new Set([])],
   ]);
   testPosition(
-    'k1n2r1r/2bP2p1/3r3p/Ppq1pPr1/qP4n1/p3r1P1/PbnP2KP/R4r1q w - - 0 1',
+    fen.read('k1n2r1r/2bP2p1/3r3p/Ppq1pPr1/qP4n1/p3r1P1/PbnP2KP/R4r1q w - - 0 1'),
+    'white',
     ['e7', 'e5'],
     expectedPremoves,
+    true,
   );
 });
