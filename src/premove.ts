@@ -198,6 +198,8 @@ const king: Mobility = (ctx: MobilityContext) =>
         .map(s => ctx.allPieces.get(s))
         .every(p => !p || util.samePiece(p, { role: 'rook', color: ctx.color }))));
 
+const mobilityByRole = { pawn, knight, bishop, rook, queen, king };
+
 export function premove(state: HeadlessState, key: cg.Key): cg.Key[] {
   const pieces = state.pieces,
     canCastle = state.premovable.castle,
@@ -208,25 +210,21 @@ export function premove(state: HeadlessState, key: cg.Key): cg.Key[] {
     friendlies = new Map([...pieces].filter(([_, p]) => p.color === color)),
     enemies = new Map([...pieces].filter(([_, p]) => p.color === util.opposite(color))),
     pos = util.key2pos(key),
-    mobility: Mobility = { pawn, knight, bishop, rook, queen, king }[piece.role];
-  return util.allPos
-    .filter(pos2 =>
-      mobility({
-        pos1: pos,
-        pos2: pos2,
-        allPieces: pieces,
-        friendlies: friendlies,
-        enemies: enemies,
-        unrestrictedPremoves: unrestrictedPremoves,
-        color: color,
-        canCastle: canCastle,
-        rookFilesFriendlies: Array.from(pieces)
-          .filter(
-            ([k, p]) => k[1] === (color === 'white' ? '1' : '8') && p.color === color && p.role === 'rook',
-          )
-          .map(([k]) => util.key2pos(k)[0]),
-        lastMove: state.lastMove,
-      }),
-    )
-    .map(util.pos2key);
+    mobility: Mobility = mobilityByRole[piece.role],
+    ctx = {
+      pos1: pos,
+      allPieces: pieces,
+      friendlies: friendlies,
+      enemies: enemies,
+      unrestrictedPremoves: unrestrictedPremoves,
+      color: color,
+      canCastle: canCastle,
+      rookFilesFriendlies: Array.from(pieces)
+        .filter(
+          ([k, p]) => k[1] === (color === 'white' ? '1' : '8') && p.color === color && p.role === 'rook',
+        )
+        .map(([k]) => util.key2pos(k)[0]),
+      lastMove: state.lastMove,
+    };
+  return util.allPos.filter(pos2 => mobility({ ...ctx, pos2 })).map(util.pos2key);
 }
