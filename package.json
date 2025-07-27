@@ -36,7 +36,8 @@
     "check-format": "prettier --check .",
     "bundle": "esbuild src/chessground.ts --bundle --format=esm --outfile=dist/chessground.min.js --minify",
     "dist": "$npm_execpath run compile && $npm_execpath run bundle",
-    "test": "vitest"
+    "test": "vitest run",
+    "test:watch": "vitest"
   },
   "files": [
     "/dist/*.js",

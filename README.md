@@ -113,4 +113,6 @@ To run tests:
 
 ```sh
 pnpm test
+## or
+pnpm test:watch
 ```
