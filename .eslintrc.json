@@ -2,7 +2,7 @@
   "root": true,
   "env": {
     "browser": true,
-    "es2017": true
+    "es2020": true
   },
   "parser": "@typescript-eslint/parser",
   "parserOptions": {
