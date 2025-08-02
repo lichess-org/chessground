@@ -20,4 +20,5 @@ jobs:
       - uses: github/codeql-action/analyze@v3
       - run: pnpm run lint
       - run: pnpm run check-format
+      - run: pnpm run test
       - run: pnpm run dist

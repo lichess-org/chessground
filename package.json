@@ -1,6 +1,6 @@
 {
   "name": "@lichess-org/chessground",
-  "version": "9.3.1",
+  "version": "9.4.0",
   "//": "version is managed by the build system",
   "description": "lichess.org chess ui",
   "type": "module",
@@ -36,7 +36,8 @@
     "check-format": "prettier --check .",
     "bundle": "esbuild src/chessground.ts --bundle --format=esm --outfile=dist/chessground.min.js --minify",
     "dist": "$npm_execpath run compile && $npm_execpath run bundle",
-    "test": "vitest"
+    "test": "vitest run",
+    "test:watch": "vitest"
   },
   "files": [
     "/dist/*.js",
