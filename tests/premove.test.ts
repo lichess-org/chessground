@@ -99,7 +99,7 @@ test('anticipate all en passant captures if no last move', () => {
     ['c4', new Set(['c5'])],
     ['f4', new Set([])],
     ['g5', new Set(['g6'])],
-    ['d3', new Set(['d4', 'e4'])]
+    ['d3', new Set(['d4', 'e4'])],
   ]);
   testPosition(
     fen.read('8/8/8/5RPp/1pP1pP2/3Pp2R/B6B/8 b - - 0 1'),
@@ -113,7 +113,7 @@ test('anticipate all en passant captures if no last move', () => {
 test('horde no en passant for first to third rank', () => {
   const expectedPremoves = new Map<cg.Key, Set<cg.Key>>([
     ['f1', new Set(['f2', 'f3'])],
-    ['g3', new Set(['g4', 'h4'])]
+    ['g3', new Set(['g4', 'h4'])],
   ]);
   testPosition(
     fen.read('rnbqkbnr/ppppppp1/8/8/8/6Pp/8/5P2 w kq - 0 1'),
