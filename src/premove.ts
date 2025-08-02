@@ -78,19 +78,19 @@ const isFriendlyOnDestAndAttacked = (ctx: MobilityContext): boolean =>
     isDestControlledByEnemy(ctx));
 
 const canBeCapturedBySomeEnemyEnPassant = (
-  squareOfFriendlyPawn: cg.Key,
+  potentialSquareOfFriendlyPawn: cg.Key,
   friendlies: cg.Pieces,
   enemies: cg.Pieces,
   lastMove?: cg.Key[],
 ): boolean => {
-  if (!lastMove || squareOfFriendlyPawn !== lastMove[1]) return false;
-  const srcPos = util.key2pos(lastMove[0]),
-    destPos = util.key2pos(lastMove[1]),
-    piece = friendlies.get(lastMove[1])!;
+  if (lastMove && potentialSquareOfFriendlyPawn !== lastMove[1]) return false;
+  const pos = util.key2pos(potentialSquareOfFriendlyPawn);
+  const friendly = friendlies.get(potentialSquareOfFriendlyPawn);
   return (
-    piece.role === 'pawn' &&
-    util.diff(srcPos[1], destPos[1]) === 2 &&
-    [1, -1].some(delta => enemies.get(util.pos2key([destPos[0] + delta, destPos[1]]))?.role === 'pawn')
+    friendly?.role === 'pawn' &&
+    pos[1] === (friendly.color === 'white' ? 3 : 4) &&
+    (!lastMove || util.diff(util.key2pos(lastMove[0])[1], pos[1]) === 2) &&
+    [1, -1].some(delta => enemies.get(util.pos2key([pos[0] + delta, pos[1]]))?.role === 'pawn')
   );
 };
 
