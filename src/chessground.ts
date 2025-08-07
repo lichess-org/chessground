@@ -27,7 +27,7 @@ export function Chessground(element: HTMLElement, config?: Config): Api {
       redrawNow = (skipSvg?: boolean): void => {
         render(state);
         if (elements.autoPieces) autoPieces.render(state, elements.autoPieces);
-        if (!skipSvg && elements.svg) svg.renderSvg(state, elements.svg, elements.customSvg!);
+        if (!skipSvg && elements.shapes) svg.renderSvg(state, elements);
       },
       onResize = (): void => {
         updateBounds(state);

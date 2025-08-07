@@ -37,8 +37,10 @@ export interface Elements {
   wrap: HTMLElement;
   container: HTMLElement;
   ghost?: HTMLElement;
-  svg?: SVGElement;
-  customSvg?: SVGElement;
+  shapes?: SVGElement;
+  custom?: SVGElement;
+  shapesBelow?: SVGElement;
+  customBelow?: SVGElement;
   autoPieces?: HTMLElement;
 }
 export interface Dom {

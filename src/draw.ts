@@ -9,13 +9,14 @@ export interface DrawShape {
   brush?: string; // if no brush, no shape. label moved to top right of square
   modifiers?: DrawModifiers;
   piece?: DrawShapePiece;
-  customSvg?: { html: string; center?: 'orig' | 'dest' | 'label' }; // 100 x 100 viewbox cenetered at [50,50]
-  label?: { text: string; fill?: string }; // fill is in '#rrggbb' format
+  customSvg?: { html: string; center?: 'orig' | 'dest' | 'label' }; // midpoint location of 100 x 100 viewbox
+  label?: { text: string; fill?: string }; // '#rrggbb' or '#rgb'
+  below?: boolean; // render to board plane, default is false (above pieces)
 }
 
 export interface DrawModifiers {
   lineWidth?: number;
-  hilite?: boolean;
+  hilite?: string; // '#rrggbb'/'#rgb' - only implemented for arrows
 }
 
 export interface DrawShapePiece {

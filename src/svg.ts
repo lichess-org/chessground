@@ -4,61 +4,7 @@ import { Drawable, DrawShape, DrawShapePiece, DrawBrush, DrawBrushes, DrawModifi
 import { SyncableShape, Hash } from './sync.js';
 import * as cg from './types.js';
 
-type CustomBrushes = Map<string, DrawBrush>; // by hash
-type Svg = { el: SVGElement; isCustom?: boolean };
-type AngleSlots = Set<number>; // arrow angle slots for label positioning
-type ArrowDests = Map<cg.Key | undefined, AngleSlots>; // angle slots per dest
-
-const hilites: { [name: string]: DrawBrush } = {
-  hilitePrimary: { key: 'hilitePrimary', color: '#3291ff', opacity: 1, lineWidth: 1 },
-  hiliteWhite: { key: 'hiliteWhite', color: '#ffffff', opacity: 1, lineWidth: 1 },
-};
-
-export { createElement, setAttributes };
-
-export function createDefs(): Element {
-  const defs = createElement('defs');
-  const filter = setAttributes(createElement('filter'), { id: 'cg-filter-blur' });
-  filter.appendChild(setAttributes(createElement('feGaussianBlur'), { stdDeviation: '0.019' }));
-  defs.appendChild(filter);
-  return defs;
-}
-
-export function renderSvg(state: State, shapesEl: SVGElement, customsEl: SVGElement): void {
-  const d = state.drawable,
-    curD = d.current,
-    cur = curD && curD.mouseSq ? (curD as DrawShape) : undefined,
-    dests: ArrowDests = new Map(),
-    bounds = state.dom.bounds(),
-    nonPieceAutoShapes = d.autoShapes.filter(autoShape => !autoShape.piece);
-
-  for (const s of d.shapes.concat(nonPieceAutoShapes).concat(cur ? [cur] : [])) {
-    if (!s.dest) continue;
-    const sources = dests.get(s.dest) ?? new Set(),
-      from = pos2user(orient(key2pos(s.orig), state.orientation), bounds),
-      to = pos2user(orient(key2pos(s.dest), state.orientation), bounds);
-    sources.add(moveAngle(from, to));
-    dests.set(s.dest, sources);
-  }
-  const shapes: SyncableShape[] = d.shapes.concat(nonPieceAutoShapes).map((s: DrawShape) => {
-    return {
-      shape: s,
-      current: false,
-      hash: shapeHash(s, isShort(s.dest, dests), false, bounds),
-    };
-  });
-  if (cur)
-    shapes.push({
-      shape: cur,
-      current: true,
-      hash: shapeHash(cur, isShort(cur.dest, dests), true, bounds),
-    });
-
-  const fullHash = shapes.map(sc => sc.hash).join(';');
-  if (fullHash === state.drawable.prevSvgHash) return;
-  state.drawable.prevSvgHash = fullHash;
-
-  /*
+/*
     -- DOM hierarchy --
     <svg class="cg-shapes">      (<= svg)
       <defs>
@@ -75,66 +21,123 @@ export function renderSvg(state: State, shapesEl: SVGElement, customsEl: SVGElem
     </svg>
   */
 
-  const defsEl = shapesEl.querySelector('defs') as SVGElement;
+type CustomBrushes = Map<string, DrawBrush>; // by hash
+type Svg = { el: SVGElement; isCustom?: boolean };
+type AngleSlots = Set<number>; // arrow angle slots for label positioning
+type ArrowDests = Map<cg.Key | undefined, AngleSlots>; // angle slots per dest
 
-  syncDefs(d, shapes, defsEl);
-  syncShapes(shapes, shapesEl.querySelector('g')!, customsEl.querySelector('g')!, s =>
-    renderShape(state, s, d.brushes, dests, bounds),
-  );
+export { createElement, setAttributes };
+
+export function createDefs(): Element {
+  const defs = createElement('defs');
+  const filter = setAttributes(createElement('filter'), { id: 'cg-filter-blur' });
+  filter.appendChild(setAttributes(createElement('feGaussianBlur'), { stdDeviation: '0.013' }));
+  defs.appendChild(filter);
+  return defs;
+}
+
+export function renderSvg(state: State, els: cg.Elements): void {
+  const d = state.drawable,
+    curD = d.current,
+    cur = curD && curD.mouseSq ? (curD as DrawShape) : undefined,
+    dests: ArrowDests = new Map(),
+    bounds = state.dom.bounds(),
+    nonPieceAutoShapes = d.autoShapes.filter(autoShape => !autoShape.piece);
+
+  for (const s of d.shapes.concat(nonPieceAutoShapes).concat(cur ? [cur] : [])) {
+    if (!s.dest) continue;
+    const sources = dests.get(s.dest) ?? new Set(),
+      from = pos2user(orient(key2pos(s.orig), state.orientation), bounds),
+      to = pos2user(orient(key2pos(s.dest), state.orientation), bounds);
+    sources.add(moveAngle(from, to));
+    dests.set(s.dest, sources);
+  }
+  const shapes: SyncableShape[] = [];
+
+  for (const s of d.shapes.concat(nonPieceAutoShapes)) {
+    shapes.push({
+      shape: s,
+      current: false,
+      hash: shapeHash(s, isShort(s.dest, dests), false, bounds),
+    });
+  }
+  if (cur)
+    shapes.push({
+      shape: cur,
+      current: true,
+      hash: shapeHash(cur, isShort(cur.dest, dests), true, bounds),
+    });
+
+  const fullHash = shapes.map(sc => sc.hash).join(';');
+  if (fullHash === state.drawable.prevSvgHash) return;
+
+  state.drawable.prevSvgHash = fullHash;
+  syncDefs(d, shapes, els);
+  syncShapes(shapes, els, s => renderShape(state, s, d.brushes, dests, bounds));
 }
 
 // append only. Don't try to update/remove.
-function syncDefs(d: Drawable, shapes: SyncableShape[], defsEl: SVGElement) {
-  const brushes: CustomBrushes = new Map();
-  let brush: DrawBrush;
-  for (const s of shapes.filter(s => s.shape.dest && s.shape.brush)) {
-    brush = makeCustomBrush(d.brushes[s.shape.brush!], s.shape.modifiers);
-    if (s.shape.modifiers?.hilite) brushes.set(hilite(brush).key, hilite(brush));
-    brushes.set(brush.key, brush);
-  }
-  const keysInDom = new Set();
-  let el: SVGElement | undefined = defsEl.firstElementChild as SVGElement;
-  while (el) {
-    keysInDom.add(el.getAttribute('cgKey'));
-    el = el.nextElementSibling as SVGElement | undefined;
-  }
-  for (const [key, brush] of brushes.entries()) {
-    if (!keysInDom.has(key)) defsEl.appendChild(renderMarker(brush));
+function syncDefs(d: Drawable, shapes: SyncableShape[], els: cg.Elements) {
+  for (const shapesEl of [els.shapes, els.shapesBelow]) {
+    const defsEl = shapesEl!.querySelector('defs') as SVGElement;
+    const thisPlane = shapes.filter(s => (shapesEl === els.shapesBelow) === !!s.shape.below);
+    const brushes: CustomBrushes = new Map();
+    for (const s of thisPlane.filter(s => s.shape.dest && s.shape.brush)) {
+      const brush = makeCustomBrush(d.brushes[s.shape.brush!], s.shape.modifiers);
+      const { key, color } = hiliteOf(s.shape);
+      if (key && color) brushes.set(key, { key, color, opacity: 1, lineWidth: 1 });
+      brushes.set(brush.key, brush);
+    }
+    const keysInDom = new Set();
+    let el: SVGElement | undefined = defsEl.firstElementChild as SVGElement;
+    while (el) {
+      keysInDom.add(el.getAttribute('cgKey'));
+      el = el.nextElementSibling as SVGElement | undefined;
+    }
+    for (const [key, brush] of brushes.entries()) {
+      if (!keysInDom.has(key)) defsEl.appendChild(renderMarker(brush));
+    }
   }
 }
 
 function syncShapes(
-  syncables: SyncableShape[],
-  shapes: Element,
-  customs: Element,
+  shapes: SyncableShape[],
+  els: cg.Elements,
   renderShape: (shape: SyncableShape) => Svg[],
 ): void {
-  const hashesInDom = new Map();
+  for (const [shapesEl, customEl] of [
+    [els.shapes, els.custom],
+    [els.shapesBelow, els.customBelow],
+  ]) {
+    const [shapesG, customG] = [shapesEl, customEl].map(el => el!.querySelector('g') as SVGElement);
+    const thisPlane = shapes.filter(s => (shapesEl === els.shapesBelow) === !!s.shape.below);
+    const hashesInDom = new Map();
 
-  for (const sc of syncables) hashesInDom.set(sc.hash, false);
-  for (const root of [shapes, customs]) {
-    const toRemove: SVGElement[] = [];
-    let el: SVGElement | undefined = root.firstElementChild as SVGElement,
-      elHash: Hash | null;
-    while (el) {
-      elHash = el.getAttribute('cgHash') as Hash;
-      if (hashesInDom.has(elHash)) hashesInDom.set(elHash, true);
-      else toRemove.push(el);
-      el = el.nextElementSibling as SVGElement | undefined;
+    for (const sc of thisPlane) hashesInDom.set(sc.hash, false);
+    for (const root of [shapesG, customG]) {
+      const toRemove: SVGElement[] = [];
+      let el: SVGElement | undefined = root.firstElementChild as SVGElement,
+        elHash: Hash | null;
+      while (el) {
+        elHash = el.getAttribute('cgHash') as Hash;
+        if (hashesInDom.has(elHash)) hashesInDom.set(elHash, true);
+        else toRemove.push(el);
+        el = el.nextElementSibling as SVGElement | undefined;
+      }
+      for (const el of toRemove) root.removeChild(el);
     }
-    for (const el of toRemove) root.removeChild(el);
-  }
-  // insert shapes that are not yet in dom
-  for (const sc of syncables.filter(s => !hashesInDom.get(s.hash))) {
-    for (const svg of renderShape(sc)) {
-      if (svg.isCustom) customs.appendChild(svg.el);
-      else shapes.appendChild(svg.el);
+    // insert shapes that are not yet in dom
+    for (const sc of thisPlane.filter(s => !hashesInDom.get(s.hash))) {
+      for (const svg of renderShape(sc)) {
+        if (svg.isCustom) customG.appendChild(svg.el);
+        else shapesG.appendChild(svg.el);
+      }
     }
   }
 }
 
 function shapeHash(
-  { orig, dest, brush, piece, modifiers, customSvg, label }: DrawShape,
+  { orig, dest, brush, piece, modifiers, customSvg, label, below }: DrawShape,
   shorten: boolean,
   current: boolean,
   bounds: DOMRectReadOnly,
@@ -152,6 +155,7 @@ function shapeHash(
     modifiers && modifiersHash(modifiers),
     customSvg && `custom-${textHash(customSvg.html)},${customSvg.center?.[0] ?? 'o'}`,
     label && `label-${textHash(label.text)}`,
+    below && 'below',
   ]
     .filter(x => x)
     .join(',');
@@ -162,7 +166,7 @@ function pieceHash(piece: DrawShapePiece): Hash {
 }
 
 function modifiersHash(m: DrawModifiers): Hash {
-  return [m.lineWidth, m.hilite && '*'].filter(x => x).join(',');
+  return [m.lineWidth, m.hilite].filter(x => x).join(',');
 }
 
 function textHash(s: string): Hash {
@@ -231,12 +235,6 @@ function renderCircle(
   });
 }
 
-function hilite(brush: DrawBrush): DrawBrush {
-  return ['#ffffff', '#fff', 'white'].includes(brush.color)
-    ? hilites['hilitePrimary']
-    : hilites['hiliteWhite'];
-}
-
 function renderArrow(
   s: DrawShape,
   brush: DrawBrush,
@@ -252,11 +250,12 @@ function renderArrow(
       angle = Math.atan2(dy, dx),
       xo = Math.cos(angle) * m,
       yo = Math.sin(angle) * m;
+    const hilite = hiliteOf(s);
     return setAttributes(createElement('line'), {
-      stroke: isHilite ? hilite(brush).color : brush.color,
-      'stroke-width': lineWidth(brush, current) + (isHilite ? 0.04 : 0),
+      stroke: isHilite ? hilite.color : brush.color,
+      'stroke-width': lineWidth(brush, current) * (isHilite ? 1.14 : 1),
       'stroke-linecap': 'round',
-      'marker-end': `url(#arrowhead-${isHilite ? hilite(brush).key : brush.key})`,
+      'marker-end': `url(#arrowhead-${isHilite ? hilite.key : brush.key})`,
       opacity: s.modifiers?.hilite ? 1 : opacity(brush, current),
       x1: from[0],
       y1: from[1],
@@ -266,7 +265,7 @@ function renderArrow(
   }
   if (!s.modifiers?.hilite) return renderLine(false);
 
-  const g = createElement('g');
+  const g = setAttributes(createElement('g'), { opacity: brush.opacity });
   const blurred = setAttributes(createElement('g'), { filter: 'url(#cg-filter-blur)' });
   blurred.appendChild(filterBox(from, to));
   blurred.appendChild(renderLine(true));
@@ -369,6 +368,11 @@ function circleWidth(): [number, number] {
 
 function lineWidth(brush: DrawBrush, current: boolean): number {
   return ((brush.lineWidth || 10) * (current ? 0.85 : 1)) / 64;
+}
+
+function hiliteOf(shape: DrawShape): { key?: string; color?: string } {
+  const hilite = shape.modifiers?.hilite;
+  return { key: hilite && `hilite-${hilite.replace('#', '')}`, color: hilite };
 }
 
 function opacity(brush: DrawBrush, current: boolean): number {
