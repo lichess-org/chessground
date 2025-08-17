@@ -92,7 +92,9 @@ piece.fading {
 
 .cg-wrap cg-auto-pieces,
 .cg-wrap .cg-shapes,
-.cg-wrap .cg-custom-svgs {
+.cg-wrap .cg-custom-svgs,
+.cg-wrap .cg-shapes-below,
+.cg-wrap .cg-custom-below {
   overflow: visible;
   position: absolute;
   top: 0px;
@@ -116,12 +118,22 @@ piece.fading {
   z-index: 2;
 }
 
+.cg-wrap .cg-shapes-below {
+  overflow: hidden;
+  z-index: 1;
+}
+
+.cg-wrap .cg-custom-below {
+  z-index: 1;
+}
+
 .cg-wrap .cg-custom-svgs {
   /* over piece.anim = 8, but under piece.dragging = 11 */
   z-index: 9;
 }
 
-.cg-wrap .cg-custom-svgs svg {
+.cg-wrap .cg-custom-svgs svg,
+.cg-wrap .cg-custom-below svg {
   overflow: visible;
 }
 
