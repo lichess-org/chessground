@@ -86,7 +86,7 @@ export function start(s: State, e: cg.MouchEvent): void {
 function pieceCloseTo(s: State, pos: cg.NumberPair): boolean {
   const asWhite = board.whitePov(s),
     bounds = s.dom.bounds(),
-    radiusSq = Math.pow(bounds.width / 16, 2) * 2;
+    radiusSq = Math.pow((s.touchIgnoreRatio * bounds.width) / 16, 2) * 2;
   for (const key of s.pieces.keys()) {
     const center = util.computeSquareCenter(key, asWhite, bounds);
     if (util.distanceSq(center, pos) <= radiusSq) return true;
