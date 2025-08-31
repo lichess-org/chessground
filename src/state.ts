@@ -21,7 +21,7 @@ export interface HeadlessState {
   addPieceZIndex: boolean; // adds z-index values to pieces (for 3D)
   addDimensionsCssVarsTo?: HTMLElement; // add ---cg-width and ---cg-height CSS vars containing the board's dimensions to this element
   blockTouchScroll: boolean; // block scrolling via touch dragging on the board
-  touchIgnoreRatio: number; // ignore touches inside a radius of an occupied square, in units of its circumradius
+  touchIgnoreRatio: number; // ignore touches within a radius of an occupied square, in units of its circumradius
   pieceKey: boolean; // add a data-key attribute to piece elements
   trustAllEvents?: boolean; // disable checking for human only input (e.isTrusted)
   highlight: {

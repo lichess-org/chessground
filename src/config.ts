@@ -19,7 +19,7 @@ export interface Config {
   addPieceZIndex?: boolean; // adds z-index values to pieces (for 3D)
   addDimensionsCssVarsTo?: HTMLElement; // add ---cg-width and ---cg-height CSS vars containing the board's dimensions to this element
   blockTouchScroll?: boolean; // block scrolling via touch dragging on the board, e.g. for coordinate training
-  // pieceKey: boolean; // add a data-key attribute to piece elements
+  touchIgnoreRatio?: number; // ignore touches within a radius of an occupied square, in units of its circumradius
   trustAllEvents?: boolean; // disable checking for human only input (e.isTrusted)
   highlight?: {
     lastMove?: boolean; // add last-move class to squares
