@@ -150,13 +150,12 @@ piece.fading {
   font-weight: bold;
 }
 
-
 .cg-wrap coords.ranks {
-  top: 1px;        
-  right: 0;       
+  top: 1px;
+  right: 0;
   flex-flow: column-reverse;
   height: 100%;
-  width: .8em;    
+  width: 0.8em;
 }
 
 .cg-wrap coords.ranks.black {
@@ -166,17 +165,16 @@ piece.fading {
 .cg-wrap coords.ranks.left {
   left: -15px;
   align-items: flex-end;
-  justify-content: baseline
+  justify-content: baseline;
 }
 
-
 .cg-wrap coords.files {
-  bottom: 0px;    
-  left: 0;          
-  text-align: left; 
+  bottom: 0px;
+  left: 0;
+  text-align: left;
   flex-flow: row;
   width: 100%;
-  height: 1.4em;   
+  height: 1.4em;
   text-transform: uppercase;
 }
 
@@ -190,7 +188,7 @@ piece.fading {
 
 .cg-wrap coords.ranks coord {
   transform: translateY(0%);
-  align-self : flex-start;
+  align-self: flex-start;
 }
 
 .cg-wrap coords.squares {
@@ -242,4 +240,3 @@ piece.fading {
 .cg-wrap coords.squares.rank8 {
   transform: translateX(700%);
 }
-
