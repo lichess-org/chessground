@@ -7,6 +7,7 @@ import * as cg from './types.js';
 
 export interface HeadlessState {
   pieces: cg.Pieces;
+  fen?: cg.FEN; // chess position in Forsyth notation
   orientation: cg.Color; // board orientation. white | black
   turnColor: cg.Color; // turn to play. white | black
   check?: cg.Key; // square currently in check "a2"
@@ -52,7 +53,7 @@ export interface HeadlessState {
     dests?: cg.Key[]; // premove destinations for the current selection
     customDests?: cg.Dests; // use custom valid premoves. {"a2" ["a3" "a4"] "b1" ["a3" "c3"]}
     current?: cg.KeyPair; // keys of the current saved premove ["e2" "e4"]
-    unrestrictedPremoves?: boolean; // if falsy, the positions of friendly pieces will be used to trim premove options
+    unrestrictedPremoves?: boolean; // if falsy, will try to trim impossible premoves
     events: {
       set?: (orig: cg.Key, dest: cg.Key, metadata?: cg.SetPremoveMetadata) => void; // called after the premove has been set
       unset?: () => void; // called after the premove has been unset
@@ -113,6 +114,7 @@ export interface State extends HeadlessState {
 export function defaults(): HeadlessState {
   return {
     pieces: fen.read(fen.initial),
+    fen: fen.initial,
     orientation: 'white',
     turnColor: 'white',
     coordinates: true,

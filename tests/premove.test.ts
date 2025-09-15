@@ -44,6 +44,7 @@ const testPosition = (
     util.allKeys.filter(sq => !expectedPremoves.has(sq)).every(sq => !premove(state, sq as cg.Key).length),
   ).toEqual(true);
   if (checkInverseToo)
+    // todo - will flipping for the test work with castling stuff?
     testPosition(
       invertPieces(pieces),
       util.opposite(turnColor),

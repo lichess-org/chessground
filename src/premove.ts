@@ -10,12 +10,33 @@ type MobilityContext = {
   enemies: cg.Pieces;
   unrestrictedPremoves: boolean;
   color: cg.Color;
-  canCastle: boolean;
+  forbidKsideCastlePremove: boolean;
+  forbidQsideCastlePremove: boolean;
   rookFilesFriendlies: number[];
   lastMove: cg.Key[] | undefined;
 };
 
 type Mobility = (ctx: MobilityContext) => boolean;
+
+// todo - review staged changes, test (manually and write tests, haven't done either yet).
+// test cases with both castling fen notations, with the king already on the castling dest
+// square, both rooks to one side, no fen, etc.
+  // fix bug where updated fen not being sent to chessground state on each move
+
+const forbidCastlePremove = (state: HeadlessState, kingSq: cg.Key, kingside: boolean): boolean => {
+  if (!state.premovable.castle) return true;
+  if (!state.fen) return false;
+  const color = util.opposite(state.turnColor);
+  console.log(state.fen);
+  return state.fen
+    .split(/\s+/)[2]
+    .split('')
+    .filter(c => c === (color === 'white' ? c.toUpperCase() : c.toLowerCase()))
+    .map(c => c.toLowerCase())
+    .every(c =>
+      kingside ? c !== 'k' && (c === 'q' || c <= kingSq[0]) : c !== 'q' && (c === 'k' || c >= kingSq[0]),
+    );
+};
 
 const isDestOccupiedByFriendly = (ctx: MobilityContext): boolean =>
   ctx.friendlies.has(util.pos2key(ctx.pos2));
@@ -179,12 +200,20 @@ const rook: Mobility = (ctx: MobilityContext) =>
 
 const queen: Mobility = (ctx: MobilityContext) => bishop(ctx) || rook(ctx);
 
-const king: Mobility = (ctx: MobilityContext) =>
-  (util.kingDirNonCastling(...ctx.pos1, ...ctx.pos2) &&
-    (ctx.unrestrictedPremoves || !isDestOccupiedByFriendly(ctx) || isFriendlyOnDestAndAttacked(ctx))) ||
-  (ctx.canCastle &&
-    ctx.pos1[1] === ctx.pos2[1] &&
-    ctx.pos1[1] === (ctx.color === 'white' ? 0 : 7) &&
+const king: Mobility = (ctx: MobilityContext) => {
+  if (
+    util.kingDirNonCastling(...ctx.pos1, ...ctx.pos2) &&
+    (ctx.unrestrictedPremoves || !isDestOccupiedByFriendly(ctx) || isFriendlyOnDestAndAttacked(ctx))
+  )
+    return true;
+  if (
+    ctx.pos1[1] !== ctx.pos2[1] ||
+    ctx.pos1[1] !== (ctx.color === 'white' ? 0 : 7) ||
+    (ctx.forbidKsideCastlePremove && ctx.pos2[0] > ctx.pos1[0]) ||
+    (ctx.forbidQsideCastlePremove && ctx.pos2[0] < ctx.pos1[0])
+  )
+    return false;
+  return (
     ((ctx.pos1[0] === 4 &&
       ((ctx.pos2[0] === 2 && ctx.rookFilesFriendlies.includes(0)) ||
         (ctx.pos2[0] === 6 && ctx.rookFilesFriendlies.includes(7)))) ||
@@ -196,15 +225,16 @@ const king: Mobility = (ctx: MobilityContext) =>
       util
         .squaresBetween(...ctx.pos1, ctx.pos2[0] > ctx.pos1[0] ? 7 : 1, ctx.pos2[1])
         .map(s => ctx.allPieces.get(s))
-        .every(p => !p || util.samePiece(p, { role: 'rook', color: ctx.color }))));
+        .every(p => !p || util.samePiece(p, { role: 'rook', color: ctx.color })))
+  );
+};
 
 const mobilityByRole = { pawn, knight, bishop, rook, queen, king };
 
 export function premove(state: HeadlessState, key: cg.Key): cg.Key[] {
+  console.log(state.lastMove);
   const pieces = state.pieces,
-    canCastle = state.premovable.castle,
-    unrestrictedPremoves = !!state.premovable.unrestrictedPremoves;
-  const piece = pieces.get(key);
+    piece = pieces.get(key);
   if (!piece || piece.color === state.turnColor) return [];
   const color = piece.color,
     friendlies = new Map([...pieces].filter(([_, p]) => p.color === color)),
@@ -216,9 +246,10 @@ export function premove(state: HeadlessState, key: cg.Key): cg.Key[] {
       allPieces: pieces,
       friendlies: friendlies,
       enemies: enemies,
-      unrestrictedPremoves: unrestrictedPremoves,
+      unrestrictedPremoves: !!state.premovable.unrestrictedPremoves,
       color: color,
-      canCastle: canCastle,
+      forbidKsideCastlePremove: piece.role !== 'king' || forbidCastlePremove(state, key, true),
+      forbidQsideCastlePremove: piece.role !== 'king' || forbidCastlePremove(state, key, false),
       rookFilesFriendlies: Array.from(pieces)
         .filter(
           ([k, p]) => k[1] === (color === 'white' ? '1' : '8') && p.color === color && p.role === 'rook',
