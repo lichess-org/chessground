@@ -89,8 +89,8 @@ function svgContainer(cls: string, isShapes: boolean) {
     viewBox: isShapes ? '-4 -4 8 8' : '-3.5 -3.5 8 8',
     preserveAspectRatio: 'xMidYMid slice',
   });
-  svg.appendChild(createSVG('g'));
   if (isShapes) svg.appendChild(createDefs());
+  svg.appendChild(createSVG('g'));
   return svg;
 }
 
