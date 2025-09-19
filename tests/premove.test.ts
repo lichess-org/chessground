@@ -123,3 +123,18 @@ test('horde no en passant for first to third rank', () => {
     true,
   );
 });
+
+test('prod bug report lichess-org/lila#18224', () => {
+  const expectedPremoves = new Map<cg.Key, Set<cg.Key>>([
+    ['a8', new Set(['a7', 'a6', 'a5', 'a4', 'a3', 'a2', 'b8', 'c8', 'd8', 'e8', 'f8', 'g8', 'h8'])],
+    ['f2', new Set(['f1'])],
+    ['g2', new Set(['h1', 'g1', 'f1', 'h2', 'h3', 'g3', 'f3'])],
+  ]);
+  testPosition(
+    fen.read('R7/6k1/8/8/5pp1/8/p4PK1/r7 b - - 0 56'),
+    'black',
+    ['h2', 'g2'],
+    expectedPremoves,
+    false,
+  );
+});
