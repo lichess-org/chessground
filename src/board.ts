@@ -9,6 +9,9 @@ import {
   queenDir,
   knightDir,
   samePos,
+  findSquareOfPiece,
+  squaresBetween,
+  samePiece,
 } from './util.js';
 import { premove } from './premove.js';
 import * as cg from './types.js';
@@ -23,13 +26,6 @@ export function callUserFunction<T extends (...args: any[]) => void>(
 export function toggleOrientation(state: HeadlessState): void {
   state.orientation = opposite(state.orientation);
   state.animation.current = state.draggable.current = state.selected = undefined;
-}
-
-export function reset(state: HeadlessState): void {
-  state.lastMove = undefined;
-  unselect(state);
-  unsetPremove(state);
-  unsetPredrop(state);
 }
 
 export function setPieces(state: HeadlessState, pieces: cg.PiecesDiff): void {
@@ -106,6 +102,37 @@ function tryAutoCastle(state: HeadlessState, orig: cg.Key, dest: cg.Key): boolea
   return true;
 }
 
+/**
+ * Note that this function relies on `state.lastMove` being updated, but not on `state.turnColor`.
+ */
+const updateCastlingRights = (state: HeadlessState, pieceThatJustMoved: cg.Piece): void => {
+  if (
+    !state.lastMove ||
+    ['king', 'rook'].every(r => r !== pieceThatJustMoved.role) ||
+    state.premovable.unrestrictedPremoves
+  )
+    return;
+  const color = pieceThatJustMoved.color;
+  const backRank = color === 'white' ? '1' : '8';
+  const kingSq = findSquareOfPiece(state.pieces, 'king', color);
+  for (const side of cg.castleSides) {
+    state.premovable.castle[color][side] &&=
+      pieceThatJustMoved.role !== 'king' &&
+      kingSq?.[1] === backRank &&
+      squaresBetween(
+        ...key2pos(kingSq),
+        ...key2pos(((side === 'kside' ? 'h' : 'a') + backRank) as cg.Key),
+        false,
+      ).some(
+        sq =>
+          sq !== state.lastMove![1] &&
+          sq[1] === backRank &&
+          state.pieces.has(sq) &&
+          samePiece(state.pieces.get(sq)!, { role: 'rook', color: color }),
+      );
+  }
+};
+
 export function baseMove(state: HeadlessState, orig: cg.Key, dest: cg.Key): cg.Piece | boolean {
   const origPiece = state.pieces.get(orig),
     destPiece = state.pieces.get(dest);
@@ -119,6 +146,7 @@ export function baseMove(state: HeadlessState, orig: cg.Key, dest: cg.Key): cg.P
   }
   state.lastMove = [orig, dest];
   state.check = undefined;
+  updateCastlingRights(state, origPiece);
   callUserFunction(state.events.change);
   return captured || true;
 }

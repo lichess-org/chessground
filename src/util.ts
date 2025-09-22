@@ -131,16 +131,21 @@ export const pawnDirAdvance = (x1: number, y1: number, x2: number, y2: number, i
 /** Returns all board squares between (x1, y1) and (x2, y2) exclusive,
  *  along a straight line (rook or bishop path). Returns [] if not aligned, or none between.
  */
-export const squaresBetween = (x1: number, y1: number, x2: number, y2: number): cg.Key[] => {
+export const squaresBetween = (
+  x1: number,
+  y1: number,
+  x2: number,
+  y2: number,
+  exclusive: boolean = true,
+): cg.Key[] => {
   const dx = x2 - x1;
   const dy = y2 - y1;
-
   // Must be a straight or diagonal line
   if (dx && dy && Math.abs(dx) !== Math.abs(dy)) return [];
-
   const stepX = Math.sign(dx),
     stepY = Math.sign(dy);
   const squares: cg.Pos[] = [];
+  if (!exclusive) squares.push([x1, y1]);
   let x = x1 + stepX,
     y = y1 + stepY;
   while (x !== x2 || y !== y2) {
@@ -148,10 +153,11 @@ export const squaresBetween = (x1: number, y1: number, x2: number, y2: number): 
     x += stepX;
     y += stepY;
   }
+  if (!exclusive && (dx || dy)) squares.push([x2, y2]);
   return squares.map(sq => pos2key(sq));
 };
 
-export const adjacentSquares = (square: cg.Key): cg.Key[] => {
+export const horizontallyAdjacentSquares = (square: cg.Key): cg.Key[] => {
   const pos = key2pos(square);
   const adjacentSquares: cg.Pos[] = [];
   if (pos[0] > 0) adjacentSquares.push([pos[0] - 1, pos[1]]);
@@ -163,4 +169,41 @@ export const squareShiftedVertically = (square: cg.Key, delta: number): cg.Key =
   const pos = key2pos(square);
   pos[1] += delta;
   return pos2key(pos);
+};
+
+export const findSquareOfPiece = (pieces: cg.Pieces, role: cg.Role, color: cg.Color): cg.Key | undefined => {
+  for (const [key, piece] of pieces) {
+    if (piece.role === role && piece.color === color) {
+      return key;
+    }
+  }
+  return undefined;
+};
+
+export const makeCastlingPrivileges = (valForAll: boolean): cg.CastlePrivileges => {
+  return { white: { kside: valForAll, qside: valForAll }, black: { kside: valForAll, qside: valForAll } };
+};
+
+export const castlingPrivilegesFromFen = (fen: cg.FEN, pieces: cg.Pieces): cg.CastlePrivileges => {
+  const castlePart = fen.split(/\s+/)[2];
+  const castlePrivileges = makeCastlingPrivileges(false);
+  if (castlePart === '-') return castlePrivileges;
+  for (const color of cg.colors) {
+    const kingSq = findSquareOfPiece(pieces, 'king', color);
+    for (const side of cg.castleSides) {
+      if (!kingSq) castlePrivileges[color][side] = false;
+      else if (!castlePart) castlePrivileges[color][side] = true;
+      else
+        castlePrivileges[color][side] = castlePart
+          .split('')
+          .filter(c => c === (color === 'white' ? c.toUpperCase() : c.toLowerCase()))
+          .map(c => c.toLowerCase())
+          .some(c =>
+            side === 'kside'
+              ? c === 'k' || (c !== 'q' && c > kingSq[0])
+              : c === 'q' || (c !== 'k' && c < kingSq[0]),
+          );
+    }
+  }
+  return castlePrivileges;
 };

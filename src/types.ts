@@ -2,6 +2,8 @@ export type Color = (typeof colors)[number];
 export type Role = (typeof roles)[number];
 export type File = (typeof files)[number];
 export type Rank = (typeof ranks)[number];
+export type CastleSide = (typeof castleSides)[number];
+export type CastlePrivileges = Record<Color, Record<CastleSide, boolean>>;
 export type Key = 'a0' | `${File}${Rank}`;
 export type FEN = string;
 export type Pos = [number, number];
@@ -104,6 +106,7 @@ export const colors = ['white', 'black'] as const;
 export const roles = ['pawn', 'knight', 'bishop', 'rook', 'queen', 'king'] as const;
 export const files = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h'] as const;
 export const ranks = ['1', '2', '3', '4', '5', '6', '7', '8'] as const;
+export const castleSides = ['kside', 'qside'] as const;
 
 export type RanksPosition = 'left' | 'right';
 

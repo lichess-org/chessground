@@ -21,22 +21,9 @@ type Mobility = (ctx: MobilityContext) => boolean;
 // todo - review staged changes, test (manually and write tests, haven't done either yet).
 // test cases with both castling fen notations, with the king already on the castling dest
 // square, both rooks to one side, no fen, etc.
-  // fix bug where updated fen not being sent to chessground state on each move
 
-const forbidCastlePremove = (state: HeadlessState, kingSq: cg.Key, kingside: boolean): boolean => {
-  if (!state.premovable.castle) return true;
-  if (!state.fen) return false;
-  const color = util.opposite(state.turnColor);
-  console.log(state.fen);
-  return state.fen
-    .split(/\s+/)[2]
-    .split('')
-    .filter(c => c === (color === 'white' ? c.toUpperCase() : c.toLowerCase()))
-    .map(c => c.toLowerCase())
-    .every(c =>
-      kingside ? c !== 'k' && (c === 'q' || c <= kingSq[0]) : c !== 'q' && (c === 'k' || c >= kingSq[0]),
-    );
-};
+const forbidCastlePremove = (state: HeadlessState, side: cg.CastleSide): boolean =>
+  !state.premovable.castle[util.opposite(state.turnColor)][side];
 
 const isDestOccupiedByFriendly = (ctx: MobilityContext): boolean =>
   ctx.friendlies.has(util.pos2key(ctx.pos2));
@@ -147,7 +134,9 @@ const isPathClearEnoughOfEnemiesForPremove = (ctx: MobilityContext): boolean => 
   const enemyStep = enemy.color === 'white' ? 1 : -1;
   const squareAbove = util.squareShiftedVertically(enemySquare, enemyStep);
   const enemyPawnDests: cg.Key[] = [
-    ...util.adjacentSquares(squareAbove).filter(s => canEnemyPawnCaptureOnSquare(enemySquare, s, ctx)),
+    ...util
+      .horizontallyAdjacentSquares(squareAbove)
+      .filter(s => canEnemyPawnCaptureOnSquare(enemySquare, s, ctx)),
     ...[squareAbove, util.squareShiftedVertically(squareAbove, enemyStep)].filter(s =>
       canEnemyPawnAdvanceToSquare(enemySquare, s, ctx),
     ),
@@ -232,7 +221,6 @@ const king: Mobility = (ctx: MobilityContext) => {
 const mobilityByRole = { pawn, knight, bishop, rook, queen, king };
 
 export function premove(state: HeadlessState, key: cg.Key): cg.Key[] {
-  console.log(state.lastMove);
   const pieces = state.pieces,
     piece = pieces.get(key);
   if (!piece || piece.color === state.turnColor) return [];
@@ -248,8 +236,8 @@ export function premove(state: HeadlessState, key: cg.Key): cg.Key[] {
       enemies: enemies,
       unrestrictedPremoves: !!state.premovable.unrestrictedPremoves,
       color: color,
-      forbidKsideCastlePremove: piece.role !== 'king' || forbidCastlePremove(state, key, true),
-      forbidQsideCastlePremove: piece.role !== 'king' || forbidCastlePremove(state, key, false),
+      forbidKsideCastlePremove: piece.role !== 'king' || forbidCastlePremove(state, 'kside'),
+      forbidQsideCastlePremove: piece.role !== 'king' || forbidCastlePremove(state, 'qside'),
       rookFilesFriendlies: Array.from(pieces)
         .filter(
           ([k, p]) => k[1] === (color === 'white' ? '1' : '8') && p.color === color && p.role === 'rook',

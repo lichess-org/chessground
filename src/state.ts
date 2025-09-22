@@ -2,12 +2,11 @@ import * as fen from './fen.js';
 import { AnimCurrent } from './anim.js';
 import { DragCurrent } from './drag.js';
 import { Drawable } from './draw.js';
-import { timer } from './util.js';
+import { makeCastlingPrivileges, timer } from './util.js';
 import * as cg from './types.js';
 
 export interface HeadlessState {
   pieces: cg.Pieces;
-  fen?: cg.FEN; // chess position in Forsyth notation
   orientation: cg.Color; // board orientation. white | black
   turnColor: cg.Color; // turn to play. white | black
   check?: cg.Key; // square currently in check "a2"
@@ -49,7 +48,7 @@ export interface HeadlessState {
   premovable: {
     enabled: boolean; // allow premoves for color that can not move
     showDests: boolean; // whether to add the premove-dest class on squares
-    castle: boolean; // whether to allow king castle premoves
+    castle: cg.CastlePrivileges; // whether to allow king castle premoves
     dests?: cg.Key[]; // premove destinations for the current selection
     customDests?: cg.Dests; // use custom valid premoves. {"a2" ["a3" "a4"] "b1" ["a3" "c3"]}
     current?: cg.KeyPair; // keys of the current saved premove ["e2" "e4"]
@@ -114,7 +113,6 @@ export interface State extends HeadlessState {
 export function defaults(): HeadlessState {
   return {
     pieces: fen.read(fen.initial),
-    fen: fen.initial,
     orientation: 'white',
     turnColor: 'white',
     coordinates: true,
@@ -146,7 +144,7 @@ export function defaults(): HeadlessState {
     premovable: {
       enabled: true,
       showDests: true,
-      castle: true,
+      castle: makeCastlingPrivileges(true),
       events: {},
     },
     predroppable: {
