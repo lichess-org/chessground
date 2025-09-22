@@ -18,10 +18,11 @@ type MobilityContext = {
 
 type Mobility = (ctx: MobilityContext) => boolean;
 
-// todo - review staged changes, test (manually and write tests, haven't done either yet).
-// test cases with both castling fen notations, with the king already on the castling dest
-// square, both rooks to one side, no fen, etc.
+// todo - review changes since master
+// do tests, including cases with both castling fen notations, with the king already on the castling dest
+// square, both rooks to one side, no fen, king on b1/b8 no longer being able to premove castling in 960.
 
+// todo - also, inline usages of this function?
 const forbidCastlePremove = (state: HeadlessState, side: cg.CastleSide): boolean =>
   !state.premovable.castle[util.opposite(state.turnColor)][side];
 
@@ -30,8 +31,8 @@ const isDestOccupiedByFriendly = (ctx: MobilityContext): boolean =>
 
 const isDestOccupiedByEnemy = (ctx: MobilityContext): boolean => ctx.enemies.has(util.pos2key(ctx.pos2));
 
-const anyPieceBetween = (pos1: cg.Pos, pos2: cg.Pos, pieces: cg.Pieces): boolean =>
-  util.squaresBetween(...pos1, ...pos2).some(s => pieces.has(s));
+const anyPieceBetween = (pos1: cg.Pos, pos2: cg.Pos, allPieces: cg.Pieces): boolean =>
+  util.squaresBetween(...pos1, ...pos2, true).some(s => allPieces.has(s));
 
 const canEnemyPawnAdvanceToSquare = (pawnStart: cg.Key, dest: cg.Key, ctx: MobilityContext): boolean => {
   const piece = ctx.enemies.get(pawnStart);
@@ -104,7 +105,7 @@ const canBeCapturedBySomeEnemyEnPassant = (
 
 const isPathClearEnoughOfFriendliesForPremove = (ctx: MobilityContext): boolean => {
   if (ctx.unrestrictedPremoves) return true;
-  const squaresBetween = util.squaresBetween(...ctx.pos1, ...ctx.pos2);
+  const squaresBetween = util.squaresBetween(...ctx.pos1, ...ctx.pos2, true);
   const squaresOfFriendliesBetween = squaresBetween.filter(s => ctx.friendlies.has(s));
   return (
     !squaresOfFriendliesBetween.length ||
@@ -123,7 +124,7 @@ const isPathClearEnoughOfFriendliesForPremove = (ctx: MobilityContext): boolean 
 
 const isPathClearEnoughOfEnemiesForPremove = (ctx: MobilityContext): boolean => {
   if (ctx.unrestrictedPremoves) return true;
-  const squaresBetween = util.squaresBetween(...ctx.pos1, ...ctx.pos2);
+  const squaresBetween = util.squaresBetween(...ctx.pos1, ...ctx.pos2, true);
   const squaresOfEnemiesBetween = squaresBetween.filter(s => ctx.enemies.has(s));
   if (squaresOfEnemiesBetween.length > 1) return false;
   if (!squaresOfEnemiesBetween.length) return true;
@@ -208,13 +209,13 @@ const king: Mobility = (ctx: MobilityContext) => {
         (ctx.pos2[0] === 6 && ctx.rookFilesFriendlies.includes(7)))) ||
       ctx.rookFilesFriendlies.includes(ctx.pos2[0])) &&
     (ctx.unrestrictedPremoves ||
-      /* The following checks if no non-rook friendly piece is in the way between the king and its castling destination.
-         Note that for the Chess960 edge case of Kb1 "long castling", the check passes even if there is a piece in the way
-         on c1. But this is fine, since premoving from b1 to a1 as a normal move would have already returned true. */
+      // The following checks if no non-rook friendly piece is in the way between the king and its castling destination.
       util
-        .squaresBetween(...ctx.pos1, ctx.pos2[0] > ctx.pos1[0] ? 7 : 1, ctx.pos2[1])
+        .squaresBetween(...ctx.pos1, ctx.pos2[0] > ctx.pos1[0] ? 6 : 2, ctx.pos2[1], false)
         .map(s => ctx.allPieces.get(s))
-        .every(p => !p || util.samePiece(p, { role: 'rook', color: ctx.color })))
+        .every(
+          p => !p || ['king', 'rook'].some(r => util.samePiece(p, { role: r as cg.Role, color: ctx.color })),
+        ))
   );
 };
 

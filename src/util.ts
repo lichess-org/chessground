@@ -136,7 +136,7 @@ export const squaresBetween = (
   y1: number,
   x2: number,
   y2: number,
-  exclusive: boolean = true,
+  exclusive: boolean,
 ): cg.Key[] => {
   const dx = x2 - x1;
   const dy = y2 - y1;
