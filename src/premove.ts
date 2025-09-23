@@ -152,6 +152,7 @@ const isPathClearEnoughForPremove = (ctx: MobilityContext): boolean =>
 const attemptingToPremoveCastle = (ctx: MobilityContext): boolean => {
   const origKey = util.pos2key(ctx.pos1);
   if (
+    ctx.pos1[0] === ctx.pos2[0] ||
     ctx.pos1[1] !== ctx.pos2[1] ||
     ctx.pos1[1] !== (ctx.color === 'white' ? 0 : 7) ||
     !ctx.allPieces.has(origKey) ||
