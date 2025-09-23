@@ -149,6 +149,23 @@ const isPathClearEnoughOfEnemiesForPremove = (ctx: MobilityContext): boolean => 
 const isPathClearEnoughForPremove = (ctx: MobilityContext): boolean =>
   isPathClearEnoughOfFriendliesForPremove(ctx) && isPathClearEnoughOfEnemiesForPremove(ctx);
 
+const attemptingToPremoveCastle = (ctx: MobilityContext): boolean => {
+  const origKey = util.pos2key(ctx.pos1);
+  if (
+    ctx.pos1[1] !== ctx.pos2[1] ||
+    ctx.pos1[1] !== (ctx.color === 'white' ? 0 : 7) ||
+    !ctx.allPieces.has(origKey) ||
+    !util.samePiece(ctx.allPieces.get(origKey)!, { role: 'king', color: ctx.color })
+  )
+    return false;
+  return (
+    (ctx.pos1[0] === 4 &&
+      ((ctx.pos2[0] === 2 && ctx.rookFilesFriendlies.includes(0)) ||
+        (ctx.pos2[0] === 6 && ctx.rookFilesFriendlies.includes(7)))) ||
+    ctx.rookFilesFriendlies.includes(ctx.pos2[0])
+  );
+};
+
 const pawn: Mobility = (ctx: MobilityContext) => {
   const step = ctx.color === 'white' ? 1 : -1;
   if (util.diff(ctx.pos1[0], ctx.pos2[0]) > 1) return false;
@@ -197,25 +214,20 @@ const king: Mobility = (ctx: MobilityContext) => {
   )
     return true;
   if (
-    ctx.pos1[1] !== ctx.pos2[1] ||
-    ctx.pos1[1] !== (ctx.color === 'white' ? 0 : 7) ||
+    !attemptingToPremoveCastle(ctx) ||
     (ctx.forbidKsideCastlePremove && ctx.pos2[0] > ctx.pos1[0]) ||
     (ctx.forbidQsideCastlePremove && ctx.pos2[0] < ctx.pos1[0])
   )
     return false;
   return (
-    ((ctx.pos1[0] === 4 &&
-      ((ctx.pos2[0] === 2 && ctx.rookFilesFriendlies.includes(0)) ||
-        (ctx.pos2[0] === 6 && ctx.rookFilesFriendlies.includes(7)))) ||
-      ctx.rookFilesFriendlies.includes(ctx.pos2[0])) &&
-    (ctx.unrestrictedPremoves ||
-      // The following checks if no non-rook friendly piece is in the way between the king and its castling destination.
-      util
-        .squaresBetween(...ctx.pos1, ctx.pos2[0] > ctx.pos1[0] ? 6 : 2, ctx.pos2[1], false)
-        .map(s => ctx.allPieces.get(s))
-        .every(
-          p => !p || ['king', 'rook'].some(r => util.samePiece(p, { role: r as cg.Role, color: ctx.color })),
-        ))
+    ctx.unrestrictedPremoves ||
+    // The following checks if no non-rook friendly piece is in the way between the king and its castling destination.
+    util
+      .squaresBetween(...ctx.pos1, ctx.pos2[0] > ctx.pos1[0] ? 6 : 2, ctx.pos2[1], false)
+      .map(s => ctx.allPieces.get(s))
+      .every(
+        p => !p || ['king', 'rook'].some(r => util.samePiece(p, { role: r as cg.Role, color: ctx.color })),
+      )
   );
 };
 
