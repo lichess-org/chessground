@@ -37,7 +37,7 @@ export function read(fen: cg.FEN): cg.Pieces {
         col = 0;
         break;
       case '~': {
-        const piece = pieces.get(pos2key([col - 1, row]));
+        const piece = pieces.get(pos2key([col - 1, row])!);
         if (piece) piece.promoted = true;
         break;
       }
@@ -46,7 +46,7 @@ export function read(fen: cg.FEN): cg.Pieces {
         if (nb < 57) col += nb - 48;
         else {
           const role = c.toLowerCase();
-          pieces.set(pos2key([col, row]), {
+          pieces.set(pos2key([col, row])!, {
             role: roles[role],
             color: c === role ? 'black' : 'white',
           });
