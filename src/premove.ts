@@ -168,6 +168,19 @@ const attemptingToPremoveCastle = (ctx: MobilityContext): boolean => {
   );
 };
 
+const findNearestMatchingSqOnRank = (
+  pieces: cg.Pieces, startSq: cg.Key | undefined, searchLeft: boolean, target: cg.Piece
+): cg.Key | undefined => {
+  if (!startSq) return undefined;
+  if (pieces.has(startSq) && util.samePiece(pieces.get(startSq)!, target)) return startSq;
+  return findNearestMatchingSqOnRank(
+    pieces,
+    util.squareShiftedHorizontally(startSq, searchLeft ? -1 : 1),
+    searchLeft,
+    target
+  );
+}
+
 const pawn: Mobility = (ctx: MobilityContext) => {
   const step = ctx.color === 'white' ? 1 : -1;
   if (util.diff(ctx.pos1[0], ctx.pos2[0]) > 1) return false;
@@ -215,21 +228,29 @@ const king: Mobility = (ctx: MobilityContext) => {
     (ctx.unrestrictedPremoves || !isDestOccupiedByFriendly(ctx) || isFriendlyOnDestAndAttacked(ctx))
   )
     return true;
+  if (!attemptingToPremoveCastle(ctx)) return false;
+  const tryingQsideCastle = ctx.pos2[0] < ctx.pos1[0];
   if (
-    !attemptingToPremoveCastle(ctx) ||
-    (ctx.forbidKsideCastlePremove && ctx.pos2[0] > ctx.pos1[0]) ||
-    (ctx.forbidQsideCastlePremove && ctx.pos2[0] < ctx.pos1[0])
-  ) 
-    return false;
-  return (
-    ctx.unrestrictedPremoves ||
-    // The following checks if no non-rook friendly piece is in the way between the king and its castling destination.
-    util
-      .squaresBetween(...ctx.pos1, ctx.pos2[0] > ctx.pos1[0] ? 6 : 2, ctx.pos2[1], false)
-      .map(s => ctx.allPieces.get(s))
-      .every(
-        p => !p || ['king', 'rook'].some(r => util.samePiece(p, { role: r as cg.Role, color: ctx.color })),
-      )
+    (ctx.forbidKsideCastlePremove && !tryingQsideCastle) ||
+    (ctx.forbidQsideCastlePremove && tryingQsideCastle)
+  ) return false;
+  if (ctx.unrestrictedPremoves) return true;
+
+  const kingOrig = ctx.pos1;
+  const rookOrig = util.key2pos(findNearestMatchingSqOnRank(
+    ctx.allPieces,
+    util.pos2key(kingOrig),
+    tryingQsideCastle,
+    {role: 'rook', color: ctx.color}
+  )!);
+  return util.squaresBetween(...kingOrig, tryingQsideCastle ? 2 : 6, kingOrig[1], false).every(s =>
+    s === util.pos2key(kingOrig) ||
+    s === util.pos2key(rookOrig) ||
+    !ctx.allPieces.has(s)
+  ) && util.squaresBetween(...rookOrig, tryingQsideCastle ? 3 : 5, rookOrig[1], false).every(s =>
+    s === util.pos2key(rookOrig) ||
+    s === util.pos2key(kingOrig) ||
+    ctx.allPieces.get(s)?.color !== ctx.color
   );
 };
 
