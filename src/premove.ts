@@ -78,12 +78,13 @@ const isFriendlyOnDestAndAttacked = (ctx: MobilityContext): boolean =>
     isDestControlledByEnemy(ctx));
 
 const canBeCapturedBySomeEnemyEnPassant = (
-  potentialSquareOfFriendlyPawn: cg.Key,
+  potentialSquareOfFriendlyPawn: cg.Key | undefined,
   friendlies: cg.Pieces,
   enemies: cg.Pieces,
   lastMove?: cg.Key[],
 ): boolean => {
-  if (lastMove && potentialSquareOfFriendlyPawn !== lastMove[1]) return false;
+  if (!potentialSquareOfFriendlyPawn || (lastMove && potentialSquareOfFriendlyPawn !== lastMove[1]))
+    return false;
   const pos = util.key2pos(potentialSquareOfFriendlyPawn);
   const friendly = friendlies.get(potentialSquareOfFriendlyPawn);
   return (
@@ -128,7 +129,7 @@ const isPathClearEnoughOfEnemiesForPremove = (ctx: MobilityContext): boolean => 
   const enemyPawnDests: cg.Key[] = [
     ...util.adjacentSquares(squareAbove).filter(s => canEnemyPawnCaptureOnSquare(enemySquare, s, ctx)),
     ...[squareAbove, util.squareShiftedVertically(squareAbove, enemyStep)].filter(
-      s => s && canEnemyPawnAdvanceToSquare(enemySquare, s, ctx),
+      (s: cg.Key | undefined) => s && canEnemyPawnAdvanceToSquare(enemySquare, s, ctx),
     ),
   ];
   const badSquares = [...squaresBetween, util.pos2key(ctx.pos1)];
