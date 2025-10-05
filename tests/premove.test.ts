@@ -59,9 +59,10 @@ const testPosition = (
   expectedPremoves: Map<cg.Key, Iterable<cg.Key>>,
   checkDiagonalInverse: boolean,
   checkVerticalInverse: boolean,
+  trimPremoves: boolean,
 ): void => {
   expect(!checkDiagonalInverse || !castlingPrivileges);
-  const state = makeState(pieces, true, lastMove, turnColor, castlingPrivileges);
+  const state = makeState(pieces, trimPremoves, lastMove, turnColor, castlingPrivileges);
   for (const [from, expectedDests] of expectedPremoves) {
     expect(new Set(premove(state, from))).toEqual(new Set(expectedDests));
   }
@@ -82,6 +83,7 @@ const testPosition = (
       ),
       false,
       false,
+      trimPremoves,
     );
   }
   if (checkVerticalInverse) {
@@ -98,6 +100,7 @@ const testPosition = (
       ),
       false,
       false,
+      trimPremoves,
     );
   }
 };
@@ -133,6 +136,7 @@ test('premoves are trimmed appropriately', () => {
     expectedPremoves,
     true,
     true,
+    true,
   );
 });
 
@@ -155,6 +159,7 @@ test('anticipate all en passant captures if no last move', () => {
     expectedPremoves,
     true,
     true,
+    true,
   );
 });
 
@@ -171,6 +176,24 @@ test('horde no en passant for first to third rank', () => {
     expectedPremoves,
     true,
     true,
+    true,
+  );
+});
+
+test('do not trim premoves when specified', () => {
+  const expectedPremoves = new Map<cg.Key, Iterable<cg.Key>>([
+    ['f1', ['f2', 'f3', 'e2', 'g2']],
+    ['g3', ['g4', 'h4', 'f4']],
+  ]);
+  testPosition(
+    fen.read('rnbqkbnr/ppppppp1/8/8/8/6Pp/8/5P2 w kq - 0 1'),
+    'black',
+    ['g1', 'g3'],
+    undefined,
+    expectedPremoves,
+    true,
+    true,
+    false,
   );
 });
 
@@ -186,6 +209,7 @@ test('prod bug report lichess-org/lila#18224', () => {
     ['h2', 'g2'],
     undefined,
     expectedPremoves,
+    true,
     true,
     true,
   );
@@ -260,8 +284,6 @@ describe('castling privileges parsed from FEN', () => {
       util.sameCastlingPrivileges(priv, util.castlingPrivilegesFromFen(fenStr.replace('AHah', '-'), pieces)),
     ).toBe(false);
   });
-
-  // todo - also test FENs where just the pieces field is given
 });
 
 describe('premove respects per-side castle forbids', () => {
@@ -284,6 +306,7 @@ describe('premove respects per-side castle forbids', () => {
       expectedPremoves,
       false,
       true,
+      true,
     );
   });
 
@@ -300,6 +323,7 @@ describe('premove respects per-side castle forbids', () => {
       util.castlingPrivilegesFromFen('r1k4r/8/8/8/8/8/8/R3K2R w Qkq - 0 1', pieces),
       expectedPremoves,
       false,
+      true,
       true,
     );
   });
@@ -318,9 +342,9 @@ describe('premove respects per-side castle forbids', () => {
       expectedPremoves,
       false,
       true,
+      true,
     );
   });
 
-  // todo - tests with trimpremoves = false? for current tests shouldnt affect anything
-  // also test castling premove stuff after making moves
+  // todo test castling premove stuff after making moves
 });
