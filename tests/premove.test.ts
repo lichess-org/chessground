@@ -6,11 +6,11 @@ import * as util from '../src/util';
 
 const verticallyOpposite = (square: cg.Key): cg.Key => {
   const pos = util.key2pos(square);
-  return util.pos2key([pos[0], 7 - pos[1]]);
+  return util.pos2keyUnsafe([pos[0], 7 - pos[1]]);
 };
 
 const diagonallyOpposite = (square: cg.Key): cg.Key =>
-  util.pos2key(util.key2pos(square).map(n => 7 - n) as cg.Pos);
+  util.pos2keyUnsafe(util.key2pos(square).map(n => 7 - n) as cg.Pos);
 
 const verticallyInvertState = (state: HeadlessState): HeadlessState =>
   makeState(
@@ -180,6 +180,23 @@ test('horde no en passant for first to third rank', () => {
     expectedPremoves,
     true,
     true,
+  );
+});
+
+test('prod bug report lichess-org/lila#18224', () => {
+  const expectedPremoves = new Map<cg.Key, Set<cg.Key>>([
+    ['a8', new Set(['a7', 'a6', 'a5', 'a4', 'a3', 'a2', 'b8', 'c8', 'd8', 'e8', 'f8', 'g8', 'h8'])],
+    ['f2', new Set(['f3', 'g3'])],
+    ['g2', new Set(['h1', 'g1', 'f1', 'h2', 'h3', 'g3', 'f3'])],
+  ]);
+  testPosition(
+    fen.read('R7/6k1/8/8/5pp1/8/p4PK1/r7 b - - 0 56'),
+    'black',
+    ['h2', 'g2'],
+    undefined,
+    expectedPremoves,
+    true,
+    true
   );
 });
 

@@ -4,7 +4,10 @@ export const invRanks: readonly cg.Rank[] = [...cg.ranks].reverse();
 
 export const allKeys: readonly cg.Key[] = cg.files.flatMap(f => cg.ranks.map(r => (f + r) as cg.Key));
 
-export const pos2key = (pos: cg.Pos): cg.Key => allKeys[8 * pos[0] + pos[1]];
+export const pos2key = (pos: cg.Pos): cg.Key | undefined => 
+  pos.every(x => x >= 0 && x <= 7) ? allKeys[8 * pos[0] + pos[1]] : undefined;
+
+export const pos2keyUnsafe = (pos: cg.Pos): cg.Key => pos2key(pos)!;
 
 export const key2pos = (k: cg.Key): cg.Pos => [k.charCodeAt(0) - 97, k.charCodeAt(1) - 49];
 
@@ -15,6 +18,8 @@ export const uciToMove = (uci: string | undefined): cg.Key[] | undefined => {
 };
 
 export const allPos: readonly cg.Pos[] = allKeys.map(key2pos);
+
+export const allPosAndKey: readonly cg.PosAndKey[] = allKeys.map((key, i) => ({ key, pos: allPos[i] }));
 
 export function memo<A>(f: () => A): cg.Memo<A> {
   let v: A | undefined;
@@ -154,7 +159,7 @@ export const squaresBetween = (
     y += stepY;
   }
   if (!exclusive && (dx || dy)) squares.push([x2, y2]);
-  return squares.map(sq => pos2key(sq));
+  return squares.map(sq => pos2key(sq)).filter(x => !!x);
 };
 
 export const horizontallyAdjacentSquares = (square: cg.Key): cg.Key[] => {
@@ -162,10 +167,10 @@ export const horizontallyAdjacentSquares = (square: cg.Key): cg.Key[] => {
   const adjacentSquares: cg.Pos[] = [];
   if (pos[0] > 0) adjacentSquares.push([pos[0] - 1, pos[1]]);
   if (pos[0] < 7) adjacentSquares.push([pos[0] + 1, pos[1]]);
-  return adjacentSquares.map(pos2key);
+  return adjacentSquares.map(pos2key).filter(k => k !== undefined);
 };
 
-export const squareShiftedVertically = (square: cg.Key, delta: number): cg.Key => {
+export const squareShiftedVertically = (square: cg.Key, delta: number): cg.Key | undefined => {
   const pos = key2pos(square);
   pos[1] += delta;
   return pos2key(pos);

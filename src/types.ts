@@ -7,6 +7,10 @@ export type CastlePrivileges = Record<Color, Record<CastleSide, boolean>>;
 export type Key = 'a0' | `${File}${Rank}`;
 export type FEN = string;
 export type Pos = [number, number];
+export interface PosAndKey {
+  pos: Pos;
+  key: Key;
+}
 export interface Piece {
   role: Role;
   color: Color;
