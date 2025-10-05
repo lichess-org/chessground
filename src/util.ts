@@ -4,7 +4,9 @@ export const invRanks: readonly cg.Rank[] = [...cg.ranks].reverse();
 
 export const allKeys: readonly cg.Key[] = cg.files.flatMap(f => cg.ranks.map(r => (f + r) as cg.Key));
 
-export const pos2key = (pos: cg.Pos): cg.Key => allKeys[8 * pos[0] + pos[1]];
+export const pos2key = (pos: cg.Pos): cg.Key | undefined => allKeys[8 * pos[0] + pos[1]];
+
+export const pos2keyUnsafe = (pos: cg.Pos): cg.Key => pos2key(pos)!;
 
 export const key2pos = (k: cg.Key): cg.Pos => [k.charCodeAt(0) - 97, k.charCodeAt(1) - 49];
 
@@ -148,7 +150,7 @@ export const squaresBetween = (x1: number, y1: number, x2: number, y2: number): 
     x += stepX;
     y += stepY;
   }
-  return squares.map(sq => pos2key(sq));
+  return squares.map(pos2key).filter(k => k !== undefined);
 };
 
 export const adjacentSquares = (square: cg.Key): cg.Key[] => {
@@ -156,10 +158,10 @@ export const adjacentSquares = (square: cg.Key): cg.Key[] => {
   const adjacentSquares: cg.Pos[] = [];
   if (pos[0] > 0) adjacentSquares.push([pos[0] - 1, pos[1]]);
   if (pos[0] < 7) adjacentSquares.push([pos[0] + 1, pos[1]]);
-  return adjacentSquares.map(pos2key);
+  return adjacentSquares.map(pos2key).filter(k => k !== undefined);
 };
 
-export const squareShiftedVertically = (square: cg.Key, delta: number): cg.Key => {
+export const squareShiftedVertically = (square: cg.Key, delta: number): cg.Key | undefined => {
   const pos = key2pos(square);
   pos[1] += delta;
   return pos2key(pos);
