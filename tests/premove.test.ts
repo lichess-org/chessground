@@ -236,22 +236,15 @@ describe('castling privileges parsed from FEN', () => {
     expect(util.sameCastlingPrivileges(priv, util.makeCastlingPrivileges(false))).toBe(true);
   });
 
-  it('interprets Chess960-style rook-file letters for white', () => {
-    const fenStr = '4k3/8/8/8/8/8/8/R1K3R w AH - 0 1'; // a1 & h1 rooks, king on c1
+  it('interprets different forms for castling notation', () => {
+    const fenStr = '4k3/8/8/8/8/8/8/R1K4R w AHah - 0 1'; // black doesn't have rooks but expected behaviour is this won't matter
     const pieces = fen.read(fenStr);
     const priv = util.castlingPrivilegesFromFen(fenStr, pieces);
-    expect(priv.white.kside).toBe(true);
-    expect(priv.white.qside).toBe(true);
-    // todo - could also test letters other than a and h?
-    // and test standard castling fen notation but with k's and q's?
-  });
-
-  it('interprets Chess960-style rook-file letters for black', () => {
-    const fenStr = 'r1k3r/8/8/8/8/8/8/4K3 b ah - 0 1';
-    const pieces = fen.read(fenStr);
-    const priv = util.castlingPrivilegesFromFen(fenStr, pieces);
-    expect(priv.black.kside).toBe(true);
-    expect(priv.black.qside).toBe(true);
+    expect(util.sameCastlingPrivileges(priv, util.makeCastlingPrivileges(true))).toBe(true);
+    expect(util.sameCastlingPrivileges(priv, util.castlingPrivilegesFromFen(fenStr.replace('AHah', 'KQkq'), pieces))).toBe(true);
+    expect(util.sameCastlingPrivileges(priv, util.castlingPrivilegesFromFen(fenStr.replace('AHah', 'BGcf'), pieces))).toBe(true);
+    expect(util.sameCastlingPrivileges(priv, util.castlingPrivilegesFromFen(fenStr.split(' ')[0], pieces))).toBe(true);
+    expect(util.sameCastlingPrivileges(priv, util.castlingPrivilegesFromFen(fenStr.replace('AHah', '-'), pieces))).toBe(false);
   });
 
   // todo - also test FENs where just the pieces field is given
