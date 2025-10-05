@@ -4,6 +4,17 @@ import { defaults, HeadlessState } from '../src/state';
 import * as fen from '../src/fen';
 import * as util from '../src/util';
 
+type ExpectedPremoves = Map<cg.Key, Iterable<cg.Key>>;
+
+type ExpectedPremovesFuture = Array<[cg.Key[], ExpectedPremoves]> | undefined;
+
+type Specs = {
+  expectedPremoves: ExpectedPremoves;
+  expectedPremovesFuture?: ExpectedPremovesFuture;
+  checkDiagonalInverse: boolean;
+  checkVerticalInverse: boolean;
+};
+
 const verticallyOpposite = (square: cg.Key): cg.Key => {
   const pos = util.key2pos(square);
   return util.pos2keyUnsafe([pos[0], 7 - pos[1]]);
@@ -12,18 +23,22 @@ const verticallyOpposite = (square: cg.Key): cg.Key => {
 const diagonallyOpposite = (square: cg.Key): cg.Key =>
   util.pos2keyUnsafe(util.key2pos(square).map(n => 7 - n) as cg.Pos);
 
-const diagonallyInvertPieces = (pieces: cg.Pieces): cg.Pieces =>
-  new Map(
-    [...pieces].map(([key, piece]) => [
-      diagonallyOpposite(key),
-      { role: piece.role, color: util.opposite(piece.color) },
-    ]),
-  );
+const transformExpectedPremoves = (
+  expectedPremoves: ExpectedPremoves,
+  transform: (sq: cg.Key) => cg.Key,
+): ExpectedPremoves =>
+  new Map([...expectedPremoves].map(([start, dests]) => [transform(start), Array.from(dests, transform)]));
 
-const verticallyInvertPieces = (pieces: cg.Pieces): cg.Pieces =>
+const transformExpectedPremovesFuture = (
+  expectedPremovesFuture: ExpectedPremovesFuture,
+  transform: (sq: cg.Key) => cg.Key,
+): ExpectedPremovesFuture =>
+  expectedPremovesFuture?.map(x => [x[0].map(transform), transformExpectedPremoves(x[1], transform)]);
+
+const swapColorAndRearrange = (pieces: cg.Pieces, transform: (sq: cg.Key) => cg.Key): cg.Pieces =>
   new Map(
     [...pieces].map(([key, piece]) => [
-      verticallyOpposite(key),
+      transform(key),
       { role: piece.role, color: util.opposite(piece.color) },
     ]),
   );
@@ -51,57 +66,65 @@ const makeState = (
   return state;
 };
 
-const testPosition = (
-  state: HeadlessState,
-  expectedPremoves: Map<cg.Key, Iterable<cg.Key>>,
+const makeSpecs = (
+  expectedPremoves: ExpectedPremoves,
+  expectedPremovesFuture: ExpectedPremovesFuture,
   checkDiagonalInverse: boolean,
   checkVerticalInverse: boolean,
-): void => {
-  expect(!checkDiagonalInverse || !state.premovable.castle);
-  for (const [from, expectedDests] of expectedPremoves) {
+): Specs => {
+  return {
+    expectedPremoves: expectedPremoves,
+    expectedPremovesFuture: expectedPremovesFuture,
+    checkDiagonalInverse: checkDiagonalInverse,
+    checkVerticalInverse: checkVerticalInverse,
+  };
+};
+
+const testPosition = (state: HeadlessState, specs: Specs): void => {
+  expect(!specs.checkDiagonalInverse || !state.premovable.castle);
+  for (const [from, expectedDests] of specs.expectedPremoves) {
     expect(new Set(premove(state, from))).toEqual(new Set(expectedDests));
   }
   expect(
-    util.allKeys.filter(sq => !expectedPremoves.has(sq)).every(sq => !premove(state, sq as cg.Key).length),
+    util.allKeys
+      .filter(sq => !specs.expectedPremoves.has(sq))
+      .every(sq => !premove(state, sq as cg.Key).length),
   ).toEqual(true);
-  if (checkDiagonalInverse) {
+  if (specs.checkDiagonalInverse) {
     testPosition(
       makeState(
-        diagonallyInvertPieces(state.pieces),
+        swapColorAndRearrange(state.pieces, diagonallyOpposite),
         !state.premovable.unrestrictedPremoves,
-        state.lastMove?.map(sq => diagonallyOpposite(sq)),
+        state.lastMove?.map(diagonallyOpposite),
         util.opposite(state.turnColor),
         undefined,
       ),
-      new Map(
-        [...expectedPremoves].map(([start, dests]) => [
-          diagonallyOpposite(start),
-          Array.from(dests, diagonallyOpposite),
-        ]),
+      makeSpecs(
+        transformExpectedPremoves(specs.expectedPremoves, diagonallyOpposite),
+        transformExpectedPremovesFuture(specs.expectedPremovesFuture, diagonallyOpposite),
+        false,
+        false,
       ),
-      false,
-      false,
     );
   }
-  if (checkVerticalInverse) {
+  if (specs.checkVerticalInverse) {
     testPosition(
       makeState(
-        verticallyInvertPieces(state.pieces),
+        swapColorAndRearrange(state.pieces, verticallyOpposite),
         !state.premovable.unrestrictedPremoves,
-        state.lastMove?.map(sq => verticallyOpposite(sq)),
+        state.lastMove?.map(verticallyOpposite),
         util.opposite(state.turnColor),
         state.premovable.castle ? invertCastlingPrivileges(state.premovable.castle) : undefined,
       ),
-      new Map(
-        [...expectedPremoves].map(([start, dests]) => [
-          verticallyOpposite(start),
-          Array.from(dests, verticallyOpposite),
-        ]),
+      makeSpecs(
+        transformExpectedPremoves(specs.expectedPremoves, verticallyOpposite),
+        transformExpectedPremovesFuture(specs.expectedPremovesFuture, verticallyOpposite),
+        false,
+        false,
       ),
-      false,
-      false,
     );
   }
+  // todo - use expectedpremovesfuture
 };
 
 test('premoves are trimmed appropriately', () => {
@@ -135,9 +158,7 @@ test('premoves are trimmed appropriately', () => {
       'white',
       undefined,
     ),
-    expectedPremoves,
-    true,
-    true,
+    makeSpecs(expectedPremoves, undefined, true, true),
   );
 });
 
@@ -154,9 +175,7 @@ test('anticipate all en passant captures if no last move', () => {
   ]);
   testPosition(
     makeState(fen.read('8/8/8/5RPp/1pP1pP2/3Pp2R/B6B/8 b - - 0 1'), true, undefined, 'black', undefined),
-    expectedPremoves,
-    true,
-    true,
+    makeSpecs(expectedPremoves, undefined, true, true),
   );
 });
 
@@ -173,9 +192,7 @@ test('horde no en passant for first to third rank', () => {
       'black',
       undefined,
     ),
-    expectedPremoves,
-    true,
-    true,
+    makeSpecs(expectedPremoves, undefined, true, true),
   );
 });
 
@@ -192,9 +209,7 @@ test('do not trim premoves when specified', () => {
       'black',
       undefined,
     ),
-    expectedPremoves,
-    true,
-    true,
+    makeSpecs(expectedPremoves, undefined, true, true),
   );
 });
 
@@ -206,9 +221,7 @@ test('prod bug report lichess-org/lila#18224', () => {
   ]);
   testPosition(
     makeState(fen.read('R7/6k1/8/8/5pp1/8/p4PK1/r7 b - - 0 56'), true, ['h2', 'g2'], 'black', undefined),
-    expectedPremoves,
-    true,
-    true,
+    makeSpecs(expectedPremoves, undefined, true, true),
   );
 });
 
@@ -297,9 +310,7 @@ describe('premove respects per-side castle forbids', () => {
     ]);
     testPosition(
       makeState(pieces, true, undefined, 'black', util.castlingPrivilegesFromFen(CLEAR_CASTLE_FEN, pieces)),
-      expectedPremoves,
-      false,
-      true,
+      makeSpecs(expectedPremoves, undefined, false, true),
     );
   });
 
@@ -317,9 +328,7 @@ describe('premove respects per-side castle forbids', () => {
         'black',
         util.castlingPrivilegesFromFen('r1k4r/8/8/8/8/8/8/R3K2R w Qkq - 0 1', pieces),
       ),
-      expectedPremoves,
-      false,
-      true,
+      makeSpecs(expectedPremoves, undefined, false, true),
     );
   });
 
@@ -337,9 +346,7 @@ describe('premove respects per-side castle forbids', () => {
         'black',
         util.castlingPrivilegesFromFen('r1k4r/8/8/8/8/8/8/R3K2R w Kkq - 0 1', pieces),
       ),
-      expectedPremoves,
-      false,
-      true,
+      makeSpecs(expectedPremoves, undefined, false, true),
     );
   });
 
