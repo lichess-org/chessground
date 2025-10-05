@@ -52,17 +52,12 @@ const makeState = (
 };
 
 const testPosition = (
-  pieces: cg.Pieces,
-  turnColor: cg.Color,
-  lastMove: cg.Key[] | undefined,
-  castlingPrivileges: cg.CastlePrivileges | undefined,
-  trimPremoves: boolean,
+  state: HeadlessState,
   expectedPremoves: Map<cg.Key, Iterable<cg.Key>>,
   checkDiagonalInverse: boolean,
   checkVerticalInverse: boolean,
 ): void => {
-  expect(!checkDiagonalInverse || !castlingPrivileges);
-  const state = makeState(pieces, trimPremoves, lastMove, turnColor, castlingPrivileges);
+  expect(!checkDiagonalInverse || !state.premovable.castle);
   for (const [from, expectedDests] of expectedPremoves) {
     expect(new Set(premove(state, from))).toEqual(new Set(expectedDests));
   }
@@ -71,11 +66,13 @@ const testPosition = (
   ).toEqual(true);
   if (checkDiagonalInverse) {
     testPosition(
-      diagonallyInvertPieces(pieces),
-      util.opposite(turnColor),
-      lastMove?.map(sq => diagonallyOpposite(sq)),
-      undefined,
-      trimPremoves,
+      makeState(
+        diagonallyInvertPieces(state.pieces),
+        !state.premovable.unrestrictedPremoves,
+        state.lastMove?.map(sq => diagonallyOpposite(sq)),
+        util.opposite(state.turnColor),
+        undefined,
+      ),
       new Map(
         [...expectedPremoves].map(([start, dests]) => [
           diagonallyOpposite(start),
@@ -88,11 +85,13 @@ const testPosition = (
   }
   if (checkVerticalInverse) {
     testPosition(
-      verticallyInvertPieces(pieces),
-      util.opposite(turnColor),
-      lastMove?.map(sq => verticallyOpposite(sq)),
-      castlingPrivileges ? invertCastlingPrivileges(castlingPrivileges) : undefined,
-      trimPremoves,
+      makeState(
+        verticallyInvertPieces(state.pieces),
+        !state.premovable.unrestrictedPremoves,
+        state.lastMove?.map(sq => verticallyOpposite(sq)),
+        util.opposite(state.turnColor),
+        state.premovable.castle ? invertCastlingPrivileges(state.premovable.castle) : undefined,
+      ),
       new Map(
         [...expectedPremoves].map(([start, dests]) => [
           verticallyOpposite(start),
@@ -129,11 +128,13 @@ test('premoves are trimmed appropriately', () => {
     ['a3', []],
   ]);
   testPosition(
-    fen.read('k1n2r1r/2bP2p1/3r3p/Ppq1pPr1/qP4n1/p3r1P1/PbnP2KP/R4r1q w - - 0 1'),
-    'white',
-    ['e7', 'e5'],
-    undefined,
-    true,
+    makeState(
+      fen.read('k1n2r1r/2bP2p1/3r3p/Ppq1pPr1/qP4n1/p3r1P1/PbnP2KP/R4r1q w - - 0 1'),
+      true,
+      ['e7', 'e5'],
+      'white',
+      undefined,
+    ),
     expectedPremoves,
     true,
     true,
@@ -152,11 +153,7 @@ test('anticipate all en passant captures if no last move', () => {
     ['d3', ['d4', 'e4']],
   ]);
   testPosition(
-    fen.read('8/8/8/5RPp/1pP1pP2/3Pp2R/B6B/8 b - - 0 1'),
-    'black',
-    undefined,
-    undefined,
-    true,
+    makeState(fen.read('8/8/8/5RPp/1pP1pP2/3Pp2R/B6B/8 b - - 0 1'), true, undefined, 'black', undefined),
     expectedPremoves,
     true,
     true,
@@ -169,11 +166,13 @@ test('horde no en passant for first to third rank', () => {
     ['g3', ['g4', 'h4']],
   ]);
   testPosition(
-    fen.read('rnbqkbnr/ppppppp1/8/8/8/6Pp/8/5P2 w kq - 0 1'),
-    'black',
-    ['g1', 'g3'],
-    undefined,
-    true,
+    makeState(
+      fen.read('rnbqkbnr/ppppppp1/8/8/8/6Pp/8/5P2 w kq - 0 1'),
+      true,
+      ['g1', 'g3'],
+      'black',
+      undefined,
+    ),
     expectedPremoves,
     true,
     true,
@@ -186,11 +185,13 @@ test('do not trim premoves when specified', () => {
     ['g3', ['g4', 'h4', 'f4']],
   ]);
   testPosition(
-    fen.read('rnbqkbnr/ppppppp1/8/8/8/6Pp/8/5P2 w kq - 0 1'),
-    'black',
-    ['g1', 'g3'],
-    undefined,
-    false,
+    makeState(
+      fen.read('rnbqkbnr/ppppppp1/8/8/8/6Pp/8/5P2 w kq - 0 1'),
+      false,
+      ['g1', 'g3'],
+      'black',
+      undefined,
+    ),
     expectedPremoves,
     true,
     true,
@@ -204,11 +205,7 @@ test('prod bug report lichess-org/lila#18224', () => {
     ['g2', new Set(['h1', 'g1', 'f1', 'h2', 'h3', 'g3', 'f3'])],
   ]);
   testPosition(
-    fen.read('R7/6k1/8/8/5pp1/8/p4PK1/r7 b - - 0 56'),
-    'black',
-    ['h2', 'g2'],
-    undefined,
-    true,
+    makeState(fen.read('R7/6k1/8/8/5pp1/8/p4PK1/r7 b - - 0 56'), true, ['h2', 'g2'], 'black', undefined),
     expectedPremoves,
     true,
     true,
@@ -299,11 +296,7 @@ describe('premove respects per-side castle forbids', () => {
       ['h1', kingsRookPremoves],
     ]);
     testPosition(
-      pieces,
-      'black',
-      undefined,
-      util.castlingPrivilegesFromFen(CLEAR_CASTLE_FEN, pieces),
-      true,
+      makeState(pieces, true, undefined, 'black', util.castlingPrivilegesFromFen(CLEAR_CASTLE_FEN, pieces)),
       expectedPremoves,
       false,
       true,
@@ -317,11 +310,13 @@ describe('premove respects per-side castle forbids', () => {
       ['h1', kingsRookPremoves],
     ]);
     testPosition(
-      pieces,
-      'black',
-      undefined,
-      util.castlingPrivilegesFromFen('r1k4r/8/8/8/8/8/8/R3K2R w Qkq - 0 1', pieces),
-      true,
+      makeState(
+        pieces,
+        true,
+        undefined,
+        'black',
+        util.castlingPrivilegesFromFen('r1k4r/8/8/8/8/8/8/R3K2R w Qkq - 0 1', pieces),
+      ),
       expectedPremoves,
       false,
       true,
@@ -335,11 +330,13 @@ describe('premove respects per-side castle forbids', () => {
       ['h1', kingsRookPremoves],
     ]);
     testPosition(
-      pieces,
-      'black',
-      undefined,
-      util.castlingPrivilegesFromFen('r1k4r/8/8/8/8/8/8/R3K2R w Kkq - 0 1', pieces),
-      true,
+      makeState(
+        pieces,
+        true,
+        undefined,
+        'black',
+        util.castlingPrivilegesFromFen('r1k4r/8/8/8/8/8/8/R3K2R w Kkq - 0 1', pieces),
+      ),
       expectedPremoves,
       false,
       true,
