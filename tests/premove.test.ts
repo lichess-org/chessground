@@ -28,10 +28,10 @@ const verticallyInvertPieces = (pieces: cg.Pieces): cg.Pieces =>
     ]),
   );
 
-const invertCastlingRights = (castlingRights: cg.CastlePrivileges): cg.CastlePrivileges => {
+const invertCastlingPrivileges = (castlingPrivileges: cg.CastlePrivileges): cg.CastlePrivileges => {
   return {
-    white: castlingRights.black,
-    black: castlingRights.white,
+    white: castlingPrivileges.black,
+    black: castlingPrivileges.white,
   };
 };
 
@@ -40,14 +40,14 @@ const makeState = (
   trimPremoves: boolean,
   lastMove: cg.Key[] | undefined,
   turnColor: cg.Color,
-  castlingRights: cg.CastlePrivileges | undefined,
+  castlingPrivileges: cg.CastlePrivileges | undefined,
 ): HeadlessState => {
   const state = defaults();
   state.pieces = pieces;
   if (!trimPremoves) state.premovable.unrestrictedPremoves = true;
   state.lastMove = lastMove;
   state.turnColor = turnColor;
-  if (castlingRights) state.premovable.castle = structuredClone(castlingRights);
+  if (castlingPrivileges) state.premovable.castle = structuredClone(castlingPrivileges);
   return state;
 };
 
@@ -55,13 +55,13 @@ const testPosition = (
   pieces: cg.Pieces,
   turnColor: cg.Color,
   lastMove: cg.Key[] | undefined,
-  castlingRights: cg.CastlePrivileges | undefined,
+  castlingPrivileges: cg.CastlePrivileges | undefined,
   expectedPremoves: Map<cg.Key, Iterable<cg.Key>>,
   checkDiagonalInverse: boolean,
   checkVerticalInverse: boolean,
 ): void => {
-  expect(!checkDiagonalInverse || !castlingRights);
-  const state = makeState(pieces, true, lastMove, turnColor, castlingRights);
+  expect(!checkDiagonalInverse || !castlingPrivileges);
+  const state = makeState(pieces, true, lastMove, turnColor, castlingPrivileges);
   for (const [from, expectedDests] of expectedPremoves) {
     expect(new Set(premove(state, from))).toEqual(new Set(expectedDests));
   }
@@ -89,7 +89,7 @@ const testPosition = (
       verticallyInvertPieces(pieces),
       util.opposite(turnColor),
       lastMove?.map(sq => verticallyOpposite(sq)),
-      castlingRights ? invertCastlingRights(castlingRights) : undefined,
+      castlingPrivileges ? invertCastlingPrivileges(castlingPrivileges) : undefined,
       new Map(
         [...expectedPremoves].map(([start, dests]) => [
           verticallyOpposite(start),
@@ -322,7 +322,4 @@ describe('premove respects per-side castle forbids', () => {
 
   // todo - tests with trimpremoves = false? for current tests shouldnt affect anything
   // also test castling premove stuff after making moves
-
-  // todo - overall for pr, consider being consistent with castling "privileges"/"rights"
-  // todo - also on draft commit, amend
 });

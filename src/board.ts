@@ -106,7 +106,7 @@ function tryAutoCastle(state: HeadlessState, orig: cg.Key, dest: cg.Key): boolea
 /**
  * Note that this function relies on `state.lastMove` being updated, but not on `state.turnColor`.
  */
-const updateCastlingRights = (state: HeadlessState, pieceThatJustMoved: cg.Piece): void => {
+const updateCastlingPrivileges = (state: HeadlessState, pieceThatJustMoved: cg.Piece): void => {
   if (
     !state.lastMove ||
     ['king', 'rook'].every(r => r !== pieceThatJustMoved.role) ||
@@ -147,7 +147,7 @@ export function baseMove(state: HeadlessState, orig: cg.Key, dest: cg.Key): cg.P
   }
   state.lastMove = [orig, dest];
   state.check = undefined;
-  updateCastlingRights(state, origPiece);
+  updateCastlingPrivileges(state, origPiece);
   callUserFunction(state.events.change);
   return captured || true;
 }
