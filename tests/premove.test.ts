@@ -196,10 +196,7 @@ describe('castling privileges parsed from FEN', () => {
     const fenStr = 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1';
     const pieces = fen.read(fenStr);
     const priv = util.castlingPrivilegesFromFen(fenStr, pieces);
-    expect(priv.white.kside).toBe(true);
-    expect(priv.white.qside).toBe(true);
-    expect(priv.black.kside).toBe(true);
-    expect(priv.black.qside).toBe(true);
+    expect(util.sameCastlingPrivileges(priv, util.makeCastlingPrivileges(true))).toBe(true);
   });
 
   it('parses standard KQ', () => {
@@ -236,10 +233,7 @@ describe('castling privileges parsed from FEN', () => {
     const fenStr = '4k3/8/8/8/8/8/8/4K3 w - - 0 1';
     const pieces = fen.read(fenStr);
     const priv = util.castlingPrivilegesFromFen(fenStr, pieces);
-    expect(priv.white.kside).toBe(false);
-    expect(priv.white.qside).toBe(false);
-    expect(priv.black.kside).toBe(false);
-    expect(priv.black.qside).toBe(false);
+    expect(util.sameCastlingPrivileges(priv, util.makeCastlingPrivileges(false))).toBe(true);
   });
 
   it('interprets Chess960-style rook-file letters for white', () => {

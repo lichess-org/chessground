@@ -189,6 +189,10 @@ export const makeCastlingPrivileges = (valForAll: boolean): cg.CastlePrivileges 
   return { white: { kside: valForAll, qside: valForAll }, black: { kside: valForAll, qside: valForAll } };
 };
 
+export const sameCastlingPrivileges = (first: cg.CastlePrivileges, second: cg.CastlePrivileges) =>
+  first.white.kside === second.white.kside && first.white.qside === second.white.qside &&
+  first.black.kside === second.black.kside && first.black.qside === second.black.qside
+
 export const castlingPrivilegesFromFen = (fen: cg.FEN, pieces: cg.Pieces): cg.CastlePrivileges => {
   const castlePart = fen.split(/\s+/)[2];
   const castlePrivileges = makeCastlingPrivileges(false);
