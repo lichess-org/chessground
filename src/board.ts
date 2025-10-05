@@ -9,6 +9,7 @@ import {
   queenDir,
   knightDir,
   samePos,
+  pos2keyUnsafe,
 } from './util.js';
 import { premove } from './premove.js';
 import * as cg from './types.js';
@@ -87,8 +88,8 @@ function tryAutoCastle(state: HeadlessState, orig: cg.Key, dest: cg.Key): boolea
   const destPos = key2pos(dest);
   if ((origPos[1] !== 0 && origPos[1] !== 7) || origPos[1] !== destPos[1]) return false;
   if (origPos[0] === 4 && !state.pieces.has(dest)) {
-    if (destPos[0] === 6) dest = pos2key([7, destPos[1]]);
-    else if (destPos[0] === 2) dest = pos2key([0, destPos[1]]);
+    if (destPos[0] === 6) dest = pos2keyUnsafe([7, destPos[1]]);
+    else if (destPos[0] === 2) dest = pos2keyUnsafe([0, destPos[1]]);
   }
   const rook = state.pieces.get(dest);
   if (!rook || rook.color !== king.color || rook.role !== 'rook') return false;
@@ -97,11 +98,11 @@ function tryAutoCastle(state: HeadlessState, orig: cg.Key, dest: cg.Key): boolea
   state.pieces.delete(dest);
 
   if (origPos[0] < destPos[0]) {
-    state.pieces.set(pos2key([6, destPos[1]]), king);
-    state.pieces.set(pos2key([5, destPos[1]]), rook);
+    state.pieces.set(pos2keyUnsafe([6, destPos[1]]), king);
+    state.pieces.set(pos2keyUnsafe([5, destPos[1]]), rook);
   } else {
-    state.pieces.set(pos2key([2, destPos[1]]), king);
-    state.pieces.set(pos2key([3, destPos[1]]), rook);
+    state.pieces.set(pos2keyUnsafe([2, destPos[1]]), king);
+    state.pieces.set(pos2keyUnsafe([3, destPos[1]]), rook);
   }
   return true;
 }
@@ -367,7 +368,9 @@ export function getSnappedKeyAtDomPos(
       queenDir(origPos[0], origPos[1], pos2[0], pos2[1]) ||
       knightDir(origPos[0], origPos[1], pos2[0], pos2[1]),
   );
-  const validSnapCenters = validSnapPos.map(pos2 => computeSquareCenter(pos2key(pos2), asWhite, bounds));
+  const validSnapCenters = validSnapPos.map(pos2 =>
+    computeSquareCenter(pos2keyUnsafe(pos2), asWhite, bounds),
+  );
   const validSnapDistances = validSnapCenters.map(pos2 => distanceSq(pos, pos2));
   const [, closestSnapIndex] = validSnapDistances.reduce(
     (a, b, index) => (a[0] < b ? a : [b, index]),

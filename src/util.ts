@@ -18,6 +18,8 @@ export const uciToMove = (uci: string | undefined): cg.Key[] | undefined => {
 
 export const allPos: readonly cg.Pos[] = allKeys.map(key2pos);
 
+export const allPosAndKey: readonly cg.PosAndKey[] = allKeys.map((key, i) => ({ key, pos: allPos[i] }));
+
 export function memo<A>(f: () => A): cg.Memo<A> {
   let v: A | undefined;
   const ret = (): A => {

@@ -5,7 +5,7 @@ import * as fen from '../src/fen';
 import * as util from '../src/util';
 
 const diagonallyOpposite = (square: cg.Key): cg.Key =>
-  util.pos2key(util.key2pos(square).map(n => 7 - n) as cg.Pos);
+  util.pos2keyUnsafe(util.key2pos(square).map(n => 7 - n) as cg.Pos);
 
 const invertPieces = (pieces: cg.Pieces): cg.Pieces =>
   new Map(

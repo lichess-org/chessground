@@ -3,8 +3,8 @@ import * as cg from './types.js';
 import { HeadlessState } from './state.js';
 
 type MobilityContext = {
-  pos1: cg.Pos;
-  pos2: cg.Pos;
+  orig: cg.PosAndKey;
+  dest: cg.PosAndKey;
   allPieces: cg.Pieces;
   friendlies: cg.Pieces;
   enemies: cg.Pieces;
@@ -17,13 +17,12 @@ type MobilityContext = {
 
 type Mobility = (ctx: MobilityContext) => boolean;
 
-const isDestOccupiedByFriendly = (ctx: MobilityContext): boolean =>
-  ctx.friendlies.has(util.pos2key(ctx.pos2));
+const isDestOccupiedByFriendly = (ctx: MobilityContext): boolean => ctx.friendlies.has(ctx.dest.key);
 
-const isDestOccupiedByEnemy = (ctx: MobilityContext): boolean => ctx.enemies.has(util.pos2key(ctx.pos2));
+const isDestOccupiedByEnemy = (ctx: MobilityContext): boolean => ctx.enemies.has(ctx.dest.key);
 
-const anyPieceBetween = (pos1: cg.Pos, pos2: cg.Pos, pieces: cg.Pieces): boolean =>
-  util.squaresBetween(...pos1, ...pos2).some(s => pieces.has(s));
+const anyPieceBetween = (orig: cg.Pos, pos2: cg.Pos, pieces: cg.Pieces): boolean =>
+  util.squaresBetween(...orig, ...pos2).some(s => pieces.has(s));
 
 const canEnemyPawnAdvanceToSquare = (pawnStart: cg.Key, dest: cg.Key, ctx: MobilityContext): boolean => {
   const piece = ctx.enemies.get(pawnStart);
@@ -53,10 +52,10 @@ const canEnemyPawnCaptureOnSquare = (pawnStart: cg.Key, dest: cg.Key, ctx: Mobil
 };
 
 const canSomeEnemyPawnAdvanceToDest = (ctx: MobilityContext): boolean =>
-  [...ctx.enemies.keys()].some(key => canEnemyPawnAdvanceToSquare(key, util.pos2key(ctx.pos2), ctx));
+  [...ctx.enemies.keys()].some(key => canEnemyPawnAdvanceToSquare(key, ctx.dest.key, ctx));
 
 const isDestControlledByEnemy = (ctx: MobilityContext, pieceRolesExclude?: cg.Role[]): boolean => {
-  const square: cg.Pos = ctx.pos2;
+  const square: cg.Pos = ctx.dest.pos;
   return [...ctx.enemies].some(([key, piece]) => {
     const piecePos = util.key2pos(key);
     return (
@@ -74,7 +73,7 @@ const isDestControlledByEnemy = (ctx: MobilityContext, pieceRolesExclude?: cg.Ro
 
 const isFriendlyOnDestAndAttacked = (ctx: MobilityContext): boolean =>
   isDestOccupiedByFriendly(ctx) &&
-  (canBeCapturedBySomeEnemyEnPassant(util.pos2key(ctx.pos2), ctx.friendlies, ctx.enemies, ctx.lastMove) ||
+  (canBeCapturedBySomeEnemyEnPassant(ctx.dest.key, ctx.friendlies, ctx.enemies, ctx.lastMove) ||
     isDestControlledByEnemy(ctx));
 
 const canBeCapturedBySomeEnemyEnPassant = (
@@ -91,32 +90,39 @@ const canBeCapturedBySomeEnemyEnPassant = (
     friendly?.role === 'pawn' &&
     pos[1] === (friendly.color === 'white' ? 3 : 4) &&
     (!lastMove || util.diff(util.key2pos(lastMove[0])[1], pos[1]) === 2) &&
-    [1, -1].some(delta => enemies.get(util.pos2key([pos[0] + delta, pos[1]]))?.role === 'pawn')
+    [1, -1].some(delta => {
+      const k = util.pos2key([pos[0] + delta, pos[1]]);
+      return !!k && enemies.get(k)?.role === 'pawn';
+    })
   );
 };
 
 const isPathClearEnoughOfFriendliesForPremove = (ctx: MobilityContext): boolean => {
   if (ctx.unrestrictedPremoves) return true;
-  const squaresBetween = util.squaresBetween(...ctx.pos1, ...ctx.pos2);
+  const squaresBetween = util.squaresBetween(...ctx.orig.pos, ...ctx.dest.pos);
   const squaresOfFriendliesBetween = squaresBetween.filter(s => ctx.friendlies.has(s));
+  const firstSquareOfFriendliesBetween = squaresOfFriendliesBetween[0];
+  if (!firstSquareOfFriendliesBetween) return true;
+  const nextSquare = util.squareShiftedVertically(
+    firstSquareOfFriendliesBetween,
+    ctx.color === 'white' ? -1 : 1,
+  );
   return (
-    !squaresOfFriendliesBetween.length ||
-    (squaresOfFriendliesBetween.length === 1 &&
-      canBeCapturedBySomeEnemyEnPassant(
-        squaresOfFriendliesBetween[0],
-        ctx.friendlies,
-        ctx.enemies,
-        ctx.lastMove,
-      ) &&
-      !squaresBetween.includes(
-        util.squareShiftedVertically(squaresOfFriendliesBetween[0], ctx.color === 'white' ? -1 : 1),
-      ))
+    squaresOfFriendliesBetween.length === 1 &&
+    canBeCapturedBySomeEnemyEnPassant(
+      firstSquareOfFriendliesBetween,
+      ctx.friendlies,
+      ctx.enemies,
+      ctx.lastMove,
+    ) &&
+    !!nextSquare &&
+    !squaresBetween.includes(nextSquare)
   );
 };
 
 const isPathClearEnoughOfEnemiesForPremove = (ctx: MobilityContext): boolean => {
   if (ctx.unrestrictedPremoves) return true;
-  const squaresBetween = util.squaresBetween(...ctx.pos1, ...ctx.pos2);
+  const squaresBetween = util.squaresBetween(...ctx.orig.pos, ...ctx.dest.pos);
   const squaresOfEnemiesBetween = squaresBetween.filter(s => ctx.enemies.has(s));
   if (squaresOfEnemiesBetween.length > 1) return false;
   if (!squaresOfEnemiesBetween.length) return true;
@@ -126,13 +132,15 @@ const isPathClearEnoughOfEnemiesForPremove = (ctx: MobilityContext): boolean => 
 
   const enemyStep = enemy.color === 'white' ? 1 : -1;
   const squareAbove = util.squareShiftedVertically(enemySquare, enemyStep);
-  const enemyPawnDests: cg.Key[] = [
-    ...util.adjacentSquares(squareAbove).filter(s => canEnemyPawnCaptureOnSquare(enemySquare, s, ctx)),
-    ...[squareAbove, util.squareShiftedVertically(squareAbove, enemyStep)].filter(
-      (s: cg.Key | undefined) => s && canEnemyPawnAdvanceToSquare(enemySquare, s, ctx),
-    ),
-  ];
-  const badSquares = [...squaresBetween, util.pos2key(ctx.pos1)];
+  const enemyPawnDests: cg.Key[] = squareAbove
+    ? [
+        ...util.adjacentSquares(squareAbove).filter(s => canEnemyPawnCaptureOnSquare(enemySquare, s, ctx)),
+        ...[squareAbove, util.squareShiftedVertically(squareAbove, enemyStep)]
+          .filter(s => !!s)
+          .filter(s => canEnemyPawnAdvanceToSquare(enemySquare, s, ctx)),
+      ]
+    : [];
+  const badSquares = [...squaresBetween, ctx.orig.key];
   return enemyPawnDests.some(square => !badSquares.includes(square));
 };
 
@@ -141,21 +149,25 @@ const isPathClearEnoughForPremove = (ctx: MobilityContext): boolean =>
 
 const pawn: Mobility = (ctx: MobilityContext) => {
   const step = ctx.color === 'white' ? 1 : -1;
-  if (util.diff(ctx.pos1[0], ctx.pos2[0]) > 1) return false;
-  if (!util.diff(ctx.pos1[0], ctx.pos2[0])) {
+  if (util.diff(ctx.orig.pos[0], ctx.dest.pos[0]) > 1) return false;
+  if (!util.diff(ctx.orig.pos[0], ctx.dest.pos[0])) {
+    const pos: cg.Pos = [ctx.dest.pos[0], ctx.dest.pos[1] + step];
+    const key = util.pos2key(pos);
+    const next = key && { pos, key };
     return (
-      util.pawnDirAdvance(...ctx.pos1, ...ctx.pos2, ctx.color === 'white') &&
-      isPathClearEnoughForPremove({ ...ctx, pos2: [ctx.pos2[0], ctx.pos2[1] + step] })
+      util.pawnDirAdvance(...ctx.orig.pos, ...ctx.dest.pos, ctx.color === 'white') &&
+      !!next &&
+      isPathClearEnoughForPremove({ ...ctx, dest: next })
     );
   }
-  if (ctx.pos2[1] !== ctx.pos1[1] + step) return false;
+  if (ctx.dest.pos[1] !== ctx.orig.pos[1] + step) return false;
   if (ctx.unrestrictedPremoves || isDestOccupiedByEnemy(ctx)) return true;
   if (isDestOccupiedByFriendly(ctx)) return isDestControlledByEnemy(ctx);
   else
     return (
       canSomeEnemyPawnAdvanceToDest(ctx) ||
       canBeCapturedBySomeEnemyEnPassant(
-        util.pos2key([ctx.pos2[0], ctx.pos2[1] + step]),
+        util.pos2key([ctx.dest.pos[0], ctx.dest.pos[1] + step]),
         ctx.friendlies,
         ctx.enemies,
         ctx.lastMove,
@@ -165,37 +177,37 @@ const pawn: Mobility = (ctx: MobilityContext) => {
 };
 
 const knight: Mobility = (ctx: MobilityContext) =>
-  util.knightDir(...ctx.pos1, ...ctx.pos2) &&
+  util.knightDir(...ctx.orig.pos, ...ctx.dest.pos) &&
   (ctx.unrestrictedPremoves || !isDestOccupiedByFriendly(ctx) || isFriendlyOnDestAndAttacked(ctx));
 
 const bishop: Mobility = (ctx: MobilityContext) =>
-  util.bishopDir(...ctx.pos1, ...ctx.pos2) &&
+  util.bishopDir(...ctx.orig.pos, ...ctx.dest.pos) &&
   isPathClearEnoughForPremove(ctx) &&
   (ctx.unrestrictedPremoves || !isDestOccupiedByFriendly(ctx) || isFriendlyOnDestAndAttacked(ctx));
 
 const rook: Mobility = (ctx: MobilityContext) =>
-  util.rookDir(...ctx.pos1, ...ctx.pos2) &&
+  util.rookDir(...ctx.orig.pos, ...ctx.dest.pos) &&
   isPathClearEnoughForPremove(ctx) &&
   (ctx.unrestrictedPremoves || !isDestOccupiedByFriendly(ctx) || isFriendlyOnDestAndAttacked(ctx));
 
 const queen: Mobility = (ctx: MobilityContext) => bishop(ctx) || rook(ctx);
 
 const king: Mobility = (ctx: MobilityContext) =>
-  (util.kingDirNonCastling(...ctx.pos1, ...ctx.pos2) &&
+  (util.kingDirNonCastling(...ctx.orig.pos, ...ctx.dest.pos) &&
     (ctx.unrestrictedPremoves || !isDestOccupiedByFriendly(ctx) || isFriendlyOnDestAndAttacked(ctx))) ||
   (ctx.canCastle &&
-    ctx.pos1[1] === ctx.pos2[1] &&
-    ctx.pos1[1] === (ctx.color === 'white' ? 0 : 7) &&
-    ((ctx.pos1[0] === 4 &&
-      ((ctx.pos2[0] === 2 && ctx.rookFilesFriendlies.includes(0)) ||
-        (ctx.pos2[0] === 6 && ctx.rookFilesFriendlies.includes(7)))) ||
-      ctx.rookFilesFriendlies.includes(ctx.pos2[0])) &&
+    ctx.orig.pos[1] === ctx.dest.pos[1] &&
+    ctx.orig.pos[1] === (ctx.color === 'white' ? 0 : 7) &&
+    ((ctx.orig.pos[0] === 4 &&
+      ((ctx.dest.pos[0] === 2 && ctx.rookFilesFriendlies.includes(0)) ||
+        (ctx.dest.pos[0] === 6 && ctx.rookFilesFriendlies.includes(7)))) ||
+      ctx.rookFilesFriendlies.includes(ctx.dest.pos[0])) &&
     (ctx.unrestrictedPremoves ||
       /* The following checks if no non-rook friendly piece is in the way between the king and its castling destination.
          Note that for the Chess960 edge case of Kb1 "long castling", the check passes even if there is a piece in the way
          on c1. But this is fine, since premoving from b1 to a1 as a normal move would have already returned true. */
       util
-        .squaresBetween(...ctx.pos1, ctx.pos2[0] > ctx.pos1[0] ? 7 : 1, ctx.pos2[1])
+        .squaresBetween(...ctx.orig.pos, ctx.dest.pos[0] > ctx.orig.pos[0] ? 7 : 1, ctx.dest.pos[1])
         .map(s => ctx.allPieces.get(s))
         .every(p => !p || util.samePiece(p, { role: 'rook', color: ctx.color }))));
 
@@ -210,10 +222,10 @@ export function premove(state: HeadlessState, key: cg.Key): cg.Key[] {
   const color = piece.color,
     friendlies = new Map([...pieces].filter(([_, p]) => p.color === color)),
     enemies = new Map([...pieces].filter(([_, p]) => p.color === util.opposite(color))),
-    pos = util.key2pos(key),
+    orig = { key, pos: util.key2pos(key) },
     mobility: Mobility = mobilityByRole[piece.role],
     ctx = {
-      pos1: pos,
+      orig,
       allPieces: pieces,
       friendlies: friendlies,
       enemies: enemies,
@@ -227,5 +239,5 @@ export function premove(state: HeadlessState, key: cg.Key): cg.Key[] {
         .map(([k]) => util.key2pos(k)[0]),
       lastMove: state.lastMove,
     };
-  return util.allPos.filter(pos2 => mobility({ ...ctx, pos2 })).map(util.pos2key);
+  return util.allPosAndKey.filter(pos2 => mobility({ ...ctx, dest: pos2 })).map(pk => pk.key);
 }
