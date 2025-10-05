@@ -143,8 +143,8 @@ const isPathClearEnoughOfEnemiesForPremove = (ctx: MobilityContext): boolean => 
   const enemyPawnDests: cg.Key[] = squareAbove
     ? [
         ...util
-      .horizontallyAdjacentSquares(squareAbove)
-      .filter(s => canEnemyPawnCaptureOnSquare(enemySquare, s, ctx)),
+          .horizontallyAdjacentSquares(squareAbove)
+          .filter(s => canEnemyPawnCaptureOnSquare(enemySquare, s, ctx)),
         ...[squareAbove, util.squareShiftedVertically(squareAbove, enemyStep)]
           .filter(s => !!s)
           .filter(s => canEnemyPawnAdvanceToSquare(enemySquare, s, ctx)),

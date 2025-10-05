@@ -4,7 +4,7 @@ export const invRanks: readonly cg.Rank[] = [...cg.ranks].reverse();
 
 export const allKeys: readonly cg.Key[] = cg.files.flatMap(f => cg.ranks.map(r => (f + r) as cg.Key));
 
-export const pos2key = (pos: cg.Pos): cg.Key | undefined => 
+export const pos2key = (pos: cg.Pos): cg.Key | undefined =>
   pos.every(x => x >= 0 && x <= 7) ? allKeys[8 * pos[0] + pos[1]] : undefined;
 
 export const pos2keyUnsafe = (pos: cg.Pos): cg.Key => pos2key(pos)!;
@@ -190,8 +190,10 @@ export const makeCastlingPrivileges = (valForAll: boolean): cg.CastlePrivileges 
 };
 
 export const sameCastlingPrivileges = (first: cg.CastlePrivileges, second: cg.CastlePrivileges) =>
-  first.white.kside === second.white.kside && first.white.qside === second.white.qside &&
-  first.black.kside === second.black.kside && first.black.qside === second.black.qside
+  first.white.kside === second.white.kside &&
+  first.white.qside === second.white.qside &&
+  first.black.kside === second.black.kside &&
+  first.black.qside === second.black.qside;
 
 export const castlingPrivilegesFromFen = (fen: cg.FEN, pieces: cg.Pieces): cg.CastlePrivileges => {
   const castlePart = fen.split(/\s+/)[2];

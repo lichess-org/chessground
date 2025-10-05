@@ -187,7 +187,7 @@ test('prod bug report lichess-org/lila#18224', () => {
     undefined,
     expectedPremoves,
     true,
-    true
+    true,
   );
 });
 
@@ -241,10 +241,24 @@ describe('castling privileges parsed from FEN', () => {
     const pieces = fen.read(fenStr);
     const priv = util.castlingPrivilegesFromFen(fenStr, pieces);
     expect(util.sameCastlingPrivileges(priv, util.makeCastlingPrivileges(true))).toBe(true);
-    expect(util.sameCastlingPrivileges(priv, util.castlingPrivilegesFromFen(fenStr.replace('AHah', 'KQkq'), pieces))).toBe(true);
-    expect(util.sameCastlingPrivileges(priv, util.castlingPrivilegesFromFen(fenStr.replace('AHah', 'BGcf'), pieces))).toBe(true);
-    expect(util.sameCastlingPrivileges(priv, util.castlingPrivilegesFromFen(fenStr.split(' ')[0], pieces))).toBe(true);
-    expect(util.sameCastlingPrivileges(priv, util.castlingPrivilegesFromFen(fenStr.replace('AHah', '-'), pieces))).toBe(false);
+    expect(
+      util.sameCastlingPrivileges(
+        priv,
+        util.castlingPrivilegesFromFen(fenStr.replace('AHah', 'KQkq'), pieces),
+      ),
+    ).toBe(true);
+    expect(
+      util.sameCastlingPrivileges(
+        priv,
+        util.castlingPrivilegesFromFen(fenStr.replace('AHah', 'BGcf'), pieces),
+      ),
+    ).toBe(true);
+    expect(
+      util.sameCastlingPrivileges(priv, util.castlingPrivilegesFromFen(fenStr.split(' ')[0], pieces)),
+    ).toBe(true);
+    expect(
+      util.sameCastlingPrivileges(priv, util.castlingPrivilegesFromFen(fenStr.replace('AHah', '-'), pieces)),
+    ).toBe(false);
   });
 
   // todo - also test FENs where just the pieces field is given
