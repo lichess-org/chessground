@@ -21,8 +21,8 @@ const isDestOccupiedByFriendly = (ctx: MobilityContext): boolean => ctx.friendli
 
 const isDestOccupiedByEnemy = (ctx: MobilityContext): boolean => ctx.enemies.has(ctx.dest.key);
 
-const anyPieceBetween = (orig: cg.Pos, pos2: cg.Pos, pieces: cg.Pieces): boolean =>
-  util.squaresBetween(...orig, ...pos2).some(s => pieces.has(s));
+const anyPieceBetween = (orig: cg.Pos, dest: cg.Pos, pieces: cg.Pieces): boolean =>
+  util.squaresBetween(...orig, ...dest).some(s => pieces.has(s));
 
 const canEnemyPawnAdvanceToSquare = (pawnStart: cg.Key, dest: cg.Key, ctx: MobilityContext): boolean => {
   const piece = ctx.enemies.get(pawnStart);
@@ -239,5 +239,5 @@ export function premove(state: HeadlessState, key: cg.Key): cg.Key[] {
         .map(([k]) => util.key2pos(k)[0]),
       lastMove: state.lastMove,
     };
-  return util.allPosAndKey.filter(pos2 => mobility({ ...ctx, dest: pos2 })).map(pk => pk.key);
+  return util.allPosAndKey.filter(dest => mobility({ ...ctx, dest })).map(pk => pk.key);
 }
