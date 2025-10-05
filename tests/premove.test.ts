@@ -12,15 +12,6 @@ const verticallyOpposite = (square: cg.Key): cg.Key => {
 const diagonallyOpposite = (square: cg.Key): cg.Key =>
   util.pos2keyUnsafe(util.key2pos(square).map(n => 7 - n) as cg.Pos);
 
-const verticallyInvertState = (state: HeadlessState): HeadlessState =>
-  makeState(
-    verticallyInvertPieces(state.pieces),
-    !state.premovable.unrestrictedPremoves,
-    state.lastMove?.map(verticallyOpposite) ?? undefined,
-    util.opposite(state.turnColor),
-    invertCastlingRights(state.premovable.castle),
-  );
-
 const diagonallyInvertPieces = (pieces: cg.Pieces): cg.Pieces =>
   new Map(
     [...pieces].map(([key, piece]) => [
