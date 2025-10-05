@@ -56,10 +56,10 @@ const testPosition = (
   turnColor: cg.Color,
   lastMove: cg.Key[] | undefined,
   castlingPrivileges: cg.CastlePrivileges | undefined,
+  trimPremoves: boolean,
   expectedPremoves: Map<cg.Key, Iterable<cg.Key>>,
   checkDiagonalInverse: boolean,
   checkVerticalInverse: boolean,
-  trimPremoves: boolean,
 ): void => {
   expect(!checkDiagonalInverse || !castlingPrivileges);
   const state = makeState(pieces, trimPremoves, lastMove, turnColor, castlingPrivileges);
@@ -75,6 +75,7 @@ const testPosition = (
       util.opposite(turnColor),
       lastMove?.map(sq => diagonallyOpposite(sq)),
       undefined,
+      trimPremoves,
       new Map(
         [...expectedPremoves].map(([start, dests]) => [
           diagonallyOpposite(start),
@@ -83,7 +84,6 @@ const testPosition = (
       ),
       false,
       false,
-      trimPremoves,
     );
   }
   if (checkVerticalInverse) {
@@ -92,6 +92,7 @@ const testPosition = (
       util.opposite(turnColor),
       lastMove?.map(sq => verticallyOpposite(sq)),
       castlingPrivileges ? invertCastlingPrivileges(castlingPrivileges) : undefined,
+      trimPremoves,
       new Map(
         [...expectedPremoves].map(([start, dests]) => [
           verticallyOpposite(start),
@@ -100,7 +101,6 @@ const testPosition = (
       ),
       false,
       false,
-      trimPremoves,
     );
   }
 };
@@ -133,8 +133,8 @@ test('premoves are trimmed appropriately', () => {
     'white',
     ['e7', 'e5'],
     undefined,
-    expectedPremoves,
     true,
+    expectedPremoves,
     true,
     true,
   );
@@ -156,8 +156,8 @@ test('anticipate all en passant captures if no last move', () => {
     'black',
     undefined,
     undefined,
-    expectedPremoves,
     true,
+    expectedPremoves,
     true,
     true,
   );
@@ -173,8 +173,8 @@ test('horde no en passant for first to third rank', () => {
     'black',
     ['g1', 'g3'],
     undefined,
-    expectedPremoves,
     true,
+    expectedPremoves,
     true,
     true,
   );
@@ -190,10 +190,10 @@ test('do not trim premoves when specified', () => {
     'black',
     ['g1', 'g3'],
     undefined,
+    false,
     expectedPremoves,
     true,
     true,
-    false,
   );
 });
 
@@ -208,8 +208,8 @@ test('prod bug report lichess-org/lila#18224', () => {
     'black',
     ['h2', 'g2'],
     undefined,
-    expectedPremoves,
     true,
+    expectedPremoves,
     true,
     true,
   );
@@ -303,9 +303,9 @@ describe('premove respects per-side castle forbids', () => {
       'black',
       undefined,
       util.castlingPrivilegesFromFen(CLEAR_CASTLE_FEN, pieces),
+      true,
       expectedPremoves,
       false,
-      true,
       true,
     );
   });
@@ -321,9 +321,9 @@ describe('premove respects per-side castle forbids', () => {
       'black',
       undefined,
       util.castlingPrivilegesFromFen('r1k4r/8/8/8/8/8/8/R3K2R w Qkq - 0 1', pieces),
+      true,
       expectedPremoves,
       false,
-      true,
       true,
     );
   });
@@ -339,9 +339,9 @@ describe('premove respects per-side castle forbids', () => {
       'black',
       undefined,
       util.castlingPrivilegesFromFen('r1k4r/8/8/8/8/8/8/R3K2R w Kkq - 0 1', pieces),
+      true,
       expectedPremoves,
       false,
-      true,
       true,
     );
   });
