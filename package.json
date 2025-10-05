@@ -1,6 +1,6 @@
 {
   "name": "@lichess-org/chessground",
-  "version": "9.7.2",
+  "version": "9.7.4",
   "//": "version is managed by the build system",
   "description": "lichess.org chess ui",
   "type": "module",
