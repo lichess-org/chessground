@@ -394,12 +394,22 @@ describe('premove respects per-side castle forbids', () => {
           ['a1', sub([...firstRankSquares, ...aFileSquares], ['a1', 'e1', 'f1', 'g1', 'h1'])],
         ]),
       ],
-      /*[['a7', 'a8'], makeExpectedPremoves(
-        [
-           // todo - input expected premoves
-           // also, use your new util functions to reduce some text for rook premoves
-        ]
-      )]*/
+      [
+        ['a7', 'a8'],
+        makeExpectedPremoves([
+          ['a8', [...aFileSquares.filter(x => x !== 'a8'), 'b8']],
+          ['c8', ['b8', 'b7', 'c7', 'd7', 'd8', 'h8']],
+          ['h8', sub([...hFileSquares, ...eighthRankSquares], ['h8', 'c8', 'b8', 'a8'])],
+        ]),
+      ],
+      [
+        ['e1', 'd1'],
+        makeExpectedPremoves([
+          ['d1', ['c1', 'c2', 'd2', 'e2', 'e1']],
+          ['a1', sub([...firstRankSquares, ...aFileSquares], ['a1', 'd1', 'e1', 'f1', 'g1', 'h1'])],
+          ['g1', sub([...firstRankSquares, ...util.keysOfFile('g')], ['g1', 'd1', 'c1', 'b1', 'a1'])],
+        ]),
+      ],
     ];
     testPosition(
       makeState(
