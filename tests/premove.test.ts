@@ -5,13 +5,13 @@ import * as fen from '../src/fen';
 import * as util from '../src/util';
 import { userMove } from '../src/board';
 
-type ExpectedPremoves = Map<cg.Key, Iterable<cg.Key>>;
+type ExpectedPremoves = Map<cg.Key, Iterable<cg.Key>> | undefined;
 
 type ExpectedPremovesFuture = Array<[cg.Key[], ExpectedPremoves]> | undefined;
 
 type Specs = {
   expectedPremoves: ExpectedPremoves;
-  expectedPremovesFuture?: ExpectedPremovesFuture;
+  expectedPremovesFuture: ExpectedPremovesFuture;
   checkDiagonalInverse: boolean;
   checkVerticalInverse: boolean;
 };
@@ -28,7 +28,9 @@ const transformExpectedPremoves = (
   expectedPremoves: ExpectedPremoves,
   transform: (sq: cg.Key) => cg.Key,
 ): ExpectedPremoves =>
-  new Map([...expectedPremoves].map(([start, dests]) => [transform(start), Array.from(dests, transform)]));
+  expectedPremoves
+    ? new Map([...expectedPremoves].map(([start, dests]) => [transform(start), Array.from(dests, transform)]))
+    : undefined;
 
 const transformExpectedPremovesFuture = (
   expectedPremovesFuture: ExpectedPremovesFuture,
@@ -93,14 +95,16 @@ const testPosition = (state: HeadlessState, specs: Specs): void => {
     state.premovable.castle,
   );
   expect(!specs.checkDiagonalInverse || !state.premovable.castle);
-  for (const [from, expectedDests] of specs.expectedPremoves) {
-    expect(new Set(premove(state, from))).toEqual(new Set(expectedDests));
+  if (specs.expectedPremoves) {
+    for (const [from, expectedDests] of specs.expectedPremoves) {
+      expect(new Set(premove(state, from))).toEqual(new Set(expectedDests));
+    }
+    expect(
+      util.allKeys
+        .filter(sq => !specs.expectedPremoves!.has(sq))
+        .every(sq => !premove(state, sq as cg.Key).length),
+    ).toEqual(true);
   }
-  expect(
-    util.allKeys
-      .filter(sq => !specs.expectedPremoves.has(sq))
-      .every(sq => !premove(state, sq as cg.Key).length),
-  ).toEqual(true);
   if (specs.checkDiagonalInverse) {
     testPosition(
       makeState(
@@ -410,6 +414,7 @@ describe('premove respects per-side castle forbids', () => {
           ['g1', sub([...firstRankSquares, ...util.keysOfFile('g')], ['g1', 'd1', 'c1', 'b1', 'a1'])],
         ]),
       ],
+      // todo - test more moves
     ];
     testPosition(
       makeState(
