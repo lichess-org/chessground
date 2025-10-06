@@ -3,6 +3,7 @@ import * as cg from '../src/types';
 import { defaults, HeadlessState } from '../src/state';
 import * as fen from '../src/fen';
 import * as util from '../src/util';
+import { userMove } from '../src/board';
 
 type ExpectedPremoves = Map<cg.Key, Iterable<cg.Key>>;
 
@@ -80,7 +81,17 @@ const makeSpecs = (
   };
 };
 
+const makeExpectedPremoves = (data: Iterable<[cg.Key, Iterable<cg.Key>]>): ExpectedPremoves =>
+  new Map<cg.Key, Iterable<cg.Key>>(data);
+
 const testPosition = (state: HeadlessState, specs: Specs): void => {
+  state = makeState(
+    state.pieces,
+    !state.premovable.unrestrictedPremoves,
+    state.lastMove,
+    state.turnColor,
+    state.premovable.castle,
+  );
   expect(!specs.checkDiagonalInverse || !state.premovable.castle);
   for (const [from, expectedDests] of specs.expectedPremoves) {
     expect(new Set(premove(state, from))).toEqual(new Set(expectedDests));
@@ -124,11 +135,18 @@ const testPosition = (state: HeadlessState, specs: Specs): void => {
       ),
     );
   }
-  // todo - use expectedpremovesfuture
+  if (specs.expectedPremovesFuture?.length) {
+    const [orig, dest] = specs.expectedPremovesFuture[0][0];
+    userMove(state, orig, dest);
+    testPosition(
+      state,
+      makeSpecs(specs.expectedPremovesFuture[0][1], specs.expectedPremovesFuture.slice(1), false, false),
+    );
+  }
 };
 
 test('premoves are trimmed appropriately', () => {
-  const expectedPremoves = new Map<cg.Key, Iterable<cg.Key>>([
+  const expectedPremoves = makeExpectedPremoves([
     ['f8', ['g8', 'e8', 'd8', 'c8', 'f7', 'f6', 'f5', 'f4', 'f3', 'f2', 'f1']],
     ['f1', ['h1', 'g1', 'e1', 'd1', 'c1', 'b1', 'a1', 'f2', 'f3', 'f4', 'f5', 'f6', 'f7']],
     ['g5', ['h5', 'f5', 'e5', 'd5', 'c5', 'g6']],
@@ -163,7 +181,7 @@ test('premoves are trimmed appropriately', () => {
 });
 
 test('anticipate all en passant captures if no last move', () => {
-  const expectedPremoves = new Map<cg.Key, Iterable<cg.Key>>([
+  const expectedPremoves = makeExpectedPremoves([
     ['a2', ['b1', 'b3', 'c4', 'd5', 'e6', 'f7', 'g8']],
     ['h2', ['g1', 'g3', 'f4', 'e5', 'd6', 'c7', 'b8']],
     ['h3', ['g3', 'f3', 'e3', 'd3', 'h4', 'h5']],
@@ -180,7 +198,7 @@ test('anticipate all en passant captures if no last move', () => {
 });
 
 test('horde no en passant for first to third rank', () => {
-  const expectedPremoves = new Map<cg.Key, Iterable<cg.Key>>([
+  const expectedPremoves = makeExpectedPremoves([
     ['f1', ['f2', 'f3']],
     ['g3', ['g4', 'h4']],
   ]);
@@ -197,7 +215,7 @@ test('horde no en passant for first to third rank', () => {
 });
 
 test('do not trim premoves when specified', () => {
-  const expectedPremoves = new Map<cg.Key, Iterable<cg.Key>>([
+  const expectedPremoves = makeExpectedPremoves([
     ['f1', ['f2', 'f3', 'e2', 'g2']],
     ['g3', ['g4', 'h4', 'f4']],
   ]);
@@ -214,10 +232,10 @@ test('do not trim premoves when specified', () => {
 });
 
 test('prod bug report lichess-org/lila#18224', () => {
-  const expectedPremoves = new Map<cg.Key, Set<cg.Key>>([
-    ['a8', new Set(['a7', 'a6', 'a5', 'a4', 'a3', 'a2', 'b8', 'c8', 'd8', 'e8', 'f8', 'g8', 'h8'])],
-    ['f2', new Set(['f3', 'g3'])],
-    ['g2', new Set(['h1', 'g1', 'f1', 'h2', 'h3', 'g3', 'f3'])],
+  const expectedPremoves = makeExpectedPremoves([
+    ['a8', [...util.keysOfFile('a'), ...util.keysOfRank('8')].filter(x => !['a8', 'a1'].includes(x))],
+    ['f2', ['f3', 'g3']],
+    ['g2', ['h1', 'g1', 'f1', 'h2', 'h3', 'g3', 'f3']],
   ]);
   testPosition(
     makeState(fen.read('R7/6k1/8/8/5pp1/8/p4PK1/r7 b - - 0 56'), true, ['h2', 'g2'], 'black', undefined),
@@ -297,58 +315,101 @@ describe('castling privileges parsed from FEN', () => {
 });
 
 describe('premove respects per-side castle forbids', () => {
-  const CLEAR_CASTLE_FEN = 'r1k4r/8/8/8/8/8/8/R3K2R w KQkq - 0 1';
+  const CLEAR_CASTLE_FEN = 'r1k4r/8/8/8/8/8/8/R3K2R b KQkq - 0 1';
   const pieces = fen.read(CLEAR_CASTLE_FEN);
-  const queensRookPremoves: Iterable<cg.Key> = ['b1', 'c1', 'd1', 'a2', 'a3', 'a4', 'a5', 'a6', 'a7', 'a8'];
-  const kingsRookPremoves: Iterable<cg.Key> = ['g1', 'f1', 'h2', 'h3', 'h4', 'h5', 'h6', 'h7', 'h8'];
+  const aFileSquares = util.keysOfFile('a');
+  const hFileSquares = util.keysOfFile('h');
+  const firstRankSquares = util.keysOfRank('1');
+  const eighthRankSquares = util.keysOfRank('8');
 
   it('includes both sides when allowed', () => {
-    const expectedPremoves = new Map<cg.Key, Iterable<cg.Key>>([
+    const expectedPremoves = makeExpectedPremoves([
       ['e1', ['d2', 'e2', 'f2', 'd1', 'f1', 'c1', 'g1', 'a1', 'h1']],
-      ['a1', queensRookPremoves],
-      ['h1', kingsRookPremoves],
+      ['a1', [...aFileSquares, ...firstRankSquares].filter(x => x !== 'a1')],
+      ['h1', [...hFileSquares, ...firstRankSquares].filter(x => x !== 'h1')],
     ]);
     testPosition(
-      makeState(pieces, true, undefined, 'black', util.castlingPrivilegesFromFen(CLEAR_CASTLE_FEN, pieces)),
+      makeState(pieces, false, undefined, 'black', util.castlingPrivilegesFromFen(CLEAR_CASTLE_FEN, pieces)),
       makeSpecs(expectedPremoves, undefined, false, true),
     );
   });
 
   it('excludes kside when forbidden', () => {
-    const expectedPremoves = new Map<cg.Key, Iterable<cg.Key>>([
+    const expectedPremoves = makeExpectedPremoves([
       ['e1', ['d2', 'e2', 'f2', 'd1', 'f1', 'c1', 'a1']],
-      ['a1', queensRookPremoves],
-      ['h1', kingsRookPremoves],
+      ['a1', [...aFileSquares, ...firstRankSquares].filter(x => x !== 'a1')],
+      ['h1', [...hFileSquares, ...firstRankSquares].filter(x => x !== 'h1')],
     ]);
     testPosition(
       makeState(
         pieces,
-        true,
+        false,
         undefined,
         'black',
-        util.castlingPrivilegesFromFen('r1k4r/8/8/8/8/8/8/R3K2R w Qkq - 0 1', pieces),
+        util.castlingPrivilegesFromFen(CLEAR_CASTLE_FEN.replace('KQ', 'Q'), pieces),
       ),
       makeSpecs(expectedPremoves, undefined, false, true),
     );
   });
 
   it('excludes qside when forbidden', () => {
-    const expectedPremoves = new Map<cg.Key, Iterable<cg.Key>>([
+    const expectedPremoves = makeExpectedPremoves([
       ['e1', ['d2', 'e2', 'f2', 'd1', 'f1', 'g1', 'h1']],
-      ['a1', queensRookPremoves],
-      ['h1', kingsRookPremoves],
+      ['a1', [...aFileSquares, ...firstRankSquares].filter(x => x !== 'a1')],
+      ['h1', [...hFileSquares, ...firstRankSquares].filter(x => x !== 'h1')],
     ]);
     testPosition(
       makeState(
         pieces,
-        true,
+        false,
         undefined,
         'black',
-        util.castlingPrivilegesFromFen('r1k4r/8/8/8/8/8/8/R3K2R w Kkq - 0 1', pieces),
+        util.castlingPrivilegesFromFen(CLEAR_CASTLE_FEN.replace('KQ', 'K'), pieces),
       ),
       makeSpecs(expectedPremoves, undefined, false, true),
     );
   });
 
-  // todo test castling premove stuff after making moves
+  it('castling privileges get updated', () => {
+    const sub = (main: cg.Key[], exclude: cg.Key[]) => main.filter(x => !exclude.includes(x));
+    const expectedPremoves = makeExpectedPremoves([
+      ['e1', ['d2', 'e2', 'f2', 'd1', 'f1', 'g1', 'h1', 'c1', 'a1']],
+      ['a1', sub([...aFileSquares, ...firstRankSquares], ['a1', 'e1', 'f1', 'g1', 'h1'])],
+      ['h1', sub([...hFileSquares, ...firstRankSquares], ['h1', 'e1', 'd1', 'c1', 'b1', 'a1'])],
+    ]);
+    const expectedPremovesFuture: ExpectedPremovesFuture = [
+      [
+        ['a8', 'a7'],
+        makeExpectedPremoves([
+          ['a7', [...aFileSquares, ...util.keysOfRank('7')].filter(x => x !== 'a7')],
+          ['c8', ['b8', 'b7', 'c7', 'd7', 'd8', 'h8']],
+          ['h8', sub([...hFileSquares, ...eighthRankSquares], ['h8', 'c8', 'b8', 'a8'])],
+        ]),
+      ],
+      [
+        ['h1', 'g1'],
+        makeExpectedPremoves([
+          ['g1', sub([...firstRankSquares, ...util.keysOfFile('g')], ['g1', 'e1', 'd1', 'c1', 'b1', 'a1'])],
+          ['e1', ['f1', 'f2', 'e2', 'd2', 'd1', 'c1', 'a1']],
+          ['a1', sub([...firstRankSquares, ...aFileSquares], ['a1', 'e1', 'f1', 'g1', 'h1'])],
+        ]),
+      ],
+      /*[['a7', 'a8'], makeExpectedPremoves(
+        [
+           // todo - input expected premoves
+           // also, use your new util functions to reduce some text for rook premoves
+        ]
+      )]*/
+    ];
+    testPosition(
+      makeState(
+        pieces,
+        true, // needed for the castling trim behaviour when making moves
+        undefined,
+        'black',
+        util.castlingPrivilegesFromFen(CLEAR_CASTLE_FEN, pieces),
+      ),
+      makeSpecs(expectedPremoves, expectedPremovesFuture, false, true),
+    );
+  });
 });
