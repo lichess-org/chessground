@@ -2,7 +2,11 @@ import * as cg from './types.js';
 
 export const invRanks: readonly cg.Rank[] = [...cg.ranks].reverse();
 
-export const allKeys: readonly cg.Key[] = cg.files.flatMap(f => cg.ranks.map(r => (f + r) as cg.Key));
+export const allKeys: readonly cg.Key[] = cg.files.flatMap(f => keysOfFile(f));
+
+export const keysOfFile = (file: cg.File): readonly cg.Key[] => cg.ranks.map(r => (file + r) as cg.Key);
+
+export const keysOfRank = (rank: cg.Rank): readonly cg.Key[] => cg.files.map(f => (f + rank) as cg.Key);
 
 export const pos2key = (pos: cg.Pos): cg.Key | undefined =>
   pos.every(x => x >= 0 && x <= 7) ? allKeys[8 * pos[0] + pos[1]] : undefined;
