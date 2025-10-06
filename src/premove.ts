@@ -18,10 +18,6 @@ type MobilityContext = {
 
 type Mobility = (ctx: MobilityContext) => boolean;
 
-// todo - review staged changes, test (manually and write tests, haven't done either yet).
-// test cases with both castling fen notations, with the king already on the castling dest
-// square, both rooks to one side, no fen, etc.
-
 const forbidCastlePremove = (state: HeadlessState, side: cg.CastleSide): boolean =>
   !state.premovable.castle[util.opposite(state.turnColor)][side];
 

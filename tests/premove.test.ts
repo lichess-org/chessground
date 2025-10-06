@@ -414,7 +414,25 @@ describe('premove respects per-side castle forbids', () => {
           ['g1', sub([...firstRankSquares, ...util.keysOfFile('g')], ['g1', 'd1', 'c1', 'b1', 'a1'])],
         ]),
       ],
-      // todo - test more moves
+      [['a8', 'b8'], undefined],
+      [
+        ['g1', 'h1'],
+        makeExpectedPremoves([
+          ['d1', ['c1', 'c2', 'd2', 'e2', 'e1']],
+          ['h1', sub([...hFileSquares, ...firstRankSquares], ['h1', 'd1', 'c1', 'b1', 'a1'])],
+          ['a1', sub([...aFileSquares, ...firstRankSquares], ['a1', 'd1', 'e1', 'f1', 'g1', 'h1'])],
+        ]),
+      ],
+      [['c8', 'h8'], undefined],
+      [['h1', 'e1'], undefined],
+      [
+        ['f8', 'f1'],
+        makeExpectedPremoves([
+          ['g8', ['h8', 'h7', 'g7', 'f7', 'f8']],
+          ['f1', sub([...util.keysOfFile('f'), ...util.keysOfRank('1')], ['f1', 'c1', 'b1', 'a1'])],
+          ['b8', sub([...util.keysOfFile('b'), ...eighthRankSquares], ['b8', 'g8', 'h8'])],
+        ]),
+      ],
     ];
     testPosition(
       makeState(
