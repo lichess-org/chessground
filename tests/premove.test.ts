@@ -247,6 +247,10 @@ test('prod bug report lichess-org/lila#18224', () => {
   );
 });
 
+test('default state allows all castle premoves', () => {
+  expect(util.sameCastlingPrivileges(defaults().premovable.castle, util.makeCastlingPrivileges(true)));
+});
+
 describe('castling privileges parsed from FEN', () => {
   it('parses standard KQkq', () => {
     const fenStr = 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1';
