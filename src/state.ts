@@ -2,7 +2,7 @@ import * as fen from './fen.js';
 import { AnimCurrent } from './anim.js';
 import { DragCurrent } from './drag.js';
 import { Drawable } from './draw.js';
-import { timer } from './util.js';
+import { makeCastlingPrivileges, timer } from './util.js';
 import * as cg from './types.js';
 
 export interface HeadlessState {
@@ -48,11 +48,11 @@ export interface HeadlessState {
   premovable: {
     enabled: boolean; // allow premoves for color that can not move
     showDests: boolean; // whether to add the premove-dest class on squares
-    castle: boolean; // whether to allow king castle premoves
+    castle: cg.CastlePrivileges; // whether to allow king castle premoves
     dests?: cg.Key[]; // premove destinations for the current selection
     customDests?: cg.Dests; // use custom valid premoves. {"a2" ["a3" "a4"] "b1" ["a3" "c3"]}
     current?: cg.KeyPair; // keys of the current saved premove ["e2" "e4"]
-    unrestrictedPremoves?: boolean; // if falsy, the positions of friendly pieces will be used to trim premove options
+    unrestrictedPremoves?: boolean; // if falsy, will try to trim impossible premoves
     events: {
       set?: (orig: cg.Key, dest: cg.Key, metadata?: cg.SetPremoveMetadata) => void; // called after the premove has been set
       unset?: () => void; // called after the premove has been unset
@@ -144,7 +144,7 @@ export function defaults(): HeadlessState {
     premovable: {
       enabled: true,
       showDests: true,
-      castle: true,
+      castle: makeCastlingPrivileges(true),
       events: {},
     },
     predroppable: {
