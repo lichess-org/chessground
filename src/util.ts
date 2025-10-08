@@ -137,7 +137,7 @@ export const pawnDirAdvance = (x1: number, y1: number, x2: number, y2: number, i
   );
 };
 
-/** Returns all board squares between (x1, y1) and (x2, y2) exclusive,
+/** Returns all board squares between (x1, y1) and (x2, y2),
  *  along a straight line (rook or bishop path). Returns [] if not aligned, or none between.
  */
 export const squaresBetween = (
@@ -145,7 +145,7 @@ export const squaresBetween = (
   y1: number,
   x2: number,
   y2: number,
-  exclusive: boolean = true,
+  exclusive: boolean,
 ): cg.Key[] => {
   const dx = x2 - x1;
   const dy = y2 - y1;
@@ -177,6 +177,12 @@ export const horizontallyAdjacentSquares = (square: cg.Key): cg.Key[] => {
 export const squareShiftedVertically = (square: cg.Key, delta: number): cg.Key | undefined => {
   const pos = key2pos(square);
   pos[1] += delta;
+  return pos2key(pos);
+};
+
+export const squareShiftedHorizontally = (square: cg.Key, delta: number): cg.Key | undefined => {
+  const pos = key2pos(square);
+  pos[0] += delta;
   return pos2key(pos);
 };
 

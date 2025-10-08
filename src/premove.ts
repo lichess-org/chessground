@@ -18,6 +18,11 @@ type MobilityContext = {
 
 type Mobility = (ctx: MobilityContext) => boolean;
 
+// todo - review changes since master
+// do tests, including cases with both castling fen notations, with the king already on the castling dest
+// square, both rooks to one side, no fen, king on b1/b8 no longer being able to premove castling in 960.
+
+// todo - also, inline usages of this function?
 const forbidCastlePremove = (state: HeadlessState, side: cg.CastleSide): boolean =>
   !state.premovable.castle[util.opposite(state.turnColor)][side];
 
@@ -25,8 +30,8 @@ const isDestOccupiedByFriendly = (ctx: MobilityContext): boolean => ctx.friendli
 
 const isDestOccupiedByEnemy = (ctx: MobilityContext): boolean => ctx.enemies.has(ctx.dest.key);
 
-const anyPieceBetween = (orig: cg.Pos, dest: cg.Pos, pieces: cg.Pieces): boolean =>
-  util.squaresBetween(...orig, ...dest).some(s => pieces.has(s));
+const anyPieceBetween = (orig: cg.Pos, dest: cg.Pos, allPieces: cg.Pieces): boolean =>
+  util.squaresBetween(...orig, ...dest, true).some(s => allPieces.has(s));
 
 const canEnemyPawnAdvanceToSquare = (pawnStart: cg.Key, dest: cg.Key, ctx: MobilityContext): boolean => {
   const piece = ctx.enemies.get(pawnStart);
@@ -47,7 +52,7 @@ const canEnemyPawnCaptureOnSquare = (pawnStart: cg.Key, dest: cg.Key, ctx: Mobil
     util.pawnDirCapture(...util.key2pos(pawnStart), ...util.key2pos(dest), enemyPawn.color === 'white') &&
     (ctx.friendlies.has(dest) ||
       canBeCapturedBySomeEnemyEnPassant(
-        util.squareShiftedVertically(dest, enemyPawn.color === 'white' ? -1 : 1),
+        util.squareShiftedVertically(dest, enemyPawn.color === 'white' ? -1 : 1)!,
         ctx.friendlies,
         ctx.enemies,
         ctx.lastMove,
@@ -103,7 +108,7 @@ const canBeCapturedBySomeEnemyEnPassant = (
 
 const isPathClearEnoughOfFriendliesForPremove = (ctx: MobilityContext): boolean => {
   if (ctx.unrestrictedPremoves) return true;
-  const squaresBetween = util.squaresBetween(...ctx.orig.pos, ...ctx.dest.pos);
+  const squaresBetween = util.squaresBetween(...ctx.orig.pos, ...ctx.dest.pos, true);
   const squaresOfFriendliesBetween = squaresBetween.filter(s => ctx.friendlies.has(s));
   const firstSquareOfFriendliesBetween = squaresOfFriendliesBetween[0];
   if (!firstSquareOfFriendliesBetween) return true;
@@ -119,14 +124,13 @@ const isPathClearEnoughOfFriendliesForPremove = (ctx: MobilityContext): boolean 
       ctx.enemies,
       ctx.lastMove,
     ) &&
-    !!nextSquare &&
-    !squaresBetween.includes(nextSquare)
+    !squaresBetween.includes(nextSquare!)
   );
 };
 
 const isPathClearEnoughOfEnemiesForPremove = (ctx: MobilityContext): boolean => {
   if (ctx.unrestrictedPremoves) return true;
-  const squaresBetween = util.squaresBetween(...ctx.orig.pos, ...ctx.dest.pos);
+  const squaresBetween = util.squaresBetween(...ctx.orig.pos, ...ctx.dest.pos, true);
   const squaresOfEnemiesBetween = squaresBetween.filter(s => ctx.enemies.has(s));
   if (squaresOfEnemiesBetween.length > 1) return false;
   if (!squaresOfEnemiesBetween.length) return true;
@@ -152,6 +156,37 @@ const isPathClearEnoughOfEnemiesForPremove = (ctx: MobilityContext): boolean => 
 
 const isPathClearEnoughForPremove = (ctx: MobilityContext): boolean =>
   isPathClearEnoughOfFriendliesForPremove(ctx) && isPathClearEnoughOfEnemiesForPremove(ctx);
+
+const attemptingToPremoveCastle = (ctx: MobilityContext): boolean => {
+  const origKey = util.pos2key(ctx.orig.pos)!;
+  if (
+    ctx.orig.pos[0] === ctx.dest.pos[0] ||
+    ctx.orig.pos[1] !== ctx.dest.pos[1] ||
+    ctx.orig.pos[1] !== (ctx.color === 'white' ? 0 : 7) ||
+    !ctx.allPieces.has(origKey) ||
+    !util.samePiece(ctx.allPieces.get(origKey)!, { role: 'king', color: ctx.color })
+  )
+    return false;
+  return (
+    (ctx.orig.pos[0] === 4 &&
+      ((ctx.dest.pos[0] === 2 && ctx.rookFilesFriendlies.includes(0)) ||
+        (ctx.dest.pos[0] === 6 && ctx.rookFilesFriendlies.includes(7)))) ||
+    ctx.rookFilesFriendlies.includes(ctx.dest.pos[0])
+  );
+};
+
+const findNearestMatchingSqOnRank = (
+  pieces: cg.Pieces, startSq: cg.Key | undefined, searchLeft: boolean, target: cg.Piece
+): cg.Key | undefined => {
+  if (!startSq) return undefined;
+  if (pieces.has(startSq) && util.samePiece(pieces.get(startSq)!, target)) return startSq;
+  return findNearestMatchingSqOnRank(
+    pieces,
+    util.squareShiftedHorizontally(startSq, searchLeft ? -1 : 1),
+    searchLeft,
+    target
+  );
+}
 
 const pawn: Mobility = (ctx: MobilityContext) => {
   const step = ctx.color === 'white' ? 1 : -1;
@@ -204,26 +239,29 @@ const king: Mobility = (ctx: MobilityContext) => {
     (ctx.unrestrictedPremoves || !isDestOccupiedByFriendly(ctx) || isFriendlyOnDestAndAttacked(ctx))
   )
     return true;
+  if (!attemptingToPremoveCastle(ctx)) return false;
+  const tryingQsideCastle = ctx.dest.pos[0] < ctx.orig.pos[0];
   if (
-    ctx.orig.pos[1] !== ctx.dest.pos[1] ||
-    ctx.orig.pos[1] !== (ctx.color === 'white' ? 0 : 7) ||
-    (ctx.forbidKsideCastlePremove && ctx.dest.pos[0] > ctx.orig.pos[0]) ||
-    (ctx.forbidQsideCastlePremove && ctx.dest.pos[0] < ctx.orig.pos[0])
-  )
-    return false;
-  return (
-    ((ctx.orig.pos[0] === 4 &&
-      ((ctx.dest.pos[0] === 2 && ctx.rookFilesFriendlies.includes(0)) ||
-        (ctx.dest.pos[0] === 6 && ctx.rookFilesFriendlies.includes(7)))) ||
-      ctx.rookFilesFriendlies.includes(ctx.dest.pos[0])) &&
-    (ctx.unrestrictedPremoves ||
-      /* The following checks if no non-rook friendly piece is in the way between the king and its castling destination.
-         Note that for the Chess960 edge case of Kb1 "long castling", the check passes even if there is a piece in the way
-         on c1. But this is fine, since premoving from b1 to a1 as a normal move would have already returned true. */
-      util
-        .squaresBetween(...ctx.orig.pos, ctx.dest.pos[0] > ctx.orig.pos[0] ? 7 : 1, ctx.dest.pos[1])
-        .map(s => ctx.allPieces.get(s))
-        .every(p => !p || util.samePiece(p, { role: 'rook', color: ctx.color })))
+    (ctx.forbidKsideCastlePremove && !tryingQsideCastle) ||
+    (ctx.forbidQsideCastlePremove && tryingQsideCastle)
+  ) return false;
+  if (ctx.unrestrictedPremoves) return true;
+
+  const kingOrig = ctx.orig.pos;
+  const rookOrig = util.key2pos(findNearestMatchingSqOnRank(
+    ctx.allPieces,
+    util.pos2key(kingOrig),
+    tryingQsideCastle,
+    {role: 'rook', color: ctx.color}
+  )!);
+  return util.squaresBetween(...kingOrig, tryingQsideCastle ? 2 : 6, kingOrig[1], false).every(s =>
+    s === util.pos2key(kingOrig) ||
+    s === util.pos2key(rookOrig) ||
+    !ctx.allPieces.has(s)
+  ) && util.squaresBetween(...rookOrig, tryingQsideCastle ? 3 : 5, rookOrig[1], false).every(s =>
+    s === util.pos2key(rookOrig) ||
+    s === util.pos2key(kingOrig) ||
+    ctx.allPieces.get(s)?.color !== ctx.color
   );
 };
 
