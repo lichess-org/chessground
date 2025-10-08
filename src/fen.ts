@@ -1,4 +1,4 @@
-import { pos2key, pos2keyUnsafe, invRanks } from './util.js';
+import { pos2key, invRanks } from './util.js';
 import * as cg from './types.js';
 
 export const initial: cg.FEN = 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR';
@@ -37,7 +37,8 @@ export function read(fen: cg.FEN): cg.Pieces {
         col = 0;
         break;
       case '~': {
-        const piece = pieces.get(pos2keyUnsafe([col - 1, row]));
+        const k = pos2key([col - 1, row]);
+        const piece = k && pieces.get(k);
         if (piece) piece.promoted = true;
         break;
       }

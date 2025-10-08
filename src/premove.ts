@@ -110,8 +110,8 @@ const isPathClearEnoughOfFriendliesForPremove = (ctx: MobilityContext): boolean 
   if (ctx.unrestrictedPremoves) return true;
   const squaresBetween = util.squaresBetween(...ctx.orig.pos, ...ctx.dest.pos, true);
   const squaresOfFriendliesBetween = squaresBetween.filter(s => ctx.friendlies.has(s));
+  if (!squaresOfFriendliesBetween.length) return true;
   const firstSquareOfFriendliesBetween = squaresOfFriendliesBetween[0];
-  if (!firstSquareOfFriendliesBetween) return true;
   const nextSquare = util.squareShiftedVertically(
     firstSquareOfFriendliesBetween,
     ctx.color === 'white' ? -1 : 1,
