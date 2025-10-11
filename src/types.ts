@@ -116,3 +116,18 @@ export type BrushColor = 'green' | 'red' | 'blue' | 'yellow';
 export type SquareClasses = Map<Key, string>;
 
 export type DirectionalCheck = (x1: number, y1: number, x2: number, y2: number) => boolean;
+
+export type MobilityContext = {
+  orig: PosAndKey;
+  dest: PosAndKey;
+  allPieces: Pieces;
+  friendlies: Pieces;
+  enemies: Pieces;
+  unrestrictedPremoves: boolean;
+  color: Color;
+  canCastle: boolean;
+  rookFilesFriendlies: number[];
+  lastMove: Key[] | undefined;
+};
+
+export type Mobility = (ctx: MobilityContext) => boolean;
