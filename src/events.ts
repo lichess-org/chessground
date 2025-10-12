@@ -68,7 +68,7 @@ function unbindable(
 const startDragOrDraw =
   (s: State): MouchBind =>
   e => {
-    s.posOfLastMouchDown = util.eventPosition(e)!;
+    s.pixelCoordsOfLastMouchDownOnBoard = util.eventPosition(e)!;
     if (s.draggable.current) drag.cancel(s);
     else if (s.drawable.current) draw.cancel(s);
     else if (e.shiftKey || isRightButton(e)) {

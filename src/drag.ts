@@ -162,7 +162,9 @@ export function end(s: State, e: cg.MouchEvent): void {
   const position = util.eventPosition(e);
   if (
     s.pendingDrawClear &&
-    (!position || !s.posOfLastMouchDown || util.samePos(position, s.posOfLastMouchDown))
+    (!position ||
+      !s.pixelCoordsOfLastMouchDownOnBoard ||
+      util.samePos(position, s.pixelCoordsOfLastMouchDownOnBoard))
   )
     drawClear(s);
   s.pendingDrawClear = false;
