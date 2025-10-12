@@ -4,6 +4,7 @@ import * as draw from './draw.js';
 import { drop } from './drop.js';
 import { isRightButton } from './util.js';
 import * as cg from './types.js';
+import * as util from './util.js';
 
 type MouchBind = (e: cg.MouchEvent) => void;
 type StateMouchBind = (d: State, e: cg.MouchEvent) => void;
@@ -67,6 +68,7 @@ function unbindable(
 const startDragOrDraw =
   (s: State): MouchBind =>
   e => {
+    s.posOfLastMouchDown = util.eventPosition(e)!;
     if (s.draggable.current) drag.cancel(s);
     else if (s.drawable.current) draw.cancel(s);
     else if (e.shiftKey || isRightButton(e)) {

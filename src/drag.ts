@@ -34,7 +34,7 @@ export function start(s: State, e: cg.MouchEvent): void {
     s.drawable.enabled &&
     (s.drawable.eraseOnClick || !piece || piece.color !== s.turnColor)
   )
-    drawClear(s);
+    s.pendingDrawClear = true;
   // Prevent touch scroll and create no corresponding mouse event, if there
   // is an intent to interact with the board.
   if (
@@ -159,6 +159,13 @@ export function move(s: State, e: cg.MouchEvent): void {
 }
 
 export function end(s: State, e: cg.MouchEvent): void {
+  const position = util.eventPosition(e);
+  if (
+    s.pendingDrawClear &&
+    (!position || !s.posOfLastMouchDown || util.samePos(position, s.posOfLastMouchDown))
+  )
+    drawClear(s);
+  s.pendingDrawClear = false;
   const cur = s.draggable.current;
   if (!cur) return;
   // create no corresponding mouse event
