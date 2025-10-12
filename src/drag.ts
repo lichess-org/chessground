@@ -32,7 +32,7 @@ export function start(s: State, e: cg.MouchEvent): void {
   if (
     !previouslySelected &&
     s.drawable.enabled &&
-    (s.drawable.eraseOnClick || !piece || piece.color !== s.turnColor)
+    (s.drawable.eraseOnMovablePieceClick || !piece || piece.color !== s.turnColor)
   )
     drawClear(s);
   // Prevent touch scroll and create no corresponding mouse event, if there
