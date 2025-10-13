@@ -97,9 +97,10 @@ const canBeCapturedBySomeEnemyEnPassant = (
   );
 };
 
-const isPathClearEnoughOfFriendliesForPremove = (ctx: MobilityContext): boolean => {
+const isPathClearEnoughOfFriendliesForPremove = (ctx: MobilityContext, isPawnAdvance: boolean): boolean => {
   if (ctx.unrestrictedPremoves) return true;
   const squaresBetween = util.squaresBetween(...ctx.orig.pos, ...ctx.dest.pos);
+  if (isPawnAdvance) squaresBetween.push(ctx.dest.key);
   const squaresOfFriendliesBetween = squaresBetween.filter(s => ctx.friendlies.has(s));
   if (!squaresOfFriendliesBetween.length) return true;
   const firstSquareOfFriendliesBetween = squaresOfFriendliesBetween[0];
@@ -120,9 +121,10 @@ const isPathClearEnoughOfFriendliesForPremove = (ctx: MobilityContext): boolean 
   );
 };
 
-const isPathClearEnoughOfEnemiesForPremove = (ctx: MobilityContext): boolean => {
+const isPathClearEnoughOfEnemiesForPremove = (ctx: MobilityContext, isPawnAdvance: boolean): boolean => {
   if (ctx.unrestrictedPremoves) return true;
   const squaresBetween = util.squaresBetween(...ctx.orig.pos, ...ctx.dest.pos);
+  if (isPawnAdvance) squaresBetween.push(ctx.dest.key);
   const squaresOfEnemiesBetween = squaresBetween.filter(s => ctx.enemies.has(s));
   if (squaresOfEnemiesBetween.length > 1) return false;
   if (!squaresOfEnemiesBetween.length) return true;
@@ -144,21 +146,18 @@ const isPathClearEnoughOfEnemiesForPremove = (ctx: MobilityContext): boolean => 
   return enemyPawnDests.some(square => !badSquares.includes(square));
 };
 
-const isPathClearEnoughForPremove = (ctx: MobilityContext): boolean =>
-  isPathClearEnoughOfFriendliesForPremove(ctx) && isPathClearEnoughOfEnemiesForPremove(ctx);
+const isPathClearEnoughForPremove = (ctx: MobilityContext, isPawnAdvance: boolean): boolean =>
+  isPathClearEnoughOfFriendliesForPremove(ctx, isPawnAdvance) &&
+  isPathClearEnoughOfEnemiesForPremove(ctx, isPawnAdvance);
 
 const pawn: Mobility = (ctx: MobilityContext) => {
   const step = ctx.color === 'white' ? 1 : -1;
   if (util.diff(ctx.orig.pos[0], ctx.dest.pos[0]) > 1) return false;
-  if (!util.diff(ctx.orig.pos[0], ctx.dest.pos[0])) {
-    const pos: cg.Pos = [ctx.dest.pos[0], ctx.dest.pos[1] + step];
-    const key = util.pos2key(pos);
-    const next = key && { pos, key };
+  if (!util.diff(ctx.orig.pos[0], ctx.dest.pos[0]))
     return (
       util.pawnDirAdvance(...ctx.orig.pos, ...ctx.dest.pos, ctx.color === 'white') &&
-      (!next || isPathClearEnoughForPremove({ ...ctx, dest: next }))
+      isPathClearEnoughForPremove(ctx, true)
     );
-  }
   if (ctx.dest.pos[1] !== ctx.orig.pos[1] + step) return false;
   if (ctx.unrestrictedPremoves || isDestOccupiedByEnemy(ctx)) return true;
   if (isDestOccupiedByFriendly(ctx)) return isDestControlledByEnemy(ctx);
@@ -181,12 +180,12 @@ const knight: Mobility = (ctx: MobilityContext) =>
 
 const bishop: Mobility = (ctx: MobilityContext) =>
   util.bishopDir(...ctx.orig.pos, ...ctx.dest.pos) &&
-  isPathClearEnoughForPremove(ctx) &&
+  isPathClearEnoughForPremove(ctx, false) &&
   (ctx.unrestrictedPremoves || !isDestOccupiedByFriendly(ctx) || isFriendlyOnDestAndAttacked(ctx));
 
 const rook: Mobility = (ctx: MobilityContext) =>
   util.rookDir(...ctx.orig.pos, ...ctx.dest.pos) &&
-  isPathClearEnoughForPremove(ctx) &&
+  isPathClearEnoughForPremove(ctx, false) &&
   (ctx.unrestrictedPremoves || !isDestOccupiedByFriendly(ctx) || isFriendlyOnDestAndAttacked(ctx));
 
 const queen: Mobility = (ctx: MobilityContext) => bishop(ctx) || rook(ctx);

@@ -141,8 +141,17 @@ test('prod bug report lichess-org/lila#18224', () => {
 
 test('promotion premove allowed', () => {
   const expectedPremoves = new Map<cg.Key, Set<cg.Key>>([
-    ['h7', new Set(['h8'])],
+    ['c7', new Set(['c8', 'b8', 'd8'])],
+    ['e7', new Set(['d8', 'e8', 'f8'])],
+    ['g7', new Set(['f8'])],
+    ['g8', new Set(['h8', 'f8', 'e8', 'd8', 'c8', 'b8', 'a8'])],
     ['c1', new Set(['b1', 'b2', 'c2', 'd2', 'd1'])],
   ]);
-  testPosition(fen.read('1k6/7P/8/8/8/8/8/2K5 b - - 0 1'), 'black', undefined, expectedPremoves, true);
+  testPosition(
+    fen.read('4r1R1/k1P1P1P1/8/8/8/8/8/2K5 b - - 0 1'),
+    'black',
+    undefined,
+    expectedPremoves,
+    true,
+  );
 });
