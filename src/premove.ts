@@ -156,8 +156,7 @@ const pawn: Mobility = (ctx: MobilityContext) => {
     const next = key && { pos, key };
     return (
       util.pawnDirAdvance(...ctx.orig.pos, ...ctx.dest.pos, ctx.color === 'white') &&
-      !!next &&
-      isPathClearEnoughForPremove({ ...ctx, dest: next })
+      (!next || isPathClearEnoughForPremove({ ...ctx, dest: next }))
     );
   }
   if (ctx.dest.pos[1] !== ctx.orig.pos[1] + step) return false;
