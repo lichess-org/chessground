@@ -144,11 +144,13 @@ test('promotion premove allowed', () => {
     ['c7', new Set(['c8', 'b8', 'd8'])],
     ['e7', new Set(['d8', 'e8', 'f8'])],
     ['g7', new Set(['f8'])],
-    ['g8', new Set(['h8', 'f8', 'e8', 'd8', 'c8', 'b8', 'a8'])],
+    ['g8', new Set(['f8', 'e8', 'd8', 'c8', 'b8', 'a8'])],
+    ['h7', new Set(['g8'])],
+    ['a7', new Set(['a8', 'b8'])],
     ['c1', new Set(['b1', 'b2', 'c2', 'd2', 'd1'])],
   ]);
   testPosition(
-    fen.read('4r1R1/k1P1P1P1/8/8/8/8/8/2K5 b - - 0 1'),
+    fen.read('n3r1RB/PkP1P1PP/8/8/8/8/8/2K5 b - - 0 1'),
     'black',
     undefined,
     expectedPremoves,
