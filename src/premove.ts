@@ -1,21 +1,7 @@
 import * as util from './util.js';
 import * as cg from './types.js';
 import { HeadlessState } from './state.js';
-
-type MobilityContext = {
-  orig: cg.PosAndKey;
-  dest: cg.PosAndKey;
-  allPieces: cg.Pieces;
-  friendlies: cg.Pieces;
-  enemies: cg.Pieces;
-  unrestrictedPremoves: boolean;
-  color: cg.Color;
-  canCastle: boolean;
-  rookFilesFriendlies: number[];
-  lastMove: cg.Key[] | undefined;
-};
-
-type Mobility = (ctx: MobilityContext) => boolean;
+import { Mobility, MobilityContext } from './types.js';
 
 const isDestOccupiedByFriendly = (ctx: MobilityContext): boolean => ctx.friendlies.has(ctx.dest.key);
 
@@ -223,9 +209,11 @@ export function premove(state: HeadlessState, key: cg.Key): cg.Key[] {
     friendlies = new Map([...pieces].filter(([_, p]) => p.color === color)),
     enemies = new Map([...pieces].filter(([_, p]) => p.color === util.opposite(color))),
     orig = { key, pos: util.key2pos(key) },
-    mobility: Mobility = mobilityByRole[piece.role],
-    ctx = {
+    mobility: Mobility = (ctx: MobilityContext) =>
+      mobilityByRole[piece.role](ctx) && state.premovable.additionalPremoveRequirements(ctx),
+    partialCtx = {
       orig,
+      role: piece.role,
       allPieces: pieces,
       friendlies: friendlies,
       enemies: enemies,
@@ -239,5 +227,5 @@ export function premove(state: HeadlessState, key: cg.Key): cg.Key[] {
         .map(([k]) => util.key2pos(k)[0]),
       lastMove: state.lastMove,
     };
-  return util.allPosAndKey.filter(dest => mobility({ ...ctx, dest })).map(pk => pk.key);
+  return util.allPosAndKey.filter(dest => mobility({ ...partialCtx, dest })).map(pk => pk.key);
 }
