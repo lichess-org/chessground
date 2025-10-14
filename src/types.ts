@@ -120,6 +120,7 @@ export type DirectionalCheck = (x1: number, y1: number, x2: number, y2: number) 
 export type MobilityContext = {
   orig: PosAndKey;
   dest: PosAndKey;
+  role: Role;
   allPieces: Pieces;
   friendlies: Pieces;
   enemies: Pieces;

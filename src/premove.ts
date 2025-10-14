@@ -209,11 +209,11 @@ export function premove(state: HeadlessState, key: cg.Key): cg.Key[] {
     friendlies = new Map([...pieces].filter(([_, p]) => p.color === color)),
     enemies = new Map([...pieces].filter(([_, p]) => p.color === util.opposite(color))),
     orig = { key, pos: util.key2pos(key) },
-    mobility: Mobility = (ctxParam: MobilityContext) =>
-      mobilityByRole[piece.role](ctxParam) &&
-      state.premovable.additionalPremoveRequirements[piece.role](ctxParam),
-    ctx = {
+    mobility: Mobility = (ctx: MobilityContext) =>
+      mobilityByRole[piece.role](ctx) && state.premovable.additionalPremoveRequirements(ctx),
+    partialCtx = {
       orig,
+      role: piece.role,
       allPieces: pieces,
       friendlies: friendlies,
       enemies: enemies,
@@ -227,5 +227,5 @@ export function premove(state: HeadlessState, key: cg.Key): cg.Key[] {
         .map(([k]) => util.key2pos(k)[0]),
       lastMove: state.lastMove,
     };
-  return util.allPosAndKey.filter(dest => mobility({ ...ctx, dest })).map(pk => pk.key);
+  return util.allPosAndKey.filter(dest => mobility({ ...partialCtx, dest })).map(pk => pk.key);
 }

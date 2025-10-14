@@ -53,7 +53,7 @@ export interface HeadlessState {
     customDests?: cg.Dests; // use custom valid premoves. {"a2" ["a3" "a4"] "b1" ["a3" "c3"]}
     current?: cg.KeyPair; // keys of the current saved premove ["e2" "e4"]
     unrestrictedPremoves?: boolean; // if falsy, the positions of friendly pieces will be used to trim premove options
-    additionalPremoveRequirements: Record<cg.Role, cg.Mobility>;
+    additionalPremoveRequirements: cg.Mobility;
     events: {
       set?: (orig: cg.Key, dest: cg.Key, metadata?: cg.SetPremoveMetadata) => void; // called after the premove has been set
       unset?: () => void; // called after the premove has been unset
@@ -146,14 +146,7 @@ export function defaults(): HeadlessState {
       enabled: true,
       showDests: true,
       castle: true,
-      additionalPremoveRequirements: {
-        pawn: _ => true,
-        knight: _ => true,
-        bishop: _ => true,
-        rook: _ => true,
-        queen: _ => true,
-        king: _ => true,
-      },
+      additionalPremoveRequirements: _ => true,
       events: {},
     },
     predroppable: {
