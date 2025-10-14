@@ -116,3 +116,12 @@ pnpm test
 ## or
 pnpm test:watch
 ```
+
+## Release procedure
+
+- https://github.com/lichess-org/chessground/actions/workflows/release.yaml
+- [Run workflow]
+- Branch: master
+- Version tag: vX.Y.Z
+
+The release workflow will increment the package.json version, create the tag, the github release, and publish to npm
