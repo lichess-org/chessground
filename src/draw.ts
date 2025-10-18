@@ -44,7 +44,7 @@ export interface Drawable {
   enabled: boolean; // can draw
   visible: boolean; // can view
   defaultSnapToValidMove: boolean;
-  eraseOnMovablePieceClick: boolean;
+  eraseOnMouchDown: boolean;
   onChange?: (shapes: DrawShape[]) => void;
   shapes: DrawShape[]; // user shapes
   autoShapes: DrawShape[]; // computer shapes
