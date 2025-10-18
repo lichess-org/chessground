@@ -1,21 +1,7 @@
 import * as util from './util.js';
 import * as cg from './types.js';
 import { HeadlessState } from './state.js';
-
-type MobilityContext = {
-  orig: cg.PosAndKey;
-  dest: cg.PosAndKey;
-  allPieces: cg.Pieces;
-  friendlies: cg.Pieces;
-  enemies: cg.Pieces;
-  unrestrictedPremoves: boolean;
-  color: cg.Color;
-  canCastle: boolean;
-  rookFilesFriendlies: number[];
-  lastMove: cg.Key[] | undefined;
-};
-
-type Mobility = (ctx: MobilityContext) => boolean;
+import { Mobility, MobilityContext } from './types.js';
 
 const isDestOccupiedByFriendly = (ctx: MobilityContext): boolean => ctx.friendlies.has(ctx.dest.key);
 
@@ -97,9 +83,10 @@ const canBeCapturedBySomeEnemyEnPassant = (
   );
 };
 
-const isPathClearEnoughOfFriendliesForPremove = (ctx: MobilityContext): boolean => {
+const isPathClearEnoughOfFriendliesForPremove = (ctx: MobilityContext, isPawnAdvance: boolean): boolean => {
   if (ctx.unrestrictedPremoves) return true;
   const squaresBetween = util.squaresBetween(...ctx.orig.pos, ...ctx.dest.pos);
+  if (isPawnAdvance) squaresBetween.push(ctx.dest.key);
   const squaresOfFriendliesBetween = squaresBetween.filter(s => ctx.friendlies.has(s));
   if (!squaresOfFriendliesBetween.length) return true;
   const firstSquareOfFriendliesBetween = squaresOfFriendliesBetween[0];
@@ -120,9 +107,10 @@ const isPathClearEnoughOfFriendliesForPremove = (ctx: MobilityContext): boolean 
   );
 };
 
-const isPathClearEnoughOfEnemiesForPremove = (ctx: MobilityContext): boolean => {
+const isPathClearEnoughOfEnemiesForPremove = (ctx: MobilityContext, isPawnAdvance: boolean): boolean => {
   if (ctx.unrestrictedPremoves) return true;
   const squaresBetween = util.squaresBetween(...ctx.orig.pos, ...ctx.dest.pos);
+  if (isPawnAdvance) squaresBetween.push(ctx.dest.key);
   const squaresOfEnemiesBetween = squaresBetween.filter(s => ctx.enemies.has(s));
   if (squaresOfEnemiesBetween.length > 1) return false;
   if (!squaresOfEnemiesBetween.length) return true;
@@ -144,22 +132,18 @@ const isPathClearEnoughOfEnemiesForPremove = (ctx: MobilityContext): boolean => 
   return enemyPawnDests.some(square => !badSquares.includes(square));
 };
 
-const isPathClearEnoughForPremove = (ctx: MobilityContext): boolean =>
-  isPathClearEnoughOfFriendliesForPremove(ctx) && isPathClearEnoughOfEnemiesForPremove(ctx);
+const isPathClearEnoughForPremove = (ctx: MobilityContext, isPawnAdvance: boolean): boolean =>
+  isPathClearEnoughOfFriendliesForPremove(ctx, isPawnAdvance) &&
+  isPathClearEnoughOfEnemiesForPremove(ctx, isPawnAdvance);
 
 const pawn: Mobility = (ctx: MobilityContext) => {
   const step = ctx.color === 'white' ? 1 : -1;
   if (util.diff(ctx.orig.pos[0], ctx.dest.pos[0]) > 1) return false;
-  if (!util.diff(ctx.orig.pos[0], ctx.dest.pos[0])) {
-    const pos: cg.Pos = [ctx.dest.pos[0], ctx.dest.pos[1] + step];
-    const key = util.pos2key(pos);
-    const next = key && { pos, key };
+  if (!util.diff(ctx.orig.pos[0], ctx.dest.pos[0]))
     return (
       util.pawnDirAdvance(...ctx.orig.pos, ...ctx.dest.pos, ctx.color === 'white') &&
-      !!next &&
-      isPathClearEnoughForPremove({ ...ctx, dest: next })
+      isPathClearEnoughForPremove(ctx, true)
     );
-  }
   if (ctx.dest.pos[1] !== ctx.orig.pos[1] + step) return false;
   if (ctx.unrestrictedPremoves || isDestOccupiedByEnemy(ctx)) return true;
   if (isDestOccupiedByFriendly(ctx)) return isDestControlledByEnemy(ctx);
@@ -182,12 +166,12 @@ const knight: Mobility = (ctx: MobilityContext) =>
 
 const bishop: Mobility = (ctx: MobilityContext) =>
   util.bishopDir(...ctx.orig.pos, ...ctx.dest.pos) &&
-  isPathClearEnoughForPremove(ctx) &&
+  isPathClearEnoughForPremove(ctx, false) &&
   (ctx.unrestrictedPremoves || !isDestOccupiedByFriendly(ctx) || isFriendlyOnDestAndAttacked(ctx));
 
 const rook: Mobility = (ctx: MobilityContext) =>
   util.rookDir(...ctx.orig.pos, ...ctx.dest.pos) &&
-  isPathClearEnoughForPremove(ctx) &&
+  isPathClearEnoughForPremove(ctx, false) &&
   (ctx.unrestrictedPremoves || !isDestOccupiedByFriendly(ctx) || isFriendlyOnDestAndAttacked(ctx));
 
 const queen: Mobility = (ctx: MobilityContext) => bishop(ctx) || rook(ctx);
@@ -223,9 +207,11 @@ export function premove(state: HeadlessState, key: cg.Key): cg.Key[] {
     friendlies = new Map([...pieces].filter(([_, p]) => p.color === color)),
     enemies = new Map([...pieces].filter(([_, p]) => p.color === util.opposite(color))),
     orig = { key, pos: util.key2pos(key) },
-    mobility: Mobility = mobilityByRole[piece.role],
-    ctx = {
+    mobility: Mobility = (ctx: MobilityContext) =>
+      mobilityByRole[piece.role](ctx) && state.premovable.additionalPremoveRequirements(ctx),
+    partialCtx = {
       orig,
+      role: piece.role,
       allPieces: pieces,
       friendlies: friendlies,
       enemies: enemies,
@@ -239,5 +225,5 @@ export function premove(state: HeadlessState, key: cg.Key): cg.Key[] {
         .map(([k]) => util.key2pos(k)[0]),
       lastMove: state.lastMove,
     };
-  return util.allPosAndKey.filter(dest => mobility({ ...ctx, dest })).map(pk => pk.key);
+  return util.allPosAndKey.filter(dest => mobility({ ...partialCtx, dest })).map(pk => pk.key);
 }

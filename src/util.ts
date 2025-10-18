@@ -4,7 +4,8 @@ export const invRanks: readonly cg.Rank[] = [...cg.ranks].reverse();
 
 export const allKeys: readonly cg.Key[] = cg.files.flatMap(f => cg.ranks.map(r => (f + r) as cg.Key));
 
-export const pos2key = (pos: cg.Pos): cg.Key | undefined => allKeys[8 * pos[0] + pos[1]];
+export const pos2key = (pos: cg.Pos): cg.Key | undefined =>
+  pos.every(x => x >= 0 && x <= 7) ? allKeys[8 * pos[0] + pos[1]] : undefined;
 
 export const pos2keyUnsafe = (pos: cg.Pos): cg.Key => pos2key(pos)!;
 

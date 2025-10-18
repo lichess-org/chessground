@@ -23,7 +23,6 @@ export interface HeadlessState {
   blockTouchScroll: boolean; // block scrolling via touch dragging on the board
   touchIgnoreRadius: number; // ignore touches within a radius of an occupied square, in units of its circumradius
   pieceKey: boolean; // add a data-key attribute to piece elements
-  pixelCoordsOfMouchDownToMaybeClearShapes?: cg.NumberPair;
   trustAllEvents?: boolean; // disable checking for human only input (e.isTrusted)
   highlight: {
     lastMove: boolean; // add last-move class to squares
@@ -54,6 +53,7 @@ export interface HeadlessState {
     customDests?: cg.Dests; // use custom valid premoves. {"a2" ["a3" "a4"] "b1" ["a3" "c3"]}
     current?: cg.KeyPair; // keys of the current saved premove ["e2" "e4"]
     unrestrictedPremoves?: boolean; // if falsy, the positions of friendly pieces will be used to trim premove options
+    additionalPremoveRequirements: cg.Mobility;
     events: {
       set?: (orig: cg.Key, dest: cg.Key, metadata?: cg.SetPremoveMetadata) => void; // called after the premove has been set
       unset?: () => void; // called after the premove has been unset
@@ -146,6 +146,7 @@ export function defaults(): HeadlessState {
       enabled: true,
       showDests: true,
       castle: true,
+      additionalPremoveRequirements: _ => true,
       events: {},
     },
     predroppable: {
