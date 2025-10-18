@@ -23,6 +23,7 @@ export interface HeadlessState {
   blockTouchScroll: boolean; // block scrolling via touch dragging on the board
   touchIgnoreRadius: number; // ignore touches within a radius of an occupied square, in units of its circumradius
   pieceKey: boolean; // add a data-key attribute to piece elements
+  pixelCoordsOfMouchDownToMaybeClearShapes?: cg.NumberPair;
   trustAllEvents?: boolean; // disable checking for human only input (e.isTrusted)
   highlight: {
     lastMove: boolean; // add last-move class to squares
