@@ -161,7 +161,7 @@ export function end(s: State, e: cg.MouchEvent): void {
   if (
     position &&
     s.pixelCoordsOfMouchDownToMaybeClearShapes &&
-    util.samePos(position, s.pixelCoordsOfMouchDownToMaybeClearShapes)
+    util.distanceSq(position, s.pixelCoordsOfMouchDownToMaybeClearShapes) < 225
   )
     drawClear(s);
   s.pixelCoordsOfMouchDownToMaybeClearShapes = undefined;
