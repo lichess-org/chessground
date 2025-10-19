@@ -74,7 +74,7 @@ export function renderSvg(state: State, els: cg.Elements): void {
       shape: cur,
       current: true,
       hash: shapeHash(cur, isShort(cur.dest, dests), true, bounds, false),
-      pendingErase: false
+      pendingErase: false,
     });
 
   const fullHash = shapes.map(sc => sc.hash).join(';');
