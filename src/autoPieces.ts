@@ -12,6 +12,7 @@ export function render(state: State, autoPieceEl: HTMLElement): void {
       shape: s,
       hash: hash(s),
       current: false,
+      pendingErase: false,
     };
   });
 
