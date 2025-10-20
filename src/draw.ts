@@ -62,7 +62,7 @@ export interface DrawCurrent {
   snapToValidMove: boolean; // whether to snap to valid piece moves
 }
 
-const brushes: cg.BrushColor[] = ['green', 'red', 'blue', 'yellow'];
+const brushes: cg.BrushColor[] = ['green', 'red', 'blue', 'purple', 'yellow', 'orange', 'pink', 'white'];
 
 export function start(state: State, e: cg.MouchEvent): void {
   // support one finger touch only
@@ -132,9 +132,10 @@ export function clear(state: State): void {
 }
 
 function eventBrush(e: cg.MouchEvent): cg.BrushColor {
-  const modA = (e.shiftKey || e.ctrlKey) && isRightButton(e);
+  const modA = e.ctrlKey && isRightButton(e);
   const modB = e.altKey || e.metaKey || e.getModifierState?.('AltGraph');
-  return brushes[(modA ? 1 : 0) + (modB ? 2 : 0)];
+  const modC = e.shiftKey && isRightButton(e);
+  return brushes[(modA ? 1 : 0) + (modB ? 2 : 0) + (modC ? 4 : 0)];
 }
 
 function addShape(drawable: Drawable, cur: DrawCurrent): void {
