@@ -3,6 +3,7 @@ import { DrawShape } from './draw';
 export interface SyncableShape {
   shape: DrawShape;
   current: boolean;
+  pendingErase: boolean;
   hash: Hash;
 }
 

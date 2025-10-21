@@ -131,6 +131,10 @@ export function clear(state: State): void {
   }
 }
 
+export const sameEndpoints = (s1: DrawShape, s2: DrawShape) => s1.orig === s2.orig && s1.dest === s2.dest;
+
+export const sameColor = (s1: DrawShape, s2: DrawShape) => s1.brush === s2.brush;
+
 function eventBrush(e: cg.MouchEvent): cg.BrushColor {
   const modA = (e.shiftKey || e.ctrlKey) && isRightButton(e);
   const modB = e.altKey || e.metaKey || e.getModifierState?.('AltGraph');
@@ -138,10 +142,9 @@ function eventBrush(e: cg.MouchEvent): cg.BrushColor {
 }
 
 function addShape(drawable: Drawable, cur: DrawCurrent): void {
-  const sameShape = (s: DrawShape) => s.orig === cur.orig && s.dest === cur.dest;
-  const similar = drawable.shapes.find(sameShape);
-  if (similar) drawable.shapes = drawable.shapes.filter(s => !sameShape(s));
-  if (!similar || similar.brush !== cur.brush)
+  const similar = drawable.shapes.find(s => sameEndpoints(s, cur));
+  if (similar) drawable.shapes = drawable.shapes.filter(s => !sameEndpoints(s, cur));
+  if (!similar || !sameColor(similar, cur))
     drawable.shapes.push({
       orig: cur.orig,
       dest: cur.dest,
