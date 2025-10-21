@@ -54,22 +54,20 @@ export function renderSvg(state: State, els: cg.Elements): void {
   }
   const shapes: SyncableShape[] = [];
 
-  const willRemove = new Set<number>();
-  if (cur) {
-    d.shapes.forEach((s, idx) => {
-      if (s.orig === cur.orig && s.dest === cur.dest && s.brush === cur.brush) willRemove.add(idx);
-    });
-  }
+  const pendingEraseIdx = cur
+    ? d.shapes.findIndex(s => s.orig === cur.orig && s.dest === cur.dest && s.brush === cur.brush)
+    : -1;
 
   for (const s of d.shapes.concat(nonPieceAutoShapes)) {
+    const isPendingErase = pendingEraseIdx !== -1 && pendingEraseIdx === d.shapes.indexOf(s);
     shapes.push({
       shape: s,
       current: false,
-      pendingErase: willRemove.has(d.shapes.indexOf(s)),
-      hash: shapeHash(s, isShort(s.dest, dests), false, bounds, willRemove.has(d.shapes.indexOf(s))),
+      pendingErase: isPendingErase,
+      hash: shapeHash(s, isShort(s.dest, dests), false, bounds, isPendingErase),
     });
   }
-  if (cur && !willRemove.size)
+  if (cur && pendingEraseIdx === -1)
     shapes.push({
       shape: cur,
       current: true,
