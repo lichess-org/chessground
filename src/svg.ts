@@ -58,8 +58,8 @@ export function renderSvg(state: State, els: cg.Elements): void {
     ? d.shapes.findIndex(s => s.orig === cur.orig && s.dest === cur.dest && s.brush === cur.brush)
     : -1;
 
-  for (const s of d.shapes.concat(nonPieceAutoShapes)) {
-    const isPendingErase = pendingEraseIdx !== -1 && pendingEraseIdx === d.shapes.indexOf(s);
+  for (const [idx, s] of d.shapes.concat(nonPieceAutoShapes).entries()) {
+    const isPendingErase = pendingEraseIdx !== -1 && pendingEraseIdx === idx;
     shapes.push({
       shape: s,
       current: false,
