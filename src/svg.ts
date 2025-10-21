@@ -1,6 +1,15 @@
 import { State } from './state.js';
 import { key2pos } from './util.js';
-import { Drawable, DrawShape, DrawShapePiece, DrawBrush, DrawBrushes, DrawModifiers } from './draw.js';
+import {
+  Drawable,
+  DrawShape,
+  DrawShapePiece,
+  DrawBrush,
+  DrawBrushes,
+  DrawModifiers,
+  sameEndpoints,
+  sameColor,
+} from './draw.js';
 import { SyncableShape, Hash } from './sync.js';
 import * as cg from './types.js';
 
@@ -54,9 +63,7 @@ export function renderSvg(state: State, els: cg.Elements): void {
   }
   const shapes: SyncableShape[] = [];
 
-  const pendingEraseIdx = cur
-    ? d.shapes.findIndex(s => s.orig === cur.orig && s.dest === cur.dest && s.brush === cur.brush)
-    : -1;
+  const pendingEraseIdx = cur ? d.shapes.findIndex(s => sameEndpoints(s, cur) && sameColor(s, cur)) : -1;
 
   for (const [idx, s] of d.shapes.concat(nonPieceAutoShapes).entries()) {
     const isPendingErase = pendingEraseIdx !== -1 && pendingEraseIdx === idx;
