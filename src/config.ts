@@ -87,7 +87,7 @@ export interface Config {
     defaultSnapToValidMove?: boolean;
     // Clicking an empty square or immovable piece will clear the drawing regardless, but when this property is true,
     // clicking on a (currently unselected) movable piece will also clear the drawing.
-    eraseOnMouchDown?: boolean;
+    eraseOnClick?: boolean;
     shapes?: DrawShape[];
     autoShapes?: DrawShape[];
     brushes?: DrawBrushes;
