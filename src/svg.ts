@@ -1,6 +1,15 @@
 import { State } from './state.js';
 import { key2pos } from './util.js';
-import { Drawable, DrawShape, DrawShapePiece, DrawBrush, DrawBrushes, DrawModifiers } from './draw.js';
+import {
+  Drawable,
+  DrawShape,
+  DrawShapePiece,
+  DrawBrush,
+  DrawBrushes,
+  DrawModifiers,
+  sameEndpoints,
+  sameColor,
+} from './draw.js';
 import { SyncableShape, Hash } from './sync.js';
 import * as cg from './types.js';
 
@@ -54,18 +63,23 @@ export function renderSvg(state: State, els: cg.Elements): void {
   }
   const shapes: SyncableShape[] = [];
 
-  for (const s of d.shapes.concat(nonPieceAutoShapes)) {
+  const pendingEraseIdx = cur ? d.shapes.findIndex(s => sameEndpoints(s, cur) && sameColor(s, cur)) : -1;
+
+  for (const [idx, s] of d.shapes.concat(nonPieceAutoShapes).entries()) {
+    const isPendingErase = pendingEraseIdx !== -1 && pendingEraseIdx === idx;
     shapes.push({
       shape: s,
       current: false,
-      hash: shapeHash(s, isShort(s.dest, dests), false, bounds),
+      pendingErase: isPendingErase,
+      hash: shapeHash(s, isShort(s.dest, dests), false, bounds, isPendingErase),
     });
   }
-  if (cur)
+  if (cur && pendingEraseIdx === -1)
     shapes.push({
       shape: cur,
       current: true,
-      hash: shapeHash(cur, isShort(cur.dest, dests), true, bounds),
+      hash: shapeHash(cur, isShort(cur.dest, dests), true, bounds, false),
+      pendingErase: false,
     });
 
   const fullHash = shapes.map(sc => sc.hash).join(';');
@@ -141,12 +155,14 @@ function shapeHash(
   shorten: boolean,
   current: boolean,
   bounds: DOMRectReadOnly,
+  pendingErase: boolean,
 ): Hash {
   // a shape and an overlay svg share a lifetime and have the same cgHash attribute
   return [
     bounds.width,
     bounds.height,
     current,
+    pendingErase && 'pendingErase',
     orig,
     dest,
     brush,
@@ -180,7 +196,7 @@ function textHash(s: string): Hash {
 
 function renderShape(
   state: State,
-  { shape, current, hash }: SyncableShape,
+  { shape, current, pendingErase, hash }: SyncableShape,
   brushes: DrawBrushes,
   dests: ArrowDests,
   bounds: DOMRectReadOnly,
@@ -196,8 +212,8 @@ function renderShape(
     svgs.push({ el });
 
     if (from[0] !== to[0] || from[1] !== to[1])
-      el.appendChild(renderArrow(shape, brush, from, to, current, isShort(shape.dest, dests)));
-    else el.appendChild(renderCircle(brushes[shape.brush!], from, current, bounds));
+      el.appendChild(renderArrow(shape, brush, from, to, current, isShort(shape.dest, dests), pendingErase));
+    else el.appendChild(renderCircle(brushes[shape.brush!], from, current, bounds, pendingErase));
   }
   if (shape.label) {
     const label = shape.label;
@@ -221,6 +237,7 @@ function renderCircle(
   at: cg.NumberPair,
   current: boolean,
   bounds: DOMRectReadOnly,
+  pendingErase: boolean,
 ): SVGElement {
   const widths = circleWidth(),
     radius = (bounds.width + bounds.height) / (4 * Math.max(bounds.width, bounds.height));
@@ -228,7 +245,7 @@ function renderCircle(
     stroke: brush.color,
     'stroke-width': widths[current ? 0 : 1],
     fill: 'none',
-    opacity: opacity(brush, current),
+    opacity: opacity(brush, current, pendingErase),
     cx: at[0],
     cy: at[1],
     r: radius - widths[1] / 2,
@@ -242,6 +259,7 @@ function renderArrow(
   to: cg.NumberPair,
   current: boolean,
   shorten: boolean,
+  pendingErase: boolean,
 ): SVGElement {
   function renderLine(isHilite: boolean) {
     const m = arrowMargin(shorten && !current),
@@ -256,7 +274,7 @@ function renderArrow(
       'stroke-width': lineWidth(brush, current) * (isHilite ? 1.14 : 1),
       'stroke-linecap': 'round',
       'marker-end': `url(#arrowhead-${isHilite ? hilite.key : brush.key})`,
-      opacity: s.modifiers?.hilite ? 1 : opacity(brush, current),
+      opacity: s.modifiers?.hilite && !pendingErase ? 1 : opacity(brush, current, pendingErase),
       x1: from[0],
       y1: from[1],
       x2: to[0] - xo,
@@ -375,8 +393,8 @@ function hiliteOf(shape: DrawShape): { key?: string; color?: string } {
   return { key: hilite && `hilite-${hilite.replace('#', '')}`, color: hilite };
 }
 
-function opacity(brush: DrawBrush, current: boolean): number {
-  return (brush.opacity || 1) * (current ? 0.9 : 1);
+function opacity(brush: DrawBrush, current: boolean, pendingErase: boolean): number {
+  return (brush.opacity || 1) * (pendingErase ? 0.6 : current ? 0.9 : 1);
 }
 
 function arrowMargin(shorten: boolean): number {
