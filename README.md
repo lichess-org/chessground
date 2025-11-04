@@ -76,7 +76,7 @@ const ground = Chessground(document.body, config);
 - React: [react-chess/chessground](https://github.com/react-chess/chessground), [ruilisi/react-chessground](https://github.com/ruilisi/react-chessground)
 - Vue.js: [vitogit/vue-chessboard](https://github.com/vitogit/vue-chessboard), [qwerty084/vue3-chessboard](https://github.com/qwerty084/vue3-chessboard)
 - Angular: [topce/ngx-chessground](https://github.com/topce/ngx-chessground)
-- Svelte: [agelas/svelte-chessground-ui](https://github.com/agelas/svelte-chessground-ui), [gtim/svelte-chessground](https://github.com/gtim/svelte-chessground), [gtm-nayan/svelte-use-chessground](https://github.com/gtm-nayan/svelte-use-chessground)
+- Svelte: [Janldeboer/svelte5-chessground](https://github.com/Janldeboer/svelte5-chessground), [agelas/svelte-chessground-ui (Svelte 4)](https://github.com/agelas/svelte-chessground-ui), [gtim/svelte-chessground (Svelte3)](https://github.com/gtim/svelte-chessground),
 
 More? Please make a pull request to include it here.
 
