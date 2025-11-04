@@ -86,7 +86,11 @@ export const eventPosition = (e: cg.MouchEvent): cg.NumberPair | undefined => {
   return; // touchend has no position!
 };
 
-export const isRightButton = (e: cg.MouchEvent): boolean => e.button === 2;
+const isFireMac =
+  ['macintosh', 'firefox'].every(x => navigator.userAgent.toLowerCase().includes(x)) &&
+  !('ontouchstart' in window);
+
+export const isRightButton = (e: cg.MouchEvent): boolean => e.button === 2 && !(isFireMac && e.ctrlKey);
 
 export const createEl = (tagName: string, className?: string): HTMLElement => {
   const el = document.createElement(tagName);
