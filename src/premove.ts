@@ -5,7 +5,7 @@ import { Mobility, MobilityContext } from './types.js';
 
 const pawn: Mobility = (ctx: MobilityContext) =>
   util.diff(ctx.orig.pos[0], ctx.dest.pos[0]) <= 1 &&
-  (util.diff(ctx.orig.pos[0], ctx.dest.pos[0]) > 0
+  (util.diff(ctx.orig.pos[0], ctx.dest.pos[0]) === 1
     ? ctx.dest.pos[1] === ctx.orig.pos[1] + (ctx.color === 'white' ? 1 : -1)
     : util.pawnDirAdvance(...ctx.orig.pos, ...ctx.dest.pos, ctx.color === 'white'));
 
