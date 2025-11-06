@@ -129,6 +129,7 @@ export type MobilityContext = {
   canCastle: boolean;
   rookFilesFriendlies: number[];
   lastMove: Key[] | undefined;
+  rookCastle: boolean;
 };
 
 export type Mobility = (ctx: MobilityContext) => boolean;
