@@ -30,6 +30,7 @@ const king: Mobility = (ctx: MobilityContext) =>
 const mobilityByRole = { pawn, knight, bishop, rook, queen, king };
 
 export function premove(state: HeadlessState, key: cg.Key): cg.Key[] {
+  // TODO - remove `castle` once https://github.com/lichess-org/lila/pull/18630 is merged.
   const pieces = state.pieces,
     canCastle = state.premovable.castle;
   const piece = pieces.get(key);
