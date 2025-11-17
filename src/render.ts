@@ -1,5 +1,6 @@
 import { State } from './state.js';
 import { key2pos, createEl, posToTranslate as posToTranslateFromBounds, translate } from './util.js';
+import * as util from './util.js';
 import { whitePov } from './board.js';
 import { AnimCurrent, AnimVectors, AnimVector, AnimFadings } from './anim.js';
 import { DragCurrent } from './drag.js';
@@ -214,8 +215,21 @@ const pieceNameOf = (piece: cg.Piece): string => `${piece.color} ${piece.role}`;
 function computeSquareClasses(s: State): cg.SquareClasses {
   const squares: cg.SquareClasses = new Map();
   if (s.lastMove && s.highlight.lastMove)
-    for (const k of s.lastMove) {
-      addSquare(squares, k, 'last-move');
+    for (const [i, k] of s.lastMove.entries()) {
+      // check if the user has castled by moving the king onto the rook
+      addSquare(
+        squares,
+        i === 1 &&
+          !s.pieces.has(k) &&
+          util
+            .squaresBetween(...key2pos(s.lastMove[0]), ...key2pos(s.lastMove[1]))
+            .some(sq => s.pieces.has(sq)) &&
+          s.lastMove[0][0] === 'e' &&
+          ['h', 'a'].includes(s.lastMove[1][0])
+          ? (((k > s.lastMove[0] ? 'g' : 'c') + k[1]) as cg.Key)
+          : k,
+        'last-move',
+      );
     }
   if (s.check && s.highlight.check) addSquare(squares, s.check, 'check');
   if (s.selected) {
