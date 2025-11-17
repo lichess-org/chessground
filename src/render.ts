@@ -72,23 +72,15 @@ export function render(s: State): void {
           if (s.addPieceZIndex) el.style.zIndex = posZIndex(key2pos(k), asWhite);
         }
         // same piece: flag as same
-        if (elPieceName === pieceNameOf(pieceAtKey) && (!fading || !el.cgFading)) {
-          samePieces.add(k);
-        }
+        if (elPieceName === pieceNameOf(pieceAtKey) && (!fading || !el.cgFading)) samePieces.add(k);
         // different piece: flag as moved unless it is a fading piece
-        else {
-          if (fading && elPieceName === pieceNameOf(fading)) {
-            el.classList.add('fading');
-            el.cgFading = true;
-          } else {
-            appendValue(movedPieces, elPieceName, el);
-          }
-        }
+        else if (fading && elPieceName === pieceNameOf(fading)) {
+          el.classList.add('fading');
+          el.cgFading = true;
+        } else appendValue(movedPieces, elPieceName, el);
       }
       // no piece: flag as moved
-      else {
-        appendValue(movedPieces, elPieceName, el);
-      }
+      else appendValue(movedPieces, elPieceName, el);
     } else if (isSquareNode(el)) {
       const cn = el.className;
       if (squares.get(k) === cn) sameSquares.add(k);
@@ -206,7 +198,6 @@ function posZIndex(pos: cg.Pos, asWhite: boolean): string {
   const minZ = 3;
   const rank = pos[1];
   const z = asWhite ? minZ + 7 - rank : minZ + rank;
-
   return `${z}`;
 }
 
@@ -233,16 +224,10 @@ function computeSquareClasses(s: State): cg.SquareClasses {
   if (s.selected) {
     addSquare(squares, s.selected, 'selected');
     if (s.movable.showDests) {
-      const dests = s.movable.dests?.get(s.selected);
-      if (dests)
-        for (const k of dests) {
-          addSquare(squares, k, 'move-dest' + (s.pieces.has(k) ? ' oc' : ''));
-        }
-      const pDests = s.premovable.customDests?.get(s.selected) ?? s.premovable.dests;
-      if (pDests)
-        for (const k of pDests) {
-          addSquare(squares, k, 'premove-dest' + (s.pieces.has(k) ? ' oc' : ''));
-        }
+      for (const k of s.movable.dests?.get(s.selected) ?? [])
+        addSquare(squares, k, 'move-dest' + (s.pieces.has(k) ? ' oc' : ''));
+      for (const k of s.premovable.customDests?.get(s.selected) ?? s.premovable.dests ?? [])
+        addSquare(squares, k, 'premove-dest' + (s.pieces.has(k) ? ' oc' : ''));
     }
   }
   const premove = s.premovable.current;
