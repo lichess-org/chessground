@@ -203,23 +203,21 @@ function posZIndex(pos: cg.Pos, asWhite: boolean): string {
 
 const pieceNameOf = (piece: cg.Piece): string => `${piece.color} ${piece.role}`;
 
-const lastMoveStandardRookCastle = (s: State): boolean =>
-  s.lastMove?.length === 2 &&
+const normalizeLastMoveStandardRookCastle = (s: State, k: cg.Key): cg.Key =>
+  !!s.lastMove?.[1] &&
   !s.pieces.has(s.lastMove[1]) &&
-  util.squaresBetween(...key2pos(s.lastMove[0]), ...key2pos(s.lastMove[1])).some(sq => s.pieces.has(sq)) &&
   s.lastMove[0][0] === 'e' &&
-  ['h', 'a'].includes(s.lastMove[1][0]);
+  ['h', 'a'].includes(s.lastMove[1][0]) &&
+  s.lastMove[0][1] === s.lastMove[1][1] &&
+  util.squaresBetween(...key2pos(s.lastMove[0]), ...key2pos(s.lastMove[1])).some(sq => s.pieces.has(sq))
+    ? (((k > s.lastMove[0] ? 'g' : 'c') + k[1]) as cg.Key)
+    : k;
 
 function computeSquareClasses(s: State): cg.SquareClasses {
   const squares: cg.SquareClasses = new Map();
   if (s.lastMove && s.highlight.lastMove)
-    for (const [i, k] of s.lastMove.entries()) {
-      addSquare(
-        squares,
-        i === 1 && lastMoveStandardRookCastle(s) ? (((k > s.lastMove[0] ? 'g' : 'c') + k[1]) as cg.Key) : k,
-        'last-move',
-      );
-    }
+    for (const [i, k] of s.lastMove.entries())
+      addSquare(squares, i === 1 ? normalizeLastMoveStandardRookCastle(s, k) : k, 'last-move');
   if (s.check && s.highlight.check) addSquare(squares, s.check, 'check');
   if (s.selected) {
     addSquare(squares, s.selected, 'selected');
