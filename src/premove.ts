@@ -19,8 +19,7 @@ const queen: Mobility = (ctx: MobilityContext) => bishop(ctx) || rook(ctx);
 
 const king: Mobility = (ctx: MobilityContext) =>
   util.kingDirNonCastling(...ctx.orig.pos, ...ctx.dest.pos) ||
-  (ctx.canCastle &&
-    ctx.orig.pos[1] === ctx.dest.pos[1] &&
+  (ctx.orig.pos[1] === ctx.dest.pos[1] &&
     ctx.orig.pos[1] === (ctx.color === 'white' ? 0 : 7) &&
     ((ctx.orig.pos[0] === 4 &&
       ((ctx.dest.pos[0] === 2 && ctx.rookFilesFriendlies.includes(0)) ||
@@ -30,9 +29,7 @@ const king: Mobility = (ctx: MobilityContext) =>
 const mobilityByRole = { pawn, knight, bishop, rook, queen, king };
 
 export function premove(state: HeadlessState, key: cg.Key): cg.Key[] {
-  // TODO - remove `castle` once https://github.com/lichess-org/lila/pull/18630 is merged.
-  const pieces = state.pieces,
-    canCastle = state.premovable.castle;
+  const pieces = state.pieces;
   const piece = pieces.get(key);
   if (!piece || piece.color === state.turnColor) return [];
   const color = piece.color,
@@ -48,7 +45,6 @@ export function premove(state: HeadlessState, key: cg.Key): cg.Key[] {
       friendlies: friendlies,
       enemies: enemies,
       color: color,
-      canCastle: canCastle,
       rookFilesFriendlies: Array.from(pieces)
         .filter(
           ([k, p]) => k[1] === (color === 'white' ? '1' : '8') && p.color === color && p.role === 'rook',
