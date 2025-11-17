@@ -10,7 +10,7 @@ export interface HeadlessState {
   orientation: cg.Color; // board orientation. white | black
   turnColor: cg.Color; // turn to play. white | black
   check?: cg.Key; // square currently in check "a2"
-  lastMove?: cg.Key[]; // squares part of the last move ["c3"; "c4"]
+  lastMove?: cg.Key[]; // squares part of the last move ["c3", "c4"]
   selected?: cg.Key; // square currently selected "a1"
   coordinates: boolean; // include coords attributes
   coordinatesOnSquares: boolean; // include coords attributes on every square

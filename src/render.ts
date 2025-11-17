@@ -1,5 +1,6 @@
 import { State } from './state.js';
 import { key2pos, createEl, posToTranslate as posToTranslateFromBounds, translate } from './util.js';
+import * as util from './util.js';
 import { whitePov } from './board.js';
 import { AnimCurrent, AnimVectors, AnimVector, AnimFadings } from './anim.js';
 import { DragCurrent } from './drag.js';
@@ -71,23 +72,15 @@ export function render(s: State): void {
           if (s.addPieceZIndex) el.style.zIndex = posZIndex(key2pos(k), asWhite);
         }
         // same piece: flag as same
-        if (elPieceName === pieceNameOf(pieceAtKey) && (!fading || !el.cgFading)) {
-          samePieces.add(k);
-        }
+        if (elPieceName === pieceNameOf(pieceAtKey) && (!fading || !el.cgFading)) samePieces.add(k);
         // different piece: flag as moved unless it is a fading piece
-        else {
-          if (fading && elPieceName === pieceNameOf(fading)) {
-            el.classList.add('fading');
-            el.cgFading = true;
-          } else {
-            appendValue(movedPieces, elPieceName, el);
-          }
-        }
+        else if (fading && elPieceName === pieceNameOf(fading)) {
+          el.classList.add('fading');
+          el.cgFading = true;
+        } else appendValue(movedPieces, elPieceName, el);
       }
       // no piece: flag as moved
-      else {
-        appendValue(movedPieces, elPieceName, el);
-      }
+      else appendValue(movedPieces, elPieceName, el);
     } else if (isSquareNode(el)) {
       const cn = el.className;
       if (squares.get(k) === cn) sameSquares.add(k);
@@ -205,32 +198,34 @@ function posZIndex(pos: cg.Pos, asWhite: boolean): string {
   const minZ = 3;
   const rank = pos[1];
   const z = asWhite ? minZ + 7 - rank : minZ + rank;
-
   return `${z}`;
 }
 
 const pieceNameOf = (piece: cg.Piece): string => `${piece.color} ${piece.role}`;
 
+const normalizeLastMoveStandardRookCastle = (s: State, k: cg.Key): cg.Key =>
+  !!s.lastMove?.[1] &&
+  !s.pieces.has(s.lastMove[1]) &&
+  s.lastMove[0][0] === 'e' &&
+  ['h', 'a'].includes(s.lastMove[1][0]) &&
+  s.lastMove[0][1] === s.lastMove[1][1] &&
+  util.squaresBetween(...key2pos(s.lastMove[0]), ...key2pos(s.lastMove[1])).some(sq => s.pieces.has(sq))
+    ? (((k > s.lastMove[0] ? 'g' : 'c') + k[1]) as cg.Key)
+    : k;
+
 function computeSquareClasses(s: State): cg.SquareClasses {
   const squares: cg.SquareClasses = new Map();
   if (s.lastMove && s.highlight.lastMove)
-    for (const k of s.lastMove) {
-      addSquare(squares, k, 'last-move');
-    }
+    for (const [i, k] of s.lastMove.entries())
+      addSquare(squares, i === 1 ? normalizeLastMoveStandardRookCastle(s, k) : k, 'last-move');
   if (s.check && s.highlight.check) addSquare(squares, s.check, 'check');
   if (s.selected) {
     addSquare(squares, s.selected, 'selected');
     if (s.movable.showDests) {
-      const dests = s.movable.dests?.get(s.selected);
-      if (dests)
-        for (const k of dests) {
-          addSquare(squares, k, 'move-dest' + (s.pieces.has(k) ? ' oc' : ''));
-        }
-      const pDests = s.premovable.customDests?.get(s.selected) ?? s.premovable.dests;
-      if (pDests)
-        for (const k of pDests) {
-          addSquare(squares, k, 'premove-dest' + (s.pieces.has(k) ? ' oc' : ''));
-        }
+      for (const k of s.movable.dests?.get(s.selected) ?? [])
+        addSquare(squares, k, 'move-dest' + (s.pieces.has(k) ? ' oc' : ''));
+      for (const k of s.premovable.customDests?.get(s.selected) ?? s.premovable.dests ?? [])
+        addSquare(squares, k, 'premove-dest' + (s.pieces.has(k) ? ' oc' : ''));
     }
   }
   const premove = s.premovable.current;
