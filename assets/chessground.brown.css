@@ -17,10 +17,10 @@ cg-board square.oc.move-dest {
 cg-board square.oc.premove-dest {
   background: radial-gradient(transparent 0%, transparent 80%, rgba(20, 30, 85, 0.2) 80%);
 }
-cg-board square.move-dest:hover {
+cg-board square.move-dest.hovered-sq {
   background: rgba(20, 85, 30, 0.3);
 }
-cg-board square.premove-dest:hover {
+cg-board square.premove-dest.hovered-sq {
   background: rgba(20, 30, 85, 0.2);
 }
 cg-board square.last-move {

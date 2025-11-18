@@ -13,14 +13,12 @@ export function bindBoard(s: State, onResize: () => void): void {
 
   if ('ResizeObserver' in window) new ResizeObserver(onResize).observe(s.dom.elements.wrap);
 
-  if (s.disableContextMenu || s.drawable.enabled) {
+  if (s.disableContextMenu || s.drawable.enabled)
     boardEl.addEventListener('contextmenu', e => e.preventDefault());
-  }
 
   if (s.viewOnly) return;
 
-  // Cannot be passive, because we prevent touch scrolling and dragging of
-  // selected elements.
+  // Cannot be passive, because we prevent touch scrolling and dragging of selected elements.
   const onStart = startDragOrDraw(s);
   boardEl.addEventListener('touchstart', onStart as EventListener, {
     passive: false,

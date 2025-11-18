@@ -143,7 +143,6 @@ function processDrag(s: State): void {
           cur.pos[0] - bounds.left - bounds.width / 16,
           cur.pos[1] - bounds.top - bounds.height / 16,
         ]);
-
         cur.keyHasChanged ||= cur.orig !== board.getKeyAtDomPos(cur.pos, board.whitePov(s), bounds);
       }
     }
@@ -152,10 +151,16 @@ function processDrag(s: State): void {
 }
 
 export function move(s: State, e: cg.MouchEvent): void {
+  const pos = util.eventPosition(e)!;
   // support one finger touch only
   if (s.draggable.current && (!e.touches || e.touches.length < 2)) {
-    s.draggable.current.pos = util.eventPosition(e)!;
+    s.draggable.current.pos = pos;
   }
+  const key = board.getKeyAtDomPos(pos, board.whitePov(s), s.dom.bounds());
+  if (key !== s.highlight.hovered) {
+    s.highlight.hovered = key;
+    s.dom.redraw();
+  };
 }
 
 export function end(s: State, e: cg.MouchEvent): void {

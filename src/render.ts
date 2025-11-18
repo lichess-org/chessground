@@ -235,6 +235,8 @@ function computeSquareClasses(s: State): cg.SquareClasses {
   const o = s.exploding;
   if (o) for (const k of o.keys) addSquare(squares, k, 'exploding' + o.stage);
 
+  if (s.highlight.hovered) addSquare(squares, s.highlight.hovered, 'hovered-sq');
+
   if (s.highlight.custom) {
     s.highlight.custom.forEach((v: string, k: cg.Key) => {
       addSquare(squares, k, v);
