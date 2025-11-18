@@ -160,7 +160,7 @@ export function move(s: State, e: cg.MouchEvent): void {
   if (key !== s.highlight.hovered) {
     s.highlight.hovered = key;
     s.dom.redraw();
-  };
+  }
 }
 
 export function end(s: State, e: cg.MouchEvent): void {
