@@ -73,14 +73,14 @@ export function renderSvg(state: State, els: cg.Elements): void {
       shape: s,
       current: false,
       pendingErase: isPendingErase,
-      hash: shapeHash(s, isShort(s.dest, dests), false, bounds, isPendingErase),
+      hash: shapeHash(s, isShort(s.dest, dests), false, bounds, isPendingErase, angleCount(s.dest, dests)),
     });
   }
   if (cur && pendingEraseIdx === -1)
     shapes.push({
       shape: cur,
       current: true,
-      hash: shapeHash(cur, isShort(cur.dest, dests), true, bounds, false),
+      hash: shapeHash(cur, isShort(cur.dest, dests), true, bounds, false, angleCount(cur.dest, dests)),
       pendingErase: false,
     });
 
@@ -158,6 +158,7 @@ function shapeHash(
   current: boolean,
   bounds: DOMRectReadOnly,
   pendingErase: boolean,
+  angleCountOfDest: number,
 ): Hash {
   // a shape and an overlay svg share a lifetime and have the same cgHash attribute
   return [
@@ -165,6 +166,7 @@ function shapeHash(
     bounds.height,
     current,
     pendingErase && 'pendingErase',
+    angleCountOfDest,
     orig,
     dest,
     brush,
@@ -363,6 +365,9 @@ const isShort = (dest: cg.Key | undefined, dests: ArrowDests): boolean =>
 
 const createElement = (tagName: string): SVGElement =>
   document.createElementNS('http://www.w3.org/2000/svg', tagName);
+
+const angleCount = (dest: cg.Key | undefined, dests: ArrowDests): number =>
+  dest && dests.has(dest) ? dests.get(dest)!.size : 0;
 
 function setAttributes(el: SVGElement, attrs: { [key: string]: any }): SVGElement {
   for (const key in attrs) {

@@ -124,9 +124,7 @@ export type MobilityContext = {
   allPieces: Pieces;
   friendlies: Pieces;
   enemies: Pieces;
-  unrestrictedPremoves: boolean;
   color: Color;
-  canCastle: boolean;
   rookFilesFriendlies: number[];
   lastMove: Key[] | undefined;
 };
