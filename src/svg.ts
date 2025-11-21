@@ -32,7 +32,9 @@ import * as cg from './types.js';
 
 type CustomBrushes = Map<string, DrawBrush>; // by hash
 type Svg = { el: SVGElement; isCustom?: boolean };
-type AngleSlots = Set<number>; // arrow angle slots for label positioning
+const angleSlotVals = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15] as const;
+type AngleSlot = (typeof angleSlotVals)[number];
+type AngleSlots = Set<AngleSlot>; // arrow angle slots for label positioning
 type ArrowDests = Map<cg.Key | undefined, AngleSlots>; // angle slots per dest
 
 export { createElement, setAttributes };
@@ -58,7 +60,7 @@ export function renderSvg(state: State, els: cg.Elements): void {
     const sources = dests.get(s.dest) ?? new Set(),
       from = pos2user(orient(key2pos(s.orig), state.orientation), bounds),
       to = pos2user(orient(key2pos(s.dest), state.orientation), bounds);
-    sources.add(moveAngle(from, to));
+    sources.add(angleToSlot(moveAngle(from, to)));
     dests.set(s.dest, sources);
   }
   const shapes: SyncableShape[] = [];
@@ -179,13 +181,10 @@ function shapeHash(
     .join(',');
 }
 
-function pieceHash(piece: DrawShapePiece): Hash {
-  return [piece.color, piece.role, piece.scale].filter(x => x).join(',');
-}
+const pieceHash = (piece: DrawShapePiece): Hash =>
+  [piece.color, piece.role, piece.scale].filter(x => x).join(',');
 
-function modifiersHash(m: DrawModifiers): Hash {
-  return [m.lineWidth, m.hilite].filter(x => x).join(',');
-}
+const modifiersHash = (m: DrawModifiers): Hash => [m.lineWidth, m.hilite].filter(x => x).join(',');
 
 function textHash(s: string): Hash {
   // Rolling hash with base 31 (cf. https://stackoverflow.com/questions/7616461/generate-a-hash-from-string-in-javascript)
@@ -352,20 +351,23 @@ function renderLabel(
   return g;
 }
 
-function orient(pos: cg.Pos, color: cg.Color): cg.Pos {
-  return color === 'white' ? pos : [7 - pos[0], 7 - pos[1]];
-}
+const orient = (pos: cg.Pos, color: cg.Color): cg.Pos => (color === 'white' ? pos : [7 - pos[0], 7 - pos[1]]);
 
-function isShort(dest: cg.Key | undefined, dests: ArrowDests) {
-  return true === (dest && dests.has(dest) && dests.get(dest)!.size > 1);
-}
+const mod = (n: number, m: number): number => ((n % m) + m) % m;
+
+const rotateAngleSlot = (slot: AngleSlot, steps: number): AngleSlot => mod(slot + steps, 16) as AngleSlot;
+
+const anyTwoCloserThan90Degrees = (slots: AngleSlots): boolean =>
+  [...slots].some(slot => [-3, -2, -1, 1, 2, 3].some(i => slots.has(rotateAngleSlot(slot, i))));
+
+const isShort = (dest: cg.Key | undefined, dests: ArrowDests): boolean =>
+  !!dest && dests.has(dest) && anyTwoCloserThan90Degrees(dests.get(dest)!);
+
+const createElement = (tagName: string): SVGElement =>
+  document.createElementNS('http://www.w3.org/2000/svg', tagName);
 
 const angleCount = (dest: cg.Key | undefined, dests: ArrowDests): number =>
   dest && dests.has(dest) ? dests.get(dest)!.size : 0;
-
-function createElement(tagName: string): SVGElement {
-  return document.createElementNS('http://www.w3.org/2000/svg', tagName);
-}
 
 function setAttributes(el: SVGElement, attrs: { [key: string]: any }): SVGElement {
   for (const key in attrs) {
@@ -374,8 +376,8 @@ function setAttributes(el: SVGElement, attrs: { [key: string]: any }): SVGElemen
   return el;
 }
 
-function makeCustomBrush(base: DrawBrush, modifiers: DrawModifiers | undefined): DrawBrush {
-  return !modifiers
+const makeCustomBrush = (base: DrawBrush, modifiers: DrawModifiers | undefined): DrawBrush =>
+  !modifiers
     ? base
     : {
         color: base.color,
@@ -383,28 +385,21 @@ function makeCustomBrush(base: DrawBrush, modifiers: DrawModifiers | undefined):
         lineWidth: Math.round(modifiers.lineWidth || base.lineWidth),
         key: [base.key, modifiers.lineWidth].filter(x => x).join(''),
       };
-}
 
-function circleWidth(): [number, number] {
-  return [3 / 64, 4 / 64];
-}
+const circleWidth = (): [number, number] => [3 / 64, 4 / 64];
 
-function lineWidth(brush: DrawBrush, current: boolean): number {
-  return ((brush.lineWidth || 10) * (current ? 0.85 : 1)) / 64;
-}
+const lineWidth = (brush: DrawBrush, current: boolean): number =>
+  ((brush.lineWidth || 10) * (current ? 0.85 : 1)) / 64;
 
 function hiliteOf(shape: DrawShape): { key?: string; color?: string } {
   const hilite = shape.modifiers?.hilite;
   return { key: hilite && `hilite-${hilite.replace('#', '')}`, color: hilite };
 }
 
-function opacity(brush: DrawBrush, current: boolean, pendingErase: boolean): number {
-  return (brush.opacity || 1) * (pendingErase ? 0.6 : current ? 0.9 : 1);
-}
+const opacity = (brush: DrawBrush, current: boolean, pendingErase: boolean): number =>
+  (brush.opacity || 1) * (pendingErase ? 0.6 : current ? 0.9 : 1);
 
-function arrowMargin(shorten: boolean): number {
-  return (shorten ? 20 : 10) / 64;
-}
+const arrowMargin = (shorten: boolean): number => (shorten ? 20 : 10) / 64;
 
 function pos2user(pos: cg.Pos, bounds: DOMRectReadOnly): cg.NumberPair {
   const xScale = Math.min(1, bounds.width / bounds.height);
@@ -429,14 +424,13 @@ function filterBox(from: cg.NumberPair, to: cg.NumberPair): SVGElement {
   });
 }
 
-function moveAngle(from: cg.NumberPair, to: cg.NumberPair, asSlot = true) {
-  const angle = Math.atan2(to[1] - from[1], to[0] - from[0]) + Math.PI;
-  return asSlot ? (Math.round((angle * 8) / Math.PI) + 16) % 16 : angle;
-}
+const angleToSlot = (angle: number): AngleSlot => mod(Math.round((angle * 8) / Math.PI), 16) as AngleSlot;
 
-function dist(from: cg.NumberPair, to: cg.NumberPair): number {
-  return Math.sqrt([from[0] - to[0], from[1] - to[1]].reduce((acc, x) => acc + x * x, 0));
-}
+const moveAngle = (from: cg.NumberPair, to: cg.NumberPair): number =>
+  Math.atan2(to[1] - from[1], to[0] - from[0]) + Math.PI;
+
+const dist = (from: cg.NumberPair, to: cg.NumberPair): number =>
+  Math.sqrt([from[0] - to[0], from[1] - to[1]].reduce((acc, x) => acc + x * x, 0));
 
 /*
  try to place label at the junction of the destination shaft and arrowhead. if there's more than
@@ -450,16 +444,14 @@ function dist(from: cg.NumberPair, to: cg.NumberPair): number {
 function labelCoords(from: cg.NumberPair, to: cg.NumberPair, slots?: AngleSlots): cg.NumberPair {
   let mag = dist(from, to);
   //if (mag === 0) return [from[0], from[1]];
-  const angle = moveAngle(from, to, false);
+  const angle = moveAngle(from, to);
   if (slots) {
     mag -= 33 / 64; // reduce by arrowhead length
-    if (slots.size > 1) {
+    if (anyTwoCloserThan90Degrees(slots)) {
       mag -= 10 / 64; // reduce by shortening factor
-      const slot = moveAngle(from, to);
-      if (slots.has((slot + 1) % 16) || slots.has((slot + 15) % 16)) {
-        if (slot & 1) mag -= 0.4;
-        // and by label size for the knight if another arrow is within pi / 8.
-      }
+      const slot = angleToSlot(angle);
+      // reduce by label size for the knight if another arrow is within pi / 8:
+      if (slot & 1 && [-1, 1].some(s => slots.has(rotateAngleSlot(slot, s)))) mag -= 0.4;
     }
   }
   return [from[0] - Math.cos(angle) * mag, from[1] - Math.sin(angle) * mag].map(
