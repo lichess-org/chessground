@@ -353,13 +353,10 @@ const orient = (pos: cg.Pos, color: cg.Color): cg.Pos => (color === 'white' ? po
 
 const mod = (n: number, m: number): number => ((n % m) + m) % m;
 
-const rotateAngleSlot = (slot: AngleSlot, clockwise: boolean, steps: number): AngleSlot =>
-  mod(slot + steps * (clockwise ? -1 : 1), 16) as AngleSlot;
+const rotateAngleSlot = (slot: AngleSlot, steps: number): AngleSlot => mod(slot + steps, 16) as AngleSlot;
 
 const anyTwoCloserThan90Degrees = (slots: AngleSlots): boolean =>
-  [...slots].some(slot =>
-    [1, 2, 3].some(i => [true, false].some(b => slots.has(rotateAngleSlot(slot, b, i)))),
-  );
+  [...slots].some(slot => [-3, -2, -1, 1, 2, 3].some(i => slots.has(rotateAngleSlot(slot, i))));
 
 const isShort = (dest: cg.Key | undefined, dests: ArrowDests): boolean =>
   !!dest && dests.has(dest) && anyTwoCloserThan90Degrees(dests.get(dest)!);
@@ -449,7 +446,7 @@ function labelCoords(from: cg.NumberPair, to: cg.NumberPair, slots?: AngleSlots)
       mag -= 10 / 64; // reduce by shortening factor
       const slot = angleToSlot(angle);
       // reduce by label size for the knight if another arrow is within pi / 8:
-      if (slot & 1 && [true, false].some(b => slots.has(rotateAngleSlot(slot, b, 1)))) mag -= 0.4;
+      if (slot & 1 && [-1, 1].some(s => slots.has(rotateAngleSlot(slot, s)))) mag -= 0.4;
     }
   }
   return [from[0] - Math.cos(angle) * mag, from[1] - Math.sin(angle) * mag].map(
