@@ -1,5 +1,5 @@
 import { HeadlessState } from './state.js';
-import { setVisible, createEl } from './util.js';
+import { setVisible, createEl, opposite } from './util.js';
 import { colors, files, ranks, Elements, Color } from './types.js';
 import { createElement as createSVG, setAttributes, createDefs } from './svg.js';
 
@@ -73,10 +73,10 @@ export function renderWrap(element: HTMLElement, s: HeadlessState): Elements {
         renderCoords(
           ranks,
           'ranks' + orientClass + ranksPositionClass,
-          s.ranksPosition === 'right' ? 'white' : 'black',
+          (s.ranksPosition === 'right') === (s.orientation === 'white') ? 'white' : 'black',
         ),
       );
-      container.appendChild(renderCoords(files, 'files' + orientClass, 'black'));
+      container.appendChild(renderCoords(files, 'files' + orientClass, opposite(s.orientation)));
     }
   }
 
