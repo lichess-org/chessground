@@ -64,13 +64,13 @@ export function renderWrap(element: HTMLElement, s: HeadlessState): Elements {
           renderCoords(
             ranks.map(r => f + r),
             'squares rank' + rankN(i) + orientClass + ranksPositionClass,
-            i % 2 == 0 ? 'black' : 'white',
+            i % 2 === 0 ? 'black' : 'white',
           ),
         ),
       );
     } else {
       container.appendChild(
-        renderCoords(ranks, 'ranks' + ranksPositionClass, s.ranksPosition == 'right' ? 'white' : 'black'),
+        renderCoords(ranks, 'ranks' + ranksPositionClass, s.ranksPosition === 'right' ? 'white' : 'black'),
       );
       container.appendChild(renderCoords(files, 'files', 'black'));
     }
