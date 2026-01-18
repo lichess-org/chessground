@@ -70,9 +70,13 @@ export function renderWrap(element: HTMLElement, s: HeadlessState): Elements {
       );
     } else {
       container.appendChild(
-        renderCoords(ranks, 'ranks' + ranksPositionClass, s.ranksPosition === 'right' ? 'white' : 'black'),
+        renderCoords(
+          ranks,
+          'ranks' + orientClass + ranksPositionClass,
+          s.ranksPosition === 'right' ? 'white' : 'black',
+        ),
       );
-      container.appendChild(renderCoords(files, 'files', 'black'));
+      container.appendChild(renderCoords(files, 'files' + orientClass, 'black'));
     }
   }
 
