@@ -1,6 +1,6 @@
 import { HeadlessState } from './state.js';
-import { setVisible, createEl } from './util.js';
-import { colors, files, ranks, Elements } from './types.js';
+import { setVisible, createEl, opposite } from './util.js';
+import { colors, files, ranks, Elements, Color } from './types.js';
 import { createElement as createSVG, setAttributes, createDefs } from './svg.js';
 
 export function renderWrap(element: HTMLElement, s: HeadlessState): Elements {
@@ -64,12 +64,15 @@ export function renderWrap(element: HTMLElement, s: HeadlessState): Elements {
           renderCoords(
             ranks.map(r => f + r),
             'squares rank' + rankN(i) + orientClass + ranksPositionClass,
+            i % 2 == 0 ? 'black' : 'white',
           ),
         ),
       );
     } else {
-      container.appendChild(renderCoords(ranks, 'ranks' + orientClass + ranksPositionClass));
-      container.appendChild(renderCoords(files, 'files' + orientClass));
+      container.appendChild(
+        renderCoords(ranks, 'ranks' + ranksPositionClass, s.ranksPosition == 'right' ? 'white' : 'black'),
+      );
+      container.appendChild(renderCoords(files, 'files', 'black'));
     }
   }
 
@@ -94,13 +97,14 @@ function svgContainer(cls: string, isShapes: boolean) {
   return svg;
 }
 
-function renderCoords(elems: readonly string[], className: string): HTMLElement {
+function renderCoords(elems: readonly string[], className: string, firstColor: Color): HTMLElement {
   const el = createEl('coords', className);
   let f: HTMLElement;
-  for (const elem of elems) {
-    f = createEl('coord');
+  elems.forEach((elem, i) => {
+    const light = i % 2 === (firstColor === 'white' ? 0 : 1);
+    f = createEl('coord', `coord-${light ? 'light' : 'dark'}`);
     f.textContent = elem;
     el.appendChild(f);
-  }
+  });
   return el;
 }
