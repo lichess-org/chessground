@@ -1,5 +1,5 @@
 import { HeadlessState } from './state.js';
-import { setVisible, createEl, opposite } from './util.js';
+import { setVisible, createEl } from './util.js';
 import { colors, files, ranks, Elements, Color } from './types.js';
 import { createElement as createSVG, setAttributes, createDefs } from './svg.js';
 
