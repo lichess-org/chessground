@@ -1,5 +1,11 @@
 import { State } from './state.js';
-import { key2pos, createEl, posToTranslate as posToTranslateFromBounds, translate } from './util.js';
+import {
+  key2pos,
+  createEl,
+  posToTranslate as posToTranslateFromBounds,
+  translate,
+  setVisible,
+} from './util.js';
 import * as util from './util.js';
 import { whitePov } from './board.js';
 import { AnimCurrent, AnimVectors, AnimVector, AnimFadings } from './anim.js';
@@ -19,11 +25,11 @@ export function render(s: State): void {
     anims: AnimVectors = curAnim ? curAnim.plan.anims : new Map(),
     fadings: AnimFadings = curAnim ? curAnim.plan.fadings : new Map(),
     curDrag: DragCurrent | undefined = s.draggable.current,
-    squares: cg.SquareClasses = computeSquareClasses(s),
     samePieces: Set<cg.Key> = new Set(),
-    sameSquares: Set<cg.Key> = new Set(),
     movedPieces: Map<PieceName, cg.PieceNode[]> = new Map(),
-    movedSquares: Map<string, cg.SquareNode[]> = new Map(); // by class name
+    desiredSquares: cg.SquareClasses = computeSquareClasses(s),
+    existingSquares: Set<cg.Key> = new Set(),
+    availableSquares: Map<string, cg.SquareNode[]> = new Map(); // by class name
   let k: cg.Key,
     el: cg.PieceNode | cg.SquareNode | undefined,
     pieceAtKey: cg.Piece | undefined,
@@ -32,8 +38,7 @@ export function render(s: State): void {
     fading: cg.Piece | undefined,
     pMvdset: cg.PieceNode[] | undefined,
     pMvd: cg.PieceNode | undefined,
-    sMvdset: cg.SquareNode[] | undefined,
-    sMvd: cg.SquareNode | undefined;
+    sAvail: cg.SquareNode | undefined;
 
   // walk over all board dom elements, apply animations and flag moved pieces
   el = boardEl.firstChild as cg.PieceNode | cg.SquareNode | undefined;
@@ -83,22 +88,25 @@ export function render(s: State): void {
       else appendValue(movedPieces, elPieceName, el);
     } else if (isSquareNode(el)) {
       const cn = el.className;
-      if (squares.get(k) === cn) sameSquares.add(k);
-      else appendValue(movedSquares, cn, el);
+      if (desiredSquares.get(k) === cn) {
+        setVisible(el, true);
+        existingSquares.add(k);
+      } else appendValue(availableSquares, cn, el);
     }
     el = el.nextSibling as cg.PieceNode | cg.SquareNode | undefined;
   }
 
   // walk over all squares in current set, apply dom changes to moved squares
   // or append new squares
-  for (const [sk, className] of squares) {
-    if (!sameSquares.has(sk)) {
-      sMvdset = movedSquares.get(className);
-      sMvd = sMvdset && sMvdset.pop();
+  for (const [sk, className] of desiredSquares) {
+    if (!existingSquares.has(sk)) {
+      sAvail = availableSquares.get(className)?.pop();
       const translation = posToTranslate(key2pos(sk), asWhite);
-      if (sMvd) {
-        sMvd.cgKey = sk;
-        translate(sMvd, translation);
+      if (sAvail) {
+        // repurpose an available square
+        sAvail.cgKey = sk;
+        translate(sAvail, translation);
+        setVisible(sAvail, true);
       } else {
         const squareNode = createEl('square', className) as cg.SquareNode;
         squareNode.cgKey = sk;
@@ -106,6 +114,11 @@ export function render(s: State): void {
         boardEl.insertBefore(squareNode, boardEl.firstChild);
       }
     }
+  }
+
+  // hide remaining available, therefore unused, squares
+  for (const [_, nodes] of availableSquares.entries()) {
+    for (const node of nodes) setVisible(node, false);
   }
 
   // walk over all pieces in current set, apply dom changes to moved pieces
@@ -156,9 +169,8 @@ export function render(s: State): void {
     }
   }
 
-  // remove any element that remains in the moved sets
+  // remove any piece that remains in the moved sets
   for (const nodes of movedPieces.values()) removeNodes(s, nodes);
-  for (const nodes of movedSquares.values()) removeNodes(s, nodes);
 }
 
 export function renderResized(s: State): void {
