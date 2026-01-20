@@ -28,7 +28,6 @@ export function render(s: State): void {
     samePieces: Set<cg.Key> = new Set(),
     movedPieces: Map<PieceName, cg.PieceNode[]> = new Map(),
     desiredSquares: cg.SquareClasses = computeSquareClasses(s),
-    existingSquares: Set<cg.Key> = new Set(),
     availableSquares: Map<string, cg.SquareNode[]> = new Map(); // by class name
   let k: cg.Key,
     el: cg.PieceNode | cg.SquareNode | undefined,
@@ -87,11 +86,11 @@ export function render(s: State): void {
       // no piece: flag as moved
       else appendValue(movedPieces, elPieceName, el);
     } else if (isSquareNode(el)) {
-      const cn = el.className;
-      if (desiredSquares.get(k) === cn) {
+      const cls = el.className;
+      if (desiredSquares.get(k) === cls) {
         setVisible(el, true);
-        existingSquares.add(k);
-      } else appendValue(availableSquares, cn, el);
+        desiredSquares.delete(k);
+      } else appendValue(availableSquares, cls, el);
     }
     el = el.nextSibling as cg.PieceNode | cg.SquareNode | undefined;
   }
@@ -99,20 +98,18 @@ export function render(s: State): void {
   // walk over all squares in current set, apply dom changes to moved squares
   // or append new squares
   for (const [sk, className] of desiredSquares) {
-    if (!existingSquares.has(sk)) {
-      sAvail = availableSquares.get(className)?.pop();
-      const translation = posToTranslate(key2pos(sk), asWhite);
-      if (sAvail) {
-        // repurpose an available square
-        sAvail.cgKey = sk;
-        translate(sAvail, translation);
-        setVisible(sAvail, true);
-      } else {
-        const squareNode = createEl('square', className) as cg.SquareNode;
-        squareNode.cgKey = sk;
-        translate(squareNode, translation);
-        boardEl.insertBefore(squareNode, boardEl.firstChild);
-      }
+    sAvail = availableSquares.get(className)?.pop();
+    const translation = posToTranslate(key2pos(sk), asWhite);
+    if (sAvail) {
+      // repurpose an available square
+      sAvail.cgKey = sk;
+      translate(sAvail, translation);
+      setVisible(sAvail, true);
+    } else {
+      const squareNode = createEl('square', className) as cg.SquareNode;
+      squareNode.cgKey = sk;
+      translate(squareNode, translation);
+      boardEl.insertBefore(squareNode, boardEl.firstChild);
     }
   }
 
