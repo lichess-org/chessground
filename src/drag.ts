@@ -32,6 +32,7 @@ export function start(s: State, e: cg.MouchEvent): void {
   if (
     !previouslySelected &&
     s.drawable.enabled &&
+    e.type === 'mousedown' &&
     (s.drawable.eraseOnMovablePieceClick || !piece || piece.color !== s.turnColor)
   )
     drawClear(s);
