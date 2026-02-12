@@ -29,12 +29,10 @@ export function start(s: State, e: cg.MouchEvent): void {
   if (!orig) return;
   const piece = s.pieces.get(orig);
   const previouslySelected = s.selected;
-  if (
-    !previouslySelected &&
-    s.drawable.enabled &&
-    (s.drawable.eraseOnMovablePieceClick || !piece || piece.color !== s.turnColor)
-  )
-    drawClear(s);
+  if (!previouslySelected && s.drawable.enabled) {
+    if (s.drawable.eraseOnClick) drawClear(s);
+    else if (piece?.color !== s.turnColor) s.pixelCoordsOfMouchDownToMaybeClearShapes = position;
+  }
   // Prevent touch scroll and create no corresponding mouse event, if there
   // is an intent to interact with the board.
   if (
@@ -159,6 +157,14 @@ export function move(s: State, e: cg.MouchEvent): void {
 }
 
 export function end(s: State, e: cg.MouchEvent): void {
+  const position = util.eventPosition(e);
+  if (
+    position &&
+    s.pixelCoordsOfMouchDownToMaybeClearShapes &&
+    util.distanceSq(position, s.pixelCoordsOfMouchDownToMaybeClearShapes) < 225
+  )
+    drawClear(s);
+  s.pixelCoordsOfMouchDownToMaybeClearShapes = undefined;
   const cur = s.draggable.current;
   if (!cur) return;
   // create no corresponding mouse event
