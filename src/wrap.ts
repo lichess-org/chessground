@@ -59,10 +59,10 @@ export function renderWrap(element: HTMLElement, s: HeadlessState): Elements {
 
     if (s.coordinatesOnSquares) {
       const rankN: (i: number) => number = s.orientation === 'white' ? i => i + 1 : i => 8 - i;
-      files.forEach((f, i) =>
+      ranks.forEach((r, i) =>
         container.appendChild(
           renderCoords(
-            ranks.map(r => f + r),
+            files.map(f => f + r),
             'squares rank' + rankN(i) + orientClass + ranksPositionClass,
             i % 2 === 0 ? 'black' : 'white',
           ),
