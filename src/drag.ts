@@ -144,11 +144,39 @@ function processDrag(s: State): void {
           cur.pos[1] - bounds.top - bounds.height / 16,
         ]);
 
-        cur.keyHasChanged ||= cur.orig !== board.getKeyAtDomPos(cur.pos, board.whitePov(s), bounds);
+        const hoveredKey = board.getKeyAtDomPos(cur.pos, board.whitePov(s), bounds);
+        if (cur.orig !== hoveredKey) {
+          cur.keyHasChanged = true;
+
+          if (hoveredKey) {
+            const isValidMove =
+              s.movable.dests?.get(cur.orig)?.includes(hoveredKey) ??
+              s.premovable.dests?.includes(hoveredKey);
+            if (isValidMove) {
+              const hoveredValidDestSquare = s.dom.elements.board.querySelector<SVGElement>(
+                `.move-dest.${hoveredKey}, .premove-dest.${hoveredKey}`,
+              );
+              if (hoveredValidDestSquare && !hoveredValidDestSquare.classList.contains('hover')) {
+                resetHoverState(s);
+                hoveredValidDestSquare.classList.add('hover');
+              }
+            }
+          }
+        } else {
+          cur.keyHasChanged ||= false;
+          resetHoverState(s);
+        }
       }
     }
     processDrag(s);
   });
+}
+
+function resetHoverState(s: State) {
+  const squares = s.dom.elements.board.querySelectorAll<SVGElement>(`.move-dest, .premove-dest`);
+  if (squares.length > 0) {
+    squares.forEach(sq => sq.classList.remove('hover'));
+  }
 }
 
 export function move(s: State, e: cg.MouchEvent): void {

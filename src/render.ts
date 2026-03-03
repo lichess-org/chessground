@@ -255,8 +255,8 @@ function computeSquareClasses(s: State): cg.SquareClasses {
 
 function addSquare(squares: cg.SquareClasses, key: cg.Key, klass: string): void {
   const classes = squares.get(key);
-  if (classes) squares.set(key, `${classes} ${klass}`);
-  else squares.set(key, klass);
+  if (classes) squares.set(key, `${classes} ${key} ${klass}`);
+  else squares.set(key, `${key} ${klass}`);
 }
 
 function appendValue<K, V>(map: Map<K, V[]>, key: K, value: V): void {
