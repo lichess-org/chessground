@@ -145,26 +145,32 @@ function processDrag(s: State): void {
         ]);
 
         const hoveredKey = board.getKeyAtDomPos(cur.pos, board.whitePov(s), bounds);
-        if (cur.orig !== hoveredKey) {
-          cur.keyHasChanged = true;
+        if (s.jsHover) {
+          if (cur.orig !== hoveredKey) {
+            cur.keyHasChanged = true;
 
-          if (hoveredKey) {
-            const isValidMove =
-              s.movable.dests?.get(cur.orig)?.includes(hoveredKey) ??
-              s.premovable.dests?.includes(hoveredKey);
-            if (isValidMove) {
-              const hoveredValidDestSquare = s.dom.elements.board.querySelector<SVGElement>(
-                `.move-dest.${hoveredKey}, .premove-dest.${hoveredKey}`,
-              );
-              if (hoveredValidDestSquare && !hoveredValidDestSquare.classList.contains('hover')) {
+            if (hoveredKey) {
+              const isValidMove =
+                s.movable.dests?.get(cur.orig)?.includes(hoveredKey) ??
+                s.premovable.dests?.includes(hoveredKey);
+              if (isValidMove) {
+                const hoveredValidDestSquare = s.dom.elements.board.querySelector<SVGElement>(
+                  `.move-dest.${hoveredKey}, .premove-dest.${hoveredKey}`,
+                );
+                if (hoveredValidDestSquare && !hoveredValidDestSquare.classList.contains('hover')) {
+                  resetHoverState(s);
+                  hoveredValidDestSquare.classList.add('hover');
+                }
+              } else {
                 resetHoverState(s);
-                hoveredValidDestSquare.classList.add('hover');
               }
             }
+          } else {
+            cur.keyHasChanged ||= false;
+            resetHoverState(s);
           }
         } else {
-          cur.keyHasChanged ||= false;
-          resetHoverState(s);
+          cur.keyHasChanged ||= cur.orig !== hoveredKey;
         }
       }
     }
