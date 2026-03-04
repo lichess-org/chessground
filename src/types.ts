@@ -83,6 +83,7 @@ export interface PieceNode extends KeyedNode {
   cgFading?: boolean;
   cgDragging?: boolean;
   cgScale?: number;
+  cgPromotionTo?: string;
 }
 export interface SquareNode extends KeyedNode {
   tagName: 'SQUARE';

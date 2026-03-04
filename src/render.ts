@@ -13,6 +13,23 @@ import { DragCurrent } from './drag.js';
 import * as cg from './types.js';
 
 type PieceName = string; // `$color $role`
+type PieceBase = { color: cg.Color; role: cg.Role };
+
+const parsePieceName = (name: PieceName): PieceBase => {
+  const [color, role] = name.split(' ') as [cg.Color, cg.Role];
+  return { color, role };
+};
+
+// Update only the base (color/role) classes without clobbering other classes like `anim`, `dragging`, etc.
+const applyBasePieceName = (el: cg.PieceNode, name: PieceName): void => {
+  const { color, role } = parsePieceName(name);
+  for (const c of cg.colors) el.classList.remove(c);
+  for (const r of cg.roles) el.classList.remove(r);
+  el.classList.add(color, role);
+  el.cgPiece = name;
+};
+
+const promotionSwapAlpha = 0.5;
 
 // ported from https://github.com/lichess-org/lichobile/blob/master/src/chessground/render.ts
 // in case of bugs, blame @veloce
@@ -24,6 +41,8 @@ export function render(s: State): void {
     curAnim: AnimCurrent | undefined = s.animation.current,
     anims: AnimVectors = curAnim ? curAnim.plan.anims : new Map(),
     fadings: AnimFadings = curAnim ? curAnim.plan.fadings : new Map(),
+    promotions: Set<cg.Key> = curAnim ? curAnim.plan.promotions : new Set(),
+    alpha: number = curAnim ? curAnim.alpha : 0,
     curDrag: DragCurrent | undefined = s.draggable.current,
     samePieces: Set<cg.Key> = new Set(),
     movedPieces: Map<PieceName, cg.PieceNode[]> = new Map(),
@@ -59,14 +78,21 @@ export function render(s: State): void {
         el.cgFading = false;
         el.classList.remove('fading');
       }
+      if (!curAnim && el.cgPromotionTo) el.cgPromotionTo = undefined;
       // there is now a piece at this dom key
       if (pieceAtKey) {
         // continue animation if already animating and same piece
         // (otherwise it could animate a captured piece)
-        if (anim && el.cgAnimating && elPieceName === pieceNameOf(pieceAtKey)) {
+        if (anim && el.cgAnimating && [elPieceName, el.cgPromotionTo].includes(pieceNameOf(pieceAtKey))) {
           const pos = key2pos(k);
           pos[0] += anim[2];
           pos[1] += anim[3];
+          // for promotion, keep showing a pawn while sliding halfway, then swap to the promoted role
+          if (el.cgPromotionTo) {
+            const desired = alpha > promotionSwapAlpha ? `${pieceAtKey.color} pawn` : el.cgPromotionTo;
+            if (el.cgPiece !== desired) applyBasePieceName(el, desired);
+            if (alpha <= promotionSwapAlpha) el.cgPromotionTo = undefined;
+          }
           el.classList.add('anim');
           translate(el, posToTranslate(pos, asWhite));
         } else if (el.cgAnimating) {
@@ -76,7 +102,8 @@ export function render(s: State): void {
           if (s.addPieceZIndex) el.style.zIndex = posZIndex(key2pos(k), asWhite);
         }
         // same piece: flag as same
-        if (elPieceName === pieceNameOf(pieceAtKey) && (!fading || !el.cgFading)) samePieces.add(k);
+        if ([elPieceName, el.cgPromotionTo].includes(pieceNameOf(pieceAtKey)) && (!fading || !el.cgFading))
+          samePieces.add(k);
         // different piece: flag as moved unless it is a fading piece
         else if (fading && elPieceName === pieceNameOf(fading)) {
           el.classList.add('fading');
@@ -122,13 +149,19 @@ export function render(s: State): void {
   // or append new pieces
   for (const [k, p] of pieces) {
     anim = anims.get(k);
+    const actualName = pieceNameOf(p);
+    const isPromoting = !!curAnim && promotions.has(k) && alpha > promotionSwapAlpha;
+    const displayName: PieceName = isPromoting ? `${p.color} pawn` : actualName;
     if (!samePieces.has(k)) {
-      pMvdset = movedPieces.get(pieceNameOf(p));
+      pMvdset = movedPieces.get(displayName);
       pMvd = pMvdset && pMvdset.pop();
       // a same piece was moved
       if (pMvd) {
         // apply dom changes
         pMvd.cgKey = k;
+        if (pMvd.cgPiece !== displayName) applyBasePieceName(pMvd, displayName);
+        if (isPromoting) pMvd.cgPromotionTo = actualName;
+        else if (pMvd.cgPromotionTo) pMvd.cgPromotionTo = undefined;
         if (pMvd.cgFading) {
           pMvd.classList.remove('fading');
           pMvd.cgFading = false;
@@ -146,12 +179,13 @@ export function render(s: State): void {
       // no piece in moved obj: insert the new piece
       // assumes the new piece is not being dragged
       else {
-        const pieceName = pieceNameOf(p),
+        const pieceName = displayName,
           pieceNode = createEl('piece', pieceName) as cg.PieceNode,
           pos = key2pos(k);
 
         pieceNode.cgPiece = pieceName;
         pieceNode.cgKey = k;
+        if (isPromoting) pieceNode.cgPromotionTo = actualName;
         if (anim) {
           pieceNode.cgAnimating = true;
           pos[0] += anim[2];

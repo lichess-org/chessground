@@ -15,12 +15,14 @@ export type AnimFadings = Map<cg.Key, cg.Piece>;
 export interface AnimPlan {
   anims: AnimVectors;
   fadings: AnimFadings;
+  promotions: Set<cg.Key>;
 }
 
 export interface AnimCurrent {
   start: DOMHighResTimeStamp;
   frequency: cg.KHz;
   plan: AnimPlan;
+  alpha: number; // easing value for the current frame, from 1 (start) to 0 (end)
 }
 
 export const anim = <A>(mutation: Mutation<A>, state: State): A =>
@@ -48,10 +50,18 @@ const makePiece = (key: cg.Key, piece: cg.Piece): AnimPiece => ({
 const closer = (piece: AnimPiece, pieces: AnimPiece[]): AnimPiece | undefined =>
   pieces.sort((p1, p2) => util.distanceSq(piece.pos, p1.pos) - util.distanceSq(piece.pos, p2.pos))[0];
 
+const isPromotionMatch = (from: AnimPiece, to: AnimPiece): boolean =>
+  util.samePiece(from.piece, { role: 'pawn', color: to.piece.color }) &&
+  to.piece.role !== 'pawn' &&
+  Math.abs(from.pos[0] - to.pos[0]) <= 1 &&
+  to.pos[1] === (from.piece.color === 'white' ? 7 : 0) &&
+  from.pos[1] === (from.piece.color === 'white' ? 6 : 1);
+
 function computePlan(prevPieces: cg.Pieces, current: State): AnimPlan {
   const anims: AnimVectors = new Map(),
     animedOrigs: cg.Key[] = [],
     fadings: AnimFadings = new Map(),
+    promotions: Set<cg.Key> = new Set(),
     missings: AnimPiece[] = [],
     news: AnimPiece[] = [],
     prePieces: AnimPieces = new Map();
@@ -74,9 +84,10 @@ function computePlan(prevPieces: cg.Pieces, current: State): AnimPlan {
   for (const newP of news) {
     preP = closer(
       newP,
-      missings.filter(p => util.samePiece(newP.piece, p.piece)),
+      missings.filter(p => util.samePiece(newP.piece, p.piece) || isPromotionMatch(p, newP)),
     );
     if (preP) {
+      if (isPromotionMatch(preP, newP)) promotions.add(newP.key);
       vector = [preP.pos[0] - newP.pos[0], preP.pos[1] - newP.pos[1]];
       anims.set(newP.key, vector.concat(vector) as AnimVector);
       animedOrigs.push(preP.key);
@@ -89,6 +100,7 @@ function computePlan(prevPieces: cg.Pieces, current: State): AnimPlan {
   return {
     anims: anims,
     fadings: fadings,
+    promotions: promotions,
   };
 }
 
@@ -105,6 +117,7 @@ function step(state: State, now: DOMHighResTimeStamp): void {
     state.dom.redrawNow();
   } else {
     const ease = easing(rest);
+    cur.alpha = ease;
     for (const cfg of cur.plan.anims.values()) {
       cfg[2] = cfg[0] * ease;
       cfg[3] = cfg[1] * ease;
@@ -126,6 +139,7 @@ function animate<A>(mutation: Mutation<A>, state: State): A {
       start: performance.now(),
       frequency: 1 / state.animation.duration,
       plan: plan,
+      alpha: 1,
     };
     if (!alreadyRunning) step(state, performance.now());
   } else {
