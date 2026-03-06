@@ -144,38 +144,38 @@ function processDrag(s: State): void {
           cur.pos[1] - bounds.top - bounds.height / 16,
         ]);
 
-        const hoveredKey = board.getKeyAtDomPos(cur.pos, board.whitePov(s), bounds);
-        if (s.jsHover) {
-          if (cur.orig !== hoveredKey) {
-            cur.keyHasChanged = true;
-
-            if (hoveredKey) {
-              const isValidMove =
-                s.movable.dests?.get(cur.orig)?.includes(hoveredKey) ??
-                s.premovable.dests?.includes(hoveredKey);
-              if (isValidMove) {
-                const hoveredValidDestSquare = s.dom.elements.board.querySelector<SVGElement>(
-                  `.move-dest.${hoveredKey}, .premove-dest.${hoveredKey}`,
-                );
-                if (hoveredValidDestSquare && !hoveredValidDestSquare.classList.contains('hover')) {
-                  resetHoverState(s);
-                  hoveredValidDestSquare.classList.add('hover');
-                }
-              } else {
-                resetHoverState(s);
-              }
-            }
-          } else {
-            cur.keyHasChanged ||= false;
-            resetHoverState(s);
-          }
-        } else {
-          cur.keyHasChanged ||= cur.orig !== hoveredKey;
-        }
+        if (s.jsHover) handleJsHover(s, cur);
+        else cur.keyHasChanged ||= cur.orig !== board.getKeyAtDomPos(cur.pos, board.whitePov(s), bounds);
       }
     }
     processDrag(s);
   });
+}
+
+function handleJsHover(s: State, cur: DragCurrent): void {
+  const hoveredKey = board.getKeyAtDomPos(cur.pos, board.whitePov(s), s.dom.bounds());
+  if (cur.orig !== hoveredKey) {
+    cur.keyHasChanged = true;
+
+    if (hoveredKey) {
+      const isValidMove =
+        s.movable.dests?.get(cur.orig)?.includes(hoveredKey) ?? s.premovable.dests?.includes(hoveredKey);
+      if (isValidMove) {
+        const hoveredValidDestSquare = s.dom.elements.board.querySelector<SVGElement>(
+          `.move-dest.${hoveredKey}, .premove-dest.${hoveredKey}`,
+        );
+        if (hoveredValidDestSquare && !hoveredValidDestSquare.classList.contains('hover')) {
+          resetHoverState(s);
+          hoveredValidDestSquare.classList.add('hover');
+        }
+      } else {
+        resetHoverState(s);
+      }
+    }
+  } else {
+    cur.keyHasChanged ||= false;
+    resetHoverState(s);
+  }
 }
 
 function resetHoverState(s: State) {
