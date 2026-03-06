@@ -103,11 +103,13 @@ export function render(s: State): void {
     if (sAvail) {
       // repurpose an available square
       sAvail.cgKey = sk;
+      if (s.jsHover) sAvail.dataset['key'] = sk;
       translate(sAvail, translation);
       setVisible(sAvail, true);
     } else {
       const squareNode = createEl('square', className) as cg.SquareNode;
       squareNode.cgKey = sk;
+      if (s.jsHover) squareNode.dataset['key'] = sk;
       translate(squareNode, translation);
       boardEl.insertBefore(squareNode, boardEl.firstChild);
     }
@@ -255,8 +257,8 @@ function computeSquareClasses(s: State): cg.SquareClasses {
 
 function addSquare(squares: cg.SquareClasses, key: cg.Key, klass: string): void {
   const classes = squares.get(key);
-  if (classes) squares.set(key, `${classes} ${key} ${klass}`);
-  else squares.set(key, `${key} ${klass}`);
+  if (classes) squares.set(key, `${classes} ${klass}`);
+  else squares.set(key, klass);
 }
 
 function appendValue<K, V>(map: Map<K, V[]>, key: K, value: V): void {

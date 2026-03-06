@@ -162,7 +162,7 @@ function handleJsHover(s: State, cur: DragCurrent): void {
         s.movable.dests?.get(cur.orig)?.includes(hoveredKey) ?? s.premovable.dests?.includes(hoveredKey);
       if (isValidMove) {
         const hoveredValidDestSquare = s.dom.elements.board.querySelector<SVGElement>(
-          `.move-dest.${hoveredKey}, .premove-dest.${hoveredKey}`,
+          `.move-dest[data-key="${hoveredKey}"], .premove-dest[data-key="${hoveredKey}"]`,
         );
         if (hoveredValidDestSquare && !hoveredValidDestSquare.classList.contains('hover')) {
           resetHoverState(s);
@@ -173,7 +173,7 @@ function handleJsHover(s: State, cur: DragCurrent): void {
       }
     }
   } else {
-    cur.keyHasChanged ||= false;
+    cur.keyHasChanged = false;
     resetHoverState(s);
   }
 }
