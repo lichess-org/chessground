@@ -103,11 +103,13 @@ export function render(s: State): void {
     if (sAvail) {
       // repurpose an available square
       sAvail.cgKey = sk;
+      if (s.jsHover) sAvail.dataset['key'] = sk;
       translate(sAvail, translation);
       setVisible(sAvail, true);
     } else {
       const squareNode = createEl('square', className) as cg.SquareNode;
       squareNode.cgKey = sk;
+      if (s.jsHover) squareNode.dataset['key'] = sk;
       translate(squareNode, translation);
       boardEl.insertBefore(squareNode, boardEl.firstChild);
     }

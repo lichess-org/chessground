@@ -24,6 +24,7 @@ export interface HeadlessState {
   touchIgnoreRadius: number; // ignore touches within a radius of an occupied square, in units of its circumradius
   pieceKey: boolean; // add a data-key attribute to piece elements
   trustAllEvents?: boolean; // disable checking for human only input (e.isTrusted)
+  jsHover?: boolean; // enable JS-driven hover state handling to workaround Safari drag issue
   highlight: {
     lastMove: boolean; // add last-move class to squares
     check: boolean; // add check class to squares
@@ -126,6 +127,7 @@ export function defaults(): HeadlessState {
     touchIgnoreRadius: 1,
     pieceKey: false,
     trustAllEvents: false,
+    jsHover: false,
     highlight: {
       lastMove: true,
       check: true,
