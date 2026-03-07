@@ -1,13 +1,14 @@
 import { State } from './state.js';
-import { key2pos, isKnightMove } from './util.js';import {
+import { key2pos, isKnightMove } from './util.js';
+import {
   Drawable,
-DrawShape,
+  DrawShape,
   DrawShapePiece,
   DrawBrush,
   DrawBrushes,
   DrawModifiers,
-    sameEndpoints,
-sameColor,
+  sameEndpoints,
+  sameColor,
 } from './draw.js';
 import { SyncableShape, Hash } from './sync.js';
 import * as cg from './types.js';
