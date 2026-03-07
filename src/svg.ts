@@ -1,14 +1,13 @@
 import { State } from './state.js';
-import { key2pos } from './util.js';
-import {
+import { key2pos, isKnightMove } from './util.js';import {
   Drawable,
-  DrawShape,
+DrawShape,
   DrawShapePiece,
   DrawBrush,
   DrawBrushes,
   DrawModifiers,
-  sameEndpoints,
-  sameColor,
+    sameEndpoints,
+sameColor,
 } from './draw.js';
 import { SyncableShape, Hash } from './sync.js';
 import * as cg from './types.js';
@@ -169,6 +168,7 @@ function shapeHash(
     angleCountOfDest,
     orig,
     dest,
+    dest && isKnightMove(orig, dest) && 'knight',
     brush,
     shorten && '-',
     piece && pieceHash(piece),
@@ -207,20 +207,37 @@ function renderShape(
     brush = shape.brush && makeCustomBrush(brushes[shape.brush], shape.modifiers),
     slots = dests.get(shape.dest),
     svgs: Svg[] = [];
+  const elbow =
+    shape.dest && (from[0] !== to[0] || from[1] !== to[1]) && isKnightMove(shape.orig, shape.dest)
+      ? pos2user(
+          orient(
+            (() => {
+              const o = key2pos(shape.orig),
+                d = key2pos(shape.dest);
+              const df = d[0] - o[0];
+              return Math.abs(df) === 2 ? ([d[0], o[1]] as cg.Pos) : ([o[0], d[1]] as cg.Pos);
+            })(),
+            state.orientation,
+          ),
+          bounds,
+        )
+      : undefined;
 
   if (brush) {
     const el = setAttributes(createElement('g'), { cgHash: hash });
     svgs.push({ el });
 
     if (from[0] !== to[0] || from[1] !== to[1])
-      el.appendChild(renderArrow(shape, brush, from, to, current, isShort(shape.dest, dests), pendingErase));
+      el.appendChild(
+        renderArrow(shape, brush, from, to, current, isShort(shape.dest, dests), pendingErase, elbow),
+      );
     else el.appendChild(renderCircle(brushes[shape.brush!], from, current, bounds, pendingErase));
   }
   if (shape.label) {
     const label = shape.label;
     label.fill ??= shape.brush && brushes[shape.brush].color;
     const corner = shape.brush ? undefined : 'tr';
-    svgs.push({ el: renderLabel(label, hash, from, to, slots, corner), isCustom: true });
+    svgs.push({ el: renderLabel(label, hash, from, to, slots, corner, elbow), isCustom: true });
   }
   if (shape.customSvg) {
     const on = shape.customSvg.center ?? 'orig';
@@ -261,15 +278,34 @@ function renderArrow(
   current: boolean,
   shorten: boolean,
   pendingErase: boolean,
+  elbow?: cg.NumberPair,
 ): SVGElement {
+  const m = arrowMargin(shorten && !current);
+
   function renderLine(isHilite: boolean) {
-    const m = arrowMargin(shorten && !current),
-      dx = to[0] - from[0],
+    const hilite = hiliteOf(s);
+    if (elbow) {
+      const dx = to[0] - elbow[0],
+        dy = to[1] - elbow[1],
+        dist = Math.sqrt(dx * dx + dy * dy);
+      const end = dist > 0 ? ([to[0] - (dx / dist) * m, to[1] - (dy / dist) * m] as cg.NumberPair) : to;
+      const d = `M ${from[0]} ${from[1]} L ${elbow[0]} ${elbow[1]} L ${end[0]} ${end[1]}`;
+      return setAttributes(createElement('path'), {
+        d,
+        fill: 'none',
+        stroke: isHilite ? hilite.color : brush.color,
+        'stroke-width': lineWidth(brush, current) * (isHilite ? 1.14 : 1),
+        'stroke-linecap': 'round',
+        'stroke-linejoin': 'round',
+        'marker-end': `url(#arrowhead-${isHilite ? hilite.key : brush.key})`,
+        opacity: s.modifiers?.hilite && !pendingErase ? 1 : opacity(brush, current, pendingErase),
+      });
+    }
+    const dx = to[0] - from[0],
       dy = to[1] - from[1],
       angle = Math.atan2(dy, dx),
       xo = Math.cos(angle) * m,
       yo = Math.sin(angle) * m;
-    const hilite = hiliteOf(s);
     return setAttributes(createElement('line'), {
       stroke: isHilite ? hilite.color : brush.color,
       'stroke-width': lineWidth(brush, current) * (isHilite ? 1.14 : 1),
@@ -286,7 +322,9 @@ function renderArrow(
 
   const g = setAttributes(createElement('g'), { opacity: brush.opacity });
   const blurred = setAttributes(createElement('g'), { filter: 'url(#cg-filter-blur)' });
-  blurred.appendChild(filterBox(from, to));
+  const boxFrom = elbow ? [Math.min(from[0], elbow[0], to[0]), Math.min(from[1], elbow[1], to[1])] : from;
+  const boxTo = elbow ? [Math.max(from[0], elbow[0], to[0]), Math.max(from[1], elbow[1], to[1])] : to;
+  blurred.appendChild(filterBox(boxFrom as cg.NumberPair, boxTo as cg.NumberPair));
   blurred.appendChild(renderLine(true));
   g.appendChild(blurred);
   g.appendChild(renderLine(false));
@@ -320,10 +358,11 @@ function renderLabel(
   to: cg.NumberPair,
   slots?: AngleSlots,
   corner?: 'tr',
+  atCorner?: cg.NumberPair,
 ): SVGElement {
   const labelSize = 0.4,
     fontSize = labelSize * 0.75 ** label.text.length,
-    at = labelCoords(from, to, slots),
+    at = atCorner ? ([atCorner[0] + 0.5, atCorner[1] + 0.5] as cg.NumberPair) : labelCoords(from, to, slots),
     cornerOff = corner === 'tr' ? 0.4 : 0,
     g = setAttributes(createElement('g'), {
       transform: `translate(${at[0] + cornerOff},${at[1] - cornerOff})`,

@@ -11,6 +11,14 @@ export const pos2keyUnsafe = (pos: cg.Pos): cg.Key => pos2key(pos)!;
 
 export const key2pos = (k: cg.Key): cg.Pos => [k.charCodeAt(0) - 97, k.charCodeAt(1) - 49];
 
+export const isKnightMove = (orig: cg.Key, dest: cg.Key): boolean => {
+  const [df, dr] = [
+    Math.abs(key2pos(dest)[0] - key2pos(orig)[0]),
+    Math.abs(key2pos(dest)[1] - key2pos(orig)[1]),
+  ];
+  return (df === 2 && dr === 1) || (df === 1 && dr === 2);
+};
+
 export const uciToMove = (uci: string | undefined): cg.Key[] | undefined => {
   if (!uci) return undefined;
   if (uci[1] === '@') return [uci.slice(2, 4) as cg.Key];
