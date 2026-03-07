@@ -173,7 +173,6 @@ function handleJsHover(s: State, cur: DragCurrent): void {
       }
     }
   } else {
-    cur.keyHasChanged = false;
     resetHoverState(s);
   }
 }
