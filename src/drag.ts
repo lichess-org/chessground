@@ -77,7 +77,7 @@ export function start(s: State, e: cg.MouchEvent): void {
     }
     processDrag(s);
   } else {
-    if (hadPremove) board.unsetPremove(s);
+    if (hadPremove && s.premovable.maxQueue <= 1) board.unsetPremove(s);
     if (hadPredrop) board.unsetPredrop(s);
   }
   s.dom.redraw();
@@ -202,7 +202,7 @@ export function end(s: State, e: cg.MouchEvent): void {
     s.draggable.current = undefined;
     return;
   }
-  board.unsetPremove(s);
+  if (s.premovable.maxQueue <= 1) board.unsetPremove(s);
   board.unsetPredrop(s);
   // touchend has no position; so use the last touchmove position instead
   const eventPos = util.eventPosition(e) || cur.pos;
