@@ -44,7 +44,8 @@ export function start(s: State, e: cg.MouchEvent): void {
     e.preventDefault();
   else if (e.touches) return; // Handle only corresponding mouse event https://github.com/lichess-org/chessground/pull/268
 
-  const hadPremove = s.premovable.queue.length > 0;
+  const premoveQueueLength = s.premovable.queue.length;
+  const hadPremove = premoveQueueLength > 0;
   const hadPredrop = !!s.predroppable.current;
   s.stats.ctrlKey = e.ctrlKey;
   if (s.selected && board.canMove(s, s.selected, orig)) {
@@ -77,7 +78,9 @@ export function start(s: State, e: cg.MouchEvent): void {
     }
     processDrag(s);
   } else {
-    if (hadPremove && s.premovable.maxQueue <= 1) board.unsetPremove(s);
+    // Clear premoves when clicking away, but not if a premove was just added via click-click
+    const premoveJustAdded = s.premovable.queue.length > premoveQueueLength;
+    if (hadPremove && !premoveJustAdded) board.unsetPremove(s);
     if (hadPredrop) board.unsetPredrop(s);
   }
   s.dom.redraw();
