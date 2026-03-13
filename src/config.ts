@@ -49,6 +49,7 @@ export interface Config {
     castle?: boolean; // whether to allow king castle premoves
     dests?: cg.Key[]; // premove destinations for the current selection
     customDests?: cg.Dests; // use custom valid premoves. {"a2" ["a3" "a4"] "b1" ["a3" "c3"]}
+    maxQueue?: number; // max number of premoves in queue (default 1 for legacy behavior)
     additionalPremoveRequirements?: cg.Mobility;
     events?: {
       set?: (orig: cg.Key, dest: cg.Key, metadata?: cg.SetPremoveMetadata) => void; // called after the premove has been set

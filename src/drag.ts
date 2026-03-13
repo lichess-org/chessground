@@ -44,7 +44,7 @@ export function start(s: State, e: cg.MouchEvent): void {
     e.preventDefault();
   else if (e.touches) return; // Handle only corresponding mouse event https://github.com/lichess-org/chessground/pull/268
 
-  const hadPremove = !!s.premovable.current;
+  const hadPremove = s.premovable.queue.length > 0;
   const hadPredrop = !!s.predroppable.current;
   s.stats.ctrlKey = e.ctrlKey;
   if (s.selected && board.canMove(s, s.selected, orig)) {

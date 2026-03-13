@@ -53,14 +53,35 @@ export function setCheck(state: HeadlessState, color: cg.Color | boolean): void 
 
 function setPremove(state: HeadlessState, orig: cg.Key, dest: cg.Key, meta: cg.SetPremoveMetadata): void {
   unsetPredrop(state);
-  state.premovable.current = [orig, dest];
-  callUserFunction(state.premovable.events.set, orig, dest, meta);
+  const pm = state.premovable;
+  if (pm.queue.length >= pm.maxQueue) {
+    // at capacity: replace entire queue with the new premove (legacy behavior when maxQueue=1)
+    if (pm.maxQueue === 1) {
+      pm.queue = [[orig, dest]];
+    } else {
+      return; // queue full, ignore
+    }
+  } else {
+    pm.queue.push([orig, dest]);
+  }
+  pm.current = pm.queue[0];
+  callUserFunction(pm.events.set, orig, dest, meta);
 }
 
 export function unsetPremove(state: HeadlessState): void {
-  if (state.premovable.current) {
+  if (state.premovable.queue.length) {
+    state.premovable.queue = [];
     state.premovable.current = undefined;
     callUserFunction(state.premovable.events.unset);
+  }
+}
+
+export function unsetLastPremove(state: HeadlessState): void {
+  const pm = state.premovable;
+  if (pm.queue.length) {
+    pm.queue.pop();
+    pm.current = pm.queue[0];
+    if (!pm.queue.length) callUserFunction(pm.events.unset);
   }
 }
 
@@ -293,7 +314,8 @@ export function isDraggable(state: HeadlessState, orig: cg.Key): boolean {
 }
 
 export function playPremove(state: HeadlessState): boolean {
-  const move = state.premovable.current;
+  const pm = state.premovable;
+  const move = pm.queue[0];
   if (!move) return false;
   const orig = move[0],
     dest = move[1];
@@ -307,7 +329,10 @@ export function playPremove(state: HeadlessState): boolean {
       success = true;
     }
   }
-  unsetPremove(state);
+  // remove the played (or failed) premove from the queue
+  pm.queue.shift();
+  pm.current = pm.queue[0];
+  if (!pm.queue.length) callUserFunction(pm.events.unset);
   return success;
 }
 

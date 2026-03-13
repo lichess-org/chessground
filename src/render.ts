@@ -239,8 +239,9 @@ function computeSquareClasses(s: State): cg.SquareClasses {
         addSquare(squares, k, 'premove-dest' + (s.pieces.has(k) ? ' oc' : ''));
     }
   }
-  const premove = s.premovable.current;
-  if (premove) for (const k of premove) addSquare(squares, k, 'current-premove');
+  const premoveQueue = s.premovable.queue;
+  if (premoveQueue.length)
+    for (const move of premoveQueue) for (const k of move) addSquare(squares, k, 'current-premove');
   else if (s.predroppable.current) addSquare(squares, s.predroppable.current.key, 'current-premove');
 
   const o = s.exploding;
