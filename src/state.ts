@@ -55,6 +55,7 @@ export interface HeadlessState {
     current?: cg.KeyPair; // keys of the current saved premove ["e2" "e4"] (first in queue, for backward compat)
     queue: cg.KeyPair[]; // queued premoves [["e2","e4"], ["d2","d4"]]
     maxQueue: number; // max number of premoves allowed in the queue (1 = legacy behavior)
+    piecesBeforePremoves?: cg.Pieces; // snapshot of pieces before any premoves were set (for undo)
     additionalPremoveRequirements: cg.Mobility;
     events: {
       set?: (orig: cg.Key, dest: cg.Key, metadata?: cg.SetPremoveMetadata) => void; // called after the premove has been set

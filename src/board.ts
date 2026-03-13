@@ -65,11 +65,27 @@ function setPremove(state: HeadlessState, orig: cg.Key, dest: cg.Key, meta: cg.S
     pm.queue.push([orig, dest]);
   }
   pm.current = pm.queue[0];
+  // For multiple premoves, visually move the piece so it can be premoved again
+  if (pm.maxQueue > 1) {
+    if (!pm.piecesBeforePremoves) {
+      pm.piecesBeforePremoves = new Map(state.pieces);
+    }
+    const piece = state.pieces.get(orig);
+    if (piece) {
+      state.pieces.delete(orig);
+      state.pieces.set(dest, piece);
+    }
+  }
   callUserFunction(pm.events.set, orig, dest, meta);
 }
 
 export function unsetPremove(state: HeadlessState): void {
   if (state.premovable.queue.length) {
+    // Restore original piece positions if we have a snapshot
+    if (state.premovable.piecesBeforePremoves) {
+      state.pieces = state.premovable.piecesBeforePremoves;
+      state.premovable.piecesBeforePremoves = undefined;
+    }
     state.premovable.queue = [];
     state.premovable.current = undefined;
     callUserFunction(state.premovable.events.unset);
@@ -79,9 +95,20 @@ export function unsetPremove(state: HeadlessState): void {
 export function unsetLastPremove(state: HeadlessState): void {
   const pm = state.premovable;
   if (pm.queue.length) {
-    pm.queue.pop();
+    const removed = pm.queue.pop()!;
     pm.current = pm.queue[0];
-    if (!pm.queue.length) callUserFunction(pm.events.unset);
+    // Undo the visual piece move for the removed premove
+    if (pm.maxQueue > 1 && removed) {
+      const piece = state.pieces.get(removed[1]);
+      if (piece) {
+        state.pieces.delete(removed[1]);
+        state.pieces.set(removed[0], piece);
+      }
+    }
+    if (!pm.queue.length) {
+      pm.piecesBeforePremoves = undefined;
+      callUserFunction(pm.events.unset);
+    }
   }
 }
 
@@ -319,21 +346,42 @@ export function playPremove(state: HeadlessState): boolean {
   if (!move) return false;
   const orig = move[0],
     dest = move[1];
-  let success = false;
+  // Restore original pieces before playing so canMove/baseUserMove work correctly
+  if (pm.piecesBeforePremoves) {
+    state.pieces = pm.piecesBeforePremoves;
+    pm.piecesBeforePremoves = undefined;
+  }
   if (canMove(state, orig, dest)) {
     const result = baseUserMove(state, orig, dest);
     if (result) {
       const metadata: cg.MoveMetadata = { premove: true };
       if (result !== true) metadata.captured = result;
       callUserFunction(state.movable.events.after, orig, dest, metadata);
-      success = true;
+      // remove the played premove from the queue
+      pm.queue.shift();
+      pm.current = pm.queue[0];
+      // If there are remaining premoves, re-apply their visual piece moves
+      if (pm.queue.length && pm.maxQueue > 1) {
+        pm.piecesBeforePremoves = new Map(state.pieces);
+        for (const m of pm.queue) {
+          const piece = state.pieces.get(m[0]);
+          if (piece) {
+            state.pieces.delete(m[0]);
+            state.pieces.set(m[1], piece);
+          }
+        }
+      } else if (!pm.queue.length) {
+        callUserFunction(pm.events.unset);
+      }
+      return true;
     }
   }
-  // remove the played (or failed) premove from the queue
-  pm.queue.shift();
-  pm.current = pm.queue[0];
-  if (!pm.queue.length) callUserFunction(pm.events.unset);
-  return success;
+  // Premove failed — clear all remaining premoves and restore pieces
+  pm.queue = [];
+  pm.current = undefined;
+  pm.piecesBeforePremoves = undefined;
+  callUserFunction(pm.events.unset);
+  return false;
 }
 
 export function playPredrop(state: HeadlessState, validate: (drop: cg.Drop) => boolean): boolean {

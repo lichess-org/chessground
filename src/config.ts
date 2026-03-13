@@ -116,6 +116,10 @@ export function configure(state: HeadlessState, config: Config): void {
   if (config.fen) {
     state.pieces = fenRead(config.fen);
     state.drawable.shapes = config.drawable?.shapes || [];
+    // Update premove snapshot to the new position so playPremove doesn't restore stale pieces
+    if (state.premovable.piecesBeforePremoves) {
+      state.premovable.piecesBeforePremoves = new Map(state.pieces);
+    }
   }
 
   // apply config values that could be undefined yet meaningful
