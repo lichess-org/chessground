@@ -77,7 +77,7 @@ export const translateAndScale = (el: HTMLElement, pos: cg.NumberPair, scale = 1
 };
 
 export const setVisible = (el: HTMLElement, v: boolean): void => {
-  el.style.visibility = v ? 'visible' : 'hidden';
+  el.style.display = v ? '' : 'none';
 };
 
 export const eventPosition = (e: cg.MouchEvent): cg.NumberPair | undefined => {
