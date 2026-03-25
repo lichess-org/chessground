@@ -32,8 +32,7 @@ import * as cg from './types.js';
 
 type CustomBrushes = Map<string, DrawBrush>; // by hash
 type Svg = { el: SVGElement; isCustom?: boolean };
-const angleSlotVals = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15] as const;
-type AngleSlot = (typeof angleSlotVals)[number];
+type AngleSlot = 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12 | 13 | 14 | 15;
 type AngleSlots = Set<AngleSlot>; // arrow angle slots for label positioning
 type ArrowDests = Map<cg.Key | undefined, AngleSlots>; // angle slots per dest
 
@@ -434,8 +433,8 @@ const dist = (from: cg.NumberPair, to: cg.NumberPair): number =>
 
 /*
  try to place label at the junction of the destination shaft and arrowhead. if there's more than
- 1 arrow pointing to a square, the arrow shortens by 10 / 64 units so the label must move as well. 
- 
+ 1 arrow pointing to a square, the arrow shortens by 10 / 64 units so the label must move as well.
+
  if the angle between two incoming arrows is pi / 8, such as when an adjacent knight and bishop
  attack the same square, the knight's label is slid further down the shaft by an amount equal to
  our label size to avoid collision
