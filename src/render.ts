@@ -116,7 +116,7 @@ export function render(s: State): void {
   }
 
   // hide remaining available, therefore unused, squares
-  for (const [_, nodes] of availableSquares.entries()) {
+  for (const [, nodes] of availableSquares.entries()) {
     for (const node of nodes) setVisible(node, false);
   }
 
