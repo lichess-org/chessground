@@ -1,9 +1,9 @@
-import { State } from './state.js';
-import { key2pos, createEl, posToTranslate as posToTranslateFromBounds, translateAndScale } from './util.js';
 import { whitePov } from './board.js';
-import * as cg from './types.js';
-import { DrawShape } from './draw.js';
-import { SyncableShape, Hash, syncShapes } from './sync.js';
+import { type DrawShape } from './draw.js';
+import { type State } from './state.js';
+import { type Hash, type SyncableShape, syncShapes } from './sync.js';
+import type * as cg from './types.js';
+import { createEl, key2pos, posToTranslate as posToTranslateFromBounds, translateAndScale } from './util.js';
 
 export function render(state: State, autoPieceEl: HTMLElement): void {
   const autoPieces = state.drawable.autoShapes.filter(autoShape => autoShape.piece);

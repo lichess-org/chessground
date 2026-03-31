@@ -1,13 +1,12 @@
-import { Api, start } from './api.js';
-import { Config, configure } from './config.js';
-import { HeadlessState, State, defaults } from './state.js';
-
-import { renderWrap } from './wrap.js';
+import { type Api, start } from './api.js';
+import * as autoPieces from './autoPieces.js';
+import { type Config, configure } from './config.js';
 import * as events from './events.js';
 import { render, renderResized, updateBounds } from './render.js';
-import * as autoPieces from './autoPieces.js';
+import { defaults, type HeadlessState, type State } from './state.js';
 import * as svg from './svg.js';
 import * as util from './util.js';
+import { renderWrap } from './wrap.js';
 
 export function initModule({ el, config }: { el: HTMLElement; config?: Config }): Api {
   return Chessground(el, config);

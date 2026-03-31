@@ -83,7 +83,7 @@ export const setVisible = (el: HTMLElement, v: boolean): void => {
 export const eventPosition = (e: cg.MouchEvent): cg.NumberPair | undefined => {
   if (e.clientX || e.clientX === 0) return [e.clientX, e.clientY!];
   if (e.targetTouches?.[0]) return [e.targetTouches[0].clientX, e.targetTouches[0].clientY];
-  return; // touchend has no position!
+  return undefined; // touchend has no position!
 };
 
 const isFireMac = memo(

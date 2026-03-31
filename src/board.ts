@@ -1,18 +1,18 @@
-import { HeadlessState } from './state.js';
+import { premove } from './premove.js';
+import { type HeadlessState } from './state.js';
+import type * as cg from './types.js';
 import {
-  pos2key,
-  key2pos,
-  opposite,
-  distanceSq,
   allPos,
   computeSquareCenter,
-  queenDir,
+  distanceSq,
+  key2pos,
   knightDir,
-  samePos,
+  opposite,
+  pos2key,
   pos2keyUnsafe,
+  queenDir,
+  samePos,
 } from './util.js';
-import { premove } from './premove.js';
-import * as cg from './types.js';
 
 export function callUserFunction<T extends (...args: any[]) => void>(
   f: T | undefined,

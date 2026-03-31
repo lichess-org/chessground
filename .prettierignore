@@ -1,7 +1,0 @@
-dist/
-
-pnpm-lock.yaml
-
-*.js
-*.d.ts
-*.js.map

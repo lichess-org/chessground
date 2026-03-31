@@ -1,5 +1,5 @@
-import { State } from './state.js';
-import { Key } from './types.js';
+import { type State } from './state.js';
+import { type Key } from './types.js';
 
 export function explosion(state: State, keys: Key[]): void {
   state.exploding = { stage: 1, keys };

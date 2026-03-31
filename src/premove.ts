@@ -1,7 +1,7 @@
+import { type HeadlessState } from './state.js';
+import type * as cg from './types.js';
+import { type Mobility, type MobilityContext } from './types.js';
 import * as util from './util.js';
-import * as cg from './types.js';
-import { HeadlessState } from './state.js';
-import { Mobility, MobilityContext } from './types.js';
 
 const pawn: Mobility = (ctx: MobilityContext) =>
   util.diff(ctx.orig.pos[0], ctx.dest.pos[0]) <= 1 &&
