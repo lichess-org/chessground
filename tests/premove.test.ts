@@ -1,7 +1,7 @@
-import { premove } from '../src/premove';
-import * as cg from '../src/types';
-import { defaults, HeadlessState } from '../src/state';
 import * as fen from '../src/fen';
+import { premove } from '../src/premove';
+import { defaults, type HeadlessState } from '../src/state';
+import type * as cg from '../src/types';
 import * as util from '../src/util';
 
 const invertSquare = (square: cg.Key): cg.Key => {

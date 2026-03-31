@@ -1,9 +1,9 @@
-import { State } from './state.js';
-import * as board from './board.js';
-import * as util from './util.js';
-import { clear as drawClear } from './draw.js';
-import * as cg from './types.js';
 import { anim } from './anim.js';
+import * as board from './board.js';
+import { clear as drawClear } from './draw.js';
+import { type State } from './state.js';
+import type * as cg from './types.js';
+import * as util from './util.js';
 
 export interface DragCurrent {
   orig: cg.Key; // orig key of dragging piece
@@ -252,5 +252,5 @@ function pieceElementByKey(s: State, key: cg.Key): cg.PieceNode | undefined {
       return el as cg.PieceNode;
     el = el.nextSibling;
   }
-  return;
+  return undefined;
 }

@@ -1,9 +1,9 @@
+import { type AnimCurrent } from './anim.js';
+import { type DragCurrent } from './drag.js';
+import { type Drawable } from './draw.js';
 import * as fen from './fen.js';
-import { AnimCurrent } from './anim.js';
-import { DragCurrent } from './drag.js';
-import { Drawable } from './draw.js';
+import type * as cg from './types.js';
 import { timer } from './util.js';
-import * as cg from './types.js';
 
 export interface HeadlessState {
   pieces: cg.Pieces;

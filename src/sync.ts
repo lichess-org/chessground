@@ -1,4 +1,4 @@
-import { DrawShape } from './draw';
+import { type DrawShape } from './draw';
 
 export interface SyncableShape {
   shape: DrawShape;

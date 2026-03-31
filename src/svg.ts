@@ -1,17 +1,17 @@
-import { State } from './state.js';
-import { key2pos } from './util.js';
 import {
-  Drawable,
-  DrawShape,
-  DrawShapePiece,
-  DrawBrush,
-  DrawBrushes,
-  DrawModifiers,
-  sameEndpoints,
+  type Drawable,
+  type DrawBrush,
+  type DrawBrushes,
+  type DrawModifiers,
+  type DrawShape,
+  type DrawShapePiece,
   sameColor,
+  sameEndpoints,
 } from './draw.js';
-import { SyncableShape, Hash } from './sync.js';
-import * as cg from './types.js';
+import { type State } from './state.js';
+import { type Hash, type SyncableShape } from './sync.js';
+import type * as cg from './types.js';
+import { key2pos } from './util.js';
 
 /*
     -- DOM hierarchy --
@@ -176,14 +176,14 @@ function shapeHash(
     label && `label-${textHash(label.text)}`,
     below && 'below',
   ]
-    .filter(x => x)
+    .filter(Boolean)
     .join(',');
 }
 
 const pieceHash = (piece: DrawShapePiece): Hash =>
-  [piece.color, piece.role, piece.scale].filter(x => x).join(',');
+  [piece.color, piece.role, piece.scale].filter(Boolean).join(',');
 
-const modifiersHash = (m: DrawModifiers): Hash => [m.lineWidth, m.hilite].filter(x => x).join(',');
+const modifiersHash = (m: DrawModifiers): Hash => [m.lineWidth, m.hilite].filter(Boolean).join(',');
 
 function textHash(s: string): Hash {
   // Rolling hash with base 31 (cf. https://stackoverflow.com/questions/7616461/generate-a-hash-from-string-in-javascript)
@@ -382,7 +382,7 @@ const makeCustomBrush = (base: DrawBrush, modifiers: DrawModifiers | undefined):
         color: base.color,
         opacity: Math.round(base.opacity * 10) / 10,
         lineWidth: Math.round(modifiers.lineWidth || base.lineWidth),
-        key: [base.key, modifiers.lineWidth].filter(x => x).join(''),
+        key: [base.key, modifiers.lineWidth].filter(Boolean).join(''),
       };
 
 const circleWidth = (): [number, number] => [3 / 64, 4 / 64];

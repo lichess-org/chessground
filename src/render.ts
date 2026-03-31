@@ -1,16 +1,16 @@
-import { State } from './state.js';
+import { type AnimCurrent, type AnimFadings, type AnimVector, type AnimVectors } from './anim.js';
+import { whitePov } from './board.js';
+import { type DragCurrent } from './drag.js';
+import { type State } from './state.js';
+import type * as cg from './types.js';
 import {
-  key2pos,
   createEl,
+  key2pos,
   posToTranslate as posToTranslateFromBounds,
-  translate,
   setVisible,
+  translate,
 } from './util.js';
 import * as util from './util.js';
-import { whitePov } from './board.js';
-import { AnimCurrent, AnimVectors, AnimVector, AnimFadings } from './anim.js';
-import { DragCurrent } from './drag.js';
-import * as cg from './types.js';
 
 type PieceName = string; // `$color $role`
 

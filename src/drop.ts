@@ -1,8 +1,8 @@
-import { State } from './state.js';
-import * as cg from './types.js';
 import * as board from './board.js';
-import * as util from './util.js';
 import { cancel as dragCancel } from './drag.js';
+import { type State } from './state.js';
+import type * as cg from './types.js';
+import * as util from './util.js';
 
 export function setDropMode(s: State, piece?: cg.Piece): void {
   s.dropmode = {

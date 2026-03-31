@@ -1,7 +1,7 @@
-import { HeadlessState } from './state.js';
-import { setVisible, createEl, opposite } from './util.js';
-import { colors, files, ranks, Elements, Color } from './types.js';
-import { createElement as createSVG, setAttributes, createDefs } from './svg.js';
+import { type HeadlessState } from './state.js';
+import { createDefs, createElement as createSVG, setAttributes } from './svg.js';
+import { type Color, colors, type Elements, files, ranks } from './types.js';
+import { createEl, opposite, setVisible } from './util.js';
 
 export function renderWrap(element: HTMLElement, s: HeadlessState): Elements {
   // .cg-wrap (element passed to Chessground)

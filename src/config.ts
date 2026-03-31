@@ -1,8 +1,8 @@
-import { HeadlessState } from './state.js';
 import { setCheck, setSelected } from './board.js';
+import { type DrawBrushes, type DrawShape } from './draw.js';
 import { read as fenRead } from './fen.js';
-import { DrawShape, DrawBrushes } from './draw.js';
-import * as cg from './types.js';
+import { type HeadlessState } from './state.js';
+import type * as cg from './types.js';
 
 export interface Config {
   fen?: cg.FEN; // chess position in Forsyth notation

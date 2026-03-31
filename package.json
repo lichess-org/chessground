@@ -19,21 +19,21 @@
     }
   },
   "devDependencies": {
-    "@typescript-eslint/eslint-plugin": "^8.57.2",
-    "@typescript-eslint/parser": "^8.57.2",
     "esbuild": "^0.25.12",
-    "eslint": "^8.57.1",
     "jsdom": "^26.1.0",
-    "prettier": "^3.8.1",
+    "oxfmt": "^0.42.0",
+    "oxlint": "^1.57.0",
+    "oxlint-tsgolint": "^0.18.1",
     "typescript": "^5.9.3",
     "vitest": "^3.2.4"
   },
   "scripts": {
     "prepare": "$npm_execpath run compile",
     "compile": "tsc --sourceMap --declaration",
-    "lint": "eslint src/*.ts",
-    "format": "prettier --write .",
-    "check-format": "prettier --check .",
+    "lint": "oxlint",
+    "lint:fix": "oxlint --fix",
+    "format": "oxfmt",
+    "check-format": "oxfmt --check",
     "bundle": "esbuild src/chessground.ts --bundle --format=esm --outfile=dist/chessground.min.js --minify",
     "dist": "$npm_execpath run compile && $npm_execpath run bundle",
     "test": "vitest run",
