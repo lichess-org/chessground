@@ -19,6 +19,10 @@ export function Chessground(element: HTMLElement, config?: Config): Api {
 
   function redrawAll(): State {
     const prevUnbind = 'dom' in maybeState ? maybeState.dom.unbind : undefined;
+    // Tear down the previous redraw's board-level bindings before renderWrap
+    // replaces the DOM. The ResizeObserver in bindBoard observes the wrap
+    // element, which is about to be detached.
+    if ('dom' in maybeState) maybeState.dom.unbindBoard?.();
     // compute bounds from existing board element if possible
     // this allows non-square boards from CSS to be handled (for 3D)
     const elements = renderWrap(element, maybeState),
@@ -44,7 +48,7 @@ export function Chessground(element: HTMLElement, config?: Config): Api {
     state.drawable.prevSvgHash = '';
     updateBounds(state);
     redrawNow(false);
-    events.bindBoard(state, onResize);
+    state.dom.unbindBoard = events.bindBoard(state, onResize);
     if (!prevUnbind) state.dom.unbind = events.bindDocument(state, onResize);
     state.events.insert?.(elements);
     return state;

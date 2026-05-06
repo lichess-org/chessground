@@ -53,6 +53,7 @@ export interface Dom {
   redraw: () => void;
   redrawNow: (skipSvg?: boolean) => void;
   unbind?: Unbind;
+  unbindBoard?: Unbind;
   destroyed?: boolean;
 }
 export interface Exploding {

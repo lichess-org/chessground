@@ -180,6 +180,7 @@ export function start(state: State, redrawAll: cg.Redraw): Api {
 
     destroy(): void {
       board.stop(state);
+      state.dom.unbindBoard?.();
       state.dom.unbind?.();
       state.dom.destroyed = true;
     },

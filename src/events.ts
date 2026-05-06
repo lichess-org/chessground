@@ -8,16 +8,22 @@ import { isRightButton } from './util.js';
 type MouchBind = (e: cg.MouchEvent) => void;
 type StateMouchBind = (d: State, e: cg.MouchEvent) => void;
 
-export function bindBoard(s: State, onResize: () => void): void {
+// returns the unbind function
+export function bindBoard(s: State, onResize: () => void): cg.Unbind {
   const boardEl = s.dom.elements.board;
+  const unbinds: cg.Unbind[] = [];
 
-  if ('ResizeObserver' in window) new ResizeObserver(onResize).observe(s.dom.elements.wrap);
+  if ('ResizeObserver' in window) {
+    const ro = new ResizeObserver(onResize);
+    ro.observe(s.dom.elements.wrap);
+    unbinds.push(() => ro.disconnect());
+  }
 
   if (s.disableContextMenu || s.drawable.enabled) {
     boardEl.addEventListener('contextmenu', e => e.preventDefault());
   }
 
-  if (s.viewOnly) return;
+  if (s.viewOnly) return () => unbinds.forEach(f => f());
 
   // Cannot be passive, because we prevent touch scrolling and dragging of
   // selected elements.
@@ -28,6 +34,8 @@ export function bindBoard(s: State, onResize: () => void): void {
   boardEl.addEventListener('mousedown', onStart as EventListener, {
     passive: false,
   });
+
+  return () => unbinds.forEach(f => f());
 }
 
 // returns the unbind function
