@@ -25,7 +25,7 @@
     "oxlint": "^1.57.0",
     "oxlint-tsgolint": "^0.18.1",
     "typescript": "^5.9.3",
-    "vitest": "^3.2.4"
+    "vitest": "^4.1.0"
   },
   "scripts": {
     "prepare": "$npm_execpath run compile",
