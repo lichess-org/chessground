@@ -23,6 +23,7 @@ export interface HeadlessState {
   blockTouchScroll: boolean; // block scrolling via touch dragging on the board
   touchIgnoreRadius: number; // ignore touches within a radius of an occupied square, in units of its circumradius
   pieceKey: boolean; // add a data-key attribute to piece elements
+  pixelCoordsOfMouchDownToMaybeClearShapes?: cg.NumberPair;
   trustAllEvents?: boolean; // disable checking for human only input (e.isTrusted)
   jsHover?: boolean; // enable JS-driven hover state handling to workaround Safari drag issue
   highlight: {
@@ -177,7 +178,7 @@ export function defaults(): HeadlessState {
       enabled: true, // can draw
       visible: true, // can view
       defaultSnapToValidMove: true,
-      eraseOnMovablePieceClick: true,
+      eraseOnClick: true,
       shapes: [],
       autoShapes: [],
       brushes: {
