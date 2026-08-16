@@ -52,11 +52,14 @@ export interface HeadlessState {
     castle: boolean; // whether to allow king castle premoves
     dests?: cg.Key[]; // premove destinations for the current selection
     customDests?: cg.Dests; // use custom valid premoves. {"a2" ["a3" "a4"] "b1" ["a3" "c3"]}
-    current?: cg.KeyPair; // keys of the current saved premove ["e2" "e4"]
+    current?: cg.KeyPair; // head of the saved premove queue, kept for backwards compatibility
+    queue: cg.KeyPair[]; // saved premoves in execution order
+    maxCount: number; // 1 preserves legacy single-premove behaviour; values >1 enable a queue
+    basePieces?: cg.Pieces; // authoritative pieces before applying the speculative queue preview
     additionalPremoveRequirements: cg.Mobility;
     events: {
-      set?: (orig: cg.Key, dest: cg.Key, metadata?: cg.SetPremoveMetadata) => void; // called after the premove has been set
-      unset?: () => void; // called after the premove has been unset
+      set?: (orig: cg.Key, dest: cg.Key, metadata?: cg.SetPremoveMetadata) => void; // called after a premove has been set
+      unset?: () => void; // called after the premove queue has been cleared
     };
   };
   predroppable: {
@@ -147,6 +150,8 @@ export function defaults(): HeadlessState {
       enabled: true,
       showDests: true,
       castle: true,
+      queue: [],
+      maxCount: 1,
       additionalPremoveRequirements: _ => true,
       events: {},
     },

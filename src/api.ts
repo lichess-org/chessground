@@ -16,7 +16,7 @@ export interface Api {
   // read chessground state; write at your own risks.
   state: State;
 
-  // get the position as a FEN string (only contains pieces, no flags)
+  // get the authoritative position as a FEN string (only contains pieces, no flags)
   // e.g. rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR
   getFen(): cg.FEN;
 
@@ -92,7 +92,10 @@ export function start(state: State, redrawAll: cg.Redraw): Api {
 
     state,
 
-    getFen: () => fenWrite(state.pieces),
+    // Multiple premoves may render a speculative position. Consumers such as
+    // Lila use getFen() to decide whether an incoming server position needs to
+    // be applied, so expose the latest authoritative base rather than the preview.
+    getFen: () => fenWrite(state.premovable.basePieces ?? state.pieces),
 
     toggleOrientation,
 

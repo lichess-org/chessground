@@ -1,4 +1,4 @@
-import { setCheck, setSelected } from './board.js';
+import { setCheck, setSelected, unsetPremove } from './board.js';
 import { type DrawBrushes, type DrawShape } from './draw.js';
 import { read as fenRead } from './fen.js';
 import { type HeadlessState } from './state.js';
@@ -49,10 +49,11 @@ export interface Config {
     castle?: boolean; // whether to allow king castle premoves
     dests?: cg.Key[]; // premove destinations for the current selection
     customDests?: cg.Dests; // use custom valid premoves. {"a2" ["a3" "a4"] "b1" ["a3" "c3"]}
+    maxCount?: number; // maximum queued premoves; 1 keeps the legacy single-premove behaviour
     additionalPremoveRequirements?: cg.Mobility;
     events?: {
-      set?: (orig: cg.Key, dest: cg.Key, metadata?: cg.SetPremoveMetadata) => void; // called after the premove has been set
-      unset?: () => void; // called after the premove has been unset
+      set?: (orig: cg.Key, dest: cg.Key, metadata?: cg.SetPremoveMetadata) => void; // called after a premove has been set
+      unset?: () => void; // called after the premove queue has been cleared
     };
   };
   predroppable?: {
@@ -80,11 +81,11 @@ export interface Config {
     move?: (orig: cg.Key, dest: cg.Key, capturedPiece?: cg.Piece) => void;
     dropNewPiece?: (piece: cg.Piece, key: cg.Key) => void;
     select?: (key: cg.Key) => void; // called when a square is selected
-    insert?: (elements: cg.Elements) => void; // when the board DOM has been (re)inserted
+    insert?: (elements: cg.Elements) => void; // called when the board DOM has been (re)inserted
   };
   drawable?: {
     enabled?: boolean; // can draw
-    visible?: boolean; // can view
+    visible?: boolean;
     defaultSnapToValidMove?: boolean;
     // Clicking an empty square or immovable piece will clear the drawing regardless, but when this property is true,
     // clicking on a (currently unselected) movable piece will also clear the drawing.
@@ -105,6 +106,26 @@ export function applyAnimation(state: HeadlessState, config: Config): void {
 }
 
 export function configure(state: HeadlessState, config: Config): void {
+  // A live preference change must never leave a speculative queue armed behind
+  // a disabled premove setting. Restore the authoritative pieces before applying
+  // the new configuration so a later playPremove() cannot execute stale input.
+  if (config.premovable?.enabled === false && state.premovable.queue.length) unsetPremove(state);
+  // Switching multiple -> single keeps the queue head, cancels the dependent
+  // tail and removes the speculative preview. This mirrors the compatibility
+  // behavior of a legacy single premove rather than silently discarding the head.
+  else if (
+    config.premovable?.maxCount !== undefined &&
+    config.premovable.maxCount <= 1 &&
+    state.premovable.maxCount > 1 &&
+    state.premovable.queue.length
+  ) {
+    const head = state.premovable.queue[0];
+    if (state.premovable.basePieces) state.pieces = new Map(state.premovable.basePieces);
+    state.premovable.queue = [head];
+    state.premovable.current = head;
+    state.premovable.basePieces = undefined;
+  }
+
   // don't merge destinations and autoShapes. Just override.
   if (config.movable?.dests) state.movable.dests = undefined;
   if (config.drawable?.autoShapes) state.drawable.autoShapes = [];
@@ -115,6 +136,11 @@ export function configure(state: HeadlessState, config: Config): void {
   if (config.fen) {
     state.pieces = fenRead(config.fen);
     state.drawable.shapes = config.drawable?.shapes || [];
+    // A server/parent position update becomes the new authoritative base for any
+    // queued premoves. playPremove() will validate the queue head against these
+    // real pieces before rebuilding the speculative preview for the remaining tail.
+    if (state.premovable.maxCount > 1 && state.premovable.queue.length)
+      state.premovable.basePieces = new Map(state.pieces);
   }
 
   // apply config values that could be undefined yet meaningful
