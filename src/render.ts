@@ -239,9 +239,20 @@ function computeSquareClasses(s: State): cg.SquareClasses {
         addSquare(squares, k, 'premove-dest' + (s.pieces.has(k) ? ' oc' : ''));
     }
   }
-  const premove = s.premovable.current;
-  if (premove) for (const k of premove) addSquare(squares, k, 'current-premove');
-  else if (s.predroppable.current) addSquare(squares, s.predroppable.current.key, 'current-premove');
+  if (s.premovable.multiple && s.premovable.queue.length) {
+    // Each queued premove highlights both its origin and destination squares,
+    // using an ordinal class so consumers can give earlier/later moves a
+    // distinct color ramp via CSS.
+    s.premovable.queue.forEach((item, i) => {
+      const klass = `premove-queue-${Math.min(i + 1, 8)}`;
+      addSquare(squares, item.orig, klass);
+      addSquare(squares, item.dest, klass);
+    });
+  } else {
+    const premove = s.premovable.current;
+    if (premove) for (const k of premove) addSquare(squares, k, 'current-premove');
+    else if (s.predroppable.current) addSquare(squares, s.predroppable.current.key, 'current-premove');
+  }
 
   const o = s.exploding;
   if (o) for (const k of o.keys) addSquare(squares, k, 'exploding' + o.stage);

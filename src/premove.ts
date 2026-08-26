@@ -28,8 +28,44 @@ const king: Mobility = (ctx: MobilityContext) =>
 
 const mobilityByRole = { pawn, knight, bishop, rook, queen, king };
 
-export function premove(state: HeadlessState, key: cg.Key): cg.Key[] {
-  const pieces = state.pieces;
+/**
+ * Virtually applies a single move to a pieces map and returns a new map.
+ * The moved piece is relocated and any piece on the destination square is
+ * captured (overwritten). Like the rest of premove logic, this intentionally
+ * ignores promotion, en-passant and castling-rights details — it only needs to
+ * be good enough to compute legal destination squares for the next queued
+ * premove on a hypothetical board.
+ */
+export function applyMoveToPieces(pieces: cg.Pieces, orig: cg.Key, dest: cg.Key): cg.Pieces {
+  const piece = pieces.get(orig);
+  if (!piece) return pieces;
+  const entries: [cg.Key, cg.Piece][] = [];
+  for (const [key, p] of pieces) if (key !== orig) entries.push([key, p]);
+  entries.push([dest, piece]);
+  return new Map(entries);
+}
+
+/**
+ * The pieces map that should be used to compute premove destinations for `orig`:
+ * the real board with the queued premoves already applied on top. When premoving
+ * is not in "multiple" (queue) mode, or the queue is empty, this is simply the
+ * current board.
+ *
+ * When `orig` is an origin already used by an earlier queued item, re-queueing
+ * from it replaces that item and everything queued after it, so the hypothetical
+ * board only applies the items before that one.
+ */
+export function premovePieces(state: HeadlessState, orig?: cg.Key): cg.Pieces {
+  if (!state.premovable.multiple) return state.pieces;
+  const queue = state.premovable.queue;
+  const idx = orig === undefined ? -1 : queue.findIndex(item => item.orig === orig);
+  const effective = idx === -1 ? queue : queue.slice(0, idx);
+  let pieces = state.pieces;
+  for (const item of effective) pieces = applyMoveToPieces(pieces, item.orig, item.dest);
+  return pieces;
+}
+
+function premoveFromState(state: HeadlessState, pieces: cg.Pieces, key: cg.Key): cg.Key[] {
   const piece = pieces.get(key);
   if (!piece || piece.color === state.turnColor) return [];
   const color = piece.color,
@@ -54,4 +90,8 @@ export function premove(state: HeadlessState, key: cg.Key): cg.Key[] {
     };
   // todo - remove more properties from MobilityContext that aren't used in this file, and adjust as needed in lila.
   return util.allPosAndKey.filter(dest => mobility({ ...partialCtx, dest })).map(pk => pk.key);
+}
+
+export function premove(state: HeadlessState, key: cg.Key): cg.Key[] {
+  return premoveFromState(state, premovePieces(state, key), key);
 }

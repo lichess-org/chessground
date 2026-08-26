@@ -49,10 +49,14 @@ export interface Config {
     castle?: boolean; // whether to allow king castle premoves
     dests?: cg.Key[]; // premove destinations for the current selection
     customDests?: cg.Dests; // use custom valid premoves. {"a2" ["a3" "a4"] "b1" ["a3" "c3"]}
+    multiple?: boolean; // allow a queue of several premoves (chess.com-style chain)
+    maxQueueLength?: number; // maximum number of premoves that can be queued
     additionalPremoveRequirements?: cg.Mobility;
     events?: {
       set?: (orig: cg.Key, dest: cg.Key, metadata?: cg.SetPremoveMetadata) => void; // called after the premove has been set
       unset?: () => void; // called after the premove has been unset
+      queueSet?: (queue: cg.Premove[]) => void; // called after the queue changes
+      queueUnset?: () => void; // called after the queue is emptied
     };
   };
   predroppable?: {
@@ -89,6 +93,7 @@ export interface Config {
     // Clicking an empty square or immovable piece will clear the drawing regardless, but when this property is true,
     // clicking on a (currently unselected) movable piece will also clear the drawing.
     eraseOnMovablePieceClick?: boolean;
+    knightMoveBend?: boolean; // draw knight-move arrows as a right-angle "L" instead of a straight line
     shapes?: DrawShape[];
     autoShapes?: DrawShape[];
     brushes?: DrawBrushes;

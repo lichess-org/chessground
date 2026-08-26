@@ -23,6 +23,12 @@ export type PiecesDiff = Map<Key, Piece | undefined>;
 
 export type KeyPair = [Key, Key];
 
+// a single item of the multi-premove queue (chess.com-style chain)
+export interface Premove {
+  orig: Key;
+  dest: Key;
+}
+
 export type NumberPair = [number, number];
 
 export type NumberQuad = [number, number, number, number];

@@ -72,14 +72,30 @@ export function renderSvg(state: State, els: cg.Elements): void {
       shape: s,
       current: false,
       pendingErase: isPendingErase,
-      hash: shapeHash(s, isShort(s.dest, dests), false, bounds, isPendingErase, angleCount(s.dest, dests)),
+      hash: shapeHash(
+        s,
+        isShort(s.dest, dests),
+        false,
+        bounds,
+        isPendingErase,
+        angleCount(s.dest, dests),
+        shouldBend(s, d.knightMoveBend),
+      ),
     });
   }
   if (cur && pendingEraseIdx === -1)
     shapes.push({
       shape: cur,
       current: true,
-      hash: shapeHash(cur, isShort(cur.dest, dests), true, bounds, false, angleCount(cur.dest, dests)),
+      hash: shapeHash(
+        cur,
+        isShort(cur.dest, dests),
+        true,
+        bounds,
+        false,
+        angleCount(cur.dest, dests),
+        shouldBend(cur, d.knightMoveBend),
+      ),
       pendingErase: false,
     });
 
@@ -158,6 +174,7 @@ function shapeHash(
   bounds: DOMRectReadOnly,
   pendingErase: boolean,
   angleCountOfDest: number,
+  bend: boolean,
 ): Hash {
   // a shape and an overlay svg share a lifetime and have the same cgHash attribute
   return [
@@ -170,6 +187,7 @@ function shapeHash(
     dest,
     brush,
     shorten && '-',
+    bend && 'knight-bend',
     piece && pieceHash(piece),
     modifiers && modifiersHash(modifiers),
     customSvg && `custom-${textHash(customSvg.html)},${customSvg.center?.[0] ?? 'o'}`,
@@ -179,6 +197,19 @@ function shapeHash(
     .filter(Boolean)
     .join(',');
 }
+
+// A "knight bend" only applies to arrows whose origin and destination squares are
+// exactly a knight's move apart. The long leg (2 squares) is bent at a right angle.
+export const isKnightMove = (orig: cg.Key, dest: cg.Key): boolean => {
+  const a = key2pos(orig),
+    b = key2pos(dest);
+  const df = Math.abs(a[0] - b[0]),
+    dr = Math.abs(a[1] - b[1]);
+  return (df === 1 && dr === 2) || (df === 2 && dr === 1);
+};
+
+const shouldBend = (s: DrawShape, knightMoveBend: boolean): boolean =>
+  knightMoveBend && !!s.dest && s.orig !== s.dest && isKnightMove(s.orig, s.dest);
 
 const pieceHash = (piece: DrawShapePiece): Hash =>
   [piece.color, piece.role, piece.scale].filter(Boolean).join(',');
@@ -212,7 +243,9 @@ function renderShape(
     svgs.push({ el });
 
     if (from[0] !== to[0] || from[1] !== to[1])
-      el.appendChild(renderArrow(shape, brush, from, to, current, isShort(shape.dest, dests), pendingErase));
+      el.appendChild(
+        renderArrow(shape, brush, state, from, to, current, isShort(shape.dest, dests), pendingErase),
+      );
     else el.appendChild(renderCircle(brushes[shape.brush!], from, current, bounds, pendingErase));
   }
   if (shape.label) {
@@ -255,26 +288,44 @@ function renderCircle(
 function renderArrow(
   s: DrawShape,
   brush: DrawBrush,
+  state: State,
   from: cg.NumberPair,
   to: cg.NumberPair,
   current: boolean,
   shorten: boolean,
   pendingErase: boolean,
 ): SVGElement {
+  const bend = shouldBend(s, state.drawable.knightMoveBend);
+
   function renderLine(isHilite: boolean) {
     const m = arrowMargin(shorten && !current),
-      dx = to[0] - from[0],
+      hilite = hiliteOf(s),
+      stroke = isHilite ? hilite.color : brush.color,
+      width = lineWidth(brush, current) * (isHilite ? 1.14 : 1),
+      marker = `url(#arrowhead-${isHilite ? hilite.key : brush.key})`,
+      opacityVal = s.modifiers?.hilite && !pendingErase ? 1 : opacity(brush, current, pendingErase);
+    if (bend) {
+      return setAttributes(createElement('path'), {
+        d: bentArrowPath(s, from, to, m),
+        stroke,
+        'stroke-width': width,
+        'stroke-linecap': 'round',
+        'stroke-linejoin': 'round',
+        'marker-end': marker,
+        opacity: opacityVal,
+      });
+    }
+    const dx = to[0] - from[0],
       dy = to[1] - from[1],
       angle = Math.atan2(dy, dx),
       xo = Math.cos(angle) * m,
       yo = Math.sin(angle) * m;
-    const hilite = hiliteOf(s);
     return setAttributes(createElement('line'), {
-      stroke: isHilite ? hilite.color : brush.color,
-      'stroke-width': lineWidth(brush, current) * (isHilite ? 1.14 : 1),
+      stroke,
+      'stroke-width': width,
       'stroke-linecap': 'round',
-      'marker-end': `url(#arrowhead-${isHilite ? hilite.key : brush.key})`,
-      opacity: s.modifiers?.hilite && !pendingErase ? 1 : opacity(brush, current, pendingErase),
+      'marker-end': marker,
+      opacity: opacityVal,
       x1: from[0],
       y1: from[1],
       x2: to[0] - xo,
@@ -290,6 +341,23 @@ function renderArrow(
   g.appendChild(blurred);
   g.appendChild(renderLine(false));
   return g;
+}
+
+// Builds the SVG path for a knight-move arrow bent at a right angle:
+// origin -> pivot (the long, 2-square leg) -> destination (the short, 1-square leg).
+// The long leg is the axis whose file/rank delta is 2, chosen from the board keys
+// so non-square (3D) boards are handled correctly. The final leg is shortened by
+// the arrow margin so the arrowhead is not overlapped.
+export function bentArrowPath(s: DrawShape, from: cg.NumberPair, to: cg.NumberPair, m: number): string {
+  const a = key2pos(s.orig),
+    b = key2pos(s.dest!),
+    longIsFile = Math.abs(a[0] - b[0]) === 2,
+    pivot: cg.NumberPair = longIsFile ? [to[0], from[1]] : [from[0], to[1]];
+  const ldx = to[0] - pivot[0],
+    ldy = to[1] - pivot[1],
+    len = Math.hypot(ldx, ldy),
+    end: cg.NumberPair = len === 0 ? to : [to[0] - (ldx / len) * m, to[1] - (ldy / len) * m];
+  return `M ${from[0]},${from[1]} L ${pivot[0]},${pivot[1]} L ${end[0]},${end[1]}`;
 }
 
 function renderMarker(brush: DrawBrush): SVGElement {

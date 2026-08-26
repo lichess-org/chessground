@@ -38,8 +38,14 @@ export interface Api {
   // play the current premove, if any; returns true if premove was played
   playPremove(): boolean;
 
-  // cancel the current premove, if any
+  // cancel the current (front-of-queue) premove, if any
   cancelPremove(): void;
+
+  // cancel the whole premove queue, if any
+  cancelPremoveQueue(): void;
+
+  // remove the last item from the premove queue, if any
+  popLastPremove(): void;
 
   // play the current predrop, if any; returns true if premove was played
   playPredrop(validate: (drop: cg.Drop) => boolean): boolean;
@@ -135,7 +141,18 @@ export function start(state: State, redrawAll: cg.Redraw): Api {
     },
 
     cancelPremove(): void {
-      render(board.unsetPremove, state);
+      render(
+        state => (state.premovable.multiple ? board.cancelPremoveFront(state) : board.unsetPremove(state)),
+        state,
+      );
+    },
+
+    cancelPremoveQueue(): void {
+      render(board.unsetPremoveQueue, state);
+    },
+
+    popLastPremove(): void {
+      render(board.popLastPremove, state);
     },
 
     cancelPredrop(): void {

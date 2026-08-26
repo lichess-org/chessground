@@ -45,6 +45,7 @@ export interface Drawable {
   visible: boolean; // can view
   defaultSnapToValidMove: boolean;
   eraseOnMovablePieceClick: boolean;
+  knightMoveBend: boolean; // draw knight-move arrows as a right-angle "L" instead of a straight line
   onChange?: (shapes: DrawShape[]) => void;
   shapes: DrawShape[]; // user shapes
   autoShapes: DrawShape[]; // computer shapes

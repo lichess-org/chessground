@@ -53,10 +53,15 @@ export interface HeadlessState {
     dests?: cg.Key[]; // premove destinations for the current selection
     customDests?: cg.Dests; // use custom valid premoves. {"a2" ["a3" "a4"] "b1" ["a3" "c3"]}
     current?: cg.KeyPair; // keys of the current saved premove ["e2" "e4"]
+    multiple: boolean; // allow a queue of several premoves (chess.com-style chain)
+    maxQueueLength: number; // maximum number of premoves that can be queued
+    queue: cg.Premove[]; // the queued premoves, applied in order
     additionalPremoveRequirements: cg.Mobility;
     events: {
       set?: (orig: cg.Key, dest: cg.Key, metadata?: cg.SetPremoveMetadata) => void; // called after the premove has been set
       unset?: () => void; // called after the premove has been unset
+      queueSet?: (queue: cg.Premove[]) => void; // called after the queue changes
+      queueUnset?: () => void; // called after the queue is emptied
     };
   };
   predroppable: {
@@ -147,6 +152,9 @@ export function defaults(): HeadlessState {
       enabled: true,
       showDests: true,
       castle: true,
+      multiple: false,
+      maxQueueLength: 5,
+      queue: [],
       additionalPremoveRequirements: _ => true,
       events: {},
     },
@@ -178,6 +186,7 @@ export function defaults(): HeadlessState {
       visible: true, // can view
       defaultSnapToValidMove: true,
       eraseOnMovablePieceClick: true,
+      knightMoveBend: false,
       shapes: [],
       autoShapes: [],
       brushes: {

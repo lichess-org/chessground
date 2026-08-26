@@ -2,6 +2,17 @@
   box-sizing: content-box;
   position: relative;
   display: block;
+  /* Color ramp for a chess.com-style premove queue. Earlier queued moves use a
+     muted red/orange, the most recently queued move uses a brighter yellow-green.
+     Consumers can override these variables to restyle without touching JS. */
+  --premove-queue-color-1: rgba(150, 30, 25, 0.5);
+  --premove-queue-color-2: rgba(180, 65, 25, 0.5);
+  --premove-queue-color-3: rgba(200, 115, 25, 0.5);
+  --premove-queue-color-4: rgba(165, 175, 40, 0.5);
+  --premove-queue-color-5: rgba(140, 195, 50, 0.5);
+  --premove-queue-color-6: rgba(120, 200, 60, 0.5);
+  --premove-queue-color-7: rgba(110, 205, 70, 0.5);
+  --premove-queue-color-8: rgba(100, 210, 80, 0.5);
 }
 
 cg-container {
@@ -233,4 +244,30 @@ piece.fading {
 
 .cg-wrap coords.squares.rank8 {
   transform: translateX(700%);
+}
+
+/** Chess.com-style premove queue highlights (see --premove-queue-color-N vars above) */
+cg-board square.premove-queue-1 {
+  background-color: var(--premove-queue-color-1);
+}
+cg-board square.premove-queue-2 {
+  background-color: var(--premove-queue-color-2);
+}
+cg-board square.premove-queue-3 {
+  background-color: var(--premove-queue-color-3);
+}
+cg-board square.premove-queue-4 {
+  background-color: var(--premove-queue-color-4);
+}
+cg-board square.premove-queue-5 {
+  background-color: var(--premove-queue-color-5);
+}
+cg-board square.premove-queue-6 {
+  background-color: var(--premove-queue-color-6);
+}
+cg-board square.premove-queue-7 {
+  background-color: var(--premove-queue-color-7);
+}
+cg-board square.premove-queue-8 {
+  background-color: var(--premove-queue-color-8);
 }

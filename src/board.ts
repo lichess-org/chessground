@@ -1,4 +1,4 @@
-import { premove } from './premove.js';
+import { premove, premovePieces } from './premove.js';
 import { type HeadlessState } from './state.js';
 import type * as cg from './types.js';
 import {
@@ -29,7 +29,7 @@ export function toggleOrientation(state: HeadlessState): void {
 export function reset(state: HeadlessState): void {
   state.lastMove = undefined;
   unselect(state);
-  unsetPremove(state);
+  unsetPremoveQueue(state);
   unsetPredrop(state);
 }
 
@@ -53,11 +53,90 @@ export function setCheck(state: HeadlessState, color: cg.Color | boolean): void 
 
 function setPremove(state: HeadlessState, orig: cg.Key, dest: cg.Key, meta: cg.SetPremoveMetadata): void {
   unsetPredrop(state);
-  state.premovable.current = [orig, dest];
+  if (state.premovable.multiple) addToPremoveQueue(state, orig, dest);
+  else {
+    state.premovable.current = [orig, dest];
+    state.premovable.queue = [];
+  }
   callUserFunction(state.premovable.events.set, orig, dest, meta);
 }
 
+function addToPremoveQueue(state: HeadlessState, orig: cg.Key, dest: cg.Key): void {
+  const queue = state.premovable.queue;
+  // Re-queueing a move that starts from an origin already used by an earlier
+  // queued item invalidates that item and everything queued after it (they were
+  // computed on a board where that piece was elsewhere), so truncate from there.
+  const idx = queue.findIndex(item => item.orig === orig);
+  if (idx !== -1) queue.length = idx;
+  // Respect the maximum queue length.
+  if (queue.length >= state.premovable.maxQueueLength) {
+    syncCurrentFromQueue(state);
+    return;
+  }
+  queue.push({ orig, dest });
+  syncCurrentFromQueue(state);
+  callUserFunction(state.premovable.events.queueSet, state.premovable.queue);
+}
+
+function syncCurrentFromQueue(state: HeadlessState): void {
+  const front = state.premovable.queue[0];
+  state.premovable.current = front ? [front.orig, front.dest] : undefined;
+}
+
+// Remove the first queued premove (operate on the front of the queue).
+export function cancelPremoveFront(state: HeadlessState): void {
+  if (!state.premovable.multiple) {
+    unsetPremove(state);
+    return;
+  }
+  if (!state.premovable.queue.length) return;
+  state.premovable.queue.shift();
+  syncCurrentFromQueue(state);
+  if (state.premovable.queue.length)
+    callUserFunction(state.premovable.events.queueSet, state.premovable.queue);
+  else {
+    callUserFunction(state.premovable.events.unset);
+    callUserFunction(state.premovable.events.queueUnset);
+  }
+}
+
+// Remove the most recently queued premove.
+export function popLastPremove(state: HeadlessState): void {
+  if (!state.premovable.multiple) {
+    unsetPremove(state);
+    return;
+  }
+  if (!state.premovable.queue.length) return;
+  state.premovable.queue.pop();
+  syncCurrentFromQueue(state);
+  if (state.premovable.queue.length)
+    callUserFunction(state.premovable.events.queueSet, state.premovable.queue);
+  else {
+    callUserFunction(state.premovable.events.unset);
+    callUserFunction(state.premovable.events.queueUnset);
+  }
+}
+
+// Clear the entire premove queue (or the single current premove in single mode).
+export function unsetPremoveQueue(state: HeadlessState): void {
+  if (state.premovable.multiple) {
+    if (!state.premovable.queue.length && !state.premovable.current) return;
+    state.premovable.queue = [];
+    state.premovable.current = undefined;
+    callUserFunction(state.premovable.events.unset);
+    callUserFunction(state.premovable.events.queueUnset);
+  } else {
+    unsetPremove(state);
+  }
+}
+
 export function unsetPremove(state: HeadlessState): void {
+  // In multiple mode, interaction cleanup (e.g. ending a drag) must not wipe the
+  // whole queue — only the single-premove path clears anything here.
+  if (state.premovable.multiple) {
+    syncCurrentFromQueue(state);
+    return;
+  }
   if (state.premovable.current) {
     state.premovable.current = undefined;
     callUserFunction(state.premovable.events.unset);
@@ -65,7 +144,7 @@ export function unsetPremove(state: HeadlessState): void {
 }
 
 function setPredrop(state: HeadlessState, role: cg.Role, key: cg.Key): void {
-  unsetPremove(state);
+  unsetPremoveQueue(state);
   state.predroppable.current = { role, key };
   callUserFunction(state.predroppable.events.set, role, key);
 }
@@ -255,7 +334,10 @@ function canDrop(state: HeadlessState, orig: cg.Key, dest: cg.Key): boolean {
 }
 
 function isPremovable(state: HeadlessState, orig: cg.Key): boolean {
-  const piece = state.pieces.get(orig);
+  // When queuing premoves, each subsequent move "sees" the board with the
+  // earlier queued moves already applied, so selection must check the
+  // hypothetical piece board too.
+  const piece = premovePieces(state, orig).get(orig);
   return (
     !!piece &&
     state.premovable.enabled &&
@@ -293,6 +375,40 @@ export function isDraggable(state: HeadlessState, orig: cg.Key): boolean {
 }
 
 export function playPremove(state: HeadlessState): boolean {
+  // Multiple (queue) mode: attempt to play the front premove for real. If it is
+  // legal, pop it off the front and keep the rest of the chain queued for the
+  // next turn. If it has been invalidated by the opponent's move, clear the
+  // entire queue (a broken chain cannot skip ahead to item #2).
+  if (state.premovable.multiple) {
+    const front = state.premovable.queue[0];
+    if (!front) return false;
+    const { orig, dest } = front;
+    let success = false;
+    if (canMove(state, orig, dest)) {
+      const result = baseUserMove(state, orig, dest);
+      if (result) {
+        const metadata: cg.MoveMetadata = { premove: true };
+        if (result !== true) metadata.captured = result;
+        callUserFunction(state.movable.events.after, orig, dest, metadata);
+        success = true;
+      }
+    }
+    if (success) {
+      state.premovable.queue.shift();
+      syncCurrentFromQueue(state);
+      if (state.premovable.queue.length)
+        callUserFunction(state.premovable.events.queueSet, state.premovable.queue);
+      else {
+        callUserFunction(state.premovable.events.unset);
+        callUserFunction(state.premovable.events.queueUnset);
+      }
+    } else {
+      unsetPremoveQueue(state);
+    }
+    return success;
+  }
+
+  // Single-premove mode (existing behavior).
   const move = state.premovable.current;
   if (!move) return false;
   const orig = move[0],
@@ -333,7 +449,7 @@ export function playPredrop(state: HeadlessState, validate: (drop: cg.Drop) => b
 }
 
 export function cancelMove(state: HeadlessState): void {
-  unsetPremove(state);
+  unsetPremoveQueue(state);
   unsetPredrop(state);
   unselect(state);
 }
