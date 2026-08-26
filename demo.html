@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Chessground Demo</title>
+    <title>Chessground Demo — multi-premove queue &amp; knight-move bend</title>
 
     <link rel="stylesheet" type="text/css" href="assets/chessground.base.css" />
     <link rel="stylesheet" type="text/css" href="assets/chessground.brown.css" />
@@ -12,108 +12,182 @@
       body {
         display: flex;
         flex-wrap: wrap;
+        gap: 16px;
+        font-family: system-ui, sans-serif;
       }
-
-      body > div {
+      body > div.board-wrap {
         margin: 10px;
+        max-width: 340px;
       }
-
       .chessground {
-        width: 500px;
-        height: 500px;
+        width: 320px;
+        height: 320px;
       }
-
       cg-board {
         background-color: #bfcfdd;
+      }
+      .label {
+        font-size: 15px;
+        font-weight: 600;
+        margin-bottom: 6px;
+      }
+      .hint {
+        font-size: 12px;
+        color: #555;
+        margin: 6px 0;
+      }
+      button {
+        margin: 4px 4px 0 0;
+        padding: 6px 10px;
+        font-size: 12px;
+      }
+      code {
+        background: #eee;
+        padding: 1px 4px;
+        border-radius: 3px;
       }
     </style>
 
     <script type="module">
       import { Chessground } from './dist/chessground.js';
 
-      Chessground(document.getElementById('board-1'), {});
-      Chessground(document.getElementById('board-2'), {
-        fen: 'r2q2k1/1p6/p2p4/2pN1rp1/N1Pb2Q1/8/PP1B4/R6K b - - 2 25',
-      });
-      Chessground(document.getElementById('board-3'), {
-        drawable: {
-          autoShapes: [
-            {
-              orig: 'a2',
-              dest: 'a6',
-              brush: 'green',
-              label: { text: 'A' },
-              modifiers: {
-                hilite: '#fff',
-              },
-            },
-            {
-              orig: 'b2',
-              dest: 'b6',
-              brush: 'blue',
-              label: { text: 'B' },
-              modifiers: {
-                lineWidth: 6,
-              },
-            },
-            {
-              orig: 'c2',
-              dest: 'c4',
-              brush: 'red',
-              label: { text: 'C' },
-            },
-            {
-              orig: 'd2',
-              dest: 'd3',
-              brush: 'green',
-              label: { text: 'D' },
-            },
-            {
-              orig: 'f1',
-              dest: 'h3',
-              brush: 'blue',
-              label: { text: 'F' },
-            },
-            {
-              orig: 'g1',
-              dest: 'f3',
-              brush: 'yellow',
-              label: { text: 'E' },
-            },
-          ],
+      /* ------------------------------------------------------------------ *
+       * Board 1 — Chess.com-style multi-premove queue
+       * Black is to move; the user (white) may queue a chain of premoves.
+       * ------------------------------------------------------------------ */
+      const mpEl = document.getElementById('board-premove');
+      const mpStatus = document.getElementById('premove-status');
+      const mpGround = Chessground(mpEl, {
+        fen: 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1',
+        turnColor: 'black', // black to move → white can premove
+        movable: {
+          color: 'white',
+          free: true, // demo: treat any premove as legal
+          showDests: true,
+        },
+        premovable: {
+          enabled: true,
+          multiple: true, // <-- the opt-in flag
+          maxQueueLength: 5,
+          showDests: true,
+          events: {
+            set: (orig, dest) => updatePremoveStatus(mpGround),
+            unset: () => updatePremoveStatus(mpGround),
+            queueSet: q => updatePremoveStatus(mpGround),
+            queueUnset: () => updatePremoveStatus(mpGround),
+          },
         },
       });
+
+      function updatePremoveStatus(g) {
+        const q = g.state.premovable.queue;
+        mpStatus.textContent = q.length
+          ? 'Queue: ' + q.map(m => `${m.orig}→${m.dest}`).join(', ')
+          : 'Queue empty — drag or click white pieces to queue premoves.';
+      }
+      updatePremoveStatus(mpGround);
+
+      document.getElementById('mp-play-front').addEventListener('click', () => {
+        mpGround.set({ turnColor: 'white' }); // make it the user's turn
+        const ok = mpGround.playPremove(); // plays (and pops) the front item
+        mpGround.set({ turnColor: 'black' }); // back to opponent's turn for more premoves
+        updatePremoveStatus(mpGround);
+        mpStatus.textContent =
+          (ok ? 'Played a premove. ' : 'Front premove was illegal — queue cleared. ') + mpStatus.textContent;
+      });
+      document.getElementById('mp-pop-last').addEventListener('click', () => {
+        mpGround.popLastPremove();
+        updatePremoveStatus(mpGround);
+      });
+      document.getElementById('mp-clear').addEventListener('click', () => {
+        mpGround.cancelPremoveQueue();
+        updatePremoveStatus(mpGround);
+      });
+
+      /* ------------------------------------------------------------------ *
+       * Board 2 — L-shaped (bent) knight-move arrows
+       * drawable.knightMoveBend: true → knight arrows become a right-angle L.
+       * Right-click drag any shape to draw; knight moves bend.
+       * ------------------------------------------------------------------ */
+      const kbEl = document.getElementById('board-knightbend');
+      const knightShapes = [
+        { orig: 'g1', dest: 'f3', brush: 'green' },
+        { orig: 'b1', dest: 'c3', brush: 'blue' },
+        { orig: 'e2', dest: 'e4', brush: 'yellow' }, // not a knight move → stays straight
+        { orig: 'd1', dest: 'h5', brush: 'red' }, // not a knight move → stays straight
+        { orig: 'f1', dest: 'h3', brush: 'pink' },
+        { orig: 'c1', dest: 'e3', brush: 'purple' },
+      ];
+      const kbGround = Chessground(kbEl, {
+        drawable: {
+          enabled: true,
+          knightMoveBend: true, // <-- the opt-in flag
+          autoShapes: knightShapes,
+        },
+      });
+
+      const kbStatus = document.getElementById('knightbend-status');
+      kbStatus.textContent =
+        'Knight arrows: pink (f1→h3), purple (c1→e3), green (g1→f3), blue (b1→c3) are bent. ' +
+        'Yellow (e2→e4) and red (d1→h5) stay straight. Right-click to draw your own; knight moves bend.';
+
+      const kbToggle = document.getElementById('kb-toggle');
+      kbToggle.textContent = `knightMoveBend: ${kbGround.state.drawable.knightMoveBend}`;
+      kbToggle.addEventListener('click', () => {
+        const next = !kbGround.state.drawable.knightMoveBend;
+        kbGround.set({ drawable: { knightMoveBend: next, autoShapes: knightShapes } });
+        kbToggle.textContent = `knightMoveBend: ${next}`;
+      });
+
+      /* Two extra boards mirroring the existing demo: */
+      Chessground(document.getElementById('board-1'), {});
       Chessground(document.getElementById('board-4'), {
         orientation: 'black',
         coordinatesOnSquares: true,
         ranksPosition: 'left',
       });
-      Chessground(document.getElementById('board-5'), {
-        orientation: 'white',
-        coordinatesOnSquares: true,
-      });
     </script>
   </head>
   <body>
-    <div>
-      basic board, default config
+    <div class="board-wrap">
+      <div class="label">1) Multi-premove queue</div>
+      <div class="hint">
+        Black is to move, so you (white) can queue a <b>chain</b> of premoves. Click or drag a white piece to
+        a square to queue item 1, then another piece for item 2, etc. Each item is validated on a hypothetical
+        board (earlier queued moves already applied). The most recently queued move is the brightest
+        (yellow-green); earlier ones are muted red/orange.
+      </div>
+      <div class="chessground" id="board-premove"></div>
+      <div>
+        <button id="mp-play-front">▶ Play front premove</button>
+        <button id="mp-pop-last">▣ Pop last</button>
+        <button id="mp-clear">✕ Clear queue</button>
+      </div>
+      <div class="hint" id="premove-status"></div>
+    </div>
+
+    <div class="board-wrap">
+      <div class="label">2) L-shaped knight-move arrows</div>
+      <div class="hint">
+        <code>drawable.knightMoveBend</code> is on. Arrows whose origin/destination are a knight's move apart
+        are drawn as a two-segment right angle (origin → pivot → dest) with the arrowhead on the final leg.
+        Non-knight arrows stay straight.
+      </div>
+      <div class="chessground" id="board-knightbend"></div>
+      <div>
+        <button id="kb-toggle">knightMoveBend: true</button>
+      </div>
+      <div class="hint" id="knightbend-status"></div>
+    </div>
+
+    <div class="board-wrap">
+      <div class="label">Basic board, default config</div>
       <div class="chessground" id="board-1"></div>
     </div>
-    <div>
-      board with a fen
-      <div class="chessground" id="board-2"></div>
-    </div>
-    <div>
-      board with fixed arrows + labels
-      <div class="chessground" id="board-3"></div>
-    </div>
-    <div>
-      board with coordinates on-square, ranks position left
+
+    <div class="board-wrap">
+      <div class="label">Board with coordinates on-square, ranks left</div>
       <div class="chessground" id="board-4"></div>
-    </div>
-    <div>
-      board with coordinates on-square
-      <div class="chessground" id="board-5"></div>
     </div>
   </body>
 </html>
