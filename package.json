@@ -28,14 +28,14 @@
     "vitest": "^3.2.6"
   },
   "scripts": {
-    "prepare": "$npm_execpath run compile",
+    "prepare": "npm run compile",
     "compile": "tsc --sourceMap --declaration",
     "lint": "oxlint",
     "lint:fix": "oxlint --fix",
     "format": "oxfmt",
     "check-format": "oxfmt --check",
     "bundle": "esbuild src/chessground.ts --bundle --format=esm --outfile=dist/chessground.min.js --minify",
-    "dist": "$npm_execpath run compile && $npm_execpath run bundle",
+    "dist": "npm run compile && npm run bundle",
     "test": "vitest run",
     "test:watch": "vitest"
   },

@@ -308,6 +308,7 @@ function renderArrow(
       return setAttributes(createElement('path'), {
         d: bentArrowPath(s, from, to, m),
         stroke,
+        fill: 'none',
         'stroke-width': width,
         'stroke-linecap': 'round',
         'stroke-linejoin': 'round',
