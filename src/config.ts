@@ -114,13 +114,46 @@ export function configure(state: HeadlessState, config: Config): void {
   if (config.movable?.dests) state.movable.dests = undefined;
   if (config.drawable?.autoShapes) state.drawable.autoShapes = [];
 
+  // remember premovable mode before merge so we can detect a switch and a new
+  // maxQueueLength: a host switching from single→queue (or vice versa), or
+  // shrinking the cap below the current queue length, must invalidate stale
+  // queue entries so callers don't act on impossible chains.
+  const prevMultiple = state.premovable.multiple;
+  const prevMax = state.premovable.maxQueueLength;
+
   deepMerge(state, config);
 
-  // if a fen was provided, replace the pieces
+  // Normalize maxQueueLength: non-positive values are treated as 1.
+  if (!Number.isFinite(state.premovable.maxQueueLength) || state.premovable.maxQueueLength < 1) {
+    state.premovable.maxQueueLength = 1;
+  }
+
+  // If a fen was provided, replace the pieces. The queued premoves are *not*
+  // cleared here: like the classic single premove, a chain is speculative by
+  // nature and the host re-validates it against `movable.dests` when it calls
+  // playPremove() after the board changes. Clearing on every FEN update would
+  // make multi-premove chains impossible in real online play, where the
+  // opponent's move arrives as a fresh FEN just before the user's turn. Hosts
+  // that replace the whole board (new game, analysis navigation, etc.) should
+  // cancel the queue explicitly via api.cancelPremoveQueue().
   if (config.fen) {
     state.pieces = fenRead(config.fen);
     state.drawable.shapes = config.drawable?.shapes || [];
   }
+
+  // Switching between single and queue mode also invalidates any saved premove.
+  if (config.premovable && config.premovable.multiple !== undefined && config.premovable.multiple !== prevMultiple) {
+    state.premovable.queue = [];
+    state.premovable.current = undefined;
+  }
+
+  // If the cap was lowered below the current queue length, truncate.
+  if (state.premovable.queue.length > state.premovable.maxQueueLength) {
+    state.premovable.queue.length = state.premovable.maxQueueLength;
+    const front = state.premovable.queue[0];
+    state.premovable.current = front ? [front.orig, front.dest] : undefined;
+  }
+  void prevMax;
 
   // apply config values that could be undefined yet meaningful
   if ('check' in config) setCheck(state, config.check || false);

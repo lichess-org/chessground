@@ -87,7 +87,25 @@ export function renderWrap(element: HTMLElement, s: HeadlessState): Elements {
     container.appendChild(ghost);
   }
 
-  return { board, container, wrap: element, ghost, shapes, shapesBelow, custom, customBelow, autoPieces };
+  // Virtual premove pieces layer: dedicated DOM sibling for the chess.com-style
+  // chain visualisation. Sits above normal pieces (so destination shows the
+  // moved piece) and below the drag ghost; pointer-events are disabled in CSS
+  // so it never interferes with hit testing.
+  const premovePieces = createEl('cg-premove-pieces');
+  container.appendChild(premovePieces);
+
+  return {
+    board,
+    container,
+    wrap: element,
+    ghost,
+    shapes,
+    shapesBelow,
+    custom,
+    customBelow,
+    autoPieces,
+    premovePieces,
+  };
 }
 
 function svgContainer(cls: string, isShapes: boolean) {

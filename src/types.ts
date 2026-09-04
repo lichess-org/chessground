@@ -27,7 +27,14 @@ export type KeyPair = [Key, Key];
 export interface Premove {
   orig: Key;
   dest: Key;
+  role?: Role; // optional piece role (for promotion validation / rendering)
+  promotion?: Role; // optional promotion target (e.g. 'queen')
 }
+
+// purely derived: authoritative pieces with all queued premoves applied in order.
+// used for rendering the virtual layer and for computing subsequent destinations,
+// without ever mutating state.pieces.
+export type PremovePieces = Pieces;
 
 export type NumberPair = [number, number];
 
@@ -52,6 +59,7 @@ export interface Elements {
   shapesBelow?: SVGElement;
   customBelow?: SVGElement;
   autoPieces?: HTMLElement;
+  premovePieces?: HTMLElement;
 }
 export interface Dom {
   elements: Elements;
@@ -72,6 +80,7 @@ export interface MoveMetadata {
   holdTime?: number;
   captured?: Piece;
   predrop?: boolean;
+  promotion?: Role;
 }
 export interface SetPremoveMetadata {
   ctrlKey?: boolean;

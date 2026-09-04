@@ -271,3 +271,42 @@ cg-board square.premove-queue-7 {
 cg-board square.premove-queue-8 {
   background-color: var(--premove-queue-color-8);
 }
+
+/* Virtual premove pieces layer.
+   - Sits above the authoritative piece layer so the destination shows the
+     moved piece, and below the drag ghost (z-index 11).
+   - pointer-events: none so the layer never blocks the underlying board
+     hit-testing; clicks/drags still target the authoritative nodes. */
+.cg-wrap cg-premove-pieces {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 6;
+}
+
+.cg-wrap cg-premove-pieces piece {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 12.5%;
+  height: 12.5%;
+  background-size: cover;
+  will-change: transform;
+  pointer-events: none;
+  opacity: 0.85;
+}
+
+.cg-wrap cg-premove-pieces piece.dragging {
+  z-index: 11 !important;
+}
+
+/* While a virtual piece is rendered at the destination, the corresponding
+   authoritative source node should be hidden visually (it still exists in the
+   DOM for hit-testing on a drag from the original square). The class is
+   toggled on authoritative piece nodes by the premove-pieces renderer. */
+.cg-wrap cg-board piece.premove-source {
+  visibility: hidden;
+}

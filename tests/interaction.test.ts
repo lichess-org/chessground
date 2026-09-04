@@ -72,7 +72,7 @@ test('single-premove mode holds exactly one premove (queue stays empty)', () => 
   expect(ground.state.premovable.queue).toEqual([]);
 });
 
-test('reconfiguring via set() preserves multiple/maxQueueLength and the queue', () => {
+test('reconfiguring via set() preserves multiple/maxQueueLength and the queue across FEN', () => {
   const ground = makeBoard({
     fen: BOARD_FEN,
     turnColor: 'black',
@@ -83,7 +83,9 @@ test('reconfiguring via set() preserves multiple/maxQueueLength and the queue', 
   click('e2');
   click('e4');
   expect(ground.state.premovable.queue.length).toBe(1);
-  // A typical host reconfigures on every turn, often without re-passing premovable.
+  // A host reconfiguring on every turn re-sends the FEN before it calls
+  // playPremove(). The chain must survive the FEN update so it can be
+  // validated against the new position at play time.
   ground.set({ fen: BOARD_FEN, turnColor: 'black', movable: { color: 'white', dests: new Map() } });
   expect(ground.state.premovable.multiple).toBe(true);
   expect(ground.state.premovable.maxQueueLength).toBe(4);

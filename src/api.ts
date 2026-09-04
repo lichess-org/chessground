@@ -123,6 +123,16 @@ export function start(state: State, redrawAll: cg.Redraw): Api {
     },
 
     playPremove(): boolean {
+      // In queue (multiple) mode, only the front premove can be played, and only
+      // when there's actually something in the queue. The internal `current` may
+      // be stale during config transitions, so we gate on the queue length
+      // rather than `current` here.
+      if (state.premovable.multiple) {
+        if (!state.premovable.queue.length) return false;
+        if (anim(board.playPremove, state)) return true;
+        state.dom.redraw();
+        return false;
+      }
       if (state.premovable.current) {
         if (anim(board.playPremove, state)) return true;
         // if the premove couldn't be played, redraw to clear it up

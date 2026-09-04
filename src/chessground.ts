@@ -2,6 +2,7 @@ import { type Api, start } from './api.js';
 import * as autoPieces from './autoPieces.js';
 import { type Config, configure } from './config.js';
 import * as events from './events.js';
+import * as premovePiecesLayer from './premovePieces.js';
 import { render, renderResized, updateBounds } from './render.js';
 import { defaults, type HeadlessState, type State } from './state.js';
 import * as svg from './svg.js';
@@ -25,12 +26,14 @@ export function Chessground(element: HTMLElement, config?: Config): Api {
       bounds = util.memo(() => elements.board.getBoundingClientRect()),
       redrawNow = (skipSvg?: boolean): void => {
         render(state);
+        if (elements.premovePieces) premovePiecesLayer.render(state, elements.premovePieces);
         if (elements.autoPieces) autoPieces.render(state, elements.autoPieces);
         if (!skipSvg && elements.shapes) svg.renderSvg(state, elements);
       },
       onResize = (): void => {
         updateBounds(state);
         renderResized(state);
+        if (elements.premovePieces) premovePiecesLayer.renderResized(state);
         if (elements.autoPieces) autoPieces.renderResized(state);
       };
     const state = maybeState as State;
