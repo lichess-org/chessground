@@ -179,10 +179,6 @@ test('switching from single to multiple (or vice versa) clears the queue', () =>
 });
 
 test('Api.playPremove returns false when the queue is empty even if current is set', () => {
-  const pieces: cg.Pieces = new Map([
-    ['e2', { role: 'pawn', color: 'white' }],
-    ['e1', { role: 'king', color: 'white' }],
-  ]);
   const ground = makeBoard({
     fen: '8/8/8/8/8/8/4P3/4K3 b - - 0 1',
     turnColor: 'black',
@@ -221,7 +217,7 @@ test('virtual layer renders the moved piece at the destination and hides the sou
   expect(hiddenKeys).toEqual(['e2', 'g1']);
 });
 
-test('drag from a virtual destination retargets the owning queue stage, preserving its origin', async () => {
+test('drag from a virtual destination extends the chain from that square', async () => {
   const ground = makeBoard({
     fen: BOARD_FEN,
     turnColor: 'black',
@@ -235,8 +231,11 @@ test('drag from a virtual destination retargets the owning queue stage, preservi
   click('g1');
   click('f3');
   ground.state.dom.redrawNow();
-  // Drag the virtual knight on f3 onto g5. The knight's true origin is g1, so
-  // the stage that used to read g1→f3 is retargeted to g1→g5.
+  // Drag the virtual knight on f3 onto g5. f3 is not a queued origin yet, so
+  // this behaves exactly like clicking f3 then g5: the move is appended as a
+  // new hop (knight g1→f3, then f3→g5) rather than replacing the earlier
+  // stage. The intermediate square f3 is superseded visually — the knight is
+  // drawn once, at its final queued square (g5).
   const [x0, y0] = centerOf('f3');
   const [x1, y1] = centerOf('g5');
   const b = document.querySelector('cg-board')!;
@@ -246,11 +245,13 @@ test('drag from a virtual destination retargets the owning queue stage, preservi
   await new Promise(r => requestAnimationFrame(() => r(null)));
   document.dispatchEvent(mdoc('mouseup', x1, y1));
   ground.state.dom.redrawNow();
-  // Stage 0 is preserved; stage 1 is retargeted to g1→g5.
+  // Stages 0–1 are preserved; stage 2 continues the chain from f3.
   expect(ground.state.premovable.queue).toEqual([
     { orig: 'e2', dest: 'e4' },
-    { orig: 'g1', dest: 'g5' },
+    { orig: 'g1', dest: 'f3' },
+    { orig: 'f3', dest: 'g5' },
   ]);
+  expect(ground.state.premovable.current).toEqual(['e2', 'e4']);
   const layer = ground.state.dom.elements.premovePieces!;
   const virtual = Array.from(layer.querySelectorAll('piece')) as cg.PieceNode[];
   expect(virtual.map(n => n.cgKey).sort()).toEqual(['e4', 'g5']);
@@ -260,6 +261,48 @@ test('drag from a virtual destination retargets the owning queue stage, preservi
   // Authoritative state.pieces and FEN remain untouched.
   expect(ground.state.pieces.get('e4')).toBeUndefined();
   expect(ground.state.pieces.get('g5')).toBeUndefined();
+  expect(ground.getFen()).toBe(BOARD_FEN.split(' ')[0]);
+});
+
+test('drag from a queued origin retargets that stage and drops later hops', async () => {
+  const ground = makeBoard({
+    fen: BOARD_FEN,
+    turnColor: 'black',
+    movable: { color: 'white', dests: new Map() },
+    premovable: { enabled: true, multiple: true, showDests: true },
+    trustAllEvents: true,
+  });
+  // Queue two premoves via click-click.
+  click('e2');
+  click('e4');
+  click('g1');
+  click('f3');
+  ground.state.dom.redrawNow();
+  // Drag the knight from its real origin g1 onto h3. g1 is already used as an
+  // origin by stage 1, so re-queueing from it replaces that stage (and any
+  // hops queued after it) with g1→h3.
+  const [x0, y0] = centerOf('g1');
+  const [x1, y1] = centerOf('h3');
+  const b = document.querySelector('cg-board')!;
+  b.dispatchEvent(mdoc('mousedown', x0, y0));
+  document.dispatchEvent(mdoc('mousemove', x1, y1));
+  // Wait for the next animation frame used by processDrag.
+  await new Promise(r => requestAnimationFrame(() => r(null)));
+  document.dispatchEvent(mdoc('mouseup', x1, y1));
+  ground.state.dom.redrawNow();
+  // Stage 0 is preserved; stage 1 is retargeted to g1→h3.
+  expect(ground.state.premovable.queue).toEqual([
+    { orig: 'e2', dest: 'e4' },
+    { orig: 'g1', dest: 'h3' },
+  ]);
+  const layer = ground.state.dom.elements.premovePieces!;
+  const virtual = Array.from(layer.querySelectorAll('piece')) as cg.PieceNode[];
+  expect(virtual.map(n => n.cgKey).sort()).toEqual(['e4', 'h3']);
+  const boardEl = ground.state.dom.elements.board;
+  const hidden = Array.from(boardEl.querySelectorAll('piece.premove-source')) as cg.PieceNode[];
+  expect(hidden.map(n => n.cgKey).sort()).toEqual(['e2', 'g1']);
+  // Authoritative state.pieces and FEN remain untouched.
+  expect(ground.state.pieces.get('h3')).toBeUndefined();
   expect(ground.getFen()).toBe(BOARD_FEN.split(' ')[0]);
 });
 
