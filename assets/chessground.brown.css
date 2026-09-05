@@ -62,3 +62,10 @@ coords.squares:nth-of-type(odd) :nth-child(odd),
 coords.squares:nth-of-type(even) :nth-child(even) {
   color: rgba(255, 255, 255, 0.8);
 }
+
+/* // */
+cg-board piece.premove-source { visibility: hidden; }
+cg-board square.premove-queue-1 { background-color: rgba(220, 60, 60, .6); }
+cg-board square.premove-queue-2 { background-color: rgba(60, 120, 220, .6); }
+/* ... تا 8 */
+cg-board square.premove-queue-via { opacity: .7; }

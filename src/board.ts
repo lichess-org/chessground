@@ -1,4 +1,4 @@
-import { applyMoveToPieces, premove, premovePieces } from './premove.js';
+import { premove, premovePieces } from './premove.js';
 import { type HeadlessState } from './state.js';
 import type * as cg from './types.js';
 import {
@@ -61,50 +61,30 @@ function setPremove(state: HeadlessState, orig: cg.Key, dest: cg.Key, meta: cg.S
   callUserFunction(state.premovable.events.set, orig, dest, meta);
 }
 
-function addToPremoveQueue(
-  state: HeadlessState,
-  orig: cg.Key,
-  dest: cg.Key,
-  promotion?: cg.Role,
-  reroute?: boolean,
-): void {
+function addToPremoveQueue(state: HeadlessState, orig: cg.Key, dest: cg.Key, promotion?: cg.Role): void {
   const queue = state.premovable.queue;
-  // Re-queueing a move that starts from an origin already used by an earlier
-  // queued item invalidates that item and everything queued after it (they were
-  // computed on a board where that piece was elsewhere), so truncate from there.
-  // Drag from a virtual destination (reroute=true) additionally lets the
-  // caller re-route by clicking a square the queue has previously placed a
-  // piece on.
-  let idx = queue.findIndex(item => item.orig === orig);
-  if (idx === -1 && reroute && !state.pieces.has(orig)) {
-    let live: cg.Pieces = state.pieces;
-    for (let i = 0; i < queue.length; i++) {
-      const item = queue[i];
-      if (!live.has(item.orig)) break;
-      const before = live;
-      live = applyMoveToPieces(live, item.orig, item.dest, { promotion: item.promotion });
-      if (live.has(orig) && before !== live) {
-        idx = i;
-        break;
-      }
-    }
-  }
+  // Re-queueing a move whose origin is already used by an earlier queued
+  // item invalidates that item and everything queued after it (they were
+  // computed on a board where that piece was elsewhere), so truncate from
+  // there and start again.
+  //
+  // This single rule is also what makes chain-building behave identically
+  // whether the piece is continued by click or by drag: continuing a piece
+  // from its *current* virtual position always targets a square that has
+  // never itself been used as a queued origin yet, so `idx` below is -1 and
+  // the move is simply appended — extending the chain by one more hop,
+  // exactly like re-selecting the piece and clicking a new square does.
+  // (An earlier version special-cased drags from a virtual square by
+  // resolving back to that hop's "true" origin and *replacing* it instead
+  // of appending — which silently collapsed a 3-square chain into a single
+  // direct hop the moment a drag was used to extend it. Re-queueing from an
+  // origin that's already in the queue — including the piece's real,
+  // never-yet-moved square — still correctly truncates and replaces from
+  // there, via the branch below; that part needs no special-casing at all.)
+  const idx = queue.findIndex(item => item.orig === orig);
   if (idx !== -1) {
-    if (reroute && queue[idx].orig !== orig) {
-      // The drag started on a square that only holds a piece on the virtual
-      // board — the destination of an earlier queued item. Keep that item's
-      // true origin and retarget its destination instead of orphaning the
-      // piece (nothing would ever move it onto `orig`). Items queued after it
-      // were computed against the old destination and are dropped.
-      const replacement = { orig: queue[idx].orig, dest, ...(promotion ? { promotion } : {}) };
-      queue.length = idx;
-      queue.push(replacement);
-    } else {
-      // Re-queueing from an origin already used by an earlier item replaces
-      // that item and everything queued after it.
-      queue.length = idx;
-      queue.push(promotion ? { orig, dest, promotion } : { orig, dest });
-    }
+    queue.length = idx;
+    queue.push(promotion ? { orig, dest, promotion } : { orig, dest });
   } else {
     // Respect the maximum queue length (normalised to at least 1).
     const cap = Math.max(1, state.premovable.maxQueueLength | 0);
@@ -276,10 +256,9 @@ export function userMove(
   state: HeadlessState,
   orig: cg.Key,
   dest: cg.Key,
-  opts: { promotion?: cg.Role; reroute?: boolean } = {},
+  opts: { promotion?: cg.Role } = {},
 ): boolean {
   const promotion = opts.promotion;
-  const reroute = opts.reroute === true;
   if (canMove(state, orig, dest)) {
     const result = baseUserMove(state, orig, dest);
     if (result) {
@@ -296,7 +275,7 @@ export function userMove(
       return true;
     }
   } else if (canPremove(state, orig, dest)) {
-    if (state.premovable.multiple && (promotion || reroute)) addToPremoveQueue(state, orig, dest, promotion, reroute);
+    if (state.premovable.multiple) addToPremoveQueue(state, orig, dest, promotion);
     else setPremove(state, orig, dest, { ctrlKey: state.stats.ctrlKey });
     unselect(state);
     return true;
@@ -416,10 +395,19 @@ function canPredrop(state: HeadlessState, orig: cg.Key, dest: cg.Key): boolean {
 }
 
 export function isDraggable(state: HeadlessState, orig: cg.Key): boolean {
-  // In multiple (queue) mode a drag can also start from a virtual destination —
-  // a square that only holds a piece on the hypothetical board after the queued
-  // moves are applied. Fall back to premovePieces() so reroute drags work.
-  const piece = state.pieces.get(orig) ?? (state.premovable.multiple && premovePieces(state, orig).get(orig));
+  // In multiple (queue) mode, prefer the hypothetical (queue-applied) board
+  // over the real one: if `orig` is currently the destination of a queued
+  // premove, the queued piece is what's actually shown there and what a
+  // drag should pick up — even when a real piece also still occupies that
+  // square. That includes a capture, and specifically a "defensive" premove
+  // onto one of the player's own pieces in anticipation of the opponent
+  // taking it first, where the real board keeps the friendly piece in place
+  // right up until the premove actually executes. Checking the real board
+  // first (as this used to) would grab that stale friendly piece instead of
+  // the queued attacker, making the attacker impossible to premove further.
+  const piece = state.premovable.multiple
+    ? (premovePieces(state, orig).get(orig) ?? state.pieces.get(orig))
+    : state.pieces.get(orig);
   return (
     !!piece &&
     state.draggable.enabled &&

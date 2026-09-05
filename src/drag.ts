@@ -30,18 +30,18 @@ export function start(s: State, e: cg.MouchEvent): void {
     position = util.eventPosition(e)!,
     orig = board.getKeyAtDomPos(position, board.whitePov(s), bounds);
   if (!orig) return;
-  // Look up the piece on the virtual (queued) board first so dragging from a
-  // chess.com-style virtual destination drags the right piece. Fall back to
-  // the authoritative board when there is no virtual piece there.
-  const virtual = fullPremovePieces(s);
-  let piece: cg.Piece | undefined;
-  let premoveStage: number | undefined;
-  if (virtual.has(orig) && !s.pieces.has(orig)) {
-    piece = virtual.get(orig);
-    premoveStage = stageAt(s, orig);
-  } else {
-    piece = s.pieces.get(orig);
-  }
+  // Prioritise the virtual (queued) board whenever `orig` is currently the
+  // destination of some queued premove, even when a real piece also still
+  // sits there — a capture, including a "defensive" premove onto one of the
+  // player's own pieces in anticipation of the opponent taking it first (the
+  // real board keeps that friendly piece in place until the premove actually
+  // executes). stageAt() is the source of truth for "is a queued piece
+  // actually shown here right now" — it returns undefined once the chain has
+  // moved further and superseded this square, so falling back to the
+  // authoritative board in that case is correct too (there's nothing virtual
+  // left to grab there).
+  const premoveStage = stageAt(s, orig);
+  const piece = premoveStage !== undefined ? fullPremovePieces(s).get(orig) : s.pieces.get(orig);
   const previouslySelected = s.selected;
   if (
     !previouslySelected &&
@@ -234,10 +234,11 @@ export function end(s: State, e: cg.MouchEvent): void {
     if (cur.newPiece) board.dropNewPiece(s, cur.orig, dest, cur.force);
     else {
       s.stats.ctrlKey = e.ctrlKey;
-      // Drags from a virtual piece layer entry are reroutes: the queue stage
-      // whose virtual dest was the drag origin should be replaced.
-      if (board.userMove(s, cur.orig, dest, { reroute: cur.premoveStage !== undefined }))
-        s.stats.dragged = true;
+      // A drag from a virtual (queued) piece layer entry lands here with
+      // cur.orig equal to that piece's current virtual square; userMove()
+      // treats that exactly like clicking the piece and clicking dest — it
+      // extends the chain by one more hop from wherever it's called with.
+      if (board.userMove(s, cur.orig, dest)) s.stats.dragged = true;
     }
   } else if (cur.newPiece) {
     s.pieces.delete(cur.orig);

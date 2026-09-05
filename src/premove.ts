@@ -117,18 +117,12 @@ export function applyMoveToPieces(
  */
 export function premovePieces(state: HeadlessState, orig?: cg.Key): cg.Pieces {
   if (!state.premovable.multiple) return state.pieces;
-  const queue = state.premovable.queue;
-  const idx = orig === undefined ? -1 : queue.findIndex(item => item.orig === orig);
-  const effective = idx === -1 ? queue : queue.slice(0, idx);
-  let pieces: cg.Pieces = state.pieces;
-  for (const item of effective) {
-    const before = pieces;
-    pieces = applyMoveToPieces(pieces, item.orig, item.dest, { promotion: item.promotion });
-    // If the origin disappeared (capture, en-passant, castling relocation
-    // removing a piece from orig) then the chain is broken from this point on.
-    if (pieces === before && !before.has(item.orig)) break;
-  }
-  return pieces;
+  const cut = orig === undefined ? state.premovable.queue.length : premoveCutIndex(state, orig);
+  const truncated: HeadlessState = {
+    ...state,
+    premovable: { ...state.premovable, queue: state.premovable.queue.slice(0, cut) },
+  };
+  return computeVirtualBoard(truncated).pieces;
 }
 
 /**
@@ -137,13 +131,7 @@ export function premovePieces(state: HeadlessState, orig?: cg.Key): cg.Pieces {
  * `state.pieces`. Stops at the first broken item.
  */
 export function fullPremovePieces(state: HeadlessState): cg.Pieces {
-  let pieces: cg.Pieces = state.pieces;
-  for (const item of state.premovable.queue) {
-    const before = pieces;
-    pieces = applyMoveToPieces(pieces, item.orig, item.dest, { promotion: item.promotion });
-    if (pieces === before && !before.has(item.orig)) break;
-  }
-  return pieces;
+  return computeVirtualBoard(state).pieces;
 }
 
 function premoveFromState(state: HeadlessState, pieces: cg.Pieces, key: cg.Key): cg.Key[] {
@@ -175,4 +163,78 @@ function premoveFromState(state: HeadlessState, pieces: cg.Pieces, key: cg.Key):
 
 export function premove(state: HeadlessState, key: cg.Key): cg.Key[] {
   return premoveFromState(state, premovePieces(state, key), key);
+}
+
+export interface VirtualBoard {
+  /** تخته‌ی فرضی بعد از اعمال بخش معتبر صف */
+  pieces: cg.Pieces;
+  /** key → آخرین stage ای که مهره‌ای روی این خونه گذاشته */
+  placedBy: Map<cg.Key, number>;
+  /** خونه‌هایی که رخِ قلعه در آن‌ها نشسته (نه dest خود آیتم) */
+  castlingRooks: Set<cg.Key>;
+  /** تعداد آیتم‌هایی که با موفقیت اعمال شدند (زنجیره از این‌جا به بعد شکسته) */
+  validStages: number;
+}
+
+/**
+ * صف را stage به stage اعمال می‌کند و علاوه بر تخته‌ی نهایی، برای هر خونه
+ * ثبت می‌کند چه stage ای آن را پر کرده. تشخیص تغییر با identity مهره است،
+ * چون applyMoveToPieces آبجکت‌های دست‌نخورده را همان‌طور کپی می‌کند.
+ */
+export function computeVirtualBoard(state: HeadlessState): VirtualBoard {
+  const placedBy = new Map<cg.Key, number>();
+  const castlingRooks = new Set<cg.Key>();
+  let pieces: cg.Pieces = state.pieces;
+  let validStages = 0;
+  if (!state.premovable.multiple) return { pieces, placedBy, castlingRooks, validStages };
+
+  const queue = state.premovable.queue;
+  for (let i = 0; i < queue.length; i++) {
+    const item = queue[i];
+    const before = pieces;
+    if (!before.has(item.orig)) break; // زنجیره شکسته
+    pieces = applyMoveToPieces(before, item.orig, item.dest, { promotion: item.promotion });
+    validStages = i + 1;
+
+    // خونه‌هایی که خالی شدند (مبدأ، رخ قلعه از h1/a1، پیاده‌ی آن‌پاسان)
+    for (const [k] of before) {
+      if (!pieces.has(k)) {
+        placedBy.delete(k);
+        castlingRooks.delete(k);
+      }
+    }
+    // خونه‌هایی که محتوایشان عوض شد (dest، خونه‌ی جدید رخ، ارتقا)
+    for (const [k, p] of pieces) {
+      if (before.get(k) === p) continue;
+      placedBy.set(k, i);
+      if (k === item.dest) castlingRooks.delete(k);
+      else castlingRooks.add(k);
+    }
+  }
+  return { pieces, placedBy, castlingRooks, validStages };
+}
+
+/** مهره‌ای که «روی تخته‌ی فرضی» در این خونه است (منبع حقیقت برای انتخاب/درگ) */
+export function virtualPieceAt(state: HeadlessState, key: cg.Key): cg.Piece | undefined {
+  return computeVirtualBoard(state).pieces.get(key);
+}
+
+/**
+ * وقتی کاربر از `orig` پیش‌حرکت جدید می‌زند، صف باید تا کجا نگه داشته شود؟
+ * از آخر صف به عقب می‌گردیم و به اولین رخدادِ مربوط به این خونه نگاه می‌کنیم:
+ *  - آخرین رخداد «ورود» بود (dest) → مهره‌ی روی این خونه همان مهره‌ی صف است → ادامه‌ی زنجیره؛ کل صف می‌ماند
+ *  - آخرین رخداد «خروج» بود (orig) → کاربر دارد همان آیتم را از نو مسیریابی می‌کند → از همان‌جا برش
+ *  - هیچ‌کدام → کل صف می‌ماند
+ *
+ * (findIndex(item.orig === orig) قبلی اشتباه بود: اگر خونه بعداً دوباره پر شده
+ * باشد، برش از اولین خروج باعث می‌شد مهره‌ی اشتباه دیده شود و نشود ادامه داد.)
+ */
+export function premoveCutIndex(state: HeadlessState, orig: cg.Key): number {
+  const queue = state.premovable.queue;
+  for (let i = queue.length - 1; i >= 0; i--) {
+    const item = queue[i];
+    if (item.dest === orig) return queue.length;
+    if (item.orig === orig) return i;
+  }
+  return queue.length;
 }
