@@ -17,6 +17,7 @@ export interface DragCurrent {
   previouslySelected?: cg.Key;
   originTarget: EventTarget | null;
   keyHasChanged: boolean; // whether the drag has left the orig key
+  rafPending?: boolean;
 }
 
 export function start(s: State, e: cg.MouchEvent): void {
@@ -117,9 +118,13 @@ export function dragNewPiece(s: State, piece: cg.Piece, e: cg.MouchEvent, force?
 }
 
 function processDrag(s: State): void {
+  const current = s.draggable.current;
+  if (!current || current.rafPending) return;
+  current.rafPending = true;
   requestAnimationFrame(() => {
     const cur = s.draggable.current;
     if (!cur) return;
+    cur.rafPending = false;
     // cancel animations while dragging
     if (s.animation.current?.plan.anims.has(cur.orig)) s.animation.current = undefined;
     // if moving piece is gone, cancel
@@ -148,7 +153,6 @@ function processDrag(s: State): void {
         else cur.keyHasChanged ||= cur.orig !== board.getKeyAtDomPos(cur.pos, board.whitePov(s), bounds);
       }
     }
-    processDrag(s);
   });
 }
 
@@ -188,6 +192,7 @@ export function move(s: State, e: cg.MouchEvent): void {
   // support one finger touch only
   if (s.draggable.current && (!e.touches || e.touches.length < 2)) {
     s.draggable.current.pos = util.eventPosition(e)!;
+    processDrag(s);
   }
 }
 
