@@ -198,6 +198,7 @@ export function defaults(): HeadlessState {
         pink: { key: 'pink', color: '#ee2080', opacity: 0.5, lineWidth: 10 },
         white: { key: 'white', color: 'white', opacity: 1, lineWidth: 10 },
         paleWhite: { key: 'pwhite', color: 'white', opacity: 0.6, lineWidth: 10 },
+        variation: { key: 'variation', color: 'white', opacity: 0.5, lineWidth: 12 },
       },
       prevSvgHash: '',
     },

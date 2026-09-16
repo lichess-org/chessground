@@ -213,7 +213,10 @@ function renderShape(
 
     if (from[0] !== to[0] || from[1] !== to[1])
       el.appendChild(renderArrow(shape, brush, from, to, current, isShort(shape.dest, dests), pendingErase));
-    else el.appendChild(renderCircle(brushes[shape.brush!], from, current, bounds, pendingErase));
+    else
+      el.appendChild(
+        renderCircle(brushes[shape.brush!], from, current, bounds, pendingErase, shape.modifiers?.hilite),
+      );
   }
   if (shape.label) {
     const label = shape.label;
@@ -238,18 +241,28 @@ function renderCircle(
   current: boolean,
   bounds: DOMRectReadOnly,
   pendingErase: boolean,
+  hiliteColor?: string,
 ): SVGElement {
   const widths = circleWidth(),
     radius = (bounds.width + bounds.height) / (4 * Math.max(bounds.width, bounds.height));
-  return setAttributes(createElement('circle'), {
-    stroke: brush.color,
-    'stroke-width': widths[current ? 0 : 1],
-    fill: 'none',
-    opacity: opacity(brush, current, pendingErase),
-    cx: at[0],
-    cy: at[1],
-    r: radius - widths[1] / 2,
-  });
+  function renderOneCircle(isHilite: boolean) {
+    return setAttributes(createElement('circle'), {
+      stroke: isHilite ? hiliteColor : brush.color,
+      'stroke-width': widths[current ? 0 : 1] * (isHilite ? 2 : 1),
+      fill: 'none',
+      opacity: hiliteColor && !pendingErase ? 1 : opacity(brush, current, pendingErase),
+      cx: at[0],
+      cy: at[1],
+      r: radius - widths[1] / 2,
+    });
+  }
+  if (!hiliteColor) return renderOneCircle(false);
+  const g = setAttributes(createElement('g'), { opacity: brush.opacity });
+  const blurred = setAttributes(createElement('g'), { filter: 'url(#cg-filter-blur)' });
+  blurred.appendChild(renderOneCircle(true));
+  g.appendChild(blurred);
+  g.appendChild(renderOneCircle(false));
+  return g;
 }
 
 function renderArrow(
