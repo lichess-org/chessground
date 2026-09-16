@@ -1,6 +1,7 @@
 {
   "$schema": "./node_modules/oxlint/configuration_schema.json",
   "plugins": ["import", "promise", "typescript", "unicorn"],
+  "jsPlugins": [{ "name": "golden", "specifier": "oxlint-plugin-golden" }],
   "ignorePatterns": [],
   "rules": {
     "branches-sharing-code": "error",
@@ -37,6 +38,9 @@
       "error",
       { "allowSeparatedGroups": true, "ignoreDeclarationSort": true, "ignoreCase": true }
     ],
+    "golden/no-object-parameters": "error",
+    "golden/no-redundant-optional-undefined": "error",
+    "golden/no-unknown-returns": "error",
     "import/default": "error",
     "import/namespace": "error",
     "import/no-cycle": ["error", { "maxDepth": 3 }],
