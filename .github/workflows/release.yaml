@@ -4,12 +4,12 @@ on:
   workflow_dispatch:
     inputs:
       version:
-        description: "Version tag (e.g. v1.2.3)"
+        description: 'Version tag (e.g. v1.2.3)'
         required: true
       description:
-        description: "Description"
+        description: 'Description'
         required: false
-        default: ""
+        default: ''
 
 jobs:
   release:
