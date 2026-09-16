@@ -107,11 +107,27 @@ function tryAutoCastle(state: HeadlessState, orig: cg.Key, dest: cg.Key): boolea
   return true;
 }
 
+function tryEnPassant(state: HeadlessState, orig: cg.Key, dest: cg.Key): cg.Piece | undefined {
+  const origPiece = state.pieces.get(orig);
+  if (!origPiece || origPiece.role !== 'pawn') return undefined;
+  const origPos = key2pos(orig);
+  const destPos = key2pos(dest);
+  if (origPos[0] === destPos[0]) return undefined;
+  if (state.pieces.has(dest)) return undefined;
+  const captureKey = pos2key([destPos[0], origPos[1]]);
+  if (!captureKey) return undefined;
+  const captured = state.pieces.get(captureKey);
+  if (!captured || captured.color === origPiece.color || captured.role !== 'pawn') return undefined;
+  state.pieces.delete(captureKey);
+  return captured;
+}
+
 export function baseMove(state: HeadlessState, orig: cg.Key, dest: cg.Key): cg.Piece | boolean {
   const origPiece = state.pieces.get(orig),
     destPiece = state.pieces.get(dest);
   if (orig === dest || !origPiece) return false;
-  const captured = destPiece && destPiece.color !== origPiece.color ? destPiece : undefined;
+  const captured =
+    destPiece && destPiece.color !== origPiece.color ? destPiece : tryEnPassant(state, orig, dest);
   if (dest === state.selected) unselect(state);
   callUserFunction(state.events.move, orig, dest, captured);
   if (!tryAutoCastle(state, orig, dest)) {
