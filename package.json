@@ -20,12 +20,13 @@
   },
   "devDependencies": {
     "esbuild": "^0.28.1",
-    "jsdom": "^26.1.0",
-    "oxfmt": "^0.57.0",
-    "oxlint": "^1.72.0",
-    "oxlint-tsgolint": "^0.24.0",
-    "typescript": "^5.9.3",
-    "vitest": "^3.2.6"
+    "jsdom": "^30.0.1",
+    "oxfmt": "0.61.0",
+    "oxlint": "1.79.0",
+    "oxlint-plugin-golden": "^0.1.2",
+    "oxlint-tsgolint": "7.0.2001",
+    "typescript": "^7.0.2",
+    "vitest": "^4.1.11"
   },
   "scripts": {
     "prepare": "$npm_execpath run compile",
@@ -61,9 +62,9 @@
     "url": "https://github.com/lichess-org/chessground/issues"
   },
   "funding": "https://lichess.org/patron",
-  "packageManager": "pnpm@11.5.1",
+  "packageManager": "pnpm@12.3.4",
   "engines": {
-    "node": ">=22",
-    "pnpm": "11"
+    "node": ">=24",
+    "pnpm": ">=12"
   }
 }
