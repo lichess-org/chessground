@@ -167,7 +167,7 @@ function nextArrowNumber(shapes: DrawShape[]): number {
   let max = 0;
   for (const s of shapes) {
     if (!s.dest || !s.label) continue;
-    max = Math.max(max, parseInt(s.label.text, 10) || 0);
+    max = Math.max(max, Number.parseInt(s.label.text, 10) || 0);
   }
   return max + 1;
 }
