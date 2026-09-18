@@ -178,6 +178,7 @@ export function defaults(): HeadlessState {
       visible: true, // can view
       defaultSnapToValidMove: true,
       eraseOnMovablePieceClick: true,
+      numberArrows: false,
       shapes: [],
       autoShapes: [],
       brushes: {

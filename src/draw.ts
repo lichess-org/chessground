@@ -45,6 +45,7 @@ export interface Drawable {
   visible: boolean; // can view
   defaultSnapToValidMove: boolean;
   eraseOnMovablePieceClick: boolean;
+  numberArrows: boolean; // label user arrows e.g. 1, 2, 3
   onChange?: (shapes: DrawShape[]) => void;
   shapes: DrawShape[]; // user shapes
   autoShapes: DrawShape[]; // computer shapes
@@ -148,13 +149,27 @@ function eventBrush(e: cg.MouchEvent): cg.BrushColor {
 function addShape(drawable: Drawable, cur: DrawCurrent): void {
   const similar = drawable.shapes.find(s => sameEndpoints(s, cur));
   if (similar) drawable.shapes = drawable.shapes.filter(s => !sameEndpoints(s, cur));
-  if (!similar || !sameColor(similar, cur))
-    drawable.shapes.push({
+  if (!similar || !sameColor(similar, cur)) {
+    const shape: DrawShape = {
       orig: cur.orig,
       dest: cur.dest,
       brush: cur.brush,
-    });
+    };
+    if (cur.dest && drawable.numberArrows) {
+      shape.label = { text: similar?.label?.text ?? String(nextArrowNumber(drawable.shapes)) };
+    }
+    drawable.shapes.push(shape);
+  }
   onChange(drawable);
+}
+
+function nextArrowNumber(shapes: DrawShape[]): number {
+  let max = 0;
+  for (const s of shapes) {
+    if (!s.dest || !s.label) continue;
+    max = Math.max(max, Number.parseInt(s.label.text, 10) || 0);
+  }
+  return max + 1;
 }
 
 function onChange(drawable: Drawable): void {
