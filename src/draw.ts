@@ -153,7 +153,7 @@ function addShape(drawable: Drawable, cur: DrawCurrent): void {
     const shape: DrawShape = {
       orig: cur.orig,
       dest: cur.dest,
-      brush: cur.brush
+      brush: cur.brush,
     };
     if (cur.dest && drawable.numberArrows) {
       shape.label = { text: similar?.label?.text ?? String(nextArrowNumber(drawable.shapes)) };
