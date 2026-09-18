@@ -92,6 +92,11 @@
         orientation: 'white',
         coordinatesOnSquares: true,
       });
+
+      Chessground(document.getElementById('board-6'), {
+        drawable: { numberArrows: true },
+      });
+
     </script>
   </head>
   <body>
@@ -115,5 +120,11 @@
       board with coordinates on-square
       <div class="chessground" id="board-5"></div>
     </div>
+
+    <div>
+      board with numbered arrows
+      <div class="chessground" id="board-6"></div>
+    </div>
+
   </body>
 </html>
