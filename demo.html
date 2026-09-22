@@ -23,6 +23,11 @@
         height: 500px;
       }
 
+      .board-sm {
+        width: 500px;
+        height: 500px;
+      }
+
       cg-board {
         background-color: #bfcfdd;
       }
@@ -92,6 +97,28 @@
         orientation: 'white',
         coordinatesOnSquares: true,
       });
+      Chessground(document.getElementById('board-6'), {
+        fen: 'k7/8/1p6/2P5/8/8/8/K7 w - - 0 1',
+        movable: {
+          free: false,
+          color: 'white',
+          dests: new Map([
+            ['c5', ['c6', 'b6']],
+          ]),
+          showDests: true,
+        },
+      });
+      Chessground(document.getElementById('board-7'), {
+        fen: 'k7/8/8/1pP5/8/8/8/K7 w - b6 0 1',
+        movable: {
+          free: false,
+          color: 'white',
+          dests: new Map([
+            ['c5', ['c6', 'b6']],
+          ]),
+          showDests: true,
+        },
+      });
     </script>
   </head>
   <body>
@@ -114,6 +141,11 @@
     <div>
       board with coordinates on-square
       <div class="chessground" id="board-5"></div>
+    </div>
+    <div>
+      2 boards setup for pawn capture to show animations (click dest--don't drag--to see)
+      <div class="chessground board-sm" id="board-6"></div>
+      <div class="chessground board-sm" id="board-7"></div>
     </div>
   </body>
 </html>
