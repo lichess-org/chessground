@@ -95,6 +95,7 @@ function svgContainer(cls: string, isShapes: boolean) {
     class: cls,
     viewBox: isShapes ? '-4 -4 8 8' : '-3.5 -3.5 8 8',
     preserveAspectRatio: 'xMidYMid slice',
+    style: 'color-scheme:light only',
   });
   if (isShapes) svg.appendChild(createDefs());
   svg.appendChild(createSVG('g'));
