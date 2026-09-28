@@ -15,11 +15,14 @@ const glyphStacktoPx = (maxGlyphs: number, stack: number) => ({
   y: -12,
 });
 
-const makeComposeGlyph = (maxGlyphs: number) => (fill: string, path: string, endgame: boolean = false) => (stackedNumber: number) => {
-  const { x, y } = glyphStacktoPx(maxGlyphs, stackedNumber);
-  const endgameClass = endgame ? 'class="endgame"' : ''
-  return `<defs><filter id="a"><feDropShadow dx="4" dy="7" flood-opacity=".5" stdDeviation="5"/></filter></defs><g ${endgameClass} transform="matrix(.4 0 0 .4 ${x} ${y})"><circle cx="50" cy="50" r="50" fill="${fill}" filter="url(#a)"/>${path}</g>`;
-};
+const makeComposeGlyph =
+  (maxGlyphs: number) =>
+  (fill: string, path: string, endgame: boolean = false) =>
+  (stackedNumber: number) => {
+    const { x, y } = glyphStacktoPx(maxGlyphs, stackedNumber);
+    const endgameClass = endgame ? 'class="endgame"' : '';
+    return `<defs><filter id="a"><feDropShadow dx="4" dy="7" flood-opacity=".5" stdDeviation="5"/></filter></defs><g ${endgameClass} transform="matrix(.4 0 0 .4 ${x} ${y})"><circle cx="50" cy="50" r="50" fill="${fill}" filter="url(#a)"/>${path}</g>`;
+  };
 
 export const glyphToSvg = (maxGlyphs: number): Record<string, (stackedNumber: number) => string> => {
   const composeGlyph = makeComposeGlyph(maxGlyphs);
