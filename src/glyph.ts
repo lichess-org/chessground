@@ -280,6 +280,7 @@ export const endgameGlyphs = (
     unknown: composeGlyph(
       '#df5353',
       '<path fill="#fff" transform="translate(10 10) scale(.8)" d="M18 18h12l20 20 20-20h12v12L62 50l20 20v12H70L50 62 30 82H18V70l20-20L18 30z"/>',
+      true,
     ),
     draw: composeGlyph(
       '#82c2ef',
