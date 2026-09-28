@@ -17,7 +17,7 @@ const glyphStacktoPx = (maxGlyphs: number, stack: number) => ({
 
 const makeComposeGlyph =
   (maxGlyphs: number) =>
-  (fill: string, path: string, endgame: boolean = false) =>
+  (fill: string, path: string, endgame?: boolean) =>
   (stackedNumber: number) => {
     const { x, y } = glyphStacktoPx(maxGlyphs, stackedNumber);
     const endgameClass = endgame ? 'class="endgame"' : '';
