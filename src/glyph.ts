@@ -16,10 +16,10 @@ const glyphStacktoPx = (maxGlyphs: number, stack: number) => ({
 });
 
 const makeComposeGlyph =
-  (maxGlyphs: number) => (fill: string, path: string, endgame?: boolean) => (stackedNumber: number) => {
+  (maxGlyphs: number, endgame?: boolean) => (fill: string, path: string) => (stackedNumber: number) => {
     const { x, y } = glyphStacktoPx(maxGlyphs, stackedNumber);
-    const endgameClass = endgame ? 'class="endgame"' : '';
-    return `<defs><filter id="a"><feDropShadow dx="4" dy="7" flood-opacity=".5" stdDeviation="5"/></filter></defs><g ${endgameClass} transform="matrix(.4 0 0 .4 ${x} ${y})"><circle cx="50" cy="50" r="50" fill="${fill}" filter="url(#a)"/>${path}</g>`;
+    const endgameClass = endgame ? ' class="endgame"' : '';
+    return `<defs><filter id="a"><feDropShadow dx="4" dy="7" flood-opacity=".5" stdDeviation="5"/></filter></defs><g${endgameClass} transform="matrix(.4 0 0 .4 ${x} ${y})"><circle cx="50" cy="50" r="50" fill="${fill}" filter="url(#a)"/>${path}</g>`;
   };
 
 export const glyphToSvg = (maxGlyphs: number): Record<string, (stackedNumber: number) => string> => {
@@ -249,48 +249,40 @@ type EndgameOutcome =
 export const endgameGlyphs = (
   maxGlyphs: number,
 ): Record<EndgameOutcome, (stackedNumber: number) => string> => {
-  const composeGlyph = makeComposeGlyph(maxGlyphs);
+  const composeGlyph = makeComposeGlyph(maxGlyphs, true);
 
   return {
     win: composeGlyph(
       '#22ac38',
       '<g transform="translate(6 6) scale(.88)"><path fill="none" stroke="#fff" stroke-width="8" d="M28 25H18v8c0 14 8 24 22 27M72 25h10v8c0 14-8 24-22 27"/><path fill="#fff" d="M28 14h44v20c0 14-8 25-22 30-14-5-22-16-22-30zM46 61h8v16h-8zM29 77h42v10H29z"/></g>',
-      true,
     ),
     mate: composeGlyph(
       '#df5353',
       '<path fill="none" stroke="#fff" stroke-width="8" d="M38 18 33 82M62 18l-5 64M20 40h60M18 62h60"/>',
-      true,
     ),
     resign: composeGlyph(
       '#df5353',
       '<path fill="#fff" transform="translate(10 10) scale(.8)" d="M20 14h8v72h-8zm8 4h45c4 0 6 3 3 6l-9 19 9 19c3 3 1 6-3 6H28z"/>',
-      true,
     ),
     abandoned: composeGlyph(
       '#df5353',
       '<path fill="#fff" transform="translate(11 11) scale(.78)" d="M18 12h10v76H18zm10 0h28v10H28zm0 66h28v10H28zM47 42h25L62 32l7-7 23 24-23 24-7-7 10-10H47z"/>',
-      true,
     ),
     outoftime: composeGlyph(
       '#df5353',
       '<circle cx="50" cy="50" r="32" fill="none" stroke="#fff" stroke-width="8"/><path fill="#fff" d="M46 30h8v22h-8zm0 18h20v8H46z"/>',
-      true,
     ),
     unknown: composeGlyph(
       '#df5353',
       '<path fill="#fff" transform="translate(10 10) scale(.8)" d="M18 18h12l20 20 20-20h12v12L62 50l20 20v12H70L50 62 30 82H18V70l20-20L18 30z"/>',
-      true,
     ),
     draw: composeGlyph(
       '#82c2ef',
       '<path fill="#fff" transform="translate(10 10) scale(.8)" d="M18 27h64v12H18zm0 34h64v12H18z"/>',
-      true,
     ),
     stalemate: composeGlyph(
       '#82c2ef',
       '<path fill="none" stroke="#fff" stroke-width="9" d="M31 48v-9c0-11 8-19 19-19s19 8 19 19v9"/><path fill="#fff" d="M24 43h52v38H24z"/><circle cx="50" cy="59" r="4" fill="#82c2ef"/><path fill="#82c2ef" d="M47 60h6v12h-6z"/>',
-      true,
     ),
   };
 };
