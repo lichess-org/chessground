@@ -119,6 +119,10 @@ pnpm test:watch
 
 ## Release procedure
 
+```sh
+gh workflow run release --field version=vX.Y.Z
+```
+
 - https://github.com/lichess-org/chessground/actions/workflows/release.yaml
 - [Run workflow]
 - Branch: master
