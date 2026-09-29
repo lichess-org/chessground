@@ -234,7 +234,7 @@ export const analysisGlyphs = (maxGlyphs: number): Record<string, (stackedNumber
   };
 };
 
-type EndgameOutcome =
+export type EndgameOutcome =
   | 'win'
   | 'mate'
   | 'resign'
