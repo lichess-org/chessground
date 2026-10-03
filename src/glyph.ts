@@ -234,15 +234,7 @@ export const analysisGlyphs = (maxGlyphs: number): Record<string, (stackedNumber
   };
 };
 
-export type EndgameOutcome =
-  | 'win'
-  | 'mate'
-  | 'resign'
-  | 'abandoned'
-  | 'outoftime'
-  | 'unknown'
-  | 'draw'
-  | 'stalemate';
+export type EndgameOutcome = 'mate' | 'resign' | 'abandoned' | 'outoftime' | 'unknown' | 'draw' | 'stalemate';
 
 export const endgameGlyphs = (
   maxGlyphs: number,
@@ -250,10 +242,6 @@ export const endgameGlyphs = (
   const composeGlyph = makeComposeGlyph(maxGlyphs);
 
   return {
-    win: composeGlyph(
-      '#22ac38',
-      '<g transform="translate(6 6) scale(.88)"><path fill="none" stroke="#fff" stroke-width="8" d="M28 25H18v8c0 14 8 24 22 27M72 25h10v8c0 14-8 24-22 27"/><path fill="#fff" d="M28 14h44v20c0 14-8 25-22 30-14-5-22-16-22-30zM46 61h8v16h-8zM29 77h42v10H29z"/></g>',
-    ),
     mate: composeGlyph(
       '#df5353',
       '<path fill="none" stroke="#fff" stroke-width="8" d="M38 18 33 82M62 18l-5 64M20 40h60M18 62h60"/>',
