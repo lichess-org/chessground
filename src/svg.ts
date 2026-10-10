@@ -337,8 +337,11 @@ function renderLabel(
     fontSize = labelSize * 0.75 ** label.text.length,
     at = labelCoords(from, to, slots),
     cornerOff = corner === 'tr' ? 0.4 : 0,
+    margin = labelSize / 2 + 0.03 / 2 + 0.02,
+    x = corner ? Math.min(at[0] + cornerOff, 4.5 - margin) : at[0],
+    y = corner ? Math.max(at[1] - cornerOff, -3.5 + margin) : at[1],
     g = setAttributes(createElement('g'), {
-      transform: `translate(${at[0] + cornerOff},${at[1] - cornerOff})`,
+      transform: `translate(${x},${y})`,
       cgHash: hash,
     });
   g.appendChild(
