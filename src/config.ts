@@ -89,6 +89,7 @@ export interface Config {
     // Clicking an empty square or immovable piece will clear the drawing regardless, but when this property is true,
     // clicking on a (currently unselected) movable piece will also clear the drawing.
     eraseOnMovablePieceClick?: boolean;
+    numberArrows?: boolean;
     shapes?: DrawShape[];
     autoShapes?: DrawShape[];
     brushes?: DrawBrushes;
