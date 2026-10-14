@@ -13,6 +13,7 @@ jobs:
       fail-fast: false
       matrix:
         node:
+          - 26
           - 24
           - 22
         script:
@@ -20,11 +21,20 @@ jobs:
           - check-format
           - test
           - dist
+        exclude:
+          - node: 24
+            script: lint
+          - node: 24
+            script: check-format
+          - node: 22
+            script: lint
+          - node: 22
+            script: check-format
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v6
-      - uses: pnpm/action-setup@v5
-      - uses: actions/setup-node@v6
+      - uses: actions/checkout@v7
+      - uses: pnpm/action-setup@v6
+      - uses: actions/setup-node@v7
         with:
           node-version: ${{ matrix.node }}
       - run: pnpm install
@@ -33,7 +43,7 @@ jobs:
   codeql:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
       - uses: github/codeql-action/init@v4
         with:
           languages: javascript
