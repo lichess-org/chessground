@@ -21,8 +21,8 @@
   "devDependencies": {
     "esbuild": "^0.28.1",
     "jsdom": "^30.0.1",
-    "oxfmt": "0.61.0",
-    "oxlint": "1.79.0",
+    "oxfmt": "0.68.0",
+    "oxlint": "1.85.0",
     "oxlint-plugin-golden": "^0.1.2",
     "oxlint-tsgolint": "7.0.2001",
     "typescript": "^7.0.2",
@@ -62,7 +62,7 @@
     "url": "https://github.com/lichess-org/chessground/issues"
   },
   "funding": "https://lichess.org/patron",
-  "packageManager": "pnpm@12.3.4",
+  "packageManager": "pnpm@12.9.0",
   "engines": {
     "node": ">=24",
     "pnpm": ">=12"
