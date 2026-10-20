@@ -231,6 +231,10 @@ export const analysisGlyphs = (maxGlyphs: number): Record<string, (stackedNumber
       '<path fill="#fff" d="M50 17 80 27v25c0 25-30 36-30 36S20 77 20 52V27ZM44 51 34 61 40 67 50 57 60 67 66 61 56 51 66 41 60 35 50 45 40 35 34 41Z"/>',
     ),
     checkable: composeGlyph('#2660a4', '<path fill="#fff" d="M46 28H54V46H72V54H54V72H46V54H28V46H46Z"/>'),
+    trapped: composeGlyph(
+      '#df5353',
+      '<path fill="#fff" fill-rule="evenodd" d="M32 46V36A18 18 0 0 1 68 36V46H76V82H24V46ZM40 46H60V36A10 10 0 0 0 40 36ZM55 59A1 1 0 0 0 45 59V72H55Z"/>',
+    ),
   };
 };
 
