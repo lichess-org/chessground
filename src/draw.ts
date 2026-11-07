@@ -23,6 +23,18 @@ export interface DrawShapePiece {
   role: cg.Role;
   color: cg.Color;
   scale?: number;
+  opacity?: number;
+  gravity?:
+    | 'center'
+    | 'north'
+    | 'northeast'
+    | 'east'
+    | 'southeast'
+    | 'south'
+    | 'southwest'
+    | 'west'
+    | 'northwest';
+  rotation?: number; // clockwise degrees
 }
 
 export interface DrawBrush {
