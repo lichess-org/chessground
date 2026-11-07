@@ -88,6 +88,39 @@
           ],
         },
       });
+      Chessground(document.getElementById('board-ghost'), {
+        fen: '4k3/8/8/4B3/8/8/8/4K3 w - - 0 1',
+        drawable: {
+          autoShapes: [
+            {
+              orig: 'e5',
+              piece: {
+                role: 'knight',
+                color: 'black',
+                scale: 0.4,
+                opacity: 0.65,
+                gravity: 'northwest',
+                rotation: -20,
+              },
+            },
+            {
+              orig: 'c4',
+              piece: {
+                role: 'pawn',
+                color: 'black',
+                scale: 0.4,
+                opacity: 0.65,
+                gravity: 'southeast',
+                rotation: 20,
+              },
+            },
+            {
+              orig: 'g4',
+              piece: { role: 'rook', color: 'white', scale: 0.6, opacity: 0.5, gravity: 'south' },
+            },
+          ],
+        },
+      });
       Chessground(document.getElementById('board-4'), {
         orientation: 'black',
         coordinatesOnSquares: true,
@@ -129,6 +162,10 @@
     <div>
       board with fixed arrows + labels
       <div class="chessground" id="board-3"></div>
+    </div>
+    <div>
+      ghost pieces: NW knight on bishop, SE pawn, S rook
+      <div class="chessground" id="board-ghost"></div>
     </div>
     <div>
       board with coordinates on-square, ranks position left
