@@ -84,7 +84,10 @@ export function render(s: State): void {
         } else appendValue(movedPieces, elPieceName, el);
       }
       // no piece: flag as moved
-      else appendValue(movedPieces, elPieceName, el);
+      else if (fading && elPieceName === pieceNameOf(fading)) {
+        el.classList.add('fading');
+        el.cgFading = true;
+      } else appendValue(movedPieces, elPieceName, el);
     } else if (isSquareNode(el)) {
       const cls = el.className;
       if (desiredSquares.get(k) === cls) {
