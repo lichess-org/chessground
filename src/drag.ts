@@ -29,9 +29,12 @@ export function start(s: State, e: cg.MouchEvent): void {
   if (!orig) return;
   const piece = s.pieces.get(orig);
   const previouslySelected = s.selected;
+  const move =
+    !!previouslySelected &&
+    (board.canMove(s, previouslySelected, orig) || !!s.premovable.dests?.includes(orig));
   if (
-    !previouslySelected &&
     s.drawable.enabled &&
+    !move &&
     (s.drawable.eraseOnMovablePieceClick || !piece || piece.color !== s.turnColor)
   )
     drawClear(s);
