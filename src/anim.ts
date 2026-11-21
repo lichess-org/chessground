@@ -65,6 +65,7 @@ function computePlan(prevPieces: cg.Pieces, current: State): AnimPlan {
     if (curP) {
       if (preP) {
         if (!util.samePiece(curP, preP.piece)) {
+          if (curP.color === preP.piece.color) continue;
           missings.push(preP);
           news.push(makePiece(key, curP));
         }
@@ -72,10 +73,19 @@ function computePlan(prevPieces: cg.Pieces, current: State): AnimPlan {
     } else if (preP) missings.push(preP);
   }
   for (const newP of news) {
-    preP = closer(
-      newP,
-      missings.filter(p => util.samePiece(newP.piece, p.piece)),
-    );
+    preP =
+      closer(
+        newP,
+        missings.filter(p => util.samePiece(newP.piece, p.piece)),
+      ) ??
+      missings.find(
+        p =>
+          p.piece.role === 'pawn' &&
+          p.piece.color === newP.piece.color &&
+          Math.abs(p.pos[0] - newP.pos[0]) <= 1 &&
+          p.pos[1] === (newP.piece.color === 'white' ? 6 : 1) &&
+          newP.pos[1] === (newP.piece.color === 'white' ? 7 : 0),
+      );
     if (preP) {
       vector = [preP.pos[0] - newP.pos[0], preP.pos[1] - newP.pos[1]];
       anims.set(newP.key, vector.concat(vector) as AnimVector);
